@@ -7,7 +7,6 @@ const Home: React.FC = () => {
       <Text style={styles.title}>Welcome Home</Text>
     </View>
   )
-  
 }
 
 const styles = StyleSheet.create({
