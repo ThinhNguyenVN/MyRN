@@ -3,7 +3,7 @@ import { Text, TextProps, TextStyle, StyleProp } from 'react-native'
 import { Typography, TypographyKey } from '@/theme/typography'
 import { getColor, TextColorType } from '@/theme/colors'
 
-interface MyTextProps extends TextProps {
+interface MyTextProps extends TextProps, Omit<TextStyle, 'color'> {
   typography?: TypographyKey
   color?: TextColorType
   style?: StyleProp<TextStyle>

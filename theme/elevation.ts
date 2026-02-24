@@ -1,42 +1,48 @@
 // =============================
 // Elevation Token
-// Format: "{soft|medium|hard}[/{direction}]"
-// Default direction = "down-left"
+// Types: Strength, Direction, Size
+// Token format: strength | "strength/direction" | "strength/direction/size"
 // =============================
 
+export type ElevationStrength = 'soft' | 'hard'
+export type ElevationDirection = 'down' | 'up'
+export type ElevationSize = 'large' | 'medium' | 'small'
+
+export type ElevationToken = `${ElevationStrength}/${ElevationDirection}/${ElevationSize}`
+
+// Blur radius by size
 export const ElevationBlur = {
-  soft: 2,
-  medium: 6,
-  hard: 8,
+  small: 2,
+  medium: 4,
+  large: 8,
 } as const
 
+// Shadow opacity by strength
 export const ElevationOpacity = {
-  soft: 0.18,
-  medium: 0.22,
-  hard: 0.28,
+  soft: 0.22,
+  hard: 0.3,
 } as const
 
-export const ElevationDirection = {
-  'down-left': { dx: -4, dy: 6 },
-  'down-right': { dx: 3, dy: 3 },
-  down: { dx: 0, dy: 3 },
-  'top-left': { dx: -4, dy: -6 },
-  'top-right': { dx: 4, dy: -6 },
-  top: { dx: 0, dy: -8 },
+// Shadow offset by direction (down = below, up = above)
+export const ElevationDirectionMap = {
+  down: { dx: 0, dy: 4 },
+  up: { dx: 0, dy: -4 },
 } as const
-
-export type ElevationLevel = keyof typeof ElevationBlur // soft | medium | hard
-export type ElevationDir = keyof typeof ElevationDirection // top/down...
-export type ElevationToken = ElevationLevel | `${ElevationLevel}/${ElevationDir}`
 
 // =============================
-// 🎯 core function - EXPORT ở đây luôn
+// Core function
 // =============================
 export function getElevation(token: ElevationToken) {
-  const [level, dir] = token.split('/') as [ElevationLevel, ElevationDir?]
+  const parts = token.split('/') as [ElevationStrength, ElevationDirection?, ElevationSize?]
+  const [strength, dir, size] = parts
+
+  const level = strength ?? 'soft'
+  const direction = dir ?? 'down'
+  const sizeKey = size ?? 'medium'
+
   return {
-    blur: ElevationBlur[level],
-    opacity: 0.25,
-    ...ElevationDirection[dir ?? 'down-right'], // default fallback
+    blur: ElevationBlur[sizeKey],
+    opacity: ElevationOpacity[level],
+    ...ElevationDirectionMap[direction],
   }
 }

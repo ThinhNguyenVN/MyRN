@@ -3,10 +3,8 @@ export const ColorPalette = {
   secondary: '#3B82F6',
   tertiary: '#06B6D4',
   quaternary: '#10B981',
-
   white: '#FFFFFF',
   black: '#000000',
-
   gray50: '#F9FAFB',
   gray100: '#F3F4F6',
   gray200: '#E5E7EB',
@@ -17,7 +15,6 @@ export const ColorPalette = {
   gray700: '#374151',
   gray800: '#1F2937',
   gray900: '#111827',
-
   danger: '#EF4444',
   warning: '#F59E0B',
   success: '#22C55E',
@@ -102,12 +99,17 @@ export type BorderColorType = SemanticColorString<'border'>
 
 export function getColor(
   str: TextColorType | FillColorType | IconColorType | BorderColorType | BrandColorType,
-) {
-  const [role, state, variant] = str.split('/') as [
-    keyof typeof Tokens,
+): string {
+  const parts = str.split('/')
+  if (parts.length === 2) {
+    const [role, variant] = parts as [keyof typeof Tokens, keyof (typeof Tokens)['brand']]
+    return (Tokens[role] as (typeof Tokens)['brand'])[variant]
+  }
+  const [role, state, variant] = parts as [
+    'text' | 'fill' | 'icon' | 'border',
     'active' | 'inactive',
-    keyof (typeof Tokens)['text']['active'], // same for all roles
+    keyof (typeof Tokens)['text']['active'],
   ]
-
-  return Tokens[role][state][variant]
+  const roleTokens = Tokens[role]
+  return roleTokens?.[state]?.[variant] as string
 }

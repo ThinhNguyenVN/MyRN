@@ -1,30 +1,37 @@
-import React, { memo, useMemo, useRef, useState } from 'react'
-import { View, LayoutChangeEvent, StyleProp, ViewStyle, StyleSheet } from 'react-native'
-import { Canvas, RoundedRect, Shadow } from '@shopify/react-native-skia'
+import React, { memo, useId, useMemo, useRef, useState } from 'react'
+import { View, LayoutChangeEvent, StyleProp, StyleSheet } from 'react-native'
+import Svg, { Defs, FeGaussianBlur, Filter, Rect } from 'react-native-svg'
 
 import { Radius, RadiusType } from '@/theme/radius'
-import { Spacing, SpacingType } from '@/theme/spacing'
 import { ElevationToken, getElevation } from '@/theme/elevation'
 import { SurfaceStyle } from './type'
 import { splitSurfaceStyle } from './utils'
 
-interface MySurfaceProps {
-  elevation?: ElevationToken // "soft" | "medium/top-right"
+export interface MySurfaceProps extends Omit<
+  SurfaceStyle,
+  'elevation' | 'backgroundColor' | 'style'
+> {
+  elevation?: ElevationToken
   radius?: RadiusType
-  padding?: SpacingType
+
   backgroundColor?: string
   style?: StyleProp<SurfaceStyle>
   children?: React.ReactNode
 }
 
+const MIN_INSET = 16
+/** Gaussian blur extends ~3× stdDeviation; inset cần đủ để shadow không bị cắt */
+const BLUR_EXTENT_FACTOR = 3
+
 const MySurface: React.FC<MySurfaceProps> = ({
-  elevation = 'soft', // default => soft/down-left
-  radius = 'medium',
-  padding = 'x4',
+  elevation = 'soft',
+  radius = 'none',
   backgroundColor,
   style,
   children,
+  ...rest
 }) => {
+  const filterId = useId().replace(/:/g, '')
   const fs = useMemo(() => {
     if (!style) return {}
     return StyleSheet.flatten(style)
@@ -56,46 +63,79 @@ const MySurface: React.FC<MySurfaceProps> = ({
     return { resolvedBackgroundColor: bgColor, styleWithoutBg: rest }
   }, [backgroundColor, fs])
 
-  const { containerStyle, contentStyle } = useMemo(
-    () => splitSurfaceStyle(styleWithoutBg),
-    [styleWithoutBg],
-  )
+  const { containerStyle, contentStyle } = useMemo(() => {
+    const split = splitSurfaceStyle(styleWithoutBg)
 
-  const shadowX = -8
-  const shadowY = -8
+    return {
+      containerStyle: split.containerStyle,
+      contentStyle: {
+        ...split.contentStyle,
+      },
+    }
+  }, [styleWithoutBg])
 
-  const positionX = 14
-  const positionY = 14
+  const elevationConfig = useMemo(() => getElevation(elevation as ElevationToken), [elevation])
+  const { dx, dy, blur, opacity } = elevationConfig
+  const r = Radius[radius]
 
-  const containerWidth = w + 16
-  const containerHeight = h + 16
+  // Inset đủ để shadow (blur + offset) không bị cắt
+  const blurExtent = Math.ceil(blur * BLUR_EXTENT_FACTOR)
+  const insetTop = Math.max(MIN_INSET, blurExtent + Math.max(0, -dy))
+  const insetBottom = Math.max(MIN_INSET, blurExtent + Math.max(0, dy))
+  const insetLeft = Math.max(MIN_INSET, blurExtent + Math.max(0, -dx))
+  const insetRight = Math.max(MIN_INSET, blurExtent + Math.max(0, dx))
+
+  const svgWidth = w + insetLeft + insetRight
+  const svgHeight = h + insetTop + insetBottom
+  const fillX = insetLeft
+  const fillY = insetTop
+  const shadowX = insetLeft + dx
+  const shadowY = insetTop + dy
 
   return (
     <View style={containerStyle} onLayout={onLayout}>
       {w > 0 && h > 0 && (
-        <Canvas
+        <Svg
+          width={svgWidth}
+          height={svgHeight}
           style={{
-            width: containerWidth,
-            height: containerHeight,
             position: 'absolute',
-            left: -16,
-            top: -16,
+            left: -insetLeft,
+            top: -insetTop,
           }}
         >
-          <RoundedRect
-            x={positionX}
-            y={positionY}
+          <Defs>
+            <Filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
+              <FeGaussianBlur in="SourceGraphic" stdDeviation={blur} />
+            </Filter>
+          </Defs>
+          {/* Shadow layer */}
+          <Rect
+            x={shadowX}
+            y={shadowY}
             width={w}
             height={h}
-            r={0}
-            color={resolvedBackgroundColor as string}
-          >
-            <Shadow dx={shadowX} dy={shadowY} blur={4} color="#0000004D" />
-          </RoundedRect>
-        </Canvas>
+            rx={r}
+            ry={r}
+            fill={`rgba(0,0,0,${opacity})`}
+            filter={`url(#${filterId})`}
+          />
+          {/* Fill layer */}
+          <Rect
+            x={fillX}
+            y={fillY}
+            width={w}
+            height={h}
+            rx={r}
+            ry={r}
+            fill={resolvedBackgroundColor as string}
+          />
+        </Svg>
       )}
 
-      <View style={contentStyle}>{children}</View>
+      <View {...rest} style={contentStyle}>
+        {children}
+      </View>
     </View>
   )
 }

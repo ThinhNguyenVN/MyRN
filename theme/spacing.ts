@@ -9,3 +9,8 @@ export const Spacing = {
 } as const
 
 export type SpacingType = keyof typeof Spacing
+
+export function getSpacing(spacing?: SpacingType) {
+  if (!spacing) return 0
+  return Spacing[spacing]
+}

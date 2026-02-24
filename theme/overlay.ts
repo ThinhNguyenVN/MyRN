@@ -1,21 +1,18 @@
-import { ElevationLevel } from './elevation'
+import { ElevationStrength } from './elevation'
 
 /**
  * Overlay cho dark mode — mô phỏng Material
  * Level càng cao → overlay càng sáng
  */
-export function overlay(level: ElevationLevel | number, color: string) {
+export function overlay(level: ElevationStrength | number, color: string) {
   if (level === 0) return color
 
-  // opacity scale theo material
   const alpha =
     typeof level === 'number'
       ? ([0, 0.08, 0.12, 0.16, 0.18, 0.2][level] ?? 0.12)
       : level === 'soft'
         ? 0.08
-        : level === 'medium'
-          ? 0.12
-          : 0.16
+        : 0.16
 
   return applyOverlay(color, alpha)
 }

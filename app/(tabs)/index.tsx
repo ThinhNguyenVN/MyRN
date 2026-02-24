@@ -1,5 +1,5 @@
 import { Image } from 'expo-image'
-import { Platform, StyleSheet, Text } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 
 import ParallaxScrollView from '@/components/parallax-scroll-view'
 import { ThemedText } from '@/components/themed-text'
@@ -7,6 +7,8 @@ import { ThemedView } from '@/components/themed-view'
 import { Link } from 'expo-router'
 import { MyText } from '@/components/elements/my-text'
 import MySurface from '@/components/elements/my-surface'
+
+import MyView from '@/components/elements/my-view'
 
 export default function HomeScreen() {
   return (
@@ -23,50 +25,39 @@ export default function HomeScreen() {
         <MyText typography={'h1'} color={'text/active/tertiary'}>
           Quéo còm !!
         </MyText>
-        {/* <MySurface
-          elevation={'soft'}
-          style={{
-            width: 200,
-            height: 100,
-          }}
-        >
+
+        <MyView backgroundColor={'fill/active/primary'} margin="x2" padding={'x6'} radius={'small'}>
           <MyText typography="body" color="text/active/primary">
-            This is a surface with soft elevation.
+            soft/down/small
           </MyText>
-        </MySurface> */}
+        </MyView>
         <MySurface
-          elevation="soft/down"
+          elevation={'hard/up/large'}
           style={[
             {
-              // width: 300,
-              // height: 200,
-              backgroundColor: 'green',
-              padding: 16,
-              justifyContent: 'center',
-              alignItems: 'center',
-              alignSelf: 'center',
+              backgroundColor: 'yellow',
+              marginTop: 50,
+              padding: 5,
             },
           ]}
         >
           <MyText typography="body" color="text/active/primary">
-            This is a surface with soft elevation.
+            hard/up/large
           </MyText>
         </MySurface>
         <MySurface
-          elevation="soft/down"
+          elevation={'soft/up/medium'}
           style={[
             {
-              width: 300,
-              height: 200,
               backgroundColor: 'red',
-              padding: 16,
-              justifyContent: 'center',
-              alignItems: 'center',
-              alignSelf: 'center',
+              marginTop: 50,
             },
           ]}
-        />
-        {/* <MySurface elevation="hard/down" radius="large" padding="x6" /> */}
+        >
+          <MyText typography="body" color="text/active/primary">
+            soft/down/medium
+          </MyText>
+        </MySurface>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
