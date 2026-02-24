@@ -5,6 +5,7 @@ import 'react-native-reanimated'
 import { useFonts } from 'expo-font'
 
 import { useColorScheme } from '@/hooks/use-color-scheme'
+import { MyThemeProvider } from '@/theme/theme-context'
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -21,13 +22,18 @@ export default function RootLayout() {
   if (!fontsLoaded) {
     return null
   }
+
+  const themeName = colorScheme === 'dark' ? 'dark' : 'light'
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <MyThemeProvider value={themeName}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </MyThemeProvider>
   )
 }

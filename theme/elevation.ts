@@ -32,7 +32,12 @@ export const ElevationDirectionMap = {
 // =============================
 // Core function
 // =============================
-export function getElevation(token: ElevationToken) {
+export function getElevation(token: ElevationToken): {
+  blur: number
+  opacity: number
+  dx: number
+  dy: number
+} {
   const parts = token.split('/') as [ElevationStrength, ElevationDirection?, ElevationSize?]
   const [strength, dir, size] = parts
 

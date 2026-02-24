@@ -9,8 +9,11 @@ import { MyText } from '@/components/elements/my-text'
 import MySurface from '@/components/elements/my-surface'
 
 import MyView from '@/components/elements/my-view'
+import { generateStyles } from './styles'
+import { useThemedStyles } from '@/theme/theme-context'
 
 export default function HomeScreen() {
+  const styles = useThemedStyles(generateStyles)
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -22,7 +25,7 @@ export default function HomeScreen() {
       }
     >
       <ThemedView style={styles.titleContainer}>
-        <MyText typography={'h1'} color={'text/active/tertiary'}>
+        <MyText typography={'subtitle'} color={'text/active/tertiary'}>
           Quéo còm !!
         </MyText>
 
@@ -115,21 +118,3 @@ export default function HomeScreen() {
     </ParallaxScrollView>
   )
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-})

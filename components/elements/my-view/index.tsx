@@ -1,9 +1,9 @@
 import React, { memo, useMemo } from 'react'
 import { View, ViewStyle } from 'react-native'
 
-import { getColor } from '@/theme/colors'
 import { Radius } from '@/theme/radius'
 import { Spacing } from '@/theme/spacing'
+import { useTheme } from '@/theme/theme-context'
 import { isNil } from 'es-toolkit'
 
 import type { MyViewProps } from './type'
@@ -25,6 +25,7 @@ const MyView: React.FC<MyViewProps> = ({
   children,
   ...rest
 }) => {
+  const { getColor } = useTheme()
   const tokenStyle = useMemo((): ViewStyle => {
     const s: ViewStyle = {}
     if (!isNil(backgroundColor)) s.backgroundColor = getColor(backgroundColor)
@@ -44,6 +45,7 @@ const MyView: React.FC<MyViewProps> = ({
     }
     return s
   }, [
+    getColor,
     backgroundColor,
     padding,
     paddingLeft,

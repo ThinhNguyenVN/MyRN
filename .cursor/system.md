@@ -50,7 +50,7 @@ Tài liệu tham chiếu để check stack, cấu trúc và quy ước khi làm 
 ---
 
 ## 6. Quy ước khi code
-
+- TypeScript only
 - Luôn dùng alias `@/*` cho import (đã cấu hình trong tsconfig).
 - Màu, chữ, khoảng cách: ưu tiên token từ `theme/` thay vì hardcode.
 - Component mới liên quan text/surface: ưu tiên dùng hoặc mở rộng MyText / MySurface để đồng bộ theme.

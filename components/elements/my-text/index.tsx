@@ -1,7 +1,8 @@
 import React, { memo } from 'react'
 import { Text, TextProps, TextStyle, StyleProp } from 'react-native'
 import { Typography, TypographyKey } from '@/theme/typography'
-import { getColor, TextColorType } from '@/theme/colors'
+import { TextColorType } from '@/theme/colors'
+import { useTheme } from '@/theme/theme-context'
 
 interface MyTextProps extends TextProps, Omit<TextStyle, 'color'> {
   typography?: TypographyKey
@@ -16,6 +17,7 @@ export function MyText({
   children,
   ...rest
 }: MyTextProps) {
+  const { getColor } = useTheme()
   return (
     <Text
       {...rest}
