@@ -18,11 +18,9 @@ export default function RootLayout() {
     'Roboto-Medium': require('@/assets/fonts/Roboto-Medium.ttf'),
     'Roboto-Bold': require('@/assets/fonts/Roboto-Bold.ttf'),
   })
-
   if (!fontsLoaded) {
     return null
   }
-
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>

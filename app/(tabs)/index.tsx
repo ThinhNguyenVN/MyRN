@@ -1,11 +1,12 @@
 import { Image } from 'expo-image'
-import { Platform, StyleSheet } from 'react-native'
+import { Platform, StyleSheet, Text } from 'react-native'
 
 import ParallaxScrollView from '@/components/parallax-scroll-view'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { Link } from 'expo-router'
 import { MyText } from '@/components/elements/my-text'
+import MySurface from '@/components/elements/my-surface'
 
 export default function HomeScreen() {
   return (
@@ -19,10 +20,53 @@ export default function HomeScreen() {
       }
     >
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!!!!!</ThemedText>
-        <MyText typography={'label'} style={{ marginLeft: 8 }}>
-          My text đây nhé Bro !!
+        <MyText typography={'h1'} color={'text/active/tertiary'}>
+          Quéo còm !!
         </MyText>
+        {/* <MySurface
+          elevation={'soft'}
+          style={{
+            width: 200,
+            height: 100,
+          }}
+        >
+          <MyText typography="body" color="text/active/primary">
+            This is a surface with soft elevation.
+          </MyText>
+        </MySurface> */}
+        <MySurface
+          elevation="soft/down"
+          style={[
+            {
+              // width: 300,
+              // height: 200,
+              backgroundColor: 'green',
+              padding: 16,
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'center',
+            },
+          ]}
+        >
+          <MyText typography="body" color="text/active/primary">
+            This is a surface with soft elevation.
+          </MyText>
+        </MySurface>
+        <MySurface
+          elevation="soft/down"
+          style={[
+            {
+              width: 300,
+              height: 200,
+              backgroundColor: 'red',
+              padding: 16,
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'center',
+            },
+          ]}
+        />
+        {/* <MySurface elevation="hard/down" radius="large" padding="x6" /> */}
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
@@ -83,7 +127,6 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
