@@ -1,0 +1,52 @@
+import type { ViewStyle } from 'react-native'
+import { Radius } from '@/theme/radius'
+import { ThemeType } from '@/theme/theme-context'
+
+export const BUTTON_SMALL_HEIGHT = 40
+export const BUTTON_LARGE_HEIGHT = 48
+
+export function generateStyles(theme: ThemeType): Record<string, ViewStyle> {
+  const { getColor, getSpacing } = theme
+
+  const base: ViewStyle = {
+    borderRadius: Radius.large,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: getSpacing('x2'),
+  }
+  const withBorder: ViewStyle = { borderWidth: 1 }
+  return {
+    primary: {
+      ...base,
+      backgroundColor: getColor('fill/active/primary'),
+      borderWidth: 0,
+    },
+    secondary: {
+      ...base,
+      ...withBorder,
+      backgroundColor: '#FFFFFF',
+      borderColor: getColor('fill/active/primary'),
+    },
+    tertiary: {
+      ...base,
+      ...withBorder,
+      backgroundColor: getColor('fill/inactive/quaternary'),
+      borderColor: getColor('border/inactive/primary'),
+    },
+    light: {
+      ...base,
+      ...withBorder,
+      backgroundColor: getColor('fill/background/primary'),
+      borderColor: getColor('border/inactive/primary'),
+    },
+    dark: {
+      ...base,
+      backgroundColor: '#000000',
+      borderWidth: 0,
+    },
+    sizeSmall: { height: BUTTON_SMALL_HEIGHT, paddingHorizontal: 12 },
+    sizeLarge: { height: BUTTON_LARGE_HEIGHT, paddingHorizontal: 24 },
+    disabled: { backgroundColor: getColor('fill/disabled/primary') },
+  }
+}

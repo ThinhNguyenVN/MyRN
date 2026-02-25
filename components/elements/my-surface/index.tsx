@@ -55,7 +55,9 @@ const MySurface: React.FC<MySurfaceProps> = ({
     }
   }
 
-  const { w = 0, h = 0 } = sizeRef.current
+  /** Khi có width/height (số) trong style thì dùng luôn; không thì dùng size từ onLayout */
+  const w = hasStaticSize ? (fs.width as number) : sizeRef.current.w
+  const h = hasStaticSize ? (fs.height as number) : sizeRef.current.h
 
   const { resolvedBackgroundColor, styleWithoutBg } = useMemo(() => {
     const bgColor = backgroundColor ?? fs.backgroundColor ?? 'transparent'
@@ -69,6 +71,7 @@ const MySurface: React.FC<MySurfaceProps> = ({
     return {
       containerStyle: split.containerStyle,
       contentStyle: {
+        flex: 1,
         ...split.contentStyle,
       },
     }
@@ -77,6 +80,9 @@ const MySurface: React.FC<MySurfaceProps> = ({
   const elevationConfig = useMemo(() => getElevation(elevation as ElevationToken), [elevation])
   const { dx, dy, blur, opacity } = elevationConfig
   const r = Radius[radius]
+
+  const borderWidth = typeof fs.borderWidth === 'number' ? fs.borderWidth : 0
+  const borderColor = typeof fs.borderColor === 'string' ? fs.borderColor : undefined
 
   // Inset đủ để shadow (blur + offset) không bị cắt
   const blurExtent = Math.ceil(blur * BLUR_EXTENT_FACTOR)
@@ -129,6 +135,8 @@ const MySurface: React.FC<MySurfaceProps> = ({
             rx={r}
             ry={r}
             fill={resolvedBackgroundColor as string}
+            stroke={borderWidth > 0 ? borderColor : undefined}
+            strokeWidth={borderWidth > 0 ? borderWidth : undefined}
           />
         </Svg>
       )}

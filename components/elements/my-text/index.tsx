@@ -10,13 +10,13 @@ interface MyTextProps extends TextProps, Omit<TextStyle, 'color'> {
   style?: StyleProp<TextStyle>
 }
 
-export function MyText({
+const MyText: React.FC<MyTextProps> = ({
   typography = 'label',
   color = 'text/active/primary',
   style,
   children,
   ...rest
-}: MyTextProps) {
+}: MyTextProps) => {
   const { getColor } = useTheme()
   return (
     <Text

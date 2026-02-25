@@ -1,47 +1,52 @@
 // =============================
-// LIGHT — Nền sáng, chữ tối. Dùng khi background là white/light gray.
-// Gray: 50 = nền sáng nhất → 900 = chữ đậm nhất.
+// LIGHT — Nền ấm, chữ đậm. Tông jewel + stone.
+// Gray (stone): 50 = nền sáng nhất → 900 = chữ đậm nhất.
 // =============================
 export const ColorPaletteLight = {
-  // Brand
-  primary: '#0ea5e9',
-  secondary: '#06b6d4',
-  tertiary: '#10b981',
-  quaternary: '#8b5cf6',
-  // Neutrals — light theme: số càng lớn càng tối (dùng cho chữ / border)
+  // Brand — teal, amber, violet, rose
+  primary: '#0d9488',
+  secondary: '#c2410c',
+  tertiary: '#6d28d9',
+  quaternary: '#be185d',
+  // Accent — dùng cho highlight / link / CTA phụ
+  accent: '#0891b2',
+  // Neutrals — stone (ấm, không lạnh)
   white: '#ffffff',
   black: '#000000',
-  gray50: '#f8fafc',
-  gray100: '#f1f5f9',
-  gray200: '#e2e8f0',
-  gray300: '#cbd5e1',
-  gray400: '#94a3b8',
-  gray500: '#64748b',
-  gray600: '#475569',
-  gray700: '#334155',
-  gray800: '#1e293b',
-  gray900: '#0f172a',
+  gray50: '#fafaf9',
+  gray100: '#f5f5f4',
+  gray200: '#e7e5e4',
+  gray300: '#d6d3d1',
+  gray400: '#a8a29e',
+  gray500: '#78716c',
+  gray600: '#57534e',
+  gray700: '#44403c',
+  gray800: '#292524',
+  gray900: '#1c1917',
   // Semantic
-  danger: '#dc2626',
-  warning: '#d97706',
-  success: '#16a34a',
-  background: '#FFFFFF',
-  backgroundSecondary: '#F5F5F5',
+  danger: '#b91c1c',
+  warning: '#b45309',
+  success: '#047857',
+  info: '#0e7490',
+  // Background
+  background: '#fafaf9',
+  backgroundSecondary: '#f5f5f4',
+  surface: '#ffffff',
 } as const
 
 // =============================
-// DARK — Nền tối, chữ sáng. Dùng khi background là black/dark gray.
-// Gray: 50 = nền tối nhất → 900 = chữ sáng nhất (ngược với light).
+// DARK — Nền tối, chữ mềm (không chói). Gray: 50 = nền tối nhất → 900 = chữ sáng nhất.
 // =============================
 export const ColorPaletteDark = {
-  // Brand — tông sáng hơn để nổi trên nền tối
-  primary: '#38bdf8',
-  secondary: '#22d3ee',
-  tertiary: '#34d399',
-  quaternary: '#a78bfa',
-  // Neutrals — dark theme: số càng lớn càng sáng (dùng cho chữ)
-  white: '#ffffff',
-  black: '#000000',
+  // Brand — giảm độ chói, vẫn nổi trên nền tối
+  primary: '#0d9488',
+  secondary: '#fdba74',
+  tertiary: '#c4b5fd',
+  quaternary: '#f9a8d4',
+  accent: '#67e8f9',
+  // Neutrals — tông xám mềm, không đẩy lên trắng tuyệt đối
+  white: '#e4e4e7',
+  black: '#09090b',
   gray50: '#09090b',
   gray100: '#18181b',
   gray200: '#27272a',
@@ -49,15 +54,18 @@ export const ColorPaletteDark = {
   gray400: '#52525b',
   gray500: '#71717a',
   gray600: '#a1a1aa',
-  gray700: '#d4d4d8',
-  gray800: '#e4e4e7',
-  gray900: '#fafafa',
-  // Semantic — tông sáng hơn trên nền tối
-  danger: '#f87171',
-  warning: '#fbbf24',
-  success: '#4ade80',
-  background: '#18181b',
-  backgroundSecondary: '#71717a',
+  gray700: '#b4b4b8',
+  gray800: '#d4d4d8',
+  gray900: '#e4e4e7',
+  // Semantic — bớt neon, dễ nhìn
+  danger: '#fca5a5',
+  warning: '#fcd34d',
+  success: '#86efac',
+  info: '#67e8f9',
+  // Background
+  background: '#09090b',
+  backgroundSecondary: '#27272a',
+  surface: '#18181b',
 } as const
 
 export type ColorPalette = typeof ColorPaletteLight
@@ -69,6 +77,7 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       secondary: palette.secondary,
       tertiary: palette.tertiary,
       quaternary: palette.quaternary,
+      accent: palette.accent,
     },
     text: {
       active: {
@@ -112,13 +121,17 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       background: {
         primary: palette.background,
         secondary: palette.backgroundSecondary,
+        tertiary: palette.surface,
+      },
+      disabled: {
+        primary: palette.gray400,
       },
     },
     icon: {
       active: {
         primary: palette.gray900,
         secondary: palette.gray700,
-        tertiary: palette.gray500,
+        tertiary: palette.white,
         quaternary: palette.gray300,
       },
       inactive: {
@@ -170,7 +183,7 @@ export const Themes: Record<ThemeName, TokensType> = {
 }
 
 // Token string types
-type RoleState = 'active' | 'inactive' | 'alert' | 'warning'
+type RoleState = 'active' | 'inactive' | 'alert' | 'warning' | 'disabled'
 type FillState = RoleState | 'background'
 type ActiveInactiveVariant = keyof TokensType['text']['active']
 type AlertWarningVariant = keyof TokensType['text']['alert']

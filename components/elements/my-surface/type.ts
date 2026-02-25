@@ -23,7 +23,7 @@ export type SurfaceStyle = Pick<
   | 'zIndex'
   | 'alignSelf'
   | 'backgroundColor'
-
+  | 'gap'
   // --- Size ---
   | 'width'
   | 'height'
@@ -49,6 +49,11 @@ export type SurfaceStyle = Pick<
   | 'justifyContent'
   | 'alignItems'
   | 'flexDirection'
+
+  // --- Border ---
+  | 'borderWidth'
+  | 'borderColor'
+  | 'borderStyle'
 
   // --- Misc safe ---
   | 'opacity'
@@ -100,6 +105,7 @@ export const CONTENT_STYLE_KEYS: (keyof SurfaceStyle)[] = [
   'paddingRight',
   'paddingHorizontal',
   'paddingVertical',
+  'gap',
 
   // basic flex layout
   'flexDirection',
