@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { TouchableOpacity, ActivityIndicator, ViewStyle } from 'react-native'
+import { TouchableOpacity, ViewStyle } from 'react-native'
 
 import { useTheme } from '@/theme/theme-context'
 import { useThemedStyles } from '@/hooks/use-themed-styles'
@@ -10,6 +10,7 @@ import MyView from '@/components/elements/my-view'
 import { generateStyles } from './styles'
 
 import type { MyButtonProps } from './type'
+import MySpinner from '../my-spinner'
 
 const TEXT_ON_PRIMARY = '#ffffff'
 const DEFAULT_ELEVATION: MyButtonProps['elevation'] = 'soft/down/small'
@@ -45,12 +46,11 @@ const MyButton: React.FC<MyButtonProps> = ({
   ]
   const useWhiteText = type === 'primary' || type === 'dark' || disabled
   const textColor = useWhiteText ? TEXT_ON_PRIMARY : getColor('text/active/primary')
-  const loaderColor = useWhiteText ? TEXT_ON_PRIMARY : getColor('text/active/primary')
 
   const content = (
     <>
       {loading ? (
-        <ActivityIndicator size="small" color={loaderColor} />
+        <MySpinner color={useWhiteText ? 'light' : 'primary'} size="small" />
       ) : (
         <>
           {left ?? null}

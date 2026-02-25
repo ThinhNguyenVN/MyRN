@@ -75,6 +75,7 @@ export default function HomeScreen() {
             text="Primary"
             size={'small'}
             type="primary"
+            loading
             left={<MyIcon name={'home'} color="icon/active/tertiary" />}
             onPress={() => {}}
             style={{ marginBottom: 8 }}

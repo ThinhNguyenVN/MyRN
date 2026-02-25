@@ -78,6 +78,9 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       tertiary: palette.tertiary,
       quaternary: palette.quaternary,
       accent: palette.accent,
+      black: palette.black,
+      white: palette.white,
+      gray600: palette.gray600,
     },
     text: {
       active: {
