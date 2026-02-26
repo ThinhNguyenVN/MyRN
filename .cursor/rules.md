@@ -31,8 +31,13 @@ Khi tạo component:
 1. Dùng Optional chaining khi biến/expression phía trước có thể **null** hoặc **undefined**.
 2. Không dùng != null. Check value tồn tại hay không phải dùng isNil từ `lodash` (import `lodash/isNil`).
 
-3. **Bắt buộc dùng elements từ `components/elements`** thay vì View, Text từ react-native:
+3. **Bắt buộc dùng elements từ `components/elements`** thay vì View, Text, Image từ react-native:
    - Dùng **MyView** thay cho `View` (trừ khi đang implement chính MyView hoặc component base tương đương).
    - Dùng **MyText** thay cho `Text` (trừ khi đang implement chính MyText).
+   - Dùng **MyImage** thay cho `Image` (expo-image) khi cần hiển thị ảnh từ URL (empty/error state, loading, …).
    - Dùng **MyIcon**, **MyButton**, **MySurface**, **MyTextInput**, **MySpinner** khi cần chức năng tương ứng.
    - Chỉ import View/Text từ `react-native` trong file định nghĩa MyView, MyText hoặc layout đặc thù (vd: my-surface, collapsible) khi không thể dùng element thay thế.
+
+4. **Cấm inline styles** (vd: `style={{ marginTop: 8 }}`). Style phải đặt trong `styles.ts` hoặc `generateStyles(theme)`, trừ khi style động từ props (vd: `borderColor`, `width` theo state).
+
+5. **Elements ưu tiên dùng ContainerStyleProps**: Khi cần margin, padding, flex, gap, width, height, … dùng props từ `ContainerStyleProps` (vd: `margin`, `padding`, `gap`, `alignSelf`) thay vì truyền qua `style`. Áp dụng cho MyView, MyIcon, MyButton, MySurface, MyTextInput, MyImage (nếu component hỗ trợ).
