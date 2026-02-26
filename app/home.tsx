@@ -1,24 +1,14 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+
+import MyText from '@/components/elements/my-text'
+import MyView from '@/components/elements/my-view'
 
 const Home: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome Home</Text>
-    </View>
+    <MyView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <MyText typography="h5">Welcome Home</MyText>
+    </MyView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-})
 
 export default Home

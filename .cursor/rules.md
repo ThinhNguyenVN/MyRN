@@ -29,4 +29,10 @@ Khi tạo component:
 ## Code rules
 
 1. Dùng Optional chaining khi biến/expression phía trước có thể **null** hoặc **undefined**.
-2. Check value tồn tại hay không phải dùng isNil từ `lodash` (import `lodash/isNil`), không dùng != null.
+2. Không dùng != null. Check value tồn tại hay không phải dùng isNil từ `lodash` (import `lodash/isNil`).
+
+3. **Bắt buộc dùng elements từ `components/elements`** thay vì View, Text từ react-native:
+   - Dùng **MyView** thay cho `View` (trừ khi đang implement chính MyView hoặc component base tương đương).
+   - Dùng **MyText** thay cho `Text` (trừ khi đang implement chính MyText).
+   - Dùng **MyIcon**, **MyButton**, **MySurface**, **MyTextInput**, **MySpinner** khi cần chức năng tương ứng.
+   - Chỉ import View/Text từ `react-native` trong file định nghĩa MyView, MyText hoặc layout đặc thù (vd: my-surface, collapsible) khi không thể dùng element thay thế.

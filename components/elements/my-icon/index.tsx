@@ -11,7 +11,7 @@ import MyView from '../my-view'
 export interface MyIconProps extends ContainerStyleProps {
   name: React.ComponentProps<typeof Ionicons>['name']
   size?: number
-  color?: IconColorType
+  color?: IconColorType | string
   style?: StyleProp<ViewStyle>
 }
 
@@ -26,7 +26,7 @@ const MyIcon: React.FC<MyIconProps> = ({
   ...rest
 }) => {
   const { getColor } = useTheme()
-  const resolvedColor = getColor(color)
+  const resolvedColor = color.startsWith('icon/') ? getColor(color as IconColorType) : color
 
   return (
     <MyView {...rest} style={style}>

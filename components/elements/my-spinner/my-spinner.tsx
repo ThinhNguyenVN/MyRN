@@ -1,5 +1,4 @@
 import React, { memo, useCallback, useEffect, useMemo } from 'react'
-import { View } from 'react-native'
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -59,9 +58,9 @@ const CanvasSafe: React.FC<{ size: number; children: React.ReactNode }> = memo(
       setReady(true)
     }, [])
     return (
-      <View style={{ width: size, height: size }} onLayout={onLayout}>
+      <MyView style={{ width: size, height: size }} onLayout={onLayout}>
         {ready ? children : null}
-      </View>
+      </MyView>
     )
   },
 )
