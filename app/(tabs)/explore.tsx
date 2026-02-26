@@ -79,7 +79,7 @@ export default function TabTwoScreen() {
         </MyText>
         <MyImage
           url="https://picsum.photos/200/150"
-          style={{ width: 200, height: 150, alignSelf: 'center', marginBottom: 16 }}
+          style={{ width: 200, alignSelf: 'center', marginBottom: 16 }}
         />
 
         <MyText typography="label" style={{ marginBottom: 8 }}>

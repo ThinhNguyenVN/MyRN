@@ -41,3 +41,5 @@ Khi tạo component:
 4. **Cấm inline styles** (vd: `style={{ marginTop: 8 }}`). Style phải đặt trong `styles.ts` hoặc `generateStyles(theme)`, trừ khi style động từ props (vd: `borderColor`, `width` theo state).
 
 5. **Elements ưu tiên dùng ContainerStyleProps**: Khi cần margin, padding, flex, gap, width, height, … dùng props từ `ContainerStyleProps` (vd: `margin`, `padding`, `gap`, `alignSelf`) thay vì truyền qua `style`. Áp dụng cho MyView, MyIcon, MyButton, MySurface, MyTextInput, MyImage (nếu component hỗ trợ).
+
+6. **Render có điều kiện**: Dùng **ConditionRenderer** từ `@/components/ui/condition-renderer` thay vì `{cond ? <A /> : <B />}` hoặc `{cond && <A />}` khi cần render theo điều kiện có fallback. Ví dụ: `<ConditionRenderer when={!!data} fallback={<Empty />}>{content}</ConditionRenderer>`
