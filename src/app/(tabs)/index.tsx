@@ -122,6 +122,7 @@ export default function HomeScreen() {
         <MyBottomSheet
           ref={bottomSheetRef}
           title="Text Inputs Sample"
+          showClose
           onClosed={() => {}}
           contentContainerStyle={{ gap: 8 }}
           pressBackdropToClose
@@ -133,11 +134,11 @@ export default function HomeScreen() {
           //     onPress={() => bottomSheetRef.current?.close()}
           //   />
           // }
-          header={
-            <MyView backgroundColor={'fill/active/primary'}>
-              <MyText typography="subtitle">Text Inputs Sample</MyText>
-            </MyView>
-          }
+          // header={
+          //   <MyView backgroundColor={'fill/active/primary'}>
+          //     <MyText typography="subtitle">Text Inputs Sample</MyText>
+          //   </MyView>
+          // }
         >
           <MyView style={styles.inputContainer}>
             <MyTextInput

@@ -5,6 +5,7 @@ import { StyleProp, ViewStyle } from 'react-native'
 
 export interface MyBottomSheetProps extends Omit<BottomSheetModalProps, 'children'> {
   title?: string
+  showClose?: boolean
   onClosed?: () => void
   header?: ReactNode
   footer?: ReactNode

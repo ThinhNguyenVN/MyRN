@@ -3,6 +3,7 @@ import { Radius } from '@/theme/radius'
 import { StyleSheet } from 'react-native'
 
 const HANDLE_HEIGHT = 12
+const HEADER_HEIGHT = 50
 
 export const generateStyles = (theme: ThemeType) => {
   const { getColor, getSpacing } = theme
@@ -32,16 +33,28 @@ export const generateStyles = (theme: ThemeType) => {
       backgroundColor: getColor('border/active/primary'),
     },
     header: {
+      height: HEADER_HEIGHT,
+      flexDirection: 'row',
+      alignItems: 'center',
       paddingHorizontal: getSpacing('x4'),
-      paddingTop: getSpacing('x2'),
-      paddingBottom: getSpacing('x4'),
       borderBottomWidth: 1,
       borderBottomColor: getColor('border/inactive/tertiary'),
     },
-    title: {
+    headerTitleWrap: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerTitle: {
       fontSize: 18,
       fontWeight: '600',
       color: getColor('text/active/primary'),
+    },
+    headerClose: {
+      width: 20,
+      height: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     content: {
       paddingHorizontal: getSpacing('x4'),

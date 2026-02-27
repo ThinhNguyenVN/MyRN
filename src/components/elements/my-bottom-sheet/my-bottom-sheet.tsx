@@ -1,5 +1,5 @@
 import React, { forwardRef, memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
-import { Dimensions, View } from 'react-native'
+import { Dimensions, TouchableOpacity, View } from 'react-native'
 
 import {
   BottomSheetModal,
@@ -10,6 +10,7 @@ import {
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet'
 
+import MyIcon from '@/components/elements/my-icon'
 import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
@@ -53,6 +54,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
   (
     {
       title,
+      showClose = false,
       onClosed,
       header,
       footer,
@@ -86,18 +88,40 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     }, [onClosed, onDismiss])
 
     const headerContent = useMemo(() => {
-      if (header) return header
+      if (header) return null
       if (title) {
         return (
           <MyView style={styles.header}>
-            <MyText typography="subtitle" style={styles.title}>
-              {title}
-            </MyText>
+            {showClose && <View style={styles.headerClose} />}
+            <MyView style={styles.headerTitleWrap}>
+              <MyText typography="subtitle" style={styles.headerTitle}>
+                {title}
+              </MyText>
+            </MyView>
+            {showClose && (
+              <TouchableOpacity
+                style={styles.headerClose}
+                onPress={close}
+                hitSlop={8}
+                activeOpacity={0.7}
+              >
+                <MyIcon name="close" color="icon/active/primary" />
+              </TouchableOpacity>
+            )}
           </MyView>
         )
       }
       return null
-    }, [header, title, styles.header, styles.title])
+    }, [
+      header,
+      title,
+      showClose,
+      close,
+      styles.header,
+      styles.headerClose,
+      styles.headerTitleWrap,
+      styles.headerTitle,
+    ])
 
     const footerComponent = useMemo(() => {
       if (!footer) return undefined
@@ -132,7 +156,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         maxDynamicContentSize={Dimensions.get('window').height - (insets.top ?? 16)}
         {...rest}
       >
-        {headerContent}
+        {header ?? headerContent}
         <BottomSheetScrollView
           contentContainerStyle={[styles.content, contentContainerStyle]}
           keyboardShouldPersistTaps="handled"
