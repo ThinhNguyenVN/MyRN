@@ -2,6 +2,7 @@ import React, { memo, useMemo } from 'react'
 import { ViewStyle } from 'react-native'
 
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
+import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
 
 import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
@@ -31,6 +32,18 @@ const MyButton: React.FC<MyButtonProps> = ({
 }) => {
   const { getColor } = useTheme()
   const styles = useThemedStyles(generateStyles)
+
+  const containerPropsStyle = useMemo(
+    () =>
+      getContainerStyle(
+        pickContainerProps(rest as Record<string, unknown>) as Parameters<
+          typeof getContainerStyle
+        >[0],
+      ),
+    [rest],
+  )
+  const hasContainerPropsStyle = Object.keys(containerPropsStyle).length > 0
+  const pressableProps = omitContainerProps(rest as Record<string, unknown>)
 
   const widthStyle: ViewStyle | null =
     width === 'full'
@@ -65,10 +78,15 @@ const MyButton: React.FC<MyButtonProps> = ({
   )
 
   const surfaceStyle = [buttonStyle, disabled && styles.disabled, style]
-  const touchableStyle = [styles.touchable, ...(widthStyle ? [widthStyle] : []), containerStyle]
+  const touchableStyle = [
+    styles.touchable,
+    ...(widthStyle ? [widthStyle] : []),
+    ...(hasContainerPropsStyle ? [containerPropsStyle] : []),
+    containerStyle,
+  ]
 
   return (
-    <MyPressable disabled={disabled || loading} {...rest} style={touchableStyle}>
+    <MyPressable disabled={disabled || loading} {...pressableProps} style={touchableStyle}>
       {elevation === 'none' ? (
         <MyView radius="large" style={surfaceStyle}>
           {content}

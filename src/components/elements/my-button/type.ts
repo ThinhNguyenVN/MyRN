@@ -12,7 +12,10 @@ export type ButtonWidth = number | 'auto' | 'full'
 
 export type ButtonElevation = ElevationToken | 'none'
 
-export interface MyButtonProps extends Omit<MyPressableProps, 'style' | 'children'> {
+export interface MyButtonProps extends Omit<
+  MyPressableProps,
+  'style' | 'children' | 'width' | 'left' | 'right'
+> {
   text: string
   style?: StyleProp<ViewStyle>
   disabled?: boolean

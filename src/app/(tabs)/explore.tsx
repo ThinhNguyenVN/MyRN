@@ -69,7 +69,13 @@ export default function TabTwoScreen() {
         <MyText typography="label" style={styles.labelMargin}>
           1. url hợp lệ
         </MyText>
-        <MyImage url="https://picsum.photos/200/150" style={styles.image200x150} />
+        <MyImage
+          url="https://picsum.photos/200/150"
+          width={200}
+          marginTop={20}
+          marginBottom={20}
+          alignSelf="center"
+        />
 
         <MyText typography="label" style={styles.labelMargin}>
           2. source local (require)
@@ -92,7 +98,7 @@ export default function TabTwoScreen() {
         <MyText typography="label" style={styles.labelMargin}>
           5. URL lỗi (error state)
         </MyText>
-        <MyImage url="https://invalid-url-will-fail.example/img.jpg" style={styles.image200x120} />
+        <MyImage url="https://invalid-url-will-fail.example/img.jpg" alignSelf="center" />
 
         <MyText typography="label" style={styles.labelMargin}>
           6. Error + showMessage

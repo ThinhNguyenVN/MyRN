@@ -14,6 +14,7 @@ import MySurface from '../my-surface'
 import { generateStyles } from './styles'
 import type { MyImageProps } from './type'
 import { useThemedStyles } from '@/theme/theme-context'
+import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
 
 const FADE_MS = 200
 const CACHE_POLICY = 'memory-disk'
@@ -42,8 +43,19 @@ const MyImage: React.FC<MyImageProps> = ({
   priority,
   blurhash,
   placeholder,
+  ...rest
 }) => {
   const styles = useThemedStyles(generateStyles)
+  const containerPropsStyle = useMemo(
+    () =>
+      getContainerStyle(
+        pickContainerProps(rest as Record<string, unknown>) as Parameters<
+          typeof getContainerStyle
+        >[0],
+      ),
+    [rest],
+  )
+  const hasContainerPropsStyle = Object.keys(containerPropsStyle).length > 0
   const hasImage = !isNil(source) || !!url
   const [hasError, setHasError] = useState(false)
   const [isLoading, setIsLoading] = useState(hasImage)
@@ -154,7 +166,11 @@ const MyImage: React.FC<MyImageProps> = ({
     </>
   )
 
-  const containerStyle = [styles.container, style]
+  const containerStyle = [
+    styles.container,
+    ...(hasContainerPropsStyle ? [containerPropsStyle] : []),
+    style,
+  ]
 
   if (elevation !== 'none') {
     return (

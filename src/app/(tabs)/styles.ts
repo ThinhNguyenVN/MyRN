@@ -28,6 +28,7 @@ export const generateStyles = (theme: ThemeType) => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       gap: 18,
+      alignSelf: 'stretch',
     },
     buttonMargin: {
       marginBottom: 8,

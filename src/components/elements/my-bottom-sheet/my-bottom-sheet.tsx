@@ -26,7 +26,7 @@ function SheetHandle() {
   return (
     <MySurface
       elevation="soft/up/small"
-      radius="small"
+      radius="medium"
       backgroundColor={getColor('fill/background/primary')}
       style={styles.handleShadow}
     >

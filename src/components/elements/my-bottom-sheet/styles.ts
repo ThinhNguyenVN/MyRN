@@ -2,7 +2,7 @@ import type { ThemeType } from '@/theme/theme-context'
 import { Radius } from '@/theme/radius'
 import { StyleSheet } from 'react-native'
 
-const HANDLE_HEIGHT = 12
+const HANDLE_HEIGHT = 10
 const HEADER_HEIGHT = 50
 
 export const generateStyles = (theme: ThemeType) => {
@@ -39,6 +39,7 @@ export const generateStyles = (theme: ThemeType) => {
       paddingHorizontal: getSpacing('x4'),
       borderBottomWidth: 1,
       borderBottomColor: getColor('border/inactive/tertiary'),
+      marginTop: -8,
     },
     headerTitleWrap: {
       flex: 1,

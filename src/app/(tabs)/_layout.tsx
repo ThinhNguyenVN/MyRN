@@ -13,14 +13,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: getColor('fill/active/primary'),
         headerShown: false,
         tabBarButton(props) {
-          return (
-            <MyPressable
-              {...(props as any)}
-              scaleBySize={false}
-              scaleValue={SCALE_SMALL}
-              onPress={() => {}}
-            />
-          )
+          return <MyPressable {...(props as any)} scaleBySize={false} scaleValue={SCALE_SMALL} />
         },
       }}
     >

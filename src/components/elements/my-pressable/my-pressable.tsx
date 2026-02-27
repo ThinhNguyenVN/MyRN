@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react'
 import { Pressable } from 'react-native'
 import Animated, {
   useAnimatedStyle,
@@ -14,6 +14,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 
 import type { AnimatedType, MyPressableProps } from './type'
 import { generateStyles } from './styles'
+import { getContainerStyle, pickContainerProps } from '@/utils/styles'
 
 export const SCALE_LARGE = 0.985
 export const SCALE_SMALL = 0.95
@@ -33,8 +34,19 @@ const MyPressable: React.FC<MyPressableProps> = ({
   haptic = true,
   style,
   surfaceProps,
+  ...rest
 }) => {
   const styles = useThemedStyles(generateStyles)
+  const containerStyle = useMemo(
+    () =>
+      getContainerStyle(
+        pickContainerProps(rest as Record<string, unknown>) as Parameters<
+          typeof getContainerStyle
+        >[0],
+      ),
+    [rest],
+  )
+  const hasContainerStyle = Object.keys(containerStyle).length > 0
   const scale = useSharedValue(1)
   const opacity = useSharedValue(1)
   const sizeRef = useRef({ w: 0, h: 0 })
@@ -117,7 +129,7 @@ const MyPressable: React.FC<MyPressableProps> = ({
       onPressOut={handlePressOut}
       onLayout={scaleBySize ? onLayout : undefined}
       disabled={disabled}
-      style={[styles.wrapper, style]}
+      style={[styles.wrapper, ...(hasContainerStyle ? [containerStyle] : []), style]}
     >
       <Animated.View style={animatedStyle}>{content}</Animated.View>
     </Pressable>

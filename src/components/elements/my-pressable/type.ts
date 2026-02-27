@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 
+import type { ContainerStyleProps } from '@/types/styles'
 import type { MySurfaceProps } from '../my-surface'
 
 export type AnimatedType = 'opacity' | 'scale'
 
-export interface MyPressableProps {
+export interface MyPressableProps extends ContainerStyleProps {
   children: ReactNode
   onPress?: () => void
   disabled?: boolean

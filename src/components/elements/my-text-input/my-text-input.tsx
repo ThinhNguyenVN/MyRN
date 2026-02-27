@@ -11,6 +11,7 @@ import MyView from '../my-view'
 import { generateStyles } from './styles'
 import type { MyTextInputProps } from './type'
 import { useThemedStyles } from '@/theme/theme-context'
+import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
 
 const TextInputComponent = Platform.OS === 'web' ? TextInput : BottomSheetTextInput
 
@@ -39,9 +40,21 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
   ignoreValue,
   required = false,
   value,
+  style: styleProp,
   ...rest
 }) => {
   const styles = useThemedStyles(generateStyles)
+  const containerStyle = useMemo(
+    () =>
+      getContainerStyle(
+        pickContainerProps(rest as Record<string, unknown>) as Parameters<
+          typeof getContainerStyle
+        >[0],
+      ),
+    [rest],
+  )
+  const hasContainerStyle = Object.keys(containerStyle).length > 0
+  const viewProps = omitContainerProps(rest as Record<string, unknown>)
   const [isFocused, setIsFocused] = useState(false)
 
   const handleFocus = useCallback(
@@ -95,8 +108,12 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
   const hasTitleOrSubTitle =
     (!isNil(title) && title !== '') || (!isNil(subTitle) && subTitle !== '')
 
+  const rootStyle = hasContainerStyle
+    ? [containerStyle, styles.container, widthStyle, styleProp]
+    : [styles.container, widthStyle, styleProp]
+
   return (
-    <MyView style={[styles.container, widthStyle]}>
+    <MyView style={rootStyle}>
       {hasTitleOrSubTitle && (
         <MyView style={styles.titleRow}>
           {!!title && (
@@ -129,7 +146,7 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
           </TouchableOpacity>
         )}
         <TextInputComponent
-          {...rest}
+          {...viewProps}
           value={ignoreValue ? undefined : value}
           editable={!disabled}
           onFocus={handleFocus}

@@ -1,13 +1,19 @@
 import type { ReactNode } from 'react'
-import type { TextInputProps, StyleProp, TextStyle } from 'react-native'
+import type { TextInputProps, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 import type { IconColorType } from '@/theme/colors'
+import type { ContainerStyleProps } from '@/types/styles'
 
 export type TextInputWidth = number | 'auto'
 
 export type TextInputSize = 'small' | 'large'
 
-export interface MyTextInputProps extends Omit<TextInputProps, 'style' | 'editable'> {
+export interface MyTextInputProps
+  extends
+    Omit<TextInputProps, 'style' | 'editable'>,
+    Omit<ContainerStyleProps, 'width' | 'height'> {
+  /** Style for the outer container */
+  style?: StyleProp<ViewStyle>
   title?: string
   subTitle?: string
   /** @default 'small' — large = height 100 */
