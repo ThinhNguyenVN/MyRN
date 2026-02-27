@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react'
-import { Pressable } from 'react-native'
+import { Pressable, StyleSheet } from 'react-native'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -120,6 +120,16 @@ const MyPressable: React.FC<MyPressableProps> = ({
     opacity: opacity.value,
   }))
 
+  const innerLayoutStyle = useMemo(() => {
+    const flat = StyleSheet.flatten(style)
+    if (!flat) return undefined
+    const { flexDirection, alignItems, justifyContent, gap } = flat
+    if (flexDirection || alignItems || justifyContent || gap) {
+      return { flexDirection, alignItems, justifyContent, gap }
+    }
+    return undefined
+  }, [style])
+
   const content = surfaceProps ? <MySurface {...surfaceProps}>{children}</MySurface> : children
 
   return (
@@ -131,7 +141,7 @@ const MyPressable: React.FC<MyPressableProps> = ({
       disabled={disabled}
       style={[styles.wrapper, ...(hasContainerStyle ? [containerStyle] : []), style]}
     >
-      <Animated.View style={animatedStyle}>{content}</Animated.View>
+      <Animated.View style={[innerLayoutStyle, animatedStyle]}>{content}</Animated.View>
     </Pressable>
   )
 }

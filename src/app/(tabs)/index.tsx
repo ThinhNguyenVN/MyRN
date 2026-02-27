@@ -55,7 +55,6 @@ export default function HomeScreen() {
             loading
             left={<MyIcon name={'home'} color="icon/active/tertiary" />}
             onPress={() => {}}
-            style={styles.buttonMargin}
           />
           <MyButton
             width={'full'}
@@ -63,7 +62,6 @@ export default function HomeScreen() {
             size={'small'}
             type="primary"
             onPress={() => {}}
-            style={styles.buttonMargin}
           />
         </MyView>
 
