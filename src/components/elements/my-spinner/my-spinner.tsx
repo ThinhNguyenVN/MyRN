@@ -57,8 +57,9 @@ const CanvasSafe: React.FC<{ size: number; children: React.ReactNode }> = memo(
       hasLayoutRef.current = true
       setReady(true)
     }, [])
+    const sizeStyle = useMemo(() => ({ width: size, height: size }), [size])
     return (
-      <MyView style={{ width: size, height: size }} onLayout={onLayout}>
+      <MyView style={sizeStyle} onLayout={onLayout}>
         {ready ? children : null}
       </MyView>
     )
@@ -122,20 +123,19 @@ const MySpinner: React.FC<MySpinnerProps> = ({
     }),
     [],
   )
+  const sizeBoxStyle = useMemo(
+    () => ({ borderRadius: size / 2, width: size, height: size }),
+    [size],
+  )
+  const canvasSizeStyle = useMemo(() => ({ width: size, height: size }), [size])
 
   if (size <= 0) return null
 
   return (
     <MyView {...rest} style={style}>
-      <Animated.View
-        style={[
-          styles.spinner,
-          { borderRadius: size / 2, width: size, height: size },
-          animatedStyle,
-        ]}
-      >
+      <Animated.View style={[styles.spinner, sizeBoxStyle, animatedStyle]}>
         <CanvasSafe size={size}>
-          <Canvas style={{ width: size, height: size }}>
+          <Canvas style={canvasSizeStyle}>
             <Path
               path={path}
               strokeWidth={strokeWidth}

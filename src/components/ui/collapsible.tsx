@@ -1,15 +1,18 @@
-import { PropsWithChildren, useState } from 'react'
-import { StyleSheet, TouchableOpacity } from 'react-native'
+import { PropsWithChildren, useMemo, useState } from 'react'
+import { StyleSheet, TouchableOpacity, useColorScheme } from 'react-native'
 
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { IconSymbol } from '@/components/ui/icon-symbol'
 import { Colors } from '@/constants/theme'
-import { useColorScheme } from '@/hooks/use-color-scheme'
 
 export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
   const [isOpen, setIsOpen] = useState(false)
   const theme = useColorScheme() ?? 'light'
+  const chevronStyle = useMemo(
+    () => ({ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }) as const,
+    [isOpen],
+  )
 
   return (
     <MyView>
@@ -23,7 +26,7 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
           size={18}
           weight="medium"
           color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
-          style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
+          style={chevronStyle}
         />
 
         <MyText typography="label">{title}</MyText>

@@ -1,5 +1,4 @@
-import type { ViewProps } from 'react-native'
-import type { StyleProp, ViewStyle } from 'react-native'
+import type { ViewProps, StyleProp, ViewStyle } from 'react-native'
 
 import type { ContainerStyleProps } from '@/types/styles'
 

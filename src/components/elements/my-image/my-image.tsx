@@ -3,7 +3,6 @@ import { Image, type ImageErrorEventData, type ImageSource } from 'expo-image'
 import { TouchableOpacity } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
-import { useThemedStyles } from '@/hooks/use-themed-styles'
 import { isNil } from 'lodash'
 
 import MyIcon from '../my-icon'
@@ -14,6 +13,7 @@ import MySurface from '../my-surface'
 
 import { generateStyles } from './styles'
 import type { MyImageProps } from './type'
+import { useThemedStyles } from '@/theme/theme-context'
 
 const FADE_MS = 200
 const CACHE_POLICY = 'memory-disk'
@@ -43,7 +43,7 @@ const MyImage: React.FC<MyImageProps> = ({
   blurhash,
   placeholder,
 }) => {
-  const styles = useThemedStyles((theme) => generateStyles(theme))
+  const styles = useThemedStyles(generateStyles)
   const hasImage = !isNil(source) || !!url
   const [hasError, setHasError] = useState(false)
   const [isLoading, setIsLoading] = useState(hasImage)
@@ -160,7 +160,7 @@ const MyImage: React.FC<MyImageProps> = ({
     return (
       <MySurface elevation={elevation} style={containerStyle}>
         {onPress ? (
-          <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={{ flex: 1 }}>
+          <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.touchable}>
             {content}
           </TouchableOpacity>
         ) : (
@@ -173,7 +173,7 @@ const MyImage: React.FC<MyImageProps> = ({
   return (
     <MyView style={containerStyle}>
       {onPress ? (
-        <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={{ flex: 1 }}>
+        <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.touchable}>
           {content}
         </TouchableOpacity>
       ) : (

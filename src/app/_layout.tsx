@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar'
 import 'react-native-reanimated'
 import { useFonts } from 'expo-font'
 
-import { useColorScheme } from '@/hooks/use-color-scheme'
+import { useColorScheme } from 'react-native'
 import { MyThemeProvider } from '@/theme/theme-context'
 
 export const unstable_settings = {

@@ -46,5 +46,8 @@ export function generateStyles(theme: ThemeType) {
       marginTop: getSpacing('x1'),
       textAlign: 'center' as const,
     },
+    touchable: {
+      flex: 1,
+    },
   }
 }

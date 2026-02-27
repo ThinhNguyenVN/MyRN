@@ -1,8 +1,7 @@
-import React, { memo } from 'react'
+import React, { memo, useMemo } from 'react'
 import { TouchableOpacity, ViewStyle } from 'react-native'
 
-import { useTheme } from '@/theme/theme-context'
-import { useThemedStyles } from '@/hooks/use-themed-styles'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
@@ -30,7 +29,7 @@ const MyButton: React.FC<MyButtonProps> = ({
   ...rest
 }) => {
   const { getColor } = useTheme()
-  const styles = useThemedStyles((theme) => generateStyles(theme))
+  const styles = useThemedStyles(generateStyles)
 
   const widthStyle: ViewStyle | null =
     width === 'full'
@@ -46,6 +45,7 @@ const MyButton: React.FC<MyButtonProps> = ({
   ]
   const useWhiteText = type === 'primary' || type === 'dark' || disabled
   const textColor = useWhiteText ? TEXT_ON_PRIMARY : getColor('text/active/primary')
+  const textStyle = useMemo(() => ({ color: textColor }), [textColor])
 
   const content = (
     <>
@@ -54,7 +54,7 @@ const MyButton: React.FC<MyButtonProps> = ({
       ) : (
         <>
           {left ?? null}
-          <MyText typography="button" style={{ color: textColor }}>
+          <MyText typography="button" style={textStyle}>
             {text}
           </MyText>
           {right ?? null}
@@ -64,13 +64,14 @@ const MyButton: React.FC<MyButtonProps> = ({
   )
 
   const surfaceStyle = [buttonStyle, disabled && styles.disabled, style]
+  const touchableStyle = [styles.touchable, ...(widthStyle ? [widthStyle] : []), containerStyle]
 
   return (
     <TouchableOpacity
       disabled={disabled || loading}
       activeOpacity={0.7}
       {...rest}
-      style={[{ flex: 1, ...widthStyle }, containerStyle]}
+      style={touchableStyle}
     >
       {elevation === 'none' ? (
         <MyView radius="large" style={surfaceStyle}>

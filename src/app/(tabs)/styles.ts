@@ -20,5 +20,24 @@ export const generateStyles = (theme: ThemeType) => {
       left: 0,
       position: 'absolute',
     },
+    sectionTitle: {
+      marginTop: 24,
+      marginBottom: 8,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 18,
+    },
+    buttonMargin: {
+      marginBottom: 8,
+    },
+    inputContainer: {
+      marginBottom: 12,
+      alignSelf: 'stretch',
+    },
+    redButton: {
+      backgroundColor: 'red',
+    },
   })
 }

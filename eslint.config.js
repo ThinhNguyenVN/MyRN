@@ -3,6 +3,8 @@
 const { defineConfig } = require('eslint/config')
 const prettier = require('eslint-config-prettier') // turns off conflicting rules
 const pluginPrettier = require('eslint-plugin-prettier') // integrates prettier as eslint rule
+const pluginUnusedImports = require('eslint-plugin-unused-imports')
+const pluginReactNative = require('eslint-plugin-react-native')
 
 module.exports = defineConfig([
   // Expo base config
@@ -17,9 +19,22 @@ module.exports = defineConfig([
 
     plugins: {
       prettier: pluginPrettier,
+      'unused-imports': pluginUnusedImports,
+      'react-native': pluginReactNative,
     },
 
     rules: {
+      // Không cho phép inline style
+      'react-native/no-inline-styles': 'warn',
+      // Không cho phép import và code không sử dụng
+      'no-unused-vars': 'error',
+      '@typescript-eslint/no-unused-vars': 'error',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'error',
+        { varsIgnorePattern: '^_', argsIgnorePattern: '^_' },
+      ],
+
       // 🔥 Prettier become ESLint rule
       'prettier/prettier': [
         'error',

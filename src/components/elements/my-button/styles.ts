@@ -48,5 +48,7 @@ export function generateStyles(theme: ThemeType): Record<string, ViewStyle> {
     sizeSmall: { height: BUTTON_SMALL_HEIGHT, paddingHorizontal: 12 },
     sizeLarge: { height: BUTTON_LARGE_HEIGHT, paddingHorizontal: 24 },
     disabled: { backgroundColor: getColor('fill/disabled/primary') },
+    touchable: { flex: 1 },
+    touchableFull: { flex: 1, width: '100%', alignSelf: 'stretch' },
   }
 }

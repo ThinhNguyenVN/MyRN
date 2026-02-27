@@ -1,7 +1,6 @@
-import React, { memo, useState, useCallback } from 'react'
+import React, { memo, useCallback, useMemo, useState } from 'react'
 import { TextInput, TouchableOpacity, Platform, type ViewStyle, type TextStyle } from 'react-native'
 
-import { useThemedStyles } from '@/hooks/use-themed-styles'
 import { isNil } from 'lodash'
 
 import MyText from '../my-text'
@@ -9,6 +8,7 @@ import MyView from '../my-view'
 
 import { generateStyles } from './styles'
 import type { MyTextInputProps } from './type'
+import { useThemedStyles } from '@/theme/theme-context'
 
 const INPUT_FONT_SIZE = 16
 const INPUT_HEIGHT = 40
@@ -37,7 +37,7 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
   value,
   ...rest
 }) => {
-  const styles = useThemedStyles((theme) => generateStyles(theme))
+  const styles = useThemedStyles(generateStyles)
   const [isFocused, setIsFocused] = useState(false)
 
   const handleFocus = useCallback(
@@ -66,6 +66,25 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
 
   const widthStyle: ViewStyle =
     width === 'auto' ? { width: '100%' as const, alignSelf: 'stretch' as const } : { width }
+  const inputRowStyle = useMemo(
+    () => ({ borderColor: stateColors.border, height }),
+    [stateColors.border, height],
+  )
+  const inputDynamicStyle = useMemo(
+    () => ({
+      fontSize: INPUT_FONT_SIZE,
+      color: stateColors.value,
+      alignItems: (height > INPUT_HEIGHT ? 'flex-start' : 'center') as const,
+    }),
+    [stateColors.value, height],
+  )
+  const webInputStyle = useMemo(
+    () =>
+      Platform.OS === 'web'
+        ? ({ outlineStyle: 'none', outlineWidth: 0 } as unknown as TextStyle)
+        : undefined,
+    [],
+  )
 
   const hasTitleOrSubTitle =
     (!isNil(title) && title !== '') || (!isNil(subTitle) && subTitle !== '')
@@ -87,7 +106,7 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
           )}
         </MyView>
       )}
-      <MyView style={[styles.inputRow, { borderColor: stateColors.border, height }]}>
+      <MyView style={[styles.inputRow, inputRowStyle]}>
         {!!startText && (
           <MyText typography="body" color="text/active/secondary">
             {startText}
@@ -110,17 +129,7 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
           onFocus={handleFocus}
           onBlur={handleBlur}
           textAlignVertical="top"
-          style={[
-            styles.inputBase,
-            {
-              fontSize: INPUT_FONT_SIZE,
-              color: stateColors.value,
-              alignItems: height > INPUT_HEIGHT ? 'flex-start' : 'center',
-            },
-            Platform.OS === 'web' &&
-              ({ outlineStyle: 'none', outlineWidth: 0 } as unknown as TextStyle),
-            inputStyle,
-          ]}
+          style={[styles.inputBase, inputDynamicStyle, webInputStyle, inputStyle]}
           placeholderTextColor={stateColors.placeholder}
           maxLength={maxLength}
         />

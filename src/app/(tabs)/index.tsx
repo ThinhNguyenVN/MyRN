@@ -5,16 +5,15 @@ import ParallaxScrollView from '@/components/ui/parallax-scroll-view'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
-import MySurface from '@/components/elements/my-surface'
 import MyView from '@/components/elements/my-view'
 import MyTextInput from '@/components/elements/my-text-input'
 import MyIcon from '@/components/elements/my-icon'
 import { generateStyles } from './styles'
-import { useTheme, useThemedStyles } from '@/theme/theme-context'
+import { useThemedStyles } from '@/theme/theme-context'
+import { router } from 'expo-router'
 
 export default function HomeScreen() {
   const styles = useThemedStyles(generateStyles)
-  const { getSpacing } = useTheme()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showError, setShowError] = useState(false)
@@ -29,52 +28,22 @@ export default function HomeScreen() {
       }
     >
       <MyView style={styles.titleContainer}>
-        <MyText typography={'subtitle'} color={'text/active/tertiary'}>
-          Quéo còm !!
-        </MyText>
-
-        <MyView
-          backgroundColor={'fill/active/primary'}
-          margin={getSpacing('x2')}
-          padding={getSpacing('x6')}
-          radius={'small'}
-        >
-          <MyText typography="body" color="text/active/primary">
-            soft/down/small
-          </MyText>
-        </MyView>
-        <MySurface
-          elevation={'soft/up/medium'}
-          style={[
-            {
-              backgroundColor: 'red',
-              marginTop: 30,
-              width: 200,
-              height: 100,
-              justifyContent: 'center',
-              alignItems: 'center',
-            },
-          ]}
-        >
-          <MyText typography="body" color="text/active/primary">
-            soft/down/medium
-          </MyText>
-        </MySurface>
-
-        <MyText typography="subtitle" style={{ marginTop: 24, marginBottom: 8 }}>
+        <MyText typography="subtitle" style={styles.sectionTitle}>
           Buttons
         </MyText>
         <MyButton
           width={'full'}
-          text="Button Primary"
+          text="Go to Home"
           size={'large'}
           type="primary"
-          onPress={() => {}}
+          onPress={() => {
+            router.navigate('/home')
+          }}
           left={<MyIcon name={'key'} color="icon/active/tertiary" />}
           right={<MyIcon name="home" color="icon/active/tertiary" />}
-          style={{ backgroundColor: 'red' }}
+          style={styles.redButton}
         />
-        <MyView style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 18 }}>
+        <MyView style={styles.buttonRow}>
           <MyButton
             width={'full'}
             text="Primary"
@@ -83,7 +52,7 @@ export default function HomeScreen() {
             loading
             left={<MyIcon name={'home'} color="icon/active/tertiary" />}
             onPress={() => {}}
-            style={{ marginBottom: 8 }}
+            style={styles.buttonMargin}
           />
           <MyButton
             width={'full'}
@@ -92,7 +61,7 @@ export default function HomeScreen() {
             type="primary"
             disabled
             onPress={() => {}}
-            style={{ marginBottom: 8 }}
+            style={styles.buttonMargin}
           />
         </MyView>
 
@@ -102,28 +71,28 @@ export default function HomeScreen() {
           size={'small'}
           type="secondary"
           onPress={() => {}}
-          style={{ marginBottom: 8 }}
+          style={styles.buttonMargin}
         />
         <MyButton
           width={'auto'}
           text="Tertiary"
           type="tertiary"
           onPress={() => {}}
-          style={{ marginBottom: 8 }}
+          style={styles.buttonMargin}
         />
         <MyButton
           width={'auto'}
           text="Light"
           type="light"
           onPress={() => {}}
-          style={{ marginBottom: 8 }}
+          style={styles.buttonMargin}
         />
         <MyButton
           width={'auto'}
           text="Dark"
           type="dark"
           onPress={() => {}}
-          style={{ marginBottom: 8 }}
+          style={styles.buttonMargin}
         />
         <MyButton
           text="Small"
@@ -135,10 +104,10 @@ export default function HomeScreen() {
         <MyButton text="Loading" type="secondary" loading onPress={() => {}} />
         <MyButton text="Disabled" type="primary" onPress={() => {}} disabled />
 
-        <MyText typography="subtitle" style={{ marginTop: 24, marginBottom: 8 }}>
+        <MyText typography="subtitle" style={styles.sectionTitle}>
           Text inputs
         </MyText>
-        <MyView style={{ marginBottom: 12, alignSelf: 'stretch' }}>
+        <MyView style={styles.inputContainer}>
           <MyTextInput
             title="Email"
             subTitle="Nhập email đăng nhập"
@@ -151,7 +120,7 @@ export default function HomeScreen() {
             startIcon={<MyIcon name="mail-outline" size={20} color="icon/active/primary" />}
           />
         </MyView>
-        <MyView style={{ marginBottom: 12, alignSelf: 'stretch' }}>
+        <MyView style={styles.inputContainer}>
           <MyTextInput
             title="Password"
             placeholder="Mật khẩu"
@@ -163,7 +132,7 @@ export default function HomeScreen() {
             endIcon={<MyIcon name="eye-outline" size={20} color="icon/active/primary" />}
           />
         </MyView>
-        <MyView style={{ marginBottom: 12, alignSelf: 'stretch' }}>
+        <MyView style={styles.inputContainer}>
           <MyTextInput
             title="With error"
             subTitle="(Demo trạng thái lỗi)"
@@ -179,7 +148,7 @@ export default function HomeScreen() {
             endIcon={<MyIcon name="alert-circle-outline" size={20} color="icon/alert/primary" />}
           />
         </MyView>
-        <MyView style={{ marginBottom: 12, alignSelf: 'stretch' }}>
+        <MyView style={styles.inputContainer}>
           <MyTextInput
             title="Prefix / suffix"
             startText="https://"
@@ -187,7 +156,7 @@ export default function HomeScreen() {
             placeholder="domain"
           />
         </MyView>
-        <MyView style={{ marginBottom: 12, alignSelf: 'stretch' }}>
+        <MyView style={styles.inputContainer}>
           <MyTextInput title="Fixed width (200)" placeholder="width={200}" width={200} />
         </MyView>
 

@@ -97,19 +97,19 @@ const MySurface: React.FC<MySurfaceProps> = ({
   const fillY = insetTop
   const shadowX = insetLeft + dx
   const shadowY = insetTop + dy
+  const svgStyle = useMemo(
+    () => ({
+      position: 'absolute' as const,
+      left: -insetLeft,
+      top: -insetTop,
+    }),
+    [insetLeft, insetTop],
+  )
 
   return (
     <View style={containerStyle} onLayout={onLayout}>
       {w > 0 && h > 0 && (
-        <Svg
-          width={svgWidth}
-          height={svgHeight}
-          style={{
-            position: 'absolute',
-            left: -insetLeft,
-            top: -insetTop,
-          }}
-        >
+        <Svg width={svgWidth} height={svgHeight} style={svgStyle}>
           <Defs>
             <Filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
               <FeGaussianBlur in="SourceGraphic" stdDeviation={blur} />
