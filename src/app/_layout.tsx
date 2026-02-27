@@ -3,7 +3,9 @@ import { StatusBar } from 'expo-status-bar'
 import 'react-native-reanimated'
 import { useFonts } from 'expo-font'
 
-import { useColorScheme } from 'react-native'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { StyleSheet, useColorScheme } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { MyThemeProvider } from '@/theme/theme-context'
 
 export const unstable_settings = {
@@ -25,12 +27,20 @@ export default function RootLayout() {
   const themeName = colorScheme === 'dark' ? 'dark' : 'light'
 
   return (
-    <MyThemeProvider value={themeName}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </MyThemeProvider>
+    <GestureHandlerRootView style={styles.root}>
+      <MyThemeProvider value={themeName}>
+        <BottomSheetModalProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+          </Stack>
+          <StatusBar style="auto" />
+        </BottomSheetModalProvider>
+      </MyThemeProvider>
+    </GestureHandlerRootView>
   )
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+})
