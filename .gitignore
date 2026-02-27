@@ -42,3 +42,10 @@ app-example
 /ios
 /android
 /.cursor
+/.vscode
+
+# vscode
+.vscode/
+
+# cursor
+.cursor/
