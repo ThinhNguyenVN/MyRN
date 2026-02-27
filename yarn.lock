@@ -1277,7 +1277,7 @@
     chalk "^4.1.0"
     js-yaml "^4.1.0"
 
-"@gorhom/bottom-sheet@^5.2.8":
+"@gorhom/bottom-sheet@5.2.8":
   version "5.2.8"
   resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-5.2.8.tgz#25e49122c30ffe83d3813b3bcf3dec39f3359aeb"
   integrity sha512-+N27SMpbBxXZQ/IA2nlEV6RGxL/qSFHKfdFKcygvW+HqPG5jVNb1OqehLQsGfBP+Up42i0gW5ppI+DhpB7UCzA==
@@ -3682,6 +3682,11 @@ expo-glass-effect@55.0.7, expo-glass-effect@^55.0.7:
   version "55.0.7"
   resolved "https://registry.yarnpkg.com/expo-glass-effect/-/expo-glass-effect-55.0.7.tgz#e8584bc078c8987dbcc468dfcdd0d82a1df8b8e3"
   integrity sha512-G7Q9rUaEY0YC36fGE6irDljfsfvzz/y49zagARAKvSJSyQMUSrhR25WOr5LK5Cw7gQNNBEy9U1ctlr7yCay/fQ==
+
+expo-haptics@^55.0.8:
+  version "55.0.8"
+  resolved "https://registry.yarnpkg.com/expo-haptics/-/expo-haptics-55.0.8.tgz#9ccf3527f4622d5e267a7820da43075a257777b1"
+  integrity sha512-yVR6EsQwl1WuhFITc0PpfI/7dsBdjK/F2YA8xB80UUW9iTa+Tqz21FpH4n/vtbargpzFxkhl5WNYMa419+QWFQ==
 
 expo-image@55.0.5, expo-image@^55.0.5:
   version "55.0.5"

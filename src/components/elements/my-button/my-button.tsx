@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from 'react'
-import { TouchableOpacity, ViewStyle } from 'react-native'
+import { ViewStyle } from 'react-native'
 
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
@@ -10,6 +10,7 @@ import { generateStyles } from './styles'
 
 import type { MyButtonProps } from './type'
 import MySpinner from '../my-spinner'
+import MyPressable from '../my-pressable'
 
 const TEXT_ON_PRIMARY = '#ffffff'
 const DEFAULT_ELEVATION: MyButtonProps['elevation'] = 'soft/down/small'
@@ -67,12 +68,7 @@ const MyButton: React.FC<MyButtonProps> = ({
   const touchableStyle = [styles.touchable, ...(widthStyle ? [widthStyle] : []), containerStyle]
 
   return (
-    <TouchableOpacity
-      disabled={disabled || loading}
-      activeOpacity={0.7}
-      {...rest}
-      style={touchableStyle}
-    >
+    <MyPressable disabled={disabled || loading} {...rest} style={touchableStyle}>
       {elevation === 'none' ? (
         <MyView radius="large" style={surfaceStyle}>
           {content}
@@ -82,7 +78,7 @@ const MyButton: React.FC<MyButtonProps> = ({
           {content}
         </MySurface>
       )}
-    </TouchableOpacity>
+    </MyPressable>
   )
 }
 

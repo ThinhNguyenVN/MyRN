@@ -62,7 +62,6 @@ export default function HomeScreen() {
             text="Primary"
             size={'small'}
             type="primary"
-            disabled
             onPress={() => {}}
             style={styles.buttonMargin}
           />
