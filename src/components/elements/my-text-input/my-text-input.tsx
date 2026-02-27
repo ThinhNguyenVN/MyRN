@@ -1,7 +1,9 @@
 import React, { memo, useCallback, useMemo, useState } from 'react'
-import { TouchableOpacity, Platform, type ViewStyle, type TextStyle } from 'react-native'
+import { TouchableOpacity, Platform, TextInput, type ViewStyle, type TextStyle } from 'react-native'
 
 import { isNil } from 'lodash'
+
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
 
 import MyText from '../my-text'
 import MyView from '../my-view'
@@ -9,7 +11,8 @@ import MyView from '../my-view'
 import { generateStyles } from './styles'
 import type { MyTextInputProps } from './type'
 import { useThemedStyles } from '@/theme/theme-context'
-import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
+
+const TextInputComponent = Platform.OS === 'web' ? TextInput : BottomSheetTextInput
 
 const INPUT_FONT_SIZE = 16
 const INPUT_HEIGHT = 40
@@ -125,7 +128,7 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
             {startIcon}
           </TouchableOpacity>
         )}
-        <BottomSheetTextInput
+        <TextInputComponent
           {...rest}
           value={ignoreValue ? undefined : value}
           editable={!disabled}
