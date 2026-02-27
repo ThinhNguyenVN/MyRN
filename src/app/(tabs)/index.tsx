@@ -123,16 +123,16 @@ export default function HomeScreen() {
           ref={bottomSheetRef}
           title="Text Inputs Sample"
           onClosed={() => {}}
-          snapPoints={['50%']}
+          contentContainerStyle={{ gap: 8 }}
           pressBackdropToClose
-          footer={
-            <MyButton
-              width={'full'}
-              text="Close"
-              type="primary"
-              onPress={() => bottomSheetRef.current?.close()}
-            />
-          }
+          // footer={
+          //   <MyButton
+          //     width={'full'}
+          //     text="Close"
+          //     type="primary"
+          //     onPress={() => bottomSheetRef.current?.close()}
+          //   />
+          // }
           header={
             <MyView backgroundColor={'fill/active/primary'}>
               <MyText typography="subtitle">Text Inputs Sample</MyText>
@@ -182,17 +182,16 @@ export default function HomeScreen() {
               endIcon={<MyIcon name="alert-circle-outline" size={20} color="icon/alert/primary" />}
             />
           </MyView>
-          <MyView style={styles.inputContainer}>
-            <MyTextInput
-              title="Prefix / suffix"
-              startText="https://"
-              endText=".com"
-              placeholder="domain"
-            />
-          </MyView>
-          <MyView style={styles.inputContainer}>
-            <MyTextInput title="Fixed width (200)" placeholder="width={200}" width={200} />
-          </MyView>
+
+          <MyTextInput
+            title="Prefix / suffix"
+            startText="https://"
+            endText=".com"
+            placeholder="domain"
+          />
+
+          <MyTextInput title="Fixed width (200)" placeholder="width={200}" width={200} />
+
           <MyTextInput
             title="Max length"
             placeholder="Tối đa 20 ký tự"
@@ -216,6 +215,13 @@ export default function HomeScreen() {
             showCurrentLength
             maxLength={100}
             height={100}
+          />
+          <MyTextInput
+            title="Max length"
+            placeholder="Tối đa 20 ký tự"
+            maxLength={20}
+            showCurrentLength
+            value="1234567890"
           />
         </MyBottomSheet>
       </MyView>

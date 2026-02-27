@@ -51,23 +51,17 @@ export function generateStyles(theme: ThemeType) {
       borderWidth: 1,
       borderRadius: Radius.medium,
       backgroundColor: getColor('fill/background/primary'),
-      padding: getSpacing('x2'),
+      paddingHorizontal: getSpacing('x2'),
       gap: getSpacing('x1'),
+      alignItems: 'center' as const,
     },
     inputBase: {
       fontSize: 16,
-      paddingTop: 0,
-      paddingBottom: 0,
       flex: 1,
       minWidth: 100,
       textAlignVertical: 'top' as const,
     },
-    inputInner: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      minWidth: 0,
-    },
+
     iconWrap: {
       justifyContent: 'center' as const,
       alignItems: 'center' as const,

@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useMemo, useState } from 'react'
-import { TextInput, TouchableOpacity, Platform, type ViewStyle, type TextStyle } from 'react-native'
+import { TouchableOpacity, Platform, type ViewStyle, type TextStyle } from 'react-native'
 
 import { isNil } from 'lodash'
 
@@ -9,6 +9,7 @@ import MyView from '../my-view'
 import { generateStyles } from './styles'
 import type { MyTextInputProps } from './type'
 import { useThemedStyles } from '@/theme/theme-context'
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
 
 const INPUT_FONT_SIZE = 16
 const INPUT_HEIGHT = 40
@@ -74,7 +75,9 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
     () => ({
       fontSize: INPUT_FONT_SIZE,
       color: stateColors.value,
-      alignItems: (height > INPUT_HEIGHT ? 'flex-start' : 'center') as const,
+      alignItems: height > INPUT_HEIGHT ? 'flex-start' : 'center',
+      minHeight: INPUT_HEIGHT,
+      height,
     }),
     [stateColors.value, height],
   )
@@ -122,14 +125,14 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
             {startIcon}
           </TouchableOpacity>
         )}
-        <TextInput
+        <BottomSheetTextInput
           {...rest}
           value={ignoreValue ? undefined : value}
           editable={!disabled}
           onFocus={handleFocus}
           onBlur={handleBlur}
           textAlignVertical="top"
-          style={[styles.inputBase, inputDynamicStyle, webInputStyle, inputStyle]}
+          style={[styles.inputBase, inputDynamicStyle as TextStyle, webInputStyle, inputStyle]}
           placeholderTextColor={stateColors.placeholder}
           maxLength={maxLength}
         />

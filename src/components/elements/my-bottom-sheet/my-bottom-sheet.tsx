@@ -1,5 +1,5 @@
 import React, { forwardRef, memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
-import { View } from 'react-native'
+import { Dimensions, View } from 'react-native'
 
 import {
   BottomSheetModal,
@@ -17,8 +17,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import type { MyBottomSheetProps, MyBottomSheetRef } from './type'
 import { generateStyles } from './styles'
-
-const DEFAULT_SNAP_POINTS = ['80%', '100%']
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 function SheetHandle() {
   const { getColor } = useTheme()
@@ -59,7 +58,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       footer,
       pressBackdropToClose = true,
       children,
-      snapPoints = DEFAULT_SNAP_POINTS,
+      contentContainerStyle,
       enablePanDownToClose = true,
       onDismiss,
       style,
@@ -70,7 +69,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
   ) => {
     const bottomSheetRef = useRef<BottomSheetModal>(null)
     const styles = useThemedStyles(generateStyles)
-
+    const insets = useSafeAreaInsets()
     const open = useCallback(() => {
       bottomSheetRef.current?.present()
     }, [])
@@ -120,7 +119,6 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     return (
       <BottomSheetModal
         ref={bottomSheetRef}
-        snapPoints={snapPoints}
         onDismiss={handleDismiss}
         enablePanDownToClose={enablePanDownToClose}
         style={[styles.sheet, style]}
@@ -128,14 +126,19 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         handleComponent={SheetHandle}
         backdropComponent={backdropComponent}
         footerComponent={footerComponent}
+        enableDynamicSizing
+        keyboardBehavior={'fillParent'}
+        enableBlurKeyboardOnGesture={false}
+        maxDynamicContentSize={Dimensions.get('window').height - (insets.top ?? 16)}
         {...rest}
       >
-        <View style={styles.sheetInner} pointerEvents="box-none">
-          {headerContent}
-          <BottomSheetScrollView contentContainerStyle={styles.content}>
-            {children}
-          </BottomSheetScrollView>
-        </View>
+        {headerContent}
+        <BottomSheetScrollView
+          contentContainerStyle={[styles.content, contentContainerStyle]}
+          keyboardShouldPersistTaps="handled"
+        >
+          {children}
+        </BottomSheetScrollView>
       </BottomSheetModal>
     )
   },

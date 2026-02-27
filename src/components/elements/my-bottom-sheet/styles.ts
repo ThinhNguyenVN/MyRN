@@ -46,7 +46,7 @@ export const generateStyles = (theme: ThemeType) => {
     content: {
       paddingHorizontal: getSpacing('x4'),
       paddingVertical: getSpacing('x4'),
-      paddingBottom: getSpacing('x8'),
+      paddingBottom: 120,
     },
     footer: {
       paddingHorizontal: getSpacing('x4'),
