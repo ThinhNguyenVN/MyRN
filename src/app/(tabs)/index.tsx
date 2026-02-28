@@ -105,6 +105,19 @@ export default function HomeScreen() {
         <MyButton text="Disabled" type="primary" onPress={() => {}} disabled />
 
         <MyText typography="subtitle" style={styles.sectionTitle}>
+          Button Icon
+        </MyText>
+        <MyView flexDirection="row" gap={8}>
+          <MyButton.Icon icon="home" type="primary" onPress={() => {}} />
+          <MyButton.Icon icon="add" type="secondary" size="small" onPress={() => {}} />
+          <MyButton.Icon icon="heart-outline" type="tertiary" onPress={() => {}} />
+          <MyButton.Icon icon="settings-outline" type="light" size="small" onPress={() => {}} />
+          <MyButton.Icon icon="moon" type="dark" onPress={() => {}} />
+          <MyButton.Icon icon="refresh" type="primary" loading onPress={() => {}} />
+          <MyButton.Icon icon="trash-outline" type="secondary" disabled onPress={() => {}} />
+        </MyView>
+
+        <MyText typography="subtitle" style={styles.sectionTitle}>
           Bottom Sheet
         </MyText>
         <MyButton

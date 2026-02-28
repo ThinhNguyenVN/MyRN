@@ -13,6 +13,8 @@ import type { MyButtonProps } from './type'
 import MySpinner from '../my-spinner'
 import MyPressable from '../my-pressable'
 
+import MyButtonIcon from './my-button-icon'
+
 const TEXT_ON_PRIMARY = '#ffffff'
 const DEFAULT_ELEVATION: MyButtonProps['elevation'] = 'soft/down/small'
 
@@ -100,4 +102,8 @@ const MyButton: React.FC<MyButtonProps> = ({
   )
 }
 
-export default memo(MyButton)
+const MyButtonWithIcon = Object.assign(memo(MyButton), {
+  Icon: MyButtonIcon,
+})
+
+export default MyButtonWithIcon

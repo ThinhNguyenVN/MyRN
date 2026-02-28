@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { StyleProp, ViewStyle } from 'react-native'
+import type { Ionicons } from '@expo/vector-icons'
 
 import type { ElevationToken } from '@/theme/elevation'
 import { MyPressableProps } from '../my-pressable'
@@ -26,5 +27,19 @@ export interface MyButtonProps extends Omit<
   elevation?: ButtonElevation
   left?: ReactNode
   right?: ReactNode
+  containerStyle?: StyleProp<ViewStyle>
+}
+
+export interface MyButtonIconProps extends Omit<
+  MyPressableProps,
+  'style' | 'children' | 'width' | 'left' | 'right'
+> {
+  icon: React.ComponentProps<typeof Ionicons>['name']
+  style?: StyleProp<ViewStyle>
+  disabled?: boolean
+  loading?: boolean
+  size?: ButtonSize
+  type?: ButtonType
+  elevation?: ButtonElevation
   containerStyle?: StyleProp<ViewStyle>
 }

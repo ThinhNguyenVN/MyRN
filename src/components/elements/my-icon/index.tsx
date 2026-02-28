@@ -30,7 +30,7 @@ const MyIcon: React.FC<MyIconProps> = ({
 
   return (
     <MyView {...rest} style={style}>
-      <Ionicons name={name} size={size} color={resolvedColor} />
+      <Ionicons name={name} size={size} color={resolvedColor} includeFontPadding={false} />
     </MyView>
   )
 }
