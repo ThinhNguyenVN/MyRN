@@ -101,6 +101,12 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       warning: {
         primary: palette.warning,
       },
+      info: {
+        primary: palette.info,
+      },
+      success: {
+        primary: palette.success,
+      },
     },
     fill: {
       active: {
@@ -120,6 +126,12 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       },
       warning: {
         primary: palette.warning,
+      },
+      info: {
+        primary: palette.info,
+      },
+      success: {
+        primary: palette.success,
       },
       background: {
         primary: palette.background,
@@ -149,6 +161,12 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       warning: {
         primary: palette.warning,
       },
+      info: {
+        primary: palette.info,
+      },
+      success: {
+        primary: palette.success,
+      },
     },
     border: {
       active: {
@@ -169,6 +187,12 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       warning: {
         primary: palette.warning,
       },
+      info: {
+        primary: palette.info,
+      },
+      success: {
+        primary: palette.success,
+      },
     },
   } as const
 }
@@ -186,7 +210,7 @@ export const Themes: Record<ThemeName, TokensType> = {
 }
 
 // Token string types
-type RoleState = 'active' | 'inactive' | 'alert' | 'warning' | 'disabled'
+type RoleState = 'active' | 'inactive' | 'alert' | 'warning' | 'info' | 'success' | 'disabled'
 type FillState = RoleState | 'background'
 type ActiveInactiveVariant = keyof TokensType['text']['active']
 type AlertWarningVariant = keyof TokensType['text']['alert']

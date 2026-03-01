@@ -24,6 +24,7 @@ export type SurfaceStyle = Pick<
   | 'alignSelf'
   | 'backgroundColor'
   | 'gap'
+  | 'borderRadius'
   // --- Size ---
   | 'width'
   | 'height'
@@ -58,6 +59,7 @@ export type SurfaceStyle = Pick<
   // --- Misc safe ---
   | 'opacity'
   | 'transform'
+  | 'overflow'
 >
 
 export const CONTAINER_STYLE_KEYS: (keyof SurfaceStyle)[] = [
@@ -94,6 +96,7 @@ export const CONTAINER_STYLE_KEYS: (keyof SurfaceStyle)[] = [
   // misc
   'opacity',
   'transform',
+  'overflow',
 ]
 
 export const CONTENT_STYLE_KEYS: (keyof SurfaceStyle)[] = [
@@ -111,4 +114,7 @@ export const CONTENT_STYLE_KEYS: (keyof SurfaceStyle)[] = [
   'flexDirection',
   'justifyContent',
   'alignItems',
+
+  // overflow (for content clipping when elevation - keep on inner, not outer)
+  'overflow',
 ]

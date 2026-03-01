@@ -1,5 +1,5 @@
 import React, { memo, useId, useMemo, useRef, useState } from 'react'
-import { View, LayoutChangeEvent, StyleProp, StyleSheet } from 'react-native'
+import { View, type ViewStyle, LayoutChangeEvent, StyleProp, StyleSheet } from 'react-native'
 import Svg, { Defs, FeGaussianBlur, Filter, Rect } from 'react-native-svg'
 
 import { Radius, RadiusType } from '@/theme/radius'
@@ -77,6 +77,10 @@ const MySurface: React.FC<MySurfaceProps> = ({
     }
   }, [styleWithoutBg])
 
+  // Khi có elevation: outer PHẢI overflow visible để shadow không bị cắt
+  // overflow: 'hidden' từ user → chuyển xuống inner content để clip children
+  const hasUserOverflowHidden = fs.overflow === 'hidden'
+
   const elevationConfig = useMemo(() => getElevation(elevation as ElevationToken), [elevation])
   const { dx, dy, blur, opacity } = elevationConfig
   const r = Radius[radius]
@@ -106,8 +110,27 @@ const MySurface: React.FC<MySurfaceProps> = ({
     [insetLeft, insetTop],
   )
 
+  const finalContainerStyle = useMemo(() => {
+    const base: Record<string, unknown> = { ...containerStyle }
+    // Bắt buộc overflow visible khi có elevation để shadow SVG không bị cắt
+    if (elevation && elevation !== 'none') {
+      base.overflow = 'visible'
+    }
+    return base as ViewStyle
+  }, [containerStyle, elevation])
+
+  // Inner content: nhận overflow hidden để clip children; cần borderRadius để clip bo góc
+  const finalContentStyle = useMemo(() => {
+    const base: ViewStyle = { ...contentStyle }
+    if (hasUserOverflowHidden && elevation && elevation !== 'none') {
+      base.overflow = 'hidden'
+      base.borderRadius = r
+    }
+    return base
+  }, [contentStyle, hasUserOverflowHidden, elevation, r])
+
   return (
-    <View style={containerStyle} onLayout={onLayout}>
+    <View style={finalContainerStyle} onLayout={onLayout}>
       {w > 0 && h > 0 && (
         <Svg width={svgWidth} height={svgHeight} style={svgStyle}>
           <Defs>
@@ -141,7 +164,7 @@ const MySurface: React.FC<MySurfaceProps> = ({
         </Svg>
       )}
 
-      <View {...rest} style={contentStyle}>
+      <View {...rest} style={[finalContentStyle]}>
         {children}
       </View>
     </View>

@@ -10,10 +10,9 @@ import Animated, {
 import { triggerHaptic } from './haptic'
 
 import MySurface from '@/components/elements/my-surface'
-import { useThemedStyles } from '@/theme/theme-context'
 
 import type { AnimatedType, MyPressableProps } from './type'
-import { generateStyles } from './styles'
+
 import { getContainerStyle, pickContainerProps } from '@/utils/styles'
 
 export const SCALE_LARGE = 0.985
@@ -36,7 +35,6 @@ const MyPressable: React.FC<MyPressableProps> = ({
   surfaceProps,
   ...rest
 }) => {
-  const styles = useThemedStyles(generateStyles)
   const containerStyle = useMemo(
     () =>
       getContainerStyle(
@@ -139,7 +137,7 @@ const MyPressable: React.FC<MyPressableProps> = ({
       onPressOut={handlePressOut}
       onLayout={scaleBySize ? onLayout : undefined}
       disabled={disabled}
-      style={[styles.wrapper, ...(hasContainerStyle ? [containerStyle] : []), style]}
+      style={[...(hasContainerStyle ? [containerStyle] : []), style]}
     >
       <Animated.View style={[innerLayoutStyle, animatedStyle]}>{content}</Animated.View>
     </Pressable>
