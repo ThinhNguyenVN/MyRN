@@ -11,7 +11,6 @@ import {
 } from '@gorhom/bottom-sheet'
 
 import MyIcon from '@/components/elements/my-icon'
-import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
@@ -22,17 +21,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import MyPressable from '../my-pressable'
 
 function SheetHandle() {
-  const { getColor } = useTheme()
   const styles = useThemedStyles(generateStyles)
   return (
-    <MySurface
-      elevation="soft/up/small"
-      radius="medium"
-      backgroundColor={getColor('fill/background/primary')}
-      style={styles.handleShadow}
-    >
+    <View style={styles.handleContainer}>
       <View style={styles.handleIndicator} />
-    </MySurface>
+    </View>
   )
 }
 
@@ -142,8 +135,8 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         ref={bottomSheetRef}
         onDismiss={handleDismiss}
         enablePanDownToClose={enablePanDownToClose}
-        style={[styles.sheet, style]}
-        backgroundStyle={[styles.sheetBackground, backgroundStyle]}
+        style={[style, styles.sheet]}
+        backgroundStyle={backgroundStyle}
         handleComponent={SheetHandle}
         backdropComponent={backdropComponent}
         footerComponent={footerComponent}

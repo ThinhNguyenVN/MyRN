@@ -1,5 +1,5 @@
-import type { ThemeType } from '@/theme/theme-context'
 import { Radius } from '@/theme/radius'
+import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
 const HANDLE_HEIGHT = 10
@@ -8,19 +8,14 @@ const HEADER_HEIGHT = 50
 export const generateStyles = (theme: ThemeType) => {
   const { getColor, getSpacing } = theme
   return StyleSheet.create({
-    sheet: {
-      borderTopLeftRadius: Radius.small,
-      borderTopRightRadius: Radius.small,
-    },
-    sheetBackground: {
-      backgroundColor: getColor('fill/background/tertiary'),
-      borderTopLeftRadius: Radius.small,
-      borderTopRightRadius: Radius.small,
-    },
     sheetInner: {
       flex: 1,
     },
-    handleShadow: {
+    sheet: {
+      borderTopLeftRadius: Radius.medium,
+      borderTopRightRadius: Radius.medium,
+    },
+    handleContainer: {
       width: '100%',
       height: HANDLE_HEIGHT,
       justifyContent: 'center',
