@@ -9,6 +9,7 @@ import { StyleSheet, useColorScheme } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ConfirmationRoot, setConfirmationRef } from '@/components/ui/confirmation'
 import type { ConfirmationRef } from '@/components/ui/confirmation'
+import { NavigationBarHeader } from '@/components/ui/navigation-bar'
 import { MyThemeProvider } from '@/theme/theme-context'
 
 export const unstable_settings = {
@@ -42,6 +43,14 @@ export default function RootLayout() {
           <ConfirmationRoot ref={confirmationRef} />
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="home"
+              options={{
+                header: (props) => <NavigationBarHeader {...props} />,
+                headerShown: true,
+                title: 'Home',
+              }}
+            />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
           <StatusBar style="auto" />

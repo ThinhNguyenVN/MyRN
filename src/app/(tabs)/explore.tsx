@@ -14,283 +14,293 @@ import { Fonts } from '@/constants/theme'
 
 export default function TabTwoScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }
-    >
-      <MyView style={styles.titleContainer}>
-        <MyText typography={'caption'} style={styles.captionRounded}>
-          Explore
-        </MyText>
-      </MyView>
-      <MyText>This app includes example code to help you get started.</MyText>
-      <Collapsible title="File-based routing">
-        <MyText>
-          This app has two screens: <MyText typography={'body'}>app/(tabs)/index.tsx</MyText> and{' '}
-          <MyText typography={'label'}>app/(tabs)/explore.tsx</MyText>
-        </MyText>
-        <MyText>
-          The layout file in <MyText typography={'label'}>app/(tabs)/_layout.tsx</MyText> sets up
-          the tab navigator.
-        </MyText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <MyText typography={'caption'}>Learn more</MyText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <MyText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <MyText typography={'label'}>w</MyText> in the terminal running this project.
-        </MyText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <MyText>
-          For static images, you can use the <MyText typography={'label'}>@2x</MyText> and{' '}
-          <MyText typography={'label'}>@3x</MyText> suffixes to provide files for different screen
-          densities
-        </MyText>
-        <Image source={require('@/assets/images/react-logo.png')} style={styles.smallImage} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <MyText typography={'caption'}>Learn more</MyText>
-        </ExternalLink>
-      </Collapsible>
+    <>
+      <ParallaxScrollView
+        headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
+        headerImage={
+          <IconSymbol
+            size={310}
+            color="#808080"
+            name="chevron.left.forwardslash.chevron.right"
+            style={styles.headerImage}
+          />
+        }
+      >
+        <MyView style={styles.titleContainer}>
+          <MyText typography={'caption'} style={styles.captionRounded}>
+            Explore
+          </MyText>
+        </MyView>
+        <MyText>This app includes example code to help you get started.</MyText>
+        <Collapsible title="File-based routing">
+          <MyText>
+            This app has two screens: <MyText typography={'body'}>app/(tabs)/index.tsx</MyText> and{' '}
+            <MyText typography={'label'}>app/(tabs)/explore.tsx</MyText>
+          </MyText>
+          <MyText>
+            The layout file in <MyText typography={'label'}>app/(tabs)/_layout.tsx</MyText> sets up
+            the tab navigator.
+          </MyText>
+          <ExternalLink href="https://docs.expo.dev/router/introduction">
+            <MyText typography={'caption'}>Learn more</MyText>
+          </ExternalLink>
+        </Collapsible>
+        <Collapsible title="Android, iOS, and web support">
+          <MyText>
+            You can open this project on Android, iOS, and the web. To open the web version, press{' '}
+            <MyText typography={'label'}>w</MyText> in the terminal running this project.
+          </MyText>
+        </Collapsible>
+        <Collapsible title="Images">
+          <MyText>
+            For static images, you can use the <MyText typography={'label'}>@2x</MyText> and{' '}
+            <MyText typography={'label'}>@3x</MyText> suffixes to provide files for different screen
+            densities
+          </MyText>
+          <Image source={require('@/assets/images/react-logo.png')} style={styles.smallImage} />
+          <ExternalLink href="https://reactnative.dev/docs/images">
+            <MyText typography={'caption'}>Learn more</MyText>
+          </ExternalLink>
+        </Collapsible>
 
-      <Collapsible title="MyAlert">
-        <MyText typography="caption" color="text/active/tertiary" style={styles.sectionCaption}>
-          Các loại alert
-        </MyText>
+        <Collapsible title="MyAlert">
+          <MyText typography="caption" color="text/active/tertiary" style={styles.sectionCaption}>
+            Các loại alert
+          </MyText>
 
-        <MyText typography="label" style={styles.labelMargin}>
-          1. Info
-        </MyText>
-        <MyAlert
-          type="info"
-          title="Thông tin"
-          message="Đây là thông báo thông tin"
-          description="Mô tả chi tiết của alert loại info."
-          onClose={() => {
-            console.log('onClose')
-          }}
-          style={styles.alertMargin}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            1. Info
+          </MyText>
+          <MyAlert
+            type="info"
+            title="Thông tin"
+            message="Đây là thông báo thông tin"
+            description="Mô tả chi tiết của alert loại info."
+            onClose={() => {
+              console.log('onClose')
+            }}
+            style={styles.alertMargin}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          2. Success
-        </MyText>
-        <MyAlert
-          type="success"
-          title="Thành công"
-          message="Thao tác đã hoàn tất"
-          description="Dữ liệu đã được lưu thành công."
-          onClose={() => {}}
-          style={styles.alertMargin}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            2. Success
+          </MyText>
+          <MyAlert
+            type="success"
+            title="Thành công"
+            message="Thao tác đã hoàn tất"
+            description="Dữ liệu đã được lưu thành công."
+            onClose={() => {}}
+            style={styles.alertMargin}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          3. Warning
-        </MyText>
-        <MyAlert
-          type="warning"
-          title="Cảnh báo"
-          message="Vui lòng kiểm tra lại"
-          description="Có một số thông tin cần được xác nhận."
-          onClose={() => {}}
-          style={styles.alertMargin}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            3. Warning
+          </MyText>
+          <MyAlert
+            type="warning"
+            title="Cảnh báo"
+            message="Vui lòng kiểm tra lại"
+            description="Có một số thông tin cần được xác nhận."
+            onClose={() => {}}
+            style={styles.alertMargin}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          4. Error
-        </MyText>
-        <MyAlert
-          type="error"
-          title="Lỗi"
-          message="Đã xảy ra lỗi"
-          description="Không thể thực hiện thao tác. Vui lòng thử lại sau."
-          onClose={() => {}}
-          style={styles.alertMargin}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            4. Error
+          </MyText>
+          <MyAlert
+            type="error"
+            title="Lỗi"
+            message="Đã xảy ra lỗi"
+            description="Không thể thực hiện thao tác. Vui lòng thử lại sau."
+            onClose={() => {}}
+            style={styles.alertMargin}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          5. Custom icon
-        </MyText>
-        <MyAlert
-          type="info"
-          icon="notifications"
-          message="Thông báo mới"
-          description="Bạn có 3 thông báo chưa đọc."
-          style={styles.alertMargin}
-          onClose={() => {}}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            5. Custom icon
+          </MyText>
+          <MyAlert
+            type="info"
+            icon="notifications"
+            message="Thông báo mới"
+            description="Bạn có 3 thông báo chưa đọc."
+            style={styles.alertMargin}
+            onClose={() => {}}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          6. With image
-        </MyText>
-        <MyAlert
-          type="success"
-          image={require('@/assets/images/react-logo.png')}
-          message="Cập nhật profile"
-          description="Ảnh đại diện đã được cập nhật."
-          style={styles.alertMargin}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            6. With image
+          </MyText>
+          <MyAlert
+            type="success"
+            image={require('@/assets/images/react-logo.png')}
+            message="Cập nhật profile"
+            description="Ảnh đại diện đã được cập nhật."
+            style={styles.alertMargin}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          7. Minimal (no header)
-        </MyText>
-        <MyAlert type="warning" message="Phiên đăng nhập sắp hết hạn" style={styles.alertMargin} />
+          <MyText typography="label" style={styles.labelMargin}>
+            7. Minimal (no header)
+          </MyText>
+          <MyAlert
+            type="warning"
+            message="Phiên đăng nhập sắp hết hạn"
+            style={styles.alertMargin}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          8. With elevation
-        </MyText>
-        <MyAlert
-          type="success"
-          title="Thành công"
-          message="Có shadow"
-          elevation="soft/down/small"
-          onClose={() => {}}
-          style={styles.alertMargin}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            8. With elevation
+          </MyText>
+          <MyAlert
+            type="success"
+            title="Thành công"
+            message="Có shadow"
+            elevation="soft/down/small"
+            onClose={() => {}}
+            style={styles.alertMargin}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          9. With buttons
-        </MyText>
-        <MyAlert
-          type="info"
-          title="Xác nhận"
-          message="Bạn có muốn tiếp tục?"
-          description="Thao tác này không thể hoàn tác."
-          onClose={() => {}}
-          buttons={[
-            { text: 'Hủy', type: 'tertiary', onPress: () => {} },
-            { text: 'Xác nhận', type: 'primary', onPress: () => {} },
-          ]}
-          style={styles.alertMargin}
-        />
-      </Collapsible>
+          <MyText typography="label" style={styles.labelMargin}>
+            9. With buttons
+          </MyText>
+          <MyAlert
+            type="info"
+            title="Xác nhận"
+            message="Bạn có muốn tiếp tục?"
+            description="Thao tác này không thể hoàn tác."
+            onClose={() => {}}
+            buttons={[
+              { text: 'Hủy', type: 'tertiary', onPress: () => {} },
+              { text: 'Xác nhận', type: 'primary', onPress: () => {} },
+            ]}
+            style={styles.alertMargin}
+          />
+        </Collapsible>
 
-      <Collapsible title="MyImage">
-        <MyText typography="caption" color="text/active/tertiary" style={styles.sectionCaption}>
-          Các trường hợp sử dụng MyImage
-        </MyText>
+        <Collapsible title="MyImage">
+          <MyText typography="caption" color="text/active/tertiary" style={styles.sectionCaption}>
+            Các trường hợp sử dụng MyImage
+          </MyText>
 
-        <MyText typography="label" style={styles.labelMargin}>
-          1. url hợp lệ
-        </MyText>
-        <MyImage
-          url="https://picsum.photos/200/150"
-          width={200}
-          marginTop={20}
-          marginBottom={20}
-          alignSelf="center"
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            1. url hợp lệ
+          </MyText>
+          <MyImage
+            url="https://picsum.photos/200/150"
+            width={200}
+            marginTop={20}
+            marginBottom={20}
+            alignSelf="center"
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          2. source local (require)
-        </MyText>
-        <MyImage
-          source={require('@/assets/images/react-logo.png')}
-          style={styles.smallImageMargin}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            2. source local (require)
+          </MyText>
+          <MyImage
+            source={require('@/assets/images/react-logo.png')}
+            style={styles.smallImageMargin}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          3. Không có url/source (empty)
-        </MyText>
-        <MyImage style={styles.image200x120} />
+          <MyText typography="label" style={styles.labelMargin}>
+            3. Không có url/source (empty)
+          </MyText>
+          <MyImage style={styles.image200x120} />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          4. Empty + showMessage
-        </MyText>
-        <MyImage showMessage emptyMessage="Chưa có ảnh" style={styles.image200x120} />
+          <MyText typography="label" style={styles.labelMargin}>
+            4. Empty + showMessage
+          </MyText>
+          <MyImage showMessage emptyMessage="Chưa có ảnh" style={styles.image200x120} />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          5. URL lỗi (error state)
-        </MyText>
-        <MyImage
-          url="https://invalid-url-will-fail.example/img.jpg"
-          width={100}
-          alignSelf="center"
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            5. URL lỗi (error state)
+          </MyText>
+          <MyImage
+            url="https://invalid-url-will-fail.example/img.jpg"
+            width={100}
+            alignSelf="center"
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          6. Error + showMessage
-        </MyText>
-        <MyImage
-          url="https://invalid-url-will-fail.example/img.jpg"
-          showMessage
-          errorMessage="Tải ảnh thất bại"
-          style={styles.image200x120}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            6. Error + showMessage
+          </MyText>
+          <MyImage
+            url="https://invalid-url-will-fail.example/img.jpg"
+            showMessage
+            errorMessage="Tải ảnh thất bại"
+            style={styles.image200x120}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          7. onPress
-        </MyText>
-        <MyImage
-          url="https://picsum.photos/200/100"
-          onPress={() => alert('Image pressed')}
-          style={styles.image200x100}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            7. onPress
+          </MyText>
+          <MyImage
+            url="https://picsum.photos/200/100"
+            onPress={() => alert('Image pressed')}
+            style={styles.image200x100}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          8. elevation
-        </MyText>
-        <MyImage
-          url="https://picsum.photos/180/100"
-          elevation="soft/down/small"
-          style={styles.image180x100}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            8. elevation
+          </MyText>
+          <MyImage
+            url="https://picsum.photos/180/100"
+            elevation="soft/down/small"
+            style={styles.image180x100}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          9. contentFit: contain
-        </MyText>
-        <MyImage
-          url="https://picsum.photos/200/200"
-          contentFit="contain"
-          style={styles.image150x150}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            9. contentFit: contain
+          </MyText>
+          <MyImage
+            url="https://picsum.photos/200/200"
+            contentFit="contain"
+            style={styles.image150x150}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          10. emptyContent custom
-        </MyText>
-        <MyImage
-          emptyContent={
-            <MyView padding={24} alignItems="center" gap={8}>
-              <MyIcon name="add-circle-outline" size={40} color="icon/inactive/primary" />
-              <MyText typography="caption" color="text/inactive/primary">
-                Thêm ảnh
-              </MyText>
-            </MyView>
-          }
-          style={styles.image200x100}
-        />
+          <MyText typography="label" style={styles.labelMargin}>
+            10. emptyContent custom
+          </MyText>
+          <MyImage
+            emptyContent={
+              <MyView padding={24} alignItems="center" gap={8}>
+                <MyIcon name="add-circle-outline" size={40} color="icon/inactive/primary" />
+                <MyText typography="caption" color="text/inactive/primary">
+                  Thêm ảnh
+                </MyText>
+              </MyView>
+            }
+            style={styles.image200x100}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          11. priority (high) + loading
-        </MyText>
-        <MyImage url="https://picsum.photos/200/120" priority="high" style={styles.image200x120} />
+          <MyText typography="label" style={styles.labelMargin}>
+            11. priority (high) + loading
+          </MyText>
+          <MyImage
+            url="https://picsum.photos/200/120"
+            priority="high"
+            style={styles.image200x120}
+          />
 
-        <MyText typography="label" style={styles.labelMargin}>
-          12. errorContent custom
-        </MyText>
-        <MyImage
-          url="https://invalid-url.example/img.jpg"
-          errorContent={
-            <MyView style={styles.errorContent}>
-              <MyIcon name="refresh-outline" size={28} color="icon/alert/primary" />
-              <MyText typography="caption" color="text/alert/primary">
-                Lỗi tải ảnh
-              </MyText>
-            </MyView>
-          }
-          style={styles.image200x100}
-        />
-      </Collapsible>
-    </ParallaxScrollView>
+          <MyText typography="label" style={styles.labelMargin}>
+            12. errorContent custom
+          </MyText>
+          <MyImage
+            url="https://invalid-url.example/img.jpg"
+            errorContent={
+              <MyView style={styles.errorContent}>
+                <MyIcon name="refresh-outline" size={28} color="icon/alert/primary" />
+                <MyText typography="caption" color="text/alert/primary">
+                  Lỗi tải ảnh
+                </MyText>
+              </MyView>
+            }
+            style={styles.image200x100}
+          />
+        </Collapsible>
+      </ParallaxScrollView>
+    </>
   )
 }
 
