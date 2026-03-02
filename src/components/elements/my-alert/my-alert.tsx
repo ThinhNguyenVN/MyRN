@@ -57,16 +57,15 @@ const MyAlert: React.FC<MyAlertProps> = ({
   const headerTitleTextStyle = styles[`headerTitleText${typeCap}` as keyof typeof styles] as object
   const gradientColors = styles.headerGradientByType?.[type]
 
-  const Container = elevation && elevation !== 'none' ? MySurface : MyView
+  const Container = !!elevation && elevation !== 'none' ? MySurface : MyView
   const containerProps =
-    elevation && elevation !== 'none'
+    !!elevation && elevation !== 'none'
       ? {
-          radius: 'medium' as const,
           elevation,
-          style: [styles.container, style],
+          fillParent: false,
           ...rest,
         }
-      : { radius: 'medium' as const, style: [styles.container, style], ...rest }
+      : { ...rest }
 
   const [headerSize, setHeaderSize] = useState({ w: 0, h: 0 })
   const onHeaderLayout = useCallback((e: LayoutChangeEvent) => {
@@ -81,7 +80,11 @@ const MyAlert: React.FC<MyAlertProps> = ({
   )
 
   return (
-    <Container {...(containerProps as Record<string, unknown>)}>
+    <Container
+      radius={'medium'}
+      style={[styles.container, style]}
+      {...(containerProps as Record<string, unknown>)}
+    >
       {hasHeader && (
         <MyView style={[styles.header, headerBorderStyle]} onLayout={onHeaderLayout}>
           {headerSize.w > 0 && headerSize.h > 0 && gradientColors && (

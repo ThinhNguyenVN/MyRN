@@ -17,6 +17,8 @@ export interface MySurfaceProps extends Omit<
   backgroundColor?: string
   style?: StyleProp<SurfaceStyle>
   children?: React.ReactNode
+  /** false = content size theo children (auto height, e.g. MyAlert). true = flex:1 fill parent (e.g. MyButton) */
+  fillParent?: boolean
 }
 
 const MIN_INSET = 16
@@ -29,6 +31,7 @@ const MySurface: React.FC<MySurfaceProps> = ({
   backgroundColor,
   style,
   children,
+  fillParent = true,
   ...rest
 }) => {
   const filterId = useId().replace(/:/g, '')
@@ -67,15 +70,12 @@ const MySurface: React.FC<MySurfaceProps> = ({
 
   const { containerStyle, contentStyle } = useMemo(() => {
     const split = splitSurfaceStyle(styleWithoutBg)
-
+    const contentBase = fillParent ? { flex: 1, ...split.contentStyle } : { ...split.contentStyle }
     return {
       containerStyle: split.containerStyle,
-      contentStyle: {
-        flex: 1,
-        ...split.contentStyle,
-      },
+      contentStyle: contentBase,
     }
-  }, [styleWithoutBg])
+  }, [styleWithoutBg, fillParent])
 
   // Khi có elevation: outer PHẢI overflow visible để shadow không bị cắt
   // overflow: 'hidden' từ user → chuyển xuống inner content để clip children

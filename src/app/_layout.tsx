@@ -1,11 +1,14 @@
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
+import { useRef, useEffect } from 'react'
 import 'react-native-reanimated'
 import { useFonts } from 'expo-font'
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { StyleSheet, useColorScheme } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { ConfirmationRoot, setConfirmationRef } from '@/components/ui/confirmation'
+import type { ConfirmationRef } from '@/components/ui/confirmation'
 import { MyThemeProvider } from '@/theme/theme-context'
 
 export const unstable_settings = {
@@ -14,6 +17,12 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme()
+  const confirmationRef = useRef<ConfirmationRef | null>(null)
+
+  useEffect(() => {
+    setConfirmationRef(confirmationRef)
+    return () => setConfirmationRef(null)
+  }, [])
 
   const [fontsLoaded] = useFonts({
     Roboto: require('@/assets/fonts/Roboto-Regular.ttf'),
@@ -30,6 +39,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.root}>
       <MyThemeProvider value={themeName}>
         <BottomSheetModalProvider>
+          <ConfirmationRoot ref={confirmationRef} />
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />

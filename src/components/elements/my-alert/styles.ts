@@ -54,6 +54,8 @@ export const generateStyles = (theme: ThemeType) => {
       backgroundColor: getColor('fill/background/tertiary'),
       borderWidth: 1,
       borderColor: getColor('border/inactive/tertiary'),
+      width: '100%',
+      maxWidth: 400,
     },
     header: {
       flexDirection: 'row',
@@ -90,6 +92,7 @@ export const generateStyles = (theme: ThemeType) => {
       flexDirection: 'row',
       alignItems: 'center',
       padding: getSpacing('x4'),
+      paddingTop: 20,
       gap: getSpacing('x3'),
       justifyContent: 'center',
     },

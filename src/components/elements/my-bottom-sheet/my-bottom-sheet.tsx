@@ -1,5 +1,5 @@
 import React, { forwardRef, memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
-import { Dimensions, TouchableOpacity, View } from 'react-native'
+import { Dimensions, View } from 'react-native'
 
 import {
   BottomSheetModal,
@@ -19,6 +19,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import type { MyBottomSheetProps, MyBottomSheetRef } from './type'
 import { generateStyles } from './styles'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import MyPressable from '../my-pressable'
 
 function SheetHandle() {
   const { getColor } = useTheme()
@@ -100,14 +101,9 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
               </MyText>
             </MyView>
             {showClose && (
-              <TouchableOpacity
-                style={styles.headerClose}
-                onPress={close}
-                hitSlop={8}
-                activeOpacity={0.7}
-              >
+              <MyPressable style={styles.headerClose} onPress={close}>
                 <MyIcon name="close" color="icon/active/primary" />
-              </TouchableOpacity>
+              </MyPressable>
             )}
           </MyView>
         )
@@ -140,7 +136,6 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       () => createBackdropComponent(pressBackdropToClose),
       [pressBackdropToClose],
     )
-    console.log('insets ==>', insets.top, insets.top ?? 16)
 
     return (
       <BottomSheetModal
@@ -155,6 +150,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         enableDynamicSizing
         keyboardBehavior={'fillParent'}
         enableBlurKeyboardOnGesture={false}
+        detached={true}
         maxDynamicContentSize={Dimensions.get('window').height - (insets.top || getSpacing('x6'))}
         {...rest}
       >

@@ -43,8 +43,8 @@ const MyButtonIcon: React.FC<MyButtonIconProps> = ({
   const hasContainerPropsStyle = Object.keys(containerPropsStyle).length > 0
   const pressableProps = omitContainerProps(rest as Record<string, unknown>)
 
-  const useWhiteIcon = type === 'primary' || type === 'dark' || disabled
-  const iconColor = useWhiteIcon ? TEXT_ON_PRIMARY : getColor('text/active/primary')
+  const useWhiteIcon = type === 'primary' || type === 'dark' || type === 'tertiary' || disabled
+  const iconColor = useWhiteIcon ? TEXT_ON_PRIMARY : getColor('icon/active/primary')
   const iconSize = size === 'small' ? ICON_SIZE_SMALL : ICON_SIZE_LARGE
 
   const sizeStyle = size === 'small' ? styles.iconButtonSmall : styles.iconButtonLarge

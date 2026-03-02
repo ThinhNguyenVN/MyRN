@@ -59,7 +59,7 @@ const MyButton: React.FC<MyButtonProps> = ({
     size === 'small' ? styles.sizeSmall : styles.sizeLarge,
     ...(widthStyle ? [widthStyle] : []),
   ]
-  const useWhiteText = type === 'primary' || type === 'dark' || disabled
+  const useWhiteText = type === 'primary' || type === 'dark' || type === 'tertiary' || disabled
   const textColor = useWhiteText ? TEXT_ON_PRIMARY : getColor('text/active/primary')
   const textStyle = useMemo(() => ({ color: textColor }), [textColor])
 

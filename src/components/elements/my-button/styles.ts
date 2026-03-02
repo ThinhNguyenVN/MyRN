@@ -30,9 +30,8 @@ export function generateStyles(theme: ThemeType): Record<string, ViewStyle> {
     },
     tertiary: {
       ...base,
-      ...withBorder,
-      backgroundColor: getColor('fill/inactive/quaternary'),
-      borderColor: getColor('border/inactive/primary'),
+      backgroundColor: getColor('fill/alert/primary'),
+      borderWidth: 0,
     },
     light: {
       ...base,

@@ -3,6 +3,7 @@ import { Image } from 'expo-image'
 
 import ParallaxScrollView from '@/components/ui/parallax-scroll-view'
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
+import { Confirmation } from '@/components/ui/confirmation'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
@@ -116,6 +117,64 @@ export default function HomeScreen() {
           <MyButton.Icon icon="refresh" type="primary" loading onPress={() => {}} />
           <MyButton.Icon icon="trash-outline" type="secondary" disabled onPress={() => {}} />
         </MyView>
+
+        <MyText typography="subtitle" style={styles.sectionTitle}>
+          Confirmation
+        </MyText>
+        <MyButton
+          width={'full'}
+          text="Confirm (info)"
+          size={'small'}
+          type="primary"
+          onPress={async () => {
+            const ok = await Confirmation.confirm({
+              // title: 'Xác nhận',
+              hideClose: true,
+              message: 'Bạn có chắc muốn tiếp tục?',
+              type: 'info',
+              confirmText: 'Đồng ý',
+
+              // cancelText: 'Hủy',
+            })
+            console.log('ok ==>', ok)
+          }}
+          style={styles.buttonMargin}
+        />
+        <MyButton
+          width={'full'}
+          text="Confirm (warning)"
+          size={'small'}
+          type="secondary"
+          onPress={async () => {
+            const ok = await Confirmation.confirm({
+              message: 'Hành động không thể hoàn tác.',
+              description: 'Bạn có chắc muốn xóa?',
+              type: 'warning',
+              confirmText: 'Xóa',
+              cancelText: 'Không',
+              buttons: [
+                {
+                  text: 'Xóa',
+                  type: 'tertiary',
+                  onPress: () => {
+                    console.log('Xóa')
+                    Confirmation.hide()
+                  },
+                },
+                {
+                  text: 'Không',
+                  type: 'secondary',
+                  onPress: () => {
+                    console.log('Không')
+                    Confirmation.hide()
+                  },
+                },
+              ],
+            })
+            console.log('ok ==>', ok)
+          }}
+          style={styles.buttonMargin}
+        />
 
         <MyText typography="subtitle" style={styles.sectionTitle}>
           Bottom Sheet
