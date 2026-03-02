@@ -56,11 +56,7 @@ const MyButtonIcon: React.FC<MyButtonIconProps> = ({
   )
 
   const surfaceStyle = [buttonStyle, disabled && styles.disabled, style]
-  const touchableStyle = [
-    { flex: 0, alignSelf: 'flex-start' as const },
-    ...(hasContainerPropsStyle ? [containerPropsStyle] : []),
-    containerStyle,
-  ]
+  const touchableStyle = [...(hasContainerPropsStyle ? [containerPropsStyle] : []), containerStyle]
 
   return (
     <MyPressable disabled={disabled || loading} {...pressableProps} style={touchableStyle}>

@@ -69,6 +69,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     },
     ref,
   ) => {
+    const { getSpacing } = useTheme()
     const bottomSheetRef = useRef<BottomSheetModal>(null)
     const styles = useThemedStyles(generateStyles)
     const insets = useSafeAreaInsets()
@@ -139,6 +140,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       () => createBackdropComponent(pressBackdropToClose),
       [pressBackdropToClose],
     )
+    console.log('insets ==>', insets.top, insets.top ?? 16)
 
     return (
       <BottomSheetModal
@@ -153,7 +155,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         enableDynamicSizing
         keyboardBehavior={'fillParent'}
         enableBlurKeyboardOnGesture={false}
-        maxDynamicContentSize={Dimensions.get('window').height - (insets.top ?? 16)}
+        maxDynamicContentSize={Dimensions.get('window').height - (insets.top || getSpacing('x6'))}
         {...rest}
       >
         {header ?? headerContent}

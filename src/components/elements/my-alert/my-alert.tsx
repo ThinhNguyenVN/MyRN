@@ -1,6 +1,8 @@
-import React, { memo } from 'react'
+import React, { memo, useState, useCallback } from 'react'
+import { LayoutChangeEvent } from 'react-native'
 
 import MyButton from '@/components/elements/my-button'
+import MyGradient from '@/components/elements/my-gradient'
 import MyImage from '@/components/elements/my-image'
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
@@ -49,6 +51,12 @@ const MyAlert: React.FC<MyAlertProps> = ({
   const hasContent = hasVisual || !!message || !!description
   const closeInContent = !!onClose && !title
 
+  const typeCap = type.charAt(0).toUpperCase() + type.slice(1)
+  const headerBorderStyle = styles[`headerBorder${typeCap}` as keyof typeof styles] as object
+  const headerTitleStyle = styles[`headerTitle${typeCap}` as keyof typeof styles] as object
+  const headerTitleTextStyle = styles[`headerTitleText${typeCap}` as keyof typeof styles] as object
+  const gradientColors = styles.headerGradientByType?.[type]
+
   const Container = elevation && elevation !== 'none' ? MySurface : MyView
   const containerProps =
     elevation && elevation !== 'none'
@@ -60,22 +68,41 @@ const MyAlert: React.FC<MyAlertProps> = ({
         }
       : { radius: 'medium' as const, style: [styles.container, style], ...rest }
 
-  const CloseButton = (
+  const [headerSize, setHeaderSize] = useState({ w: 0, h: 0 })
+  const onHeaderLayout = useCallback((e: LayoutChangeEvent) => {
+    const { width, height } = e.nativeEvent.layout
+    setHeaderSize((s) => (s.w === width && s.h === height ? s : { w: width, h: height }))
+  }, [])
+
+  const CloseButton = ({ iconColor }: { iconColor?: string }) => (
     <MyPressable onPress={onClose} animatedType="scale" scaleBySize={false} scaleValue={0.9}>
-      <MyIcon name="close" size={20} color="icon/active/primary" />
+      <MyIcon name="close" size={20} color={(iconColor ?? 'icon/active/primary') as never} />
     </MyPressable>
   )
 
   return (
     <Container {...(containerProps as Record<string, unknown>)}>
       {hasHeader && (
-        <MyView style={styles.header}>
-          <MyView flex={1}>
-            <MyText typography="subtitle" color="text/active/primary">
-              {title}
-            </MyText>
+        <MyView style={[styles.header, headerBorderStyle]} onLayout={onHeaderLayout}>
+          {headerSize.w > 0 && headerSize.h > 0 && gradientColors && (
+            <MyGradient
+              width={headerSize.w}
+              height={headerSize.h}
+              startColor={gradientColors.startColor}
+              endColor={gradientColors.endColor}
+              startOpacity={0.5}
+              endOpacity={0.6}
+              style={styles.headerGradient}
+            />
+          )}
+          <MyView style={styles.headerContent}>
+            <MyView style={headerTitleStyle}>
+              <MyText typography="subtitle" style={headerTitleTextStyle}>
+                {title}
+              </MyText>
+            </MyView>
+            {!!onClose && <CloseButton iconColor={iconColor} />}
           </MyView>
-          {!!onClose && CloseButton}
         </MyView>
       )}
       {(hasContent || closeInContent) && (
@@ -95,7 +122,7 @@ const MyAlert: React.FC<MyAlertProps> = ({
             {!!message && <MyText style={styles.message}>{message}</MyText>}
             {!!description && <MyText style={styles.description}>{description}</MyText>}
           </MyView>
-          {closeInContent && CloseButton}
+          {closeInContent && <CloseButton />}
         </MyView>
       )}
       {!!buttons?.length && (
