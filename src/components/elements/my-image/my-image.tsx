@@ -14,7 +14,7 @@ import MySurface from '../my-surface'
 import { generateStyles } from './styles'
 import type { MyImageProps } from './type'
 import { useThemedStyles } from '@/theme/theme-context'
-import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
+import { getContainerStyle, pickContainerProps } from '@/utils/styles'
 
 const FADE_MS = 200
 const CACHE_POLICY = 'memory-disk'
@@ -166,11 +166,19 @@ const MyImage: React.FC<MyImageProps> = ({
     </>
   )
 
+  const needsDimensionFallback = useMemo(() => {
+    const hasAlignSelf = !isNil(containerPropsStyle.alignSelf)
+    const hasWidth = !isNil(containerPropsStyle.width)
+    const hasHeight = !isNil(containerPropsStyle.height)
+    return hasAlignSelf && !hasWidth && !hasHeight
+  }, [containerPropsStyle])
+
   const containerStyle = [
     styles.container,
     ...(hasContainerPropsStyle ? [containerPropsStyle] : []),
+    needsDimensionFallback && { width: '100%' as const },
     style,
-  ]
+  ].filter(Boolean)
 
   if (elevation !== 'none') {
     return (
