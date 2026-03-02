@@ -125,10 +125,10 @@ export const generateStyles = (theme: ThemeType) => {
       alignItems: 'center',
       justifyContent: 'flex-end',
       paddingHorizontal: getSpacing('x4'),
-      paddingVertical: getSpacing('x3'),
-      gap: getSpacing('x2'),
-      borderTopWidth: 1,
-      borderTopColor: getColor('border/inactive/tertiary'),
+      paddingBottom: getSpacing('x3'),
+      gap: getSpacing('x4'),
+      // borderTopWidth: 1,
+      // borderTopColor: getColor('border/inactive/tertiary'),
     },
   })
   return { ...sheet, headerGradientByType: headerByType }

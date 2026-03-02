@@ -143,7 +143,6 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         enableDynamicSizing
         keyboardBehavior={'fillParent'}
         enableBlurKeyboardOnGesture={false}
-        detached={true}
         maxDynamicContentSize={Dimensions.get('window').height - (insets.top || getSpacing('x6'))}
         {...rest}
       >
