@@ -4,6 +4,7 @@ import { Image } from 'expo-image'
 import ParallaxScrollView from '@/components/ui/parallax-scroll-view'
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import { Confirmation } from '@/components/ui/confirmation'
+import { Toast } from '@/components/ui/toast'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
@@ -176,6 +177,49 @@ export default function HomeScreen() {
             }}
             style={styles.buttonMargin}
           />
+
+          <MyText typography="subtitle" style={styles.sectionTitle}>
+            Toast
+          </MyText>
+          <MyView flexDirection="row" flexWrap="wrap" gap={8} style={styles.buttonMargin}>
+            <MyButton
+              text="Toast (info)"
+              size="small"
+              type="primary"
+              onPress={() => Toast.show({ text: 'Thông tin', type: 'info' })}
+            />
+            <MyButton
+              text="Toast (success)"
+              size="small"
+              type="secondary"
+              onPress={() => Toast.show({ text: 'Đã lưu thành công', type: 'success' })}
+            />
+            <MyButton
+              text="Toast (warning)"
+              size="small"
+              type="tertiary"
+              onPress={() =>
+                Toast.show({
+                  text: 'Cảnh báo',
+                  description: 'Vui lòng kiểm tra lại.',
+                  type: 'warning',
+                })
+              }
+            />
+            <MyButton
+              text="Toast (error)"
+              size="small"
+              type="primary"
+              onPress={() =>
+                Toast.show({
+                  text: 'Có lỗi xảy ra',
+                  description: 'Thử lại sau.',
+                  type: 'error',
+                  elevation: 'soft/down/small',
+                })
+              }
+            />
+          </MyView>
 
           <MyText typography="subtitle" style={styles.sectionTitle}>
             Bottom Sheet

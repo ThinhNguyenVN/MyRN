@@ -74,7 +74,7 @@ const ConfirmationRoot = forwardRef<ConfirmationRef, object>(function Confirmati
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType={'fade'}
       statusBarTranslucent
       onRequestClose={handleClose}
     >

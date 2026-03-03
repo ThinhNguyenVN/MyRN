@@ -25,9 +25,13 @@ export const ColorPaletteLight = {
   gray900: '#1c1917',
   // Semantic
   danger: '#b91c1c',
+  dangerMuted: '#fecaca',
   warning: '#b45309',
+  warningMuted: '#fde68a',
   success: '#047857',
+  successMuted: '#a7f3d0',
   info: '#0e7490',
+  infoMuted: '#a5f3fc',
   // Background
   background: '#fafaf9',
   backgroundSecondary: '#f5f5f4',
@@ -59,9 +63,13 @@ export const ColorPaletteDark = {
   gray900: '#e4e4e7',
   // Semantic — bớt neon, dễ nhìn
   danger: '#fca5a5',
+  dangerMuted: '#7f1d1d',
   warning: '#fcd34d',
+  warningMuted: '#78350f',
   success: '#86efac',
+  successMuted: '#14532d',
   info: '#67e8f9',
+  infoMuted: '#0e7490',
   // Background
   background: '#09090b',
   backgroundSecondary: '#27272a',
@@ -97,15 +105,19 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       },
       alert: {
         primary: palette.danger,
+        secondary: palette.danger,
       },
       warning: {
         primary: palette.warning,
+        secondary: palette.warning,
       },
       info: {
         primary: palette.info,
+        secondary: palette.info,
       },
       success: {
         primary: palette.success,
+        secondary: palette.success,
       },
     },
     fill: {
@@ -123,15 +135,19 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       },
       alert: {
         primary: palette.danger,
+        secondary: palette.danger,
       },
       warning: {
         primary: palette.warning,
+        secondary: palette.warning,
       },
       info: {
         primary: palette.info,
+        secondary: palette.info,
       },
       success: {
         primary: palette.success,
+        secondary: palette.success,
       },
       background: {
         primary: palette.background,
@@ -157,15 +173,19 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       },
       alert: {
         primary: palette.danger,
+        secondary: palette.danger,
       },
       warning: {
         primary: palette.warning,
+        secondary: palette.warning,
       },
       info: {
         primary: palette.info,
+        secondary: palette.info,
       },
       success: {
         primary: palette.success,
+        secondary: palette.success,
       },
     },
     border: {
@@ -183,15 +203,19 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       },
       alert: {
         primary: palette.danger,
+        secondary: palette.dangerMuted,
       },
       warning: {
         primary: palette.warning,
+        secondary: palette.warningMuted,
       },
       info: {
         primary: palette.info,
+        secondary: palette.infoMuted,
       },
       success: {
         primary: palette.success,
+        secondary: palette.successMuted,
       },
     },
   } as const
