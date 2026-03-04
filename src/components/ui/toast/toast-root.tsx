@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { Platform, View } from 'react-native'
+import { View } from 'react-native'
 import { Portal } from '@gorhom/portal'
 import Animated, {
   runOnJS,
@@ -19,6 +19,7 @@ import MyIcon from '@/components/elements/my-icon'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
+import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 
 import type { ToastOptions, ToastRef, ToastType } from './type'
 import { generateStyles } from './styles'
@@ -53,7 +54,7 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
   const translateY = useSharedValue(SLIDE_DISTANCE)
   const translateX = useSharedValue(SLIDE_DISTANCE_WEB)
 
-  const isWeb = Platform.OS === 'web'
+  const isDesktopViewport = !useIsMobileSize()
 
   const clearHideTimeout = useCallback(() => {
     if (hideTimeoutRef.current) {
@@ -69,7 +70,7 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
 
   const hide = useCallback(() => {
     clearHideTimeout()
-    if (isWeb) {
+    if (isDesktopViewport) {
       translateX.value = withTiming(SLIDE_DISTANCE_WEB, { duration: ANIMATION_DURATION_WEB }, () =>
         runOnJS(setHidden)(),
       )
@@ -78,12 +79,12 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
         runOnJS(setHidden)(),
       )
     }
-  }, [clearHideTimeout, isWeb, setHidden, translateX, translateY])
+  }, [clearHideTimeout, isDesktopViewport, setHidden, translateX, translateY])
 
   const show = useCallback(
     (opts: ToastOptions) => {
       clearHideTimeout()
-      if (isWeb) {
+      if (isDesktopViewport) {
         translateX.value = SLIDE_DISTANCE_WEB
       } else {
         translateY.value = SLIDE_DISTANCE
@@ -96,24 +97,26 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
         hide()
       }, duration)
     },
-    [clearHideTimeout, hide, isWeb, translateX, translateY],
+    [clearHideTimeout, hide, isDesktopViewport, translateX, translateY],
   )
 
   useEffect(() => {
     if (!visible || !options) return
-    if (isWeb) {
+    if (isDesktopViewport) {
       translateX.value = withTiming(0, { duration: ANIMATION_DURATION_WEB })
     } else {
       translateY.value = withTiming(0, { duration: ANIMATION_DURATION })
     }
-  }, [visible, options, isWeb, translateX, translateY])
+  }, [visible, options, isDesktopViewport, translateX, translateY])
 
   useImperativeHandle(ref, () => ({ show, hide }), [show, hide])
 
   useEffect(() => clearHideTimeout, [clearHideTimeout])
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: isWeb ? [{ translateX: translateX.value }] : [{ translateY: translateY.value }],
+    transform: isDesktopViewport
+      ? [{ translateX: translateX.value }]
+      : [{ translateY: translateY.value }],
   }))
 
   if (!visible || !options) return null
@@ -159,11 +162,15 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
   return (
     <Portal hostName="root">
       <View
-        style={[styles.toastPosition, isWeb && styles.toastPositionWeb]}
+        style={[styles.toastPosition, isDesktopViewport && styles.toastPositionWeb]}
         pointerEvents="box-none"
       >
         <Animated.View
-          style={[animatedStyle, styles.toastInnerWrap, isWeb && styles.toastInnerWrapWeb]}
+          style={[
+            animatedStyle,
+            styles.toastInnerWrap,
+            isDesktopViewport && styles.toastInnerWrapWeb,
+          ]}
           pointerEvents="none"
         >
           {wrapper}
