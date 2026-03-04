@@ -13,8 +13,6 @@ import type { MyTextInputProps } from './type'
 import { useThemedStyles } from '@/theme/theme-context'
 import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
 
-const TextInputComponent = Platform.OS === 'web' ? TextInput : BottomSheetTextInput
-
 const INPUT_FONT_SIZE = 16
 const INPUT_HEIGHT = 40
 
@@ -26,6 +24,8 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
   disabled = false,
   error = false,
   errorMessage,
+  editable = true,
+  useBottomSheetTextInput = false,
   showCurrentLength,
   maxLength,
   startText,
@@ -44,6 +44,8 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
   ...rest
 }) => {
   const styles = useThemedStyles(generateStyles)
+  const TextInputComponent =
+    Platform.OS === 'web' ? TextInput : useBottomSheetTextInput ? BottomSheetTextInput : TextInput
   const containerStyle = useMemo(
     () =>
       getContainerStyle(
@@ -148,7 +150,7 @@ const MyTextInput: React.FC<MyTextInputProps> = ({
         <TextInputComponent
           {...viewProps}
           value={ignoreValue ? undefined : value}
-          editable={!disabled}
+          editable={!disabled && editable}
           onFocus={handleFocus}
           onBlur={handleBlur}
           textAlignVertical="top"

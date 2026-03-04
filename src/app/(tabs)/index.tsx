@@ -8,6 +8,7 @@ import { Toast } from '@/components/ui/toast'
 
 import MyButton from '@/components/elements/my-button'
 import MyCheckbox from '@/components/elements/my-checkbox'
+import MyDropdownInput from '@/components/elements/my-dropdown-input'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import MyTextInput from '@/components/elements/my-text-input'
@@ -24,7 +25,15 @@ export default function HomeScreen() {
   const [checkboxA, setCheckboxA] = useState(false)
   const [checkboxB, setCheckboxB] = useState(true)
   const [radioValue, setRadioValue] = useState<string>('one')
+  const [dropdownValue, setDropdownValue] = useState<string | null>(null)
+  const [dropdownMultiValue, setDropdownMultiValue] = useState<string[]>([])
   const bottomSheetRef = useRef<MyBottomSheetRef>(null)
+
+  const dropdownOptions = [
+    { label: 'Option A', value: 'a' },
+    { label: 'Option B', value: 'b' },
+    { label: 'Option C', value: 'c' },
+  ]
 
   return (
     <>
@@ -249,6 +258,50 @@ export default function HomeScreen() {
           </MyView>
 
           <MyText typography="subtitle" style={styles.sectionTitle}>
+            Dropdown Input
+          </MyText>
+          <MyView style={styles.buttonMargin}>
+            <MyDropdownInput
+              options={dropdownOptions}
+              value={dropdownValue}
+              onValueChange={(v) => setDropdownValue(Array.isArray(v) ? (v[0] ?? null) : v)}
+              placeholder="Chọn option..."
+              title="Dropdown"
+              subTitle="Mobile: bottom sheet + checkbox · Desktop: panel"
+              required
+              style={styles.inputContainer}
+            />
+            <MyDropdownInput
+              options={dropdownOptions}
+              value={dropdownValue}
+              onValueChange={(v) => setDropdownValue(Array.isArray(v) ? (v[0] ?? null) : v)}
+              placeholder="Chọn..."
+              error={!!dropdownValue && dropdownValue === 'a'}
+              errorMessage="Demo lỗi khi chọn A"
+              style={styles.inputContainer}
+            />
+            <MyDropdownInput
+              options={dropdownOptions}
+              value={dropdownMultiValue}
+              onValueChange={(v) => setDropdownMultiValue(Array.isArray(v) ? v : [v])}
+              multiSelect
+              placeholder="Chọn nhiều..."
+              title="Multi select"
+              subTitle="Mobile: checkbox list"
+              style={styles.inputContainer}
+            />
+            <MyDropdownInput
+              options={dropdownOptions}
+              value="b"
+              onValueChange={() => {}}
+              placeholder="Chọn..."
+              title="Disabled"
+              disabled
+              style={styles.inputContainer}
+            />
+          </MyView>
+
+          <MyText typography="subtitle" style={styles.sectionTitle}>
             Toast
           </MyText>
           <MyView flexDirection="row" flexWrap="wrap" gap={8} style={styles.buttonMargin}>
@@ -310,14 +363,14 @@ export default function HomeScreen() {
             onClosed={() => {}}
             contentContainerStyle={{ gap: 8 }}
             pressBackdropToClose
-            // footer={
-            //   <MyButton
-            //     width={'full'}
-            //     text="Close"
-            //     type="primary"
-            //     onPress={() => bottomSheetRef.current?.close()}
-            //   />
-            // }
+            footer={
+              <MyButton
+                width={'full'}
+                text="Close"
+                type="primary"
+                onPress={() => bottomSheetRef.current?.close()}
+              />
+            }
             // header={
             //   <MyView backgroundColor={'fill/active/primary'}>
             //     <MyText typography="subtitle">Text Inputs Sample</MyText>
@@ -326,6 +379,7 @@ export default function HomeScreen() {
           >
             <MyView style={styles.inputContainer}>
               <MyTextInput
+                useBottomSheetTextInput
                 title="Email"
                 subTitle="Nhập email đăng nhập"
                 placeholder="you@example.com"
@@ -339,6 +393,7 @@ export default function HomeScreen() {
             </MyView>
             <MyView style={styles.inputContainer}>
               <MyTextInput
+                useBottomSheetTextInput
                 title="Password"
                 placeholder="Mật khẩu"
                 value={password}
@@ -353,6 +408,7 @@ export default function HomeScreen() {
             </MyView>
             <MyView style={styles.inputContainer}>
               <MyTextInput
+                useBottomSheetTextInput
                 title="With error"
                 subTitle="(Demo trạng thái lỗi)"
                 placeholder="Nhập gì đó"
@@ -371,15 +427,22 @@ export default function HomeScreen() {
             </MyView>
 
             <MyTextInput
+              useBottomSheetTextInput
               title="Prefix / suffix"
               startText="https://"
               endText=".com"
               placeholder="domain"
             />
 
-            <MyTextInput title="Fixed width (200)" placeholder="width={200}" width={200} />
+            <MyTextInput
+              useBottomSheetTextInput
+              title="Fixed width (200)"
+              placeholder="width={200}"
+              width={200}
+            />
 
             <MyTextInput
+              useBottomSheetTextInput
               title="Max length"
               placeholder="Tối đa 20 ký tự"
               maxLength={20}
@@ -387,12 +450,14 @@ export default function HomeScreen() {
               value="1234567890"
             />
             <MyTextInput
+              useBottomSheetTextInput
               title="Disabled"
               placeholder="Không chỉnh sửa được"
               disabled
               value="Disabled value"
             />
             <MyTextInput
+              useBottomSheetTextInput
               title="Multiple lines"
               placeholder="Multiple lines"
               multiline
@@ -404,6 +469,7 @@ export default function HomeScreen() {
               height={100}
             />
             <MyTextInput
+              useBottomSheetTextInput
               title="Max length"
               placeholder="Tối đa 20 ký tự"
               maxLength={20}
