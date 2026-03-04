@@ -3,7 +3,6 @@ import React, { memo, useMemo } from 'react'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
 
-import MySurface from '@/components/elements/my-surface'
 import MyView from '@/components/elements/my-view'
 import MyIcon from '../my-icon'
 import MySpinner from '../my-spinner'
@@ -60,15 +59,9 @@ const MyButtonIcon: React.FC<MyButtonIconProps> = ({
 
   return (
     <MyPressable disabled={disabled || loading} {...pressableProps} style={touchableStyle}>
-      {elevation === 'none' ? (
-        <MyView radius="full" style={surfaceStyle}>
-          {content}
-        </MyView>
-      ) : (
-        <MySurface radius="full" elevation={elevation} style={surfaceStyle}>
-          {content}
-        </MySurface>
-      )}
+      <MyView radius="full" elevation={elevation} style={surfaceStyle}>
+        {content}
+      </MyView>
     </MyPressable>
   )
 }

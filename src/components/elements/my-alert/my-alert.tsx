@@ -6,7 +6,6 @@ import MyGradient from '@/components/elements/my-gradient'
 import MyImage from '@/components/elements/my-image'
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
-import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
@@ -57,15 +56,11 @@ const MyAlert: React.FC<MyAlertProps> = ({
   const headerTitleTextStyle = styles[`headerTitleText${typeCap}` as keyof typeof styles] as object
   const gradientColors = styles.headerGradientByType?.[type]
 
-  const Container = !!elevation && elevation !== 'none' ? MySurface : MyView
-  const containerProps =
-    !!elevation && elevation !== 'none'
-      ? {
-          elevation,
-          fillParent: false,
-          ...rest,
-        }
-      : { ...rest }
+  const containerProps = {
+    elevation: elevation && elevation !== 'none' ? elevation : undefined,
+    fillParent: false,
+    ...rest,
+  }
 
   const [headerSize, setHeaderSize] = useState({ w: 0, h: 0 })
   const onHeaderLayout = useCallback((e: LayoutChangeEvent) => {
@@ -80,8 +75,8 @@ const MyAlert: React.FC<MyAlertProps> = ({
   )
 
   return (
-    <Container
-      radius={'medium'}
+    <MyView
+      radius="medium"
       style={[styles.container, style]}
       {...(containerProps as Record<string, unknown>)}
     >
@@ -143,7 +138,7 @@ const MyAlert: React.FC<MyAlertProps> = ({
           ))}
         </MyView>
       )}
-    </Container>
+    </MyView>
   )
 }
 

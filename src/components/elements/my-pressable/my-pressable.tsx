@@ -9,7 +9,7 @@ import Animated, {
 
 import { triggerHaptic } from './haptic'
 
-import MySurface from '@/components/elements/my-surface'
+import MyView from '@/components/elements/my-view'
 
 import type { AnimatedType, MyPressableProps } from './type'
 
@@ -128,7 +128,7 @@ const MyPressable: React.FC<MyPressableProps> = ({
     return undefined
   }, [style])
 
-  const content = surfaceProps ? <MySurface {...surfaceProps}>{children}</MySurface> : children
+  const content = surfaceProps ? <MyView {...surfaceProps}>{children}</MyView> : children
 
   return (
     <Pressable

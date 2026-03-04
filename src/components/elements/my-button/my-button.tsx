@@ -4,7 +4,6 @@ import { ViewStyle } from 'react-native'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
 
-import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { generateStyles } from './styles'
@@ -89,15 +88,9 @@ const MyButton: React.FC<MyButtonProps> = ({
 
   return (
     <MyPressable disabled={disabled || loading} {...pressableProps} style={touchableStyle}>
-      {elevation === 'none' ? (
-        <MyView radius="large" style={surfaceStyle}>
-          {content}
-        </MyView>
-      ) : (
-        <MySurface radius="large" elevation={elevation} style={surfaceStyle}>
-          {content}
-        </MySurface>
-      )}
+      <MyView radius="large" elevation={elevation} style={surfaceStyle}>
+        {content}
+      </MyView>
     </MyPressable>
   )
 }

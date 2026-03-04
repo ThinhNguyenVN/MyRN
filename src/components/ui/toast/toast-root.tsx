@@ -16,7 +16,6 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import MyIcon from '@/components/elements/my-icon'
-import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
@@ -141,14 +140,11 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
     </>
   )
 
-  const useSurface = options.elevation !== 'none'
   const elevation =
-    useSurface && options.elevation !== 'none'
-      ? (options.elevation ?? 'soft/down/medium')
-      : undefined
+    options.elevation !== 'none' ? (options.elevation ?? 'soft/down/medium') : undefined
 
-  const wrapper = useSurface ? (
-    <MySurface
+  const wrapper = (
+    <MyView
       elevation={elevation}
       radius="medium"
       fillParent={false}
@@ -157,9 +153,7 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
       <MyView flexDirection="row" alignItems="center" style={{ gap }}>
         {body}
       </MyView>
-    </MySurface>
-  ) : (
-    <MyView style={[styles.container, containerStyle]}>{body}</MyView>
+    </MyView>
   )
 
   return (

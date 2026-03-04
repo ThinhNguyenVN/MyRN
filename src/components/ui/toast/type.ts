@@ -6,9 +6,7 @@ export interface ToastOptions {
   text: string
   description?: string
   type?: ToastType
-  /** Auto hide after ms. Default 2000 */
   duration?: number
-  /** Optional. When set, toast uses MySurface with this elevation. */
   elevation?: ElevationToken | 'none'
 }
 

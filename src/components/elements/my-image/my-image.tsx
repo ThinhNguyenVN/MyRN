@@ -9,7 +9,6 @@ import MyIcon from '../my-icon'
 import MySpinner from '../my-spinner'
 import MyText from '../my-text'
 import MyView from '../my-view'
-import MySurface from '../my-surface'
 
 import { generateStyles } from './styles'
 import type { MyImageProps } from './type'
@@ -180,22 +179,8 @@ const MyImage: React.FC<MyImageProps> = ({
     style,
   ].filter(Boolean)
 
-  if (elevation !== 'none') {
-    return (
-      <MySurface elevation={elevation} style={containerStyle}>
-        {onPress ? (
-          <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.touchable}>
-            {content}
-          </TouchableOpacity>
-        ) : (
-          content
-        )}
-      </MySurface>
-    )
-  }
-
   return (
-    <MyView style={containerStyle}>
+    <MyView elevation={elevation} style={containerStyle}>
       {onPress ? (
         <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.touchable}>
           {content}
