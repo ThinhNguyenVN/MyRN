@@ -7,6 +7,7 @@ import { Confirmation } from '@/components/ui/confirmation'
 import { Toast } from '@/components/ui/toast'
 
 import MyButton from '@/components/elements/my-button'
+import MyCheckbox from '@/components/elements/my-checkbox'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import MyTextInput from '@/components/elements/my-text-input'
@@ -20,6 +21,9 @@ export default function HomeScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showError, setShowError] = useState(false)
+  const [checkboxA, setCheckboxA] = useState(false)
+  const [checkboxB, setCheckboxB] = useState(true)
+  const [radioValue, setRadioValue] = useState<string>('one')
   const bottomSheetRef = useRef<MyBottomSheetRef>(null)
 
   return (
@@ -177,6 +181,72 @@ export default function HomeScreen() {
             }}
             style={styles.buttonMargin}
           />
+
+          <MyText typography="subtitle" style={styles.sectionTitle}>
+            Checkbox
+          </MyText>
+          <MyView style={styles.buttonMargin}>
+            <MyCheckbox
+              type="checkbox"
+              checked={checkboxA}
+              onValueChange={setCheckboxA}
+              label="Checkbox (default elevation)"
+              style={styles.inputContainer}
+            />
+            <MyCheckbox
+              type="checkbox"
+              checked={checkboxB}
+              onValueChange={setCheckboxB}
+              label="Checked"
+              style={styles.inputContainer}
+            />
+            <MyCheckbox
+              type="checkbox"
+              checked={false}
+              onValueChange={() => {}}
+              disabled
+              label="Disabled"
+              labelStyle={{ flex: 1 }}
+              style={styles.inputContainer}
+            />
+            <MyCheckbox
+              type="checkbox"
+              checked={true}
+              onValueChange={() => {}}
+              elevation="none"
+              label="No elevation"
+              isLeftLabel={false}
+              labelStyle={{ flex: 1, textAlign: 'right' }}
+              style={styles.inputContainer}
+            />
+          </MyView>
+          <MyText typography="caption" style={styles.sectionTitle}>
+            Radio
+          </MyText>
+          <MyView style={styles.buttonMargin}>
+            <MyCheckbox
+              type="radio"
+              checked={radioValue === 'one'}
+              onValueChange={(v) => v && setRadioValue('one')}
+              label="Option one"
+              style={styles.inputContainer}
+            />
+            <MyCheckbox
+              type="radio"
+              checked={radioValue === 'two'}
+              onValueChange={(v) => v && setRadioValue('two')}
+              label="Option two"
+              isLeftLabel={false}
+              style={styles.inputContainer}
+            />
+            <MyCheckbox
+              type="radio"
+              checked={radioValue === 'three'}
+              onValueChange={(v) => v && setRadioValue('three')}
+              label="Option three"
+              style={styles.inputContainer}
+            />
+          </MyView>
 
           <MyText typography="subtitle" style={styles.sectionTitle}>
             Toast

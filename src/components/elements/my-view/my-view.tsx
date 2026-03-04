@@ -21,21 +21,21 @@ const MyView: React.FC<MyViewProps> = ({
 }) => {
   const { getColor } = useTheme()
 
+  const useSurface = !!elevation && elevation !== 'none'
+
   const containerStyle = useMemo(() => {
     const s = getContainerStyle(pickContainerProps<MyViewProps>(rest))
     if (!isNil(backgroundColor)) s.backgroundColor = getColor(backgroundColor!)
-    if (!isNil(radius) && !elevation) {
+    if (!isNil(radius) && !useSurface) {
       s.overflow = 'hidden'
       s.borderRadius = Radius[radius!]
     }
     return s
-  }, [rest, backgroundColor, radius, elevation, getColor])
+  }, [rest, backgroundColor, radius, useSurface, getColor])
 
   const hasContainerStyle = Object.keys(containerStyle).length > 0
   const mergedStyle: StyleProp<ViewStyle> = hasContainerStyle ? [containerStyle, style] : style
   const viewProps = omitContainerProps(rest as Record<string, unknown>)
-
-  const useSurface = !!elevation && elevation !== 'none'
   const resolvedBg = !isNil(backgroundColor) ? getColor(backgroundColor!) : undefined
 
   if (useSurface) {
