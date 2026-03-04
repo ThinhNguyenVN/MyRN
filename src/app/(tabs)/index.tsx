@@ -8,6 +8,7 @@ import { Toast } from '@/components/ui/toast'
 
 import MyButton from '@/components/elements/my-button'
 import MyCheckbox from '@/components/elements/my-checkbox'
+import MyCounter from '@/components/elements/my-counter'
 import MyDropdownInput from '@/components/elements/my-dropdown-input'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
@@ -27,6 +28,8 @@ export default function HomeScreen() {
   const [radioValue, setRadioValue] = useState<string>('one')
   const [dropdownValue, setDropdownValue] = useState<string | null>(null)
   const [dropdownMultiValue, setDropdownMultiValue] = useState<string[]>([])
+  const [counterValue, setCounterValue] = useState(0)
+  const [counterValue2, setCounterValue2] = useState(0)
   const bottomSheetRef = useRef<MyBottomSheetRef>(null)
 
   const dropdownOptions = [
@@ -296,6 +299,36 @@ export default function HomeScreen() {
               onValueChange={() => {}}
               placeholder="Chọn..."
               title="Disabled"
+              disabled
+              style={styles.inputContainer}
+            />
+          </MyView>
+
+          <MyText typography="subtitle" style={styles.sectionTitle}>
+            Counter
+          </MyText>
+          <MyView style={styles.buttonMargin}>
+            <MyCounter
+              value={counterValue}
+              onValueChange={setCounterValue}
+              min={0}
+              max={99}
+              step={1}
+              style={styles.inputContainer}
+            />
+            <MyCounter
+              value={counterValue2}
+              onValueChange={setCounterValue2}
+              min={-10}
+              max={10}
+              step={2}
+              style={styles.inputContainer}
+            />
+            <MyCounter
+              value={5}
+              onValueChange={() => {}}
+              min={0}
+              max={10}
               disabled
               style={styles.inputContainer}
             />

@@ -9,6 +9,8 @@ export type AnimatedType = 'opacity' | 'scale'
 export interface MyPressableProps extends ContainerStyleProps {
   children: ReactNode
   onPress?: () => void
+  onPressIn?: () => void
+  onPressOut?: () => void
   disabled?: boolean
   scaleValue?: number
   scaleBySize?: boolean

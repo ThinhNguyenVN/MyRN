@@ -26,6 +26,8 @@ const OPACITY_IDLE = 1
 const MyPressable: React.FC<MyPressableProps> = ({
   children,
   onPress,
+  onPressIn: onPressInProp,
+  onPressOut: onPressOutProp,
   disabled = false,
   scaleValue = SCALE_LARGE,
   scaleBySize = true,
@@ -92,7 +94,8 @@ const MyPressable: React.FC<MyPressableProps> = ({
     if (haptic) {
       triggerHaptic()
     }
-  }, [disabled, animatedType, haptic, handlePressInOpacity, handlePressInScale])
+    onPressInProp?.()
+  }, [disabled, animatedType, haptic, handlePressInOpacity, handlePressInScale, onPressInProp])
 
   const handlePressOutScale = useCallback(() => {
     scale.value = withSpring(1, SPRING_CONFIG)
@@ -105,13 +108,14 @@ const MyPressable: React.FC<MyPressableProps> = ({
   }, [opacity, scale])
 
   const handlePressOut = useCallback(() => {
+    onPressOutProp?.()
     if (disabled) return
     const handlers: Record<AnimatedType, () => void> = {
       scale: handlePressOutScale,
       opacity: handlePressOutOpacity,
     }
     handlers[animatedType]()
-  }, [disabled, animatedType, handlePressOutOpacity, handlePressOutScale])
+  }, [disabled, animatedType, handlePressOutOpacity, handlePressOutScale, onPressOutProp])
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
