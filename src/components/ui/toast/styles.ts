@@ -30,11 +30,10 @@ export function generateStyles(theme: ThemeType) {
       alignItems: 'flex-end',
       paddingTop: paddingTopWeb,
     },
-    /** View bọc toast để ép maxWidth + padding; tránh Animated.View/Portal không truyền constraint */
     toastInnerWrap: {
       maxWidth: MAX_WIDTH,
       width: '100%',
-      alignSelf: 'stretch',
+      alignSelf: 'center',
     },
     /** Web: căn toast sang phải */
     toastInnerWrapWeb: {
@@ -54,9 +53,7 @@ export function generateStyles(theme: ThemeType) {
     containerSuccess: {},
     containerWarning: {},
     containerError: {},
-    text: {
-      flex: 1,
-    },
+
     description: {
       marginTop: 2,
     },

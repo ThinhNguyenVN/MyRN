@@ -130,10 +130,8 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
   const body = (
     <>
       <MyIcon name={iconName} size={22} color={iconColor as never} />
-      <MyView flex={1}>
-        <MyText style={styles.text} numberOfLines={2}>
-          {options.text}
-        </MyText>
+      <MyView flex={1} justifyContent="center">
+        <MyText numberOfLines={2}>{options.text}</MyText>
         {options.description ? (
           <MyText style={styles.description} numberOfLines={2}>
             {options.description}

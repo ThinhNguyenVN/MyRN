@@ -4,9 +4,10 @@ import { StyleSheet } from 'react-native'
 
 const HANDLE_HEIGHT = 10
 const HEADER_HEIGHT = 50
+export const MODAL_MAX_WIDTH = 480
 
 export const generateStyles = (theme: ThemeType) => {
-  const { getColor, getSpacing } = theme
+  const { getColor, getSpacing, isMobileSize } = theme
   return StyleSheet.create({
     sheetInner: {
       flex: 1,
@@ -14,6 +15,20 @@ export const generateStyles = (theme: ThemeType) => {
     sheet: {
       borderTopLeftRadius: Radius.medium,
       borderTopRightRadius: Radius.medium,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: getSpacing('x4'),
+    },
+    modalPanel: {
+      width: '100%',
+      maxWidth: MODAL_MAX_WIDTH,
+      borderRadius: Radius.medium,
+      backgroundColor: getColor('fill/background/tertiary'),
+      overflow: 'hidden',
     },
     handleContainer: {
       width: '100%',
@@ -34,7 +49,7 @@ export const generateStyles = (theme: ThemeType) => {
       paddingHorizontal: getSpacing('x4'),
       borderBottomWidth: 1,
       borderBottomColor: getColor('border/inactive/tertiary'),
-      marginTop: -8,
+      marginTop: isMobileSize ? -8 : 0,
     },
     headerTitleWrap: {
       flex: 1,

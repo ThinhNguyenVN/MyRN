@@ -1,5 +1,13 @@
-import React, { forwardRef, memo, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
-import { Dimensions, View } from 'react-native'
+import React, {
+  forwardRef,
+  memo,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { Dimensions, Modal, Pressable, ScrollView, View } from 'react-native'
 
 import {
   BottomSheetModal,
@@ -14,6 +22,7 @@ import MyIcon from '@/components/elements/my-icon'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
+import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 
 import type { MyBottomSheetProps, MyBottomSheetRef } from './type'
 import { generateStyles } from './styles'
@@ -67,13 +76,24 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     const bottomSheetRef = useRef<BottomSheetModal>(null)
     const styles = useThemedStyles(generateStyles)
     const insets = useSafeAreaInsets()
-    const open = useCallback(() => {
-      bottomSheetRef.current?.present()
-    }, [])
+    const isMobile = useIsMobileSize()
+    const [modalVisible, setModalVisible] = useState(false)
 
     const close = useCallback(() => {
-      bottomSheetRef.current?.dismiss()
-    }, [])
+      if (isMobile) {
+        bottomSheetRef.current?.dismiss()
+      } else {
+        setModalVisible(false)
+      }
+    }, [isMobile])
+
+    const open = useCallback(() => {
+      if (isMobile) {
+        bottomSheetRef.current?.present()
+      } else {
+        setModalVisible(true)
+      }
+    }, [isMobile])
 
     useImperativeHandle(ref, () => ({ open, close }), [open, close])
 
@@ -81,6 +101,11 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       onClosed?.()
       onDismiss?.()
     }, [onClosed, onDismiss])
+
+    const handleModalClose = useCallback(() => {
+      setModalVisible(false)
+      handleDismiss()
+    }, [handleDismiss])
 
     const headerContent = useMemo(() => {
       if (header) return null
@@ -129,6 +154,40 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       () => createBackdropComponent(pressBackdropToClose),
       [pressBackdropToClose],
     )
+
+    const windowHeight = Dimensions.get('window').height
+    const modalPanelStyle = useMemo(
+      () => [styles.modalPanel, { maxHeight: windowHeight * 0.8 }],
+      [styles.modalPanel, windowHeight],
+    )
+
+    if (!isMobile) {
+      return (
+        <Modal
+          visible={modalVisible}
+          transparent
+          onRequestClose={handleModalClose}
+          animationType="fade"
+        >
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={pressBackdropToClose ? handleModalClose : undefined}
+          >
+            <Pressable style={modalPanelStyle} onPress={() => {}}>
+              {header ?? headerContent}
+              <ScrollView
+                contentContainerStyle={[styles.content, contentContainerStyle]}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+              >
+                {children}
+              </ScrollView>
+              {footer ? <MyView style={styles.footer}>{footer}</MyView> : null}
+            </Pressable>
+          </Pressable>
+        </Modal>
+      )
+    }
 
     return (
       <BottomSheetModal

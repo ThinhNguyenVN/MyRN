@@ -6,6 +6,7 @@ import { ElevationToken, getElevation } from './elevation'
 import { getSpacing, SpacingType } from './spacing'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Insets } from 'react-native'
+import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 
 export interface ThemeType {
   themeName: ThemeName
@@ -19,6 +20,7 @@ export interface ThemeType {
     dy: number
   }
   insets: Insets
+  isMobileSize: boolean
 }
 
 const ThemeContext = createContext<ThemeType | null>(null)
@@ -32,11 +34,12 @@ export function MyThemeProvider({ value = 'light', children }: MyThemeProviderPr
   const themeName = value
   const tokens = useMemo(() => Themes[themeName], [themeName])
   const insets = useSafeAreaInsets()
+  const isMobileSize = useIsMobileSize()
 
   const getColor = useCallback((token: ColorToken) => getColorFromTokens(token, tokens), [tokens])
   const contextValue = useMemo<ThemeType>(
-    () => ({ themeName, tokens, getColor, getSpacing, getElevation, insets }),
-    [themeName, tokens, getColor, insets],
+    () => ({ themeName, tokens, getColor, getSpacing, getElevation, insets, isMobileSize }),
+    [themeName, tokens, getColor, insets, isMobileSize],
   )
 
   return <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>
