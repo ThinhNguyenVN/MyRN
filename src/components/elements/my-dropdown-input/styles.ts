@@ -1,7 +1,7 @@
 import { Radius } from '@/theme/radius'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
-
+const MAX_INPUT_WIDTH = 400
 export type DropdownInputState = 'default' | 'disabled' | 'error' | 'focus'
 
 function getStateColors(theme: ThemeType) {
@@ -69,6 +69,7 @@ export function generateStyles(theme: ThemeType) {
 
       dropdownPanel: {
         position: 'absolute',
+        maxWidth: MAX_INPUT_WIDTH,
         zIndex: 100,
       },
       dropdownScrollView: {

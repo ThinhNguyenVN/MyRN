@@ -76,7 +76,9 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     const bottomSheetRef = useRef<BottomSheetModal>(null)
     const styles = useThemedStyles(generateStyles)
     const insets = useSafeAreaInsets()
-    const isMobile = useIsMobileSize()
+    const isMobileSize = useIsMobileSize()
+
+    const isMobile = isMobileSize
     const [modalVisible, setModalVisible] = useState(false)
 
     const close = useCallback(() => {

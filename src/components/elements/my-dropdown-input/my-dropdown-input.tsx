@@ -14,6 +14,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 
 import type { MyDropdownInputProps } from './type'
 import { generateStyles } from './styles'
+import { isNil } from 'lodash'
 
 const MyDropdownInput = memo(function MyDropdownInput({
   options,
@@ -48,9 +49,9 @@ const MyDropdownInput = memo(function MyDropdownInput({
           : value
             ? [value]
             : []
-        : value != null && value !== ''
-          ? [value as string]
-          : [],
+        : !isNil(value) && value !== ''
+          ? []
+          : [value as unknown as string],
     [multiSelect, value],
   )
 
