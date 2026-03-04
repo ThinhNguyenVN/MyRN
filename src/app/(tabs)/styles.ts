@@ -24,6 +24,13 @@ export const generateStyles = (theme: ThemeType) => {
       marginTop: 24,
       marginBottom: 8,
     },
+    introText: {
+      marginBottom: getSpacing('x4'),
+      textAlign: 'center',
+    },
+    introButton: {
+      marginTop: getSpacing('x2'),
+    },
     buttonRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -39,6 +46,47 @@ export const generateStyles = (theme: ThemeType) => {
     },
     redButton: {
       backgroundColor: 'red',
+    },
+    playgroundHeaderImage: {
+      alignSelf: 'center',
+    },
+    playgroundContent: {
+      paddingHorizontal: 16,
+      paddingBottom: 24,
+      alignSelf: 'stretch',
+      width: '100%',
+    },
+    playgroundTitle: {
+      marginTop: 24,
+      marginBottom: 8,
+    },
+    playgroundSubtitle: {
+      marginBottom: 16,
+    },
+    linkListContent: {
+      paddingBottom: 24,
+      alignSelf: 'stretch',
+      width: '100%',
+    },
+    linkRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: getSpacing('x3'),
+      paddingHorizontal: getSpacing('x2'),
+      marginBottom: getSpacing('x1'),
+      borderRadius: 10,
+      backgroundColor: getColor('fill/background/secondary'),
+      alignSelf: 'stretch',
+      width: '100%',
+    },
+    linkRowLabel: {
+      flex: 1,
+      flexGrow: 1,
+      minWidth: 0,
+    },
+    linkRowArrow: {
+      flexShrink: 0,
     },
   })
 }

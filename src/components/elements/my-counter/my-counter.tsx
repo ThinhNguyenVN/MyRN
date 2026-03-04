@@ -36,11 +36,13 @@ const MyCounter = memo(function MyCounter({
 
   const updateValue = useCallback(
     (delta: number) => {
+      const nextRef = { current: 0 }
       setCurrentValue((prev) => {
         const next = clamp(prev + delta)
-        onValueChange(next)
+        nextRef.current = next
         return next
       })
+      queueMicrotask(() => onValueChange(nextRef.current))
     },
     [clamp, onValueChange],
   )

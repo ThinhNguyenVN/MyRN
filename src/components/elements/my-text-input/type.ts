@@ -1,8 +1,11 @@
-import type { ReactNode } from 'react'
-import type { TextInputProps, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { ComponentRef, ReactNode } from 'react'
+import type { TextInput, TextInputProps, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 import type { IconColorType } from '@/theme/colors'
 import type { ContainerStyleProps } from '@/types/styles'
+
+/** Ref type: exposes all RN TextInput methods (focus, blur, clear, setNativeProps, measure, measureInWindow, measureLayout). */
+export type MyTextInputRef = ComponentRef<typeof TextInput>
 
 export type TextInputWidth = number | 'auto'
 

@@ -198,7 +198,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
             {open && (
               <Modal visible transparent animationType="fade">
                 <Pressable style={styles.modalBackdrop} onPress={closePicker}>
-                  {triggerLayout != null && (
+                  {!!triggerLayout && (
                     <View
                       style={[
                         styles.dropdownPanel,

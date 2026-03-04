@@ -15,11 +15,15 @@ export interface ContainerStyleProps {
   marginRight?: number
   marginTop?: number
   marginBottom?: number
+  marginHorizontal?: number
+  marginVertical?: number
   padding?: number
   paddingLeft?: number
   paddingRight?: number
   paddingTop?: number
   paddingBottom?: number
+  paddingHorizontal?: number
+  paddingVertical?: number
   position?: 'absolute' | 'relative'
   top?: number
   left?: number
@@ -36,7 +40,7 @@ export interface ContainerStyleProps {
   gap?: number
   width?: number
   height?: number
-  justifyContent?: FlexAlignKey
+  justifyContent?: FlexAlignKey | 'space-between' | 'space-around' | 'space-evenly'
   alignItems?: FlexAlignKey
   alignSelf?: FlexAlignKey
   alignContent?: FlexAlignKey

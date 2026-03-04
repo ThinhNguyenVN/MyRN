@@ -53,6 +53,7 @@ export default function RootLayout() {
             <ToastRoot ref={toastRef} />
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="playground" options={{ headerShown: false }} />
               <Stack.Screen
                 name="home"
                 options={{

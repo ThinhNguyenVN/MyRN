@@ -50,7 +50,7 @@ export function generateStyles(theme: ThemeType): Record<string, ViewStyle> {
       backgroundColor: getColor('fill/disabled/primary'),
       borderWidth: 0,
     },
-    touchable: { flex: 1 },
+    touchable: { flex: 1, minWidth: 70 },
     touchableFull: { flex: 1, width: '100%', alignSelf: 'stretch' },
     iconButtonSmall: {
       width: BUTTON_SMALL_HEIGHT,

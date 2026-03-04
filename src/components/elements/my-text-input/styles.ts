@@ -44,6 +44,7 @@ export function generateStyles(theme: ThemeType) {
     stateColors,
     container: {
       gap: getSpacing('x1'),
+      maxWidth: 400,
     },
     inputRow: {
       flexDirection: 'row' as const,
@@ -60,6 +61,10 @@ export function generateStyles(theme: ThemeType) {
       flex: 1,
       minWidth: 100,
       textAlignVertical: 'top' as const,
+    },
+    inputMultilinePadding: {
+      paddingTop: getSpacing('x2'),
+      paddingBottom: getSpacing('x2'),
     },
 
     iconWrap: {
