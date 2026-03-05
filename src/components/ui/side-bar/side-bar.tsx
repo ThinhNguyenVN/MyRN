@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useEffect, useRef } from 'react'
 import { FlatList, View } from 'react-native'
-import { router, usePathname } from 'expo-router'
+import { usePathname } from 'expo-router'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
 import MyView from '@/components/elements/my-view'
@@ -10,32 +10,45 @@ import { ANIMATION_DURATION, generateStyles, ITEM_ROW_HEIGHT } from './styles'
 import type { SideBarItem, SideBarProps } from './type'
 import SideBarRow from './sider-bar-item'
 
-function SideBarInner({ data, elevation = 'soft/right/small', style }: SideBarProps) {
+function SideBarInner({
+  data,
+  elevation = 'soft/right/small',
+  style,
+  onSelected: onSelectedProp,
+}: SideBarProps) {
   const pathname = usePathname()
   const styles = useThemedStyles(generateStyles)
   const listContentRef = useRef<View>(null)
   const layoutsRef = useRef<Record<number, { y: number; height: number }>>({})
   const activeIndexRef = useRef(0)
 
-  const activeIndex = data.findIndex(
-    (item) => item.href && (pathname === item.href || pathname === item.href + '/'),
-  )
+  const pathMatchesHref = (href: string) => {
+    if (!href) return false
+    const escaped = href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`^${escaped}(/|$)`).test(pathname)
+  }
+  const activeIndex = data.findIndex((item) => item.href && pathMatchesHref(item.href))
   activeIndexRef.current = activeIndex
 
   const highlightY = useSharedValue(0)
   const highlightHeight = useSharedValue(ITEM_ROW_HEIGHT)
+  const userTappedSidebar = useSharedValue(false)
 
-  const highlightStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateY: withTiming(highlightY.value, { duration: ANIMATION_DURATION }),
-      },
-    ],
-    height: withTiming(highlightHeight.value, { duration: ANIMATION_DURATION }),
-  }))
+  const highlightStyle = useAnimatedStyle(() => {
+    const duration = userTappedSidebar.value ? ANIMATION_DURATION : 0
+
+    return {
+      transform: [
+        {
+          translateY: withTiming(highlightY.value, { duration }),
+        },
+      ],
+      height: withTiming(highlightHeight.value, { duration }),
+    }
+  }, [])
 
   const syncHighlightFromLayouts = useCallback(() => {
-    const layout = layoutsRef.current[activeIndexRef.current]
+    const layout = layoutsRef.current?.[activeIndexRef.current]
     if (layout) {
       highlightY.value = layout.y
       highlightHeight.value = layout.height
@@ -63,12 +76,11 @@ function SideBarInner({ data, elevation = 'soft/right/small', style }: SideBarPr
   )
 
   const handleSelected = useCallback(
-    (item: SideBarItem) => () => {
-      if (item.href) {
-        router.replace(item.href as any)
-      }
+    (item: SideBarItem, index: number) => () => {
+      userTappedSidebar.value = true
+      onSelectedProp?.(item, index)
     },
-    [],
+    [onSelectedProp, userTappedSidebar],
   )
 
   const renderItem = useCallback(
@@ -77,7 +89,7 @@ function SideBarInner({ data, elevation = 'soft/right/small', style }: SideBarPr
         item={item}
         index={index}
         isActive={index === activeIndex}
-        onSelected={handleSelected(item)}
+        onSelected={handleSelected(item, index)}
         containerRef={listContentRef}
         onMeasureLayout={handleMeasureLayout}
       />

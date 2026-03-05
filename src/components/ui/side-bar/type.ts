@@ -11,6 +11,7 @@ export interface SideBarProps {
   data: SideBarItem[]
   elevation?: ElevationToken | 'none'
   style?: StyleProp<ViewStyle>
+  onSelected?: (item: SideBarItem, index: number) => void
 }
 
 export interface SideBarRowProps {

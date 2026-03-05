@@ -10,17 +10,26 @@ const SEGMENT_TITLE: Record<string, string> = {
   explore: 'Explore',
 }
 
-const NavigationBarHeader: React.FC<NativeStackHeaderProps> = ({ navigation, options }) => {
+export interface NavigationBarHeaderExtraProps {
+  hideBackButton?: boolean
+}
+
+const NavigationBarHeader: React.FC<NativeStackHeaderProps & NavigationBarHeaderExtraProps> = ({
+  navigation,
+  options,
+  hideBackButton = false,
+}) => {
   const segments = useSegments()
   const nav = navigation ?? { canGoBack: () => router.canGoBack(), goBack: () => router.back() }
   const title = options?.title ?? (segments.length >= 2 ? SEGMENT_TITLE[segments[1] as string] : '')
   const right = options?.headerRight?.({ canGoBack: nav.canGoBack() })
+  const showBack = !hideBackButton && nav.canGoBack()
 
   return (
     <NavigationBar
       title={title}
-      showBack={nav.canGoBack()}
-      onBackPress={nav.canGoBack() ? nav.goBack : undefined}
+      showBack={showBack}
+      onBackPress={showBack ? nav.goBack : undefined}
       right={right}
     />
   )

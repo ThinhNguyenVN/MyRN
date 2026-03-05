@@ -45,5 +45,9 @@ export function generateStyles(theme: ThemeType) {
     title: {
       textAlign: 'center',
     },
+    contentHeight: {
+      opacity: 0,
+      zIndex: -1,
+    },
   })
 }

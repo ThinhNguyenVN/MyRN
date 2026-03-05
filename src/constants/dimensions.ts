@@ -6,3 +6,5 @@ export const BREAKPOINT_DESKTOP = 768
 export const BREAKPOINT_SIDEBAR = 600
 
 export const isMobileSize = Dimensions.get('window').width < BREAKPOINT_DESKTOP
+
+export const NAVIGATION_BAR_HEIGHT = 70

@@ -52,7 +52,15 @@ export default function DropdownScreen() {
           title="Multi select"
           style={styles.inputContainer}
         />
-        <MyDropdownInput options={dropdownOptions} value="b" onValueChange={() => {}} placeholder="Chọn..." title="Disabled" disabled style={styles.inputContainer} />
+        <MyDropdownInput
+          options={dropdownOptions}
+          value="b"
+          onValueChange={() => {}}
+          placeholder="Chọn..."
+          title="Disabled"
+          disabled
+          style={styles.inputContainer}
+        />
       </MyView>
     </ScrollView>
   )

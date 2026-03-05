@@ -1,11 +1,13 @@
-import React from 'react'
-import { Stack } from 'expo-router'
-import { View } from 'react-native'
+import React, { useEffect } from 'react'
+import { router, Stack, usePathname } from 'expo-router'
+import { Platform, View } from 'react-native'
 
 import { NavigationBarHeader } from '@/components/ui/navigation-bar'
-import SideBar from '@/components/ui/side-bar'
+import SideBar, { SideBarItem } from '@/components/ui/side-bar'
 import { useShowSidebar } from '@/hooks/dimenstions-hooks'
 import { PLAYGROUND_LINKS } from './constants'
+import { useThemedStyles } from '@/theme/theme-context'
+import { generateStyles } from './styles'
 
 function titleFromRoute(routeName: string): string {
   if (routeName === 'toast') return 'Toast & Confirmation'
@@ -20,28 +22,52 @@ const screenOptions = {
 
 export default function PlaygroundLayout() {
   const showSidebar = useShowSidebar()
+  const pathname = usePathname()
+
+  const styles = useThemedStyles(generateStyles)
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !showSidebar) return
+    const path = pathname.replace(/\?.*$/, '').replace(/\/$/, '')
+    const isPlaygroundIndex = path === '/playground' || path === '/(tabs)/playground'
+    if (isPlaygroundIndex) {
+      router.replace('/playground/buttons')
+    }
+  }, [pathname, showSidebar])
 
   if (!showSidebar) {
     return (
       <Stack
-        screenOptions={({ route }) => ({
-          ...screenOptions,
-          title: titleFromRoute(route.name ?? ''),
-        })}
+        screenOptions={({ route }) => {
+          return {
+            ...screenOptions,
+            title: titleFromRoute(route.name ?? ''),
+            headerShown: route.name !== 'buttons',
+          }
+        }}
       />
     )
   }
 
-  return (
-    <View style={{ flex: 1, flexDirection: 'row' }}>
-      <SideBar data={PLAYGROUND_LINKS} />
-      <View style={{ flex: 1, marginLeft: 16 }}>
-        <Stack
-          screenOptions={({ route }) => ({
-            ...screenOptions,
+  const handleSelected = (item: SideBarItem) => {
+    router.replace(item.href as any)
+  }
 
-            title: titleFromRoute(route.name ?? ''),
-          })}
+  return (
+    <View style={styles.sideBarContainer}>
+      <SideBar data={PLAYGROUND_LINKS} onSelected={handleSelected} />
+      <View style={styles.contentContainer}>
+        <Stack
+          initialRouteName="buttons"
+          screenOptions={({ route }) => {
+            const isButtonsRoute = route.name === 'buttons'
+            return {
+              ...screenOptions,
+              title: titleFromRoute(route.name ?? ''),
+              header: (props) => <NavigationBarHeader {...props} hideBackButton />,
+              headerShown: !isButtonsRoute,
+            }
+          }}
         />
       </View>
     </View>

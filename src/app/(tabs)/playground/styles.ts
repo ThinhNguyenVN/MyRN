@@ -4,6 +4,14 @@ import { StyleSheet } from 'react-native'
 export const generateStyles = (theme: ThemeType) => {
   const { getSpacing } = theme
   return StyleSheet.create({
+    sideBarContainer: {
+      flex: 1,
+      flexDirection: 'row',
+    },
+    contentContainer: {
+      flex: 1,
+      marginLeft: 16,
+    },
     sectionTitle: {
       marginTop: 24,
       marginBottom: 8,
@@ -36,6 +44,9 @@ export const generateStyles = (theme: ThemeType) => {
       marginBottom: 16,
     },
     sectionCaption: {
+      marginBottom: 12,
+    },
+    introText: {
       marginBottom: 12,
     },
     smallImage: {

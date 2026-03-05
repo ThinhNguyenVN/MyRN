@@ -1,4 +1,5 @@
 import { ScrollView } from 'react-native'
+import { router } from 'expo-router'
 
 import MyButton from '@/components/elements/my-button'
 import MyIcon from '@/components/elements/my-icon'
@@ -6,7 +7,7 @@ import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '../styles'
 
 export default function ButtonsScreen() {
   const styles = useThemedStyles(generateStyles)
@@ -15,6 +16,15 @@ export default function ButtonsScreen() {
       <MyText typography="subtitle" style={styles.sectionTitle}>
         Buttons
       </MyText>
+
+      <MyButton
+        width={'full'}
+        text="Open screen con (Buttons Detail)"
+        size={'large'}
+        type="secondary"
+        onPress={() => router.push('/playground/buttons/detail')}
+        left={<MyIcon name="arrow-forward" color="icon/active/tertiary" />}
+      />
       <MyButton
         width={'full'}
         text="Primary large"

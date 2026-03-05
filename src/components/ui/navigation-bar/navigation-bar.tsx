@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useState } from 'react'
-import { LayoutChangeEvent } from 'react-native'
+import { LayoutChangeEvent, View } from 'react-native'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
@@ -31,12 +31,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
 
   const padding = Math.max(leftWidth, rightWidth)
   return (
-    <MyView style={styles.bar}>
+    <View style={styles.bar}>
       <MyView style={styles.left} onLayout={onLeftLayout}>
         {shouldShowBack ? (
           <MyButton.Icon icon="arrow-back" type="light" size="small" onPress={onBackPress} />
         ) : null}
       </MyView>
+      <View style={styles.contentHeight}>
+        <MyButton.Icon icon="arrow-back" type="light" size="small" onPress={onBackPress} />
+      </View>
       <MyView style={styles.center}>
         <MyView
           style={{
@@ -54,7 +57,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
       <MyView style={styles.right} onLayout={onRightLayout}>
         {right ?? null}
       </MyView>
-    </MyView>
+    </View>
   )
 }
 
