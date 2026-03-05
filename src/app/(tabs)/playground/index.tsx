@@ -7,19 +7,8 @@ import ParallaxScrollView from '@/components/ui/parallax-scroll-view'
 import { IconSymbol } from '@/components/ui/icon-symbol'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
-
-const PLAYGROUND_LINKS: { label: string; href: string }[] = [
-  { label: 'Buttons', href: '/playground/buttons' },
-  { label: 'Checkbox', href: '/playground/checkbox' },
-  { label: 'Dropdown', href: '/playground/dropdown' },
-  { label: 'Counter', href: '/playground/counter' },
-  { label: 'Toast & Confirmation', href: '/playground/toast' },
-  { label: 'Bottom Sheet', href: '/playground/bottom-sheet' },
-  { label: 'Text Input', href: '/playground/text-input' },
-  { label: 'Alert', href: '/playground/alert' },
-  { label: 'Image', href: '/playground/image' },
-]
+import { PLAYGROUND_LINKS } from './constants'
+import { generateStyles } from '../styles'
 
 export default function PlaygroundScreen() {
   const styles = useThemedStyles(generateStyles)

@@ -1,12 +1,10 @@
 import React from 'react'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 
-import { WithSkiaWeb } from '@shopify/react-native-skia/lib/module/web'
-
 import type { MySpinnerProps } from './type'
 
 const styles = StyleSheet.create({
-  fallback: {
+  wrapper: {
     width: 32,
     height: 32,
     justifyContent: 'center',
@@ -15,19 +13,15 @@ const styles = StyleSheet.create({
 })
 
 /**
- * Web: Load Skia trước khi render MySpinner (vì dùng expo-router/entry, không LoadSkiaWeb ở entry).
+ * Web: Luôn dùng ActivityIndicator, không load Skia/WASM để tránh lỗi
+ * "both async and sync fetching of the wasm failed" trên web.
  */
-export default function MySpinnerWeb(props: MySpinnerProps) {
+export default function MySpinnerWeb({ size = 'default', style, ...rest }: MySpinnerProps) {
+  const indicatorSize = size === 'xsmall' ? 'small' : size === 'default' ? 'large' : 'small'
   return (
-    <WithSkiaWeb
-      getComponent={() => import('./my-spinner')}
-      fallback={
-        <View style={styles.fallback}>
-          <ActivityIndicator size="small" />
-        </View>
-      }
-      componentProps={props}
-    />
+    <View style={[styles.wrapper, style]} {...rest}>
+      <ActivityIndicator size={indicatorSize} />
+    </View>
   )
 }
 

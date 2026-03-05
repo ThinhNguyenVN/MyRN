@@ -47,13 +47,12 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <PortalProvider shouldAddRootHost={false}>
-        <MyThemeProvider value={themeName}>
+        <MyThemeProvider value={'light'}>
           <BottomSheetModalProvider>
             <ConfirmationRoot ref={confirmationRef} />
             <ToastRoot ref={toastRef} />
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="playground" options={{ headerShown: false }} />
               <Stack.Screen
                 name="home"
                 options={{

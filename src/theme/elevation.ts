@@ -5,7 +5,7 @@
 // =============================
 
 export type ElevationStrength = 'soft' | 'hard'
-export type ElevationDirection = 'down' | 'up'
+export type ElevationDirection = 'down' | 'up' | 'left' | 'right'
 export type ElevationSize = 'large' | 'medium' | 'small'
 
 export type ElevationToken = `${ElevationStrength}/${ElevationDirection}/${ElevationSize}`
@@ -23,10 +23,12 @@ export const ElevationOpacity = {
   hard: 0.3,
 } as const
 
-// Shadow offset by direction (down = below, up = above)
+// Shadow offset by direction (down = below, up = above, left = to the left, right = to the right)
 export const ElevationDirectionMap = {
   down: { dx: 0, dy: 4 },
   up: { dx: 0, dy: -4 },
+  left: { dx: -4, dy: 0 },
+  right: { dx: 4, dy: 0 },
 } as const
 
 // =============================

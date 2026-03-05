@@ -1,0 +1,11 @@
+export const PLAYGROUND_LINKS: { label: string; href: string }[] = [
+  { label: 'Buttons', href: '/playground/buttons' },
+  { label: 'Checkbox', href: '/playground/checkbox' },
+  { label: 'Dropdown', href: '/playground/dropdown' },
+  { label: 'Counter', href: '/playground/counter' },
+  { label: 'Toast & Confirmation', href: '/playground/toast' },
+  { label: 'Bottom Sheet', href: '/playground/bottom-sheet' },
+  { label: 'Text Input', href: '/playground/text-input' },
+  { label: 'Alert', href: '/playground/alert' },
+  { label: 'Image', href: '/playground/image' },
+]
