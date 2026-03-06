@@ -40,7 +40,7 @@ const MyChips: React.FC<MyChipsProps> = ({
           : [item]
       onChanged(newSelected)
     },
-    [disabled, multiSelect, selected, onChanged],
+    [multiSelect, selected, onChanged],
   )
 
   const handleAddSubmit = useCallback(() => {
