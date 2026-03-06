@@ -22,6 +22,12 @@ export const generateStyles = (theme: ThemeType) => {
       gap: 18,
       alignSelf: 'stretch',
     },
+    chipRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: getSpacing('x2'),
+      marginBottom: getSpacing('x4'),
+    },
     buttonMargin: {
       marginBottom: 8,
     },

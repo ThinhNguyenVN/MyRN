@@ -1,5 +1,6 @@
 export const PLAYGROUND_LINKS: { label: string; href: string }[] = [
   { label: 'Buttons', href: '/playground/buttons' },
+  { label: 'Chips', href: '/playground/chips' },
   { label: 'Checkbox', href: '/playground/checkbox' },
   { label: 'Dropdown', href: '/playground/dropdown' },
   { label: 'Counter', href: '/playground/counter' },
