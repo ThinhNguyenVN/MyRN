@@ -12,6 +12,7 @@ import { generateStyles } from './styles'
 import type { MyTextInputProps, MyTextInputRef } from './type'
 import { useThemedStyles } from '@/theme/theme-context'
 import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
+import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 
 const INPUT_FONT_SIZE = 16
 const INPUT_HEIGHT = 40
@@ -48,8 +49,13 @@ const MyTextInput = memo(
     ref,
   ) {
     const styles = useThemedStyles(generateStyles)
+    const isMobileSize = useIsMobileSize()
     const TextInputComponent =
-      Platform.OS === 'web' ? TextInput : useBottomSheetTextInput ? BottomSheetTextInput : TextInput
+      Platform.OS === 'web' || !isMobileSize
+        ? TextInput
+        : useBottomSheetTextInput
+          ? BottomSheetTextInput
+          : TextInput
     const containerStyle = useMemo(
       () =>
         getContainerStyle(

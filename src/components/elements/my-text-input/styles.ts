@@ -1,3 +1,4 @@
+import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
 import { Radius } from '@/theme/radius'
 import type { ThemeType } from '@/theme/theme-context'
 
@@ -44,7 +45,7 @@ export function generateStyles(theme: ThemeType) {
     stateColors,
     container: {
       gap: getSpacing('x1'),
-      maxWidth: 400,
+      maxWidth: MAX_INPUT_WIDTH,
     },
     inputRow: {
       flexDirection: 'row' as const,

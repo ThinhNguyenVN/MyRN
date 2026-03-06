@@ -1,7 +1,8 @@
+import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
 import { Radius } from '@/theme/radius'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
-const MAX_INPUT_WIDTH = 400
+
 export type DropdownInputState = 'default' | 'disabled' | 'error' | 'focus'
 
 function getStateColors(theme: ThemeType) {

@@ -10,7 +10,7 @@ import MyText from '@/components/elements/my-text'
 import MyTextInput from '@/components/elements/my-text-input'
 import MyView from '@/components/elements/my-view'
 import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
-import { useThemedStyles } from '@/theme/theme-context'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import type { MyDropdownInputProps } from './type'
 import { generateStyles } from './styles'
@@ -33,6 +33,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
   const styles = useThemedStyles(generateStyles)
   const isMobile = useIsMobileSize()
   const sheetRef = useRef<MyBottomSheetRef>(null)
+  const { getSpacing } = useTheme()
   const [open, setOpen] = useState(false)
   const [triggerLayout, setTriggerLayout] = useState<{
     x: number
@@ -155,7 +156,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
 
   const trigger = (
     <View ref={triggerRef} collapsable={false} style={styles.triggerWrap}>
-      <MyPressable onPress={openPicker} disabled={disabled}>
+      <MyPressable onPress={openPicker} disabled={disabled} haptic={false} animatedType={'opacity'}>
         <MyTextInput
           title={title}
           subTitle={subTitle}
@@ -205,7 +206,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
                         styles.dropdownPanel,
                         {
                           left: triggerLayout.x,
-                          top: triggerLayout.y + triggerLayout.height,
+                          top: triggerLayout.y + triggerLayout.height + getSpacing('x1'),
                           width: triggerLayout.width,
                         },
                       ]}

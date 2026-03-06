@@ -75,6 +75,10 @@ export const generateStyles = (theme: ThemeType) => {
     footer: {
       paddingHorizontal: getSpacing('x4'),
       paddingBottom: getSpacing('x4'),
+      bottom: 0,
+      left: 0,
+      right: 0,
+      position: 'absolute',
     },
   })
 }
