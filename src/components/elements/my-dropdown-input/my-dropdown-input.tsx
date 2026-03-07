@@ -47,12 +47,12 @@ const MyDropdownInput = memo(function MyDropdownInput({
       multiSelect
         ? Array.isArray(value)
           ? value
-          : value
-            ? [value]
+          : !isNil(value) && value !== ''
+            ? [value as string]
             : []
         : !isNil(value) && value !== ''
-          ? []
-          : [value as unknown as string],
+          ? [value as string]
+          : [],
     [multiSelect, value],
   )
 
@@ -167,6 +167,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
           error={error}
           errorMessage={errorMessage}
           required={required}
+          pointerEvents="box-none"
           endIcon={
             <Animated.View style={chevronAnimatedStyle}>
               <MyIcon name="chevron-down" size={20} color="icon/active/primary" />

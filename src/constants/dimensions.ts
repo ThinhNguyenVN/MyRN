@@ -9,4 +9,4 @@ export const isMobileSize = Dimensions.get('window').width < BREAKPOINT_DESKTOP
 
 export const NAVIGATION_BAR_HEIGHT = 70
 
-export const MAX_INPUT_WIDTH = 500
+export const MAX_INPUT_WIDTH = 400

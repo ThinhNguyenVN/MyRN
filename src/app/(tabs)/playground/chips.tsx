@@ -115,7 +115,6 @@ export default function ChipsScreen() {
       <MyChips
         data={chipsData}
         multiSelect
-        disabled
         selected={chipsSelected}
         onChanged={setChipsSelected}
         canRemove

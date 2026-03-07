@@ -75,9 +75,9 @@ const MyChips: React.FC<MyChipsProps> = ({
 
   return (
     <MyView style={[styles.chipsRow, style]} flexDirection="row" flexWrap="wrap">
-      {data.map((item) => (
+      {data.map((item, index) => (
         <MyChip
-          key={item}
+          key={`${item}-${index}`}
           label={item}
           {...chipProps}
           disabled={disabled || chipProps.disabled}

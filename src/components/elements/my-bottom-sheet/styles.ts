@@ -7,7 +7,7 @@ const HEADER_HEIGHT = 50
 export const MODAL_MAX_WIDTH = 480
 
 export const generateStyles = (theme: ThemeType) => {
-  const { getColor, getSpacing, isMobileSize } = theme
+  const { getColor, getSpacing, isMobileSize, insets } = theme
   return StyleSheet.create({
     sheetInner: {
       flex: 1,
@@ -74,7 +74,7 @@ export const generateStyles = (theme: ThemeType) => {
     },
     footer: {
       paddingHorizontal: getSpacing('x4'),
-      paddingBottom: getSpacing('x4'),
+      paddingBottom: insets.bottom || getSpacing('x4'),
       bottom: 0,
       left: 0,
       right: 0,
