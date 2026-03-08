@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Modal, Pressable, ScrollView, View } from 'react-native'
+import { FlatList, Modal, Pressable, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
@@ -12,7 +12,7 @@ import MyView from '@/components/elements/my-view'
 import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
-import type { MyDropdownInputProps } from './type'
+import type { DropdownOption, MyDropdownInputProps } from './type'
 import { generateStyles } from './styles'
 import { isNil } from 'lodash'
 
@@ -65,7 +65,18 @@ const MyDropdownInput = memo(function MyDropdownInput({
     : (selectedOption?.label ?? placeholder)
 
   const triggerRef = useRef<View>(null)
+  const listRef = useRef<FlatList<DropdownOption>>(null)
   const chevronRotation = useSharedValue(0)
+
+  const selectedIndex = useMemo(() => {
+    if (multiSelect) {
+      if (selectedValues.length === 0) return 0
+      const lastValue = selectedValues[selectedValues.length - 1]
+      return options.findIndex((o) => o.value === lastValue)
+    }
+    if (isNil(value) || value === '') return 0
+    return options.findIndex((o) => o.value === value)
+  }, [multiSelect, options, selectedValues, value])
 
   useEffect(() => {
     chevronRotation.value = withTiming(open ? -90 : 0)
@@ -77,6 +88,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
 
   const openPicker = useCallback(() => {
     if (disabled) return
+
     if (isMobile) {
       setOpen(true)
       sheetRef.current?.open()
@@ -86,7 +98,15 @@ const MyDropdownInput = memo(function MyDropdownInput({
         setOpen(true)
       })
     }
-  }, [disabled, isMobile])
+
+    const timer = setTimeout(() => {
+      listRef.current?.scrollToIndex({
+        index: Math.min(selectedIndex ? selectedIndex - 1 : 0, options.length - 1),
+        animated: false,
+      })
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [disabled, isMobile, selectedIndex, options.length])
 
   const closePicker = useCallback(() => {
     if (isMobile) {
@@ -110,13 +130,12 @@ const MyDropdownInput = memo(function MyDropdownInput({
     [multiSelect, selectedValues, onValueChange, closePicker],
   )
 
-  const optionListMobile = (
-    <>
-      {options.map((opt) => {
-        const isSelected = selectedValues.includes(opt.value)
+  const renderOption = useCallback(
+    ({ item: opt }: { item: DropdownOption }) => {
+      const isSelected = selectedValues.includes(opt.value)
+      if (isMobile) {
         return (
           <MyCheckbox
-            key={opt.value}
             type={multiSelect ? 'checkbox' : 'radio'}
             checked={isSelected}
             onValueChange={() => toggleOrSelect(opt.value)}
@@ -127,31 +146,34 @@ const MyDropdownInput = memo(function MyDropdownInput({
             style={styles.optionRowMobile}
           />
         )
-      })}
-    </>
-  )
-
-  const optionListDesktop = (
-    <>
-      {options.map((opt) => {
-        const isSelected = selectedValues.includes(opt.value)
-        return (
-          <MyPressable
-            key={opt.value}
-            onPress={() => toggleOrSelect(opt.value)}
-            style={[styles.optionRow, isSelected && styles.optionRowSelected]}
+      }
+      return (
+        <MyPressable
+          onPress={() => toggleOrSelect(opt.value)}
+          style={[styles.optionRow, isSelected && styles.optionRowSelected]}
+        >
+          <MyText
+            typography="body"
+            style={[styles.optionText, isSelected && styles.optionTextSelected]}
+            numberOfLines={1}
           >
-            <MyText
-              typography="body"
-              style={[styles.optionText, isSelected && styles.optionTextSelected]}
-              numberOfLines={1}
-            >
-              {opt.label}
-            </MyText>
-          </MyPressable>
-        )
-      })}
-    </>
+            {opt.label}
+          </MyText>
+        </MyPressable>
+      )
+    },
+    [
+      isMobile,
+      multiSelect,
+      selectedValues,
+      toggleOrSelect,
+      styles.optionLabelMobile,
+      styles.optionRowMobile,
+      styles.optionRow,
+      styles.optionRowSelected,
+      styles.optionText,
+      styles.optionTextSelected,
+    ],
   )
 
   const trigger = (
@@ -179,6 +201,20 @@ const MyDropdownInput = memo(function MyDropdownInput({
     </View>
   )
 
+  const optionsList = (
+    <FlatList<DropdownOption>
+      ref={listRef}
+      data={options}
+      keyExtractor={(item) => item.value}
+      renderItem={renderOption}
+      onScrollToIndexFailed={() => {}}
+      contentContainerStyle={isMobile ? styles.sheetListContent : undefined}
+      style={styles.dropdownScrollView}
+      nestedScrollEnabled
+      keyboardShouldPersistTaps={'handled'}
+    />
+  )
+
   return (
     <MyView style={[styles.container, style]}>
       <MyView style={styles.relativeWrap}>
@@ -192,9 +228,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
             onClosed={closePicker}
             pressBackdropToClose
           >
-            <ScrollView contentContainerStyle={styles.sheetListContent}>
-              {optionListMobile}
-            </ScrollView>
+            {optionsList}
           </MyBottomSheet>
         ) : (
           <>
@@ -213,13 +247,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
                       ]}
                       onStartShouldSetResponder={() => true}
                     >
-                      <ScrollView
-                        style={styles.dropdownScrollView}
-                        nestedScrollEnabled
-                        keyboardShouldPersistTaps="handled"
-                      >
-                        {optionListDesktop}
-                      </ScrollView>
+                      {optionsList}
                     </View>
                   )}
                 </Pressable>

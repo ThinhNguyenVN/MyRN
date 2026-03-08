@@ -5,6 +5,8 @@ import { StyleSheet } from 'react-native'
 
 export type DropdownInputState = 'default' | 'disabled' | 'error' | 'focus'
 
+export const DROPDOWN_MAX_HEIGHT = 240
+
 function getStateColors(theme: ThemeType) {
   const { getColor } = theme
   return {
@@ -78,7 +80,7 @@ export function generateStyles(theme: ThemeType) {
         backgroundColor: getColor('fill/background/tertiary'),
         borderWidth: 1,
         borderColor: getColor('border/inactive/tertiary'),
-        maxHeight: 240,
+        maxHeight: DROPDOWN_MAX_HEIGHT,
       },
       optionRow: {
         flexDirection: 'row',
