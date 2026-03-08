@@ -1,5 +1,12 @@
-import React, { memo, useMemo } from 'react'
-import { Dimensions, Modal, Pressable, View } from 'react-native'
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Dimensions, Pressable, StyleSheet, View } from 'react-native'
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated'
+import { Portal } from '@gorhom/portal'
 
 import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
@@ -9,6 +16,7 @@ import type { TriggerModalProps } from './type'
 
 const DEFAULT_ESTIMATED_HEIGHT = 320
 const DEFAULT_SAFE_INSET = 24
+const FADE_DURATION = 200
 
 const TriggerModal = memo(function TriggerModal({
   visible,
@@ -26,6 +34,9 @@ const TriggerModal = memo(function TriggerModal({
   const styles = useThemedStyles(generateStyles)
   const { getSpacing } = useTheme()
   const gap = getSpacing('x1')
+  const opacity = useSharedValue(0)
+  const [isExiting, setIsExiting] = useState(false)
+  const wasVisibleRef = useRef(false)
 
   const panelLayout = useMemo(() => {
     if (!triggerLayout) return null
@@ -45,32 +56,57 @@ const TriggerModal = memo(function TriggerModal({
     }
   }, [triggerLayout, gap, safeInset, estimatedPanelHeight, panelMinWidth])
 
-  if (!visible || !triggerLayout) return null
+  const finishExit = useCallback(() => {
+    setIsExiting(false)
+    wasVisibleRef.current = false
+  }, [])
+
+  useEffect(() => {
+    if (visible) {
+      wasVisibleRef.current = true
+      setIsExiting(false)
+      opacity.value = withTiming(1, { duration: FADE_DURATION })
+    } else if (wasVisibleRef.current) {
+      setIsExiting(true)
+      opacity.value = withTiming(
+        0,
+        { duration: FADE_DURATION },
+        (finished) => finished && runOnJS(finishExit)(),
+      )
+    }
+  }, [visible, opacity, finishExit])
+
+  const animatedBackdropStyle = useAnimatedStyle(() => ({ opacity: opacity.value }))
+
+  if (!triggerLayout) return null
+  if (!visible && !isExiting && !wasVisibleRef.current) return null
 
   return (
-    <Modal visible transparent animationType="fade">
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable
-          style={[
-            styles.panel,
-            panelLayout && {
-              left: panelLayout.left,
-              width: panelLayout.width,
-              top: panelLayout.top,
-              bottom: panelLayout.bottom,
-              maxHeight: Math.max(200, panelLayout.maxHeight),
-            },
-            panelStyle,
-          ]}
-          onPress={() => {}}
-        >
-          <View style={[styles.contentWrap, contentContainerStyle]}>{children}</View>
-          {!!footer ? (
-            <View style={[styles.footerWrap, footerContainerStyle]}>{footer}</View>
-          ) : null}
+    <Portal hostName="root">
+      <Animated.View style={[StyleSheet.absoluteFillObject, animatedBackdropStyle]}>
+        <Pressable style={[StyleSheet.absoluteFillObject, styles.backdrop]} onPress={onClose}>
+          <Pressable
+            style={[
+              styles.panel,
+              panelLayout && {
+                left: panelLayout.left,
+                width: panelLayout.width,
+                top: panelLayout.top,
+                bottom: panelLayout.bottom,
+                maxHeight: Math.max(200, panelLayout.maxHeight),
+              },
+              panelStyle,
+            ]}
+            onPress={() => {}}
+          >
+            <View style={[styles.contentWrap, contentContainerStyle]}>{children}</View>
+            {!!footer ? (
+              <View style={[styles.footerWrap, footerContainerStyle]}>{footer}</View>
+            ) : null}
+          </Pressable>
         </Pressable>
-      </Pressable>
-    </Modal>
+      </Animated.View>
+    </Portal>
   )
 })
 
