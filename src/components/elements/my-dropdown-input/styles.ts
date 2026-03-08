@@ -1,5 +1,3 @@
-import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
-import { Radius } from '@/theme/radius'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
@@ -71,17 +69,9 @@ export function generateStyles(theme: ThemeType) {
       },
 
       dropdownPanel: {
-        position: 'absolute',
-        maxWidth: MAX_INPUT_WIDTH,
-        zIndex: 100,
+        padding: 0,
       },
-      dropdownScrollView: {
-        borderRadius: Radius.medium,
-        backgroundColor: getColor('fill/background/tertiary'),
-        borderWidth: 1,
-        borderColor: getColor('border/inactive/tertiary'),
-        maxHeight: DROPDOWN_MAX_HEIGHT,
-      },
+
       optionRow: {
         flexDirection: 'row',
         alignItems: 'center',

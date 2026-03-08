@@ -1,9 +1,10 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FlatList, Modal, Pressable, View } from 'react-native'
+import { FlatList, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
+import { TriggerModal } from '@/components/ui/trigger-modal'
 import MyCheckbox from '@/components/elements/my-checkbox'
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
@@ -11,10 +12,10 @@ import MyText from '@/components/elements/my-text'
 import MyTextInput from '@/components/elements/my-text-input'
 import MyView from '@/components/elements/my-view'
 import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
-import { useTheme, useThemedStyles } from '@/theme/theme-context'
+import { useThemedStyles } from '@/theme/theme-context'
 
 import type { DropdownOption, MyDropdownInputProps } from './type'
-import { generateStyles } from './styles'
+import { DROPDOWN_MAX_HEIGHT, generateStyles } from './styles'
 import { isNil } from 'lodash'
 
 const MyDropdownInput = memo(function MyDropdownInput({
@@ -34,7 +35,6 @@ const MyDropdownInput = memo(function MyDropdownInput({
   const styles = useThemedStyles(generateStyles)
   const isMobile = useIsMobileSize()
   const sheetRef = useRef<MyBottomSheetRef>(null)
-  const { getSpacing } = useTheme()
   const [open, setOpen] = useState(false)
   const [triggerLayout, setTriggerLayout] = useState<{
     x: number
@@ -215,8 +215,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
       keyExtractor={(item, index) => `dropdown-option-${item.value}-${index}`}
       renderItem={renderOption}
       onScrollToIndexFailed={() => {}}
-      contentContainerStyle={isMobile ? styles.sheetListContent : undefined}
-      style={isMobile ? undefined : styles.dropdownScrollView}
+      contentContainerStyle={styles.sheetListContent}
       keyboardShouldPersistTaps="handled"
     />
   )
@@ -239,29 +238,15 @@ const MyDropdownInput = memo(function MyDropdownInput({
             {optionsList}
           </MyBottomSheet>
         ) : (
-          <>
-            {open && (
-              <Modal visible transparent animationType="fade">
-                <Pressable style={styles.modalBackdrop} onPress={closePicker}>
-                  {!!triggerLayout && (
-                    <View
-                      style={[
-                        styles.dropdownPanel,
-                        {
-                          left: triggerLayout.x,
-                          top: triggerLayout.y + triggerLayout.height + getSpacing('x1'),
-                          width: triggerLayout.width,
-                        },
-                      ]}
-                      onStartShouldSetResponder={() => true}
-                    >
-                      {optionsList}
-                    </View>
-                  )}
-                </Pressable>
-              </Modal>
-            )}
-          </>
+          <TriggerModal
+            visible={open}
+            onClose={closePicker}
+            triggerLayout={triggerLayout}
+            estimatedPanelHeight={DROPDOWN_MAX_HEIGHT}
+            panelStyle={styles.dropdownPanel}
+          >
+            {optionsList}
+          </TriggerModal>
         )}
       </MyView>
     </MyView>
