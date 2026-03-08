@@ -68,6 +68,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       onDismiss,
       style,
       backgroundStyle,
+      useScrollView = true,
       ...rest
     },
     ref,
@@ -208,12 +209,16 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         {...rest}
       >
         {header ?? headerContent}
-        <BottomSheetScrollView
-          contentContainerStyle={[styles.content, contentContainerStyle]}
-          keyboardShouldPersistTaps="handled"
-        >
-          {children}
-        </BottomSheetScrollView>
+        {useScrollView ? (
+          <BottomSheetScrollView
+            contentContainerStyle={[styles.content, contentContainerStyle]}
+            keyboardShouldPersistTaps="handled"
+          >
+            {children}
+          </BottomSheetScrollView>
+        ) : (
+          <View style={[styles.content, contentContainerStyle]}>{children}</View>
+        )}
       </BottomSheetModal>
     )
   },

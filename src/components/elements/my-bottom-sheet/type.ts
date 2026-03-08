@@ -12,6 +12,7 @@ export interface MyBottomSheetProps extends Omit<BottomSheetModalProps, 'childre
   pressBackdropToClose?: boolean
   children: ReactNode
   contentContainerStyle?: StyleProp<ViewStyle>
+  useScrollView?: boolean
 }
 
 export interface MyBottomSheetRef {

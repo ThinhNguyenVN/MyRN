@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Modal, Pressable, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import MyCheckbox from '@/components/elements/my-checkbox'
@@ -65,8 +66,10 @@ const MyDropdownInput = memo(function MyDropdownInput({
     : (selectedOption?.label ?? placeholder)
 
   const triggerRef = useRef<View>(null)
-  const listRef = useRef<FlatList<DropdownOption>>(null)
+  const listRef = useRef<FlatList<DropdownOption> | null>(null)
   const chevronRotation = useSharedValue(0)
+
+  const ListComponent = isMobile ? BottomSheetFlatList : FlatList
 
   const selectedIndex = useMemo(() => {
     if (multiSelect) {
@@ -86,6 +89,17 @@ const MyDropdownInput = memo(function MyDropdownInput({
     transform: [{ rotate: `${chevronRotation.value}deg` }],
   }))
 
+  const scrollToSelected = useCallback(() => {
+    const index = Math.min(selectedIndex ? selectedIndex - 1 : 0, options.length - 1)
+    const timer = setTimeout(
+      () => {
+        listRef.current?.scrollToIndex({ index, animated: true })
+      },
+      isMobile ? 0 : 250,
+    )
+    return () => clearTimeout(timer)
+  }, [selectedIndex, options.length, isMobile])
+
   const openPicker = useCallback(() => {
     if (disabled) return
 
@@ -97,16 +111,9 @@ const MyDropdownInput = memo(function MyDropdownInput({
         setTriggerLayout({ x, y, width, height })
         setOpen(true)
       })
+      scrollToSelected()
     }
-
-    const timer = setTimeout(() => {
-      listRef.current?.scrollToIndex({
-        index: Math.min(selectedIndex ? selectedIndex - 1 : 0, options.length - 1),
-        animated: false,
-      })
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [disabled, isMobile, selectedIndex, options.length])
+  }, [disabled, isMobile, scrollToSelected])
 
   const closePicker = useCallback(() => {
     if (isMobile) {
@@ -202,16 +209,15 @@ const MyDropdownInput = memo(function MyDropdownInput({
   )
 
   const optionsList = (
-    <FlatList<DropdownOption>
-      ref={listRef}
+    <ListComponent
+      ref={listRef as React.Ref<any>}
       data={options}
-      keyExtractor={(item) => item.value}
+      keyExtractor={(item, index) => `dropdown-option-${item.value}-${index}`}
       renderItem={renderOption}
       onScrollToIndexFailed={() => {}}
       contentContainerStyle={isMobile ? styles.sheetListContent : undefined}
-      style={styles.dropdownScrollView}
-      nestedScrollEnabled
-      keyboardShouldPersistTaps={'handled'}
+      style={isMobile ? undefined : styles.dropdownScrollView}
+      keyboardShouldPersistTaps="handled"
     />
   )
 
@@ -227,6 +233,8 @@ const MyDropdownInput = memo(function MyDropdownInput({
             showClose
             onClosed={closePicker}
             pressBackdropToClose
+            useScrollView={false}
+            onChange={scrollToSelected}
           >
             {optionsList}
           </MyBottomSheet>
