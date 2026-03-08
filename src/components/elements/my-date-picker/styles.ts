@@ -122,6 +122,16 @@ export function generateStyles(theme: ThemeType) {
       dayCellToday: {
         backgroundColor: getColor('fill/background/secondary'),
       },
+      dayCellTodayDot: {
+        width: 4,
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: getColor('fill/active/primary'),
+        marginTop: 2,
+      },
+      dayCellTodayDotSelected: {
+        backgroundColor: getColor('brand/white'),
+      },
       dayCellSelected: {
         backgroundColor: getColor('fill/active/primary'),
       },
@@ -137,6 +147,9 @@ export function generateStyles(theme: ThemeType) {
       },
       dayCellEmpty: {
         backgroundColor: 'transparent',
+      },
+      dayCellContent: {
+        alignItems: 'center',
       },
       dayCellText: {
         color: getColor('text/active/primary'),

@@ -148,12 +148,19 @@ const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }
         haptic={false}
         animatedType="opacity"
       >
-        <MyText
-          typography="label"
-          style={[styles.dayCellText, selected && styles.dayCellSelectedText]}
-        >
-          {cell.date.getDate()}
-        </MyText>
+        <View style={styles.dayCellContent}>
+          <MyText
+            typography="label"
+            style={[styles.dayCellText, selected && styles.dayCellSelectedText]}
+          >
+            {cell.date.getDate()}
+          </MyText>
+          {isToday ? (
+            <View
+              style={[styles.dayCellTodayDot, selected && styles.dayCellTodayDotSelected]}
+            />
+          ) : null}
+        </View>
       </MyPressable>
     )
   }
