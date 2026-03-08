@@ -116,8 +116,11 @@ export function generateStyles(theme: ThemeType) {
         height: DAY_CELL_SIZE,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: Radius.small,
+        borderRadius: Radius.medium,
         ...(isWeb ? { minWidth: 0 } : { flex: 1, flexShrink: 0 }),
+      },
+      dayCellToday: {
+        backgroundColor: getColor('fill/background/secondary'),
       },
       dayCellSelected: {
         backgroundColor: getColor('fill/active/primary'),

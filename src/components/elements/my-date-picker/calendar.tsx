@@ -120,6 +120,7 @@ const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }
   }, [cells])
 
   const valueOnly = value ? toDateOnly(value) : null
+  const todayOnly = useMemo(() => toDateOnly(new Date()), [])
 
   const renderCell = (cell: (typeof cells)[number], idx: number) => {
     const baseCellStyle = [styles.dayCell, cellStyle]
@@ -132,6 +133,7 @@ const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }
       )
     }
     const selected = !isNil(valueOnly) && isSameDay(cell.date, valueOnly)
+    const isToday = isSameDay(cell.date, todayOnly)
     return (
       <MyPressable
         key={`${idx}-day-cell`}
@@ -139,6 +141,7 @@ const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }
         disabled={cell.disabled}
         style={[
           baseCellStyle,
+          isToday && styles.dayCellToday,
           selected && styles.dayCellSelected,
           cell.disabled && styles.dayCellDisabled,
         ]}
@@ -158,13 +161,13 @@ const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }
   return (
     <View>
       <View style={styles.calendarHeader}>
-        <MyPressable onPress={goPrev} style={styles.calendarPrevNext} haptic={false}>
+        <MyPressable onPress={goPrev} style={styles.calendarPrevNext}>
           <MyIcon name="chevron-back" size={24} color="icon/active/primary" />
         </MyPressable>
         <MyText typography="label" style={styles.calendarMonthYear}>
           {getMonthYearLabel(currentView)}
         </MyText>
-        <MyPressable onPress={goNext} style={styles.calendarPrevNext} haptic={false}>
+        <MyPressable onPress={goNext} style={styles.calendarPrevNext}>
           <MyIcon name="chevron-forward" size={24} color="icon/active/primary" />
         </MyPressable>
       </View>
