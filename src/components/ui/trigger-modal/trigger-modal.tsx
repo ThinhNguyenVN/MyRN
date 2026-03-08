@@ -36,6 +36,7 @@ const TriggerModal = memo(function TriggerModal({
   const gap = getSpacing('x1')
   const opacity = useSharedValue(0)
   const [isExiting, setIsExiting] = useState(false)
+  const [contentReady, setContentReady] = useState(false)
   const wasVisibleRef = useRef(false)
 
   const panelLayout = useMemo(() => {
@@ -65,16 +66,24 @@ const TriggerModal = memo(function TriggerModal({
     if (visible) {
       wasVisibleRef.current = true
       setIsExiting(false)
-      opacity.value = withTiming(1, { duration: FADE_DURATION })
-    } else if (wasVisibleRef.current) {
-      setIsExiting(true)
-      opacity.value = withTiming(
-        0,
-        { duration: FADE_DURATION },
-        (finished) => finished && runOnJS(finishExit)(),
-      )
+    } else {
+      setContentReady(false)
+      if (wasVisibleRef.current) {
+        setIsExiting(true)
+        opacity.value = withTiming(
+          0,
+          { duration: FADE_DURATION },
+          (finished) => finished && runOnJS(finishExit)(),
+        )
+      }
     }
   }, [visible, opacity, finishExit])
+
+  useEffect(() => {
+    if (visible && contentReady) {
+      opacity.value = withTiming(1, { duration: FADE_DURATION })
+    }
+  }, [visible, contentReady, opacity])
 
   const animatedBackdropStyle = useAnimatedStyle(() => ({ opacity: opacity.value }))
 
@@ -99,7 +108,12 @@ const TriggerModal = memo(function TriggerModal({
             ]}
             onPress={() => {}}
           >
-            <View style={[styles.contentWrap, contentContainerStyle]}>{children}</View>
+            <View
+              style={[styles.contentWrap, contentContainerStyle]}
+              onLayout={() => setContentReady(true)}
+            >
+              {children}
+            </View>
             {!!footer ? (
               <View style={[styles.footerWrap, footerContainerStyle]}>{footer}</View>
             ) : null}

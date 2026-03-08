@@ -81,7 +81,10 @@ const MyDatePicker = memo(function MyDatePicker({
   const handleSelectDay = useCallback(
     (date: Date) => {
       onValueChange?.(date)
-      closePicker()
+      const timer = setTimeout(() => {
+        closePicker()
+      }, 300)
+      return () => clearTimeout(timer)
     },
     [onValueChange, closePicker],
   )
