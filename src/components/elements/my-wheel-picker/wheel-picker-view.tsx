@@ -1,7 +1,11 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react'
-import { type NativeSyntheticEvent, type NativeScrollEvent, View } from 'react-native'
+import { type NativeSyntheticEvent, type NativeScrollEvent, Platform, View } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
-import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated'
+import Animated, {
+  runOnJS,
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from 'react-native-reanimated'
 
 import { triggerHaptic } from '@/components/elements/my-pressable/haptic'
 import { useThemedStyles } from '@/theme/theme-context'
@@ -11,6 +15,9 @@ import type { WheelPickerViewProps, WheelPickerItem as WheelPickerItemType } fro
 import WheelPickerRow from './wheel-picker-item'
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<WheelPickerItemType | null>)
+
+const IS_WEB = Platform.OS === 'web'
+const VELOCITY_NEAR_ZERO = 1 // px/ms, dưới ngưỡng này coi là scroll đã dừng (chỉ web)
 
 const WheelPickerView = memo(function WheelPickerView({
   items,
@@ -24,6 +31,9 @@ const WheelPickerView = memo(function WheelPickerView({
   const flatListRef = useRef<FlatList<WheelPickerItemType | null>>(null)
   const scrollY = useSharedValue(0)
   const lastSelectedFromScrollRef = useRef<number | null>(null)
+  const lastOffsetYRef = useRef(0)
+  const lastTimeRef = useRef(0)
+  const scrollEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const visibleRest = Math.floor(visibleCount / 2)
   const containerHeight = (1 + visibleRest * 2) * itemHeight
@@ -47,25 +57,15 @@ const WheelPickerView = memo(function WheelPickerView({
     [visibleCount],
   )
 
-  const onScroll = useAnimatedScrollHandler({
-    onScroll: (e) => {
-      scrollY.value = e.contentOffset.y
-    },
-  })
-
   const clampIndex = useCallback(
     (i: number) => Math.max(0, Math.min(i, items.length - 1)),
     [items.length],
   )
 
-  const handleMomentumScrollEnd = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const offsetY = Math.min(
-        itemHeight * (paddedData.length - 1),
-        Math.max(e.nativeEvent.contentOffset.y, 0),
-      )
-
-      const centerY = offsetY + (containerHeight > 0 ? containerHeight / 2 : 0)
+  const commitScrollEnd = useCallback(
+    (offsetY: number) => {
+      const offset = Math.min(itemHeight * (paddedData.length - 1), Math.max(offsetY, 0))
+      const centerY = offset + (containerHeight > 0 ? containerHeight / 2 : 0)
       const paddedIndex = Math.max(
         0,
         Math.min(paddedData.length - 1, Math.floor(centerY / itemHeight)),
@@ -88,6 +88,54 @@ const WheelPickerView = memo(function WheelPickerView({
       onSelectIndex,
       haptic,
     ],
+  )
+  const commitScrollEndRef = useRef(commitScrollEnd)
+  commitScrollEndRef.current = commitScrollEnd
+
+  /** Chỉ web: onMomentumScrollEnd không fire, dùng onScroll + velocity gần 0 để coi là scroll end. */
+  const handleScrollOffsetForWeb = useCallback((offsetY: number) => {
+    const now = Date.now()
+    const prevOffset = lastOffsetYRef.current
+    const prevTime = lastTimeRef.current
+    lastOffsetYRef.current = offsetY
+    lastTimeRef.current = now
+
+    if (scrollEndTimeoutRef.current) {
+      clearTimeout(scrollEndTimeoutRef.current)
+      scrollEndTimeoutRef.current = null
+    }
+
+    const dt = now - prevTime
+    const velocity = dt > 0 ? Math.abs((offsetY - prevOffset) / dt) : 0
+    if (prevTime > 0 && velocity <= VELOCITY_NEAR_ZERO) {
+      commitScrollEndRef.current(offsetY)
+      return
+    }
+
+    scrollEndTimeoutRef.current = setTimeout(() => {
+      scrollEndTimeoutRef.current = null
+      commitScrollEndRef.current(lastOffsetYRef.current)
+    }, 150)
+  }, [])
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (e) => {
+      scrollY.value = e.contentOffset.y
+      if (IS_WEB) {
+        runOnJS(handleScrollOffsetForWeb)(e.contentOffset.y)
+      }
+    },
+  })
+
+  const handleMomentumScrollEnd = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (scrollEndTimeoutRef.current) {
+        clearTimeout(scrollEndTimeoutRef.current)
+        scrollEndTimeoutRef.current = null
+      }
+      commitScrollEnd(e.nativeEvent.contentOffset.y)
+    },
+    [commitScrollEnd],
   )
 
   /** Offset để item được chọn nằm giữa viewport (trùng với logic handleMomentumScrollEnd). */
@@ -176,7 +224,6 @@ const WheelPickerView = memo(function WheelPickerView({
         showsVerticalScrollIndicator={false}
         onScroll={onScroll}
         onMomentumScrollEnd={handleMomentumScrollEnd}
-        onScrollEndDrag={handleMomentumScrollEnd}
         snapToOffsets={snapToOffsets}
         decelerationRate={'fast' as const}
         initialScrollIndex={initialScrollIndex}

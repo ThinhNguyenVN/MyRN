@@ -28,7 +28,6 @@ export default function WheelPickerScreen() {
   const [selectedIndex, setSelectedIndex] = useState(1)
   const [value, setValue] = useState<number | null>(null)
 
-  console.log('selectedIndex ====> ', selectedIndex)
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
       <MyText typography="subtitle" style={styles.sectionTitle}>
