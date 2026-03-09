@@ -109,7 +109,6 @@ const MyDatePicker = memo(function MyDatePicker({
       footer={footer}
       panelMinWidth={280}
       estimatedPanelHeight={380}
-      contentContainerStyle={styles.sheetCalendarContent}
       footerContainerStyle={styles.sheetFooter}
       style={style}
       renderTrigger={({ openPicker, disabled: d, open }) => (

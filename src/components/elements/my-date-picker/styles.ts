@@ -105,6 +105,7 @@ export function generateStyles(theme: ThemeType) {
       },
       daysGrid: {
         flexDirection: 'column',
+        gap: getSpacing('x1'),
       },
       daysRow: {
         ...webGridRow(getSpacing('x1')),
@@ -113,7 +114,7 @@ export function generateStyles(theme: ThemeType) {
         height: DAY_CELL_SIZE,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: Radius.medium,
+        borderRadius: Radius.small,
         ...(isWeb ? { minWidth: 0 } : { flex: 1, flexShrink: 0 }),
       },
       dayCellToday: {
@@ -137,19 +138,19 @@ export function generateStyles(theme: ThemeType) {
       },
       dayCellInRange: {
         backgroundColor: getColor('fill/background/secondary'),
+        borderRadius: Radius.small,
       },
       dayCellRangeStart: {
         backgroundColor: getColor('fill/active/primary'),
-        borderTopLeftRadius: Radius.small,
-        borderBottomLeftRadius: Radius.small,
+        borderRadius: Radius.small,
       },
       dayCellRangeEnd: {
         backgroundColor: getColor('fill/active/primary'),
-        borderTopRightRadius: Radius.small,
-        borderBottomRightRadius: Radius.small,
+        borderRadius: Radius.small,
       },
       dayCellRangeStartEnd: {
         backgroundColor: getColor('fill/active/primary'),
+        borderRadius: Radius.small,
       },
       dayCellRangeText: {
         color: getColor('brand/white'),

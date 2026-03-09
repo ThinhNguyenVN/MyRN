@@ -1,83 +1,22 @@
 import React, { memo, useCallback, useMemo, useState } from 'react'
 import { Platform, View } from 'react-native'
 
-import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
-import { DEFAULT_DATE_LOCALE } from '@/configs/themes'
+import { isNil } from 'lodash'
 
+import { CalendarBase } from './calendar-base'
+import {
+  COLS,
+  FALLBACK_CELL_WIDTH,
+  getDaysForMonth,
+  isSameDay,
+  toDateOnly,
+  type DayCell,
+} from './calendar-utils'
 import { generateStyles } from './styles'
 import type { CalendarRangeProps } from './type'
-
-const COLS = 7
-const FALLBACK_CELL_WIDTH = 36
-
-const WEEKDAYS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
-
-function toDateOnly(d: Date): Date {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
-}
-
-function isSameDay(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  )
-}
-
-function getMonthYearLabel(date: Date): string {
-  return new Intl.DateTimeFormat(DEFAULT_DATE_LOCALE, { month: 'long', year: 'numeric' }).format(
-    date,
-  )
-}
-
-function getDaysForMonth(viewMonth: Date, minDate?: Date, maxDate?: Date) {
-  const year = viewMonth.getFullYear()
-  const month = viewMonth.getMonth()
-  const first = new Date(year, month, 1)
-  const last = new Date(year, month + 1, 0)
-  const firstWeekday = (first.getDay() + 6) % 7
-  const daysInMonth = last.getDate()
-  const min = minDate ? toDateOnly(minDate) : null
-  const max = maxDate ? toDateOnly(maxDate) : null
-
-  const cells: { date: Date; isCurrentMonth: boolean; disabled: boolean }[] = []
-  const startPad = firstWeekday
-  const prevMonth = month === 0 ? 11 : month - 1
-  const prevYear = month === 0 ? year - 1 : year
-  const prevLast = new Date(prevYear, prevMonth + 1, 0).getDate()
-
-  for (let i = 0; i < startPad; i++) {
-    const d = new Date(prevYear, prevMonth, prevLast - startPad + 1 + i)
-    cells.push({
-      date: d,
-      isCurrentMonth: false,
-      disabled: !!((min && d < min) || (max && d > max)),
-    })
-  }
-  for (let day = 1; day <= daysInMonth; day++) {
-    const d = new Date(year, month, day)
-    cells.push({
-      date: d,
-      isCurrentMonth: true,
-      disabled: !!((min && d < min) || (max && d > max)),
-    })
-  }
-  const remaining = 42 - cells.length
-  const nextMonth = month === 11 ? 0 : month + 1
-  const nextYear = month === 11 ? year + 1 : year
-  for (let day = 1; day <= remaining; day++) {
-    const d = new Date(nextYear, nextMonth, day)
-    cells.push({
-      date: d,
-      isCurrentMonth: false,
-      disabled: !!((min && d < min) || (max && d > max)),
-    })
-  }
-  return cells
-}
 
 const CalendarRange = memo(function CalendarRange({
   startDate,
@@ -91,7 +30,10 @@ const CalendarRange = memo(function CalendarRange({
   const [gridWidth, setGridWidth] = useState(0)
   const gap = getSpacing('x1')
   const cellWidth = gridWidth > 0 ? (gridWidth - (COLS - 1) * gap) / COLS : FALLBACK_CELL_WIDTH
-  const cellStyle = Platform.OS === 'web' ? undefined : { width: cellWidth, flex: 0 as const }
+  const cellStyle = useMemo(
+    () => (Platform.OS === 'web' ? undefined : { width: cellWidth, flex: 0 as const }),
+    [cellWidth],
+  )
 
   const initialView = startDate ?? endDate ?? new Date()
   const [viewMonth, setViewMonth] = useState<Date>(
@@ -115,121 +57,100 @@ const CalendarRange = memo(function CalendarRange({
     [currentView, minDate, maxDate],
   )
 
-  const rows = useMemo(() => {
-    const result: (typeof cells)[] = []
-    for (let i = 0; i < cells.length; i += 7) {
-      result.push(cells.slice(i, i + 7))
-    }
-    return result
-  }, [cells])
-
   const startOnly = startDate ? toDateOnly(startDate) : null
   const endOnly = endDate ? toDateOnly(endDate) : null
   const todayOnly = useMemo(() => toDateOnly(new Date()), [])
 
-  const renderCell = (cell: (typeof cells)[number], idx: number) => {
-    const baseCellStyle = [styles.dayCell, cellStyle]
-    if (!cell.isCurrentMonth) {
+  const renderCell = useCallback(
+    (cell: DayCell, idx: number) => {
+      const baseCellStyle = [styles.dayCell, cellStyle]
+      if (!cell.isCurrentMonth) {
+        return (
+          <View
+            key={`${idx}-other-month`}
+            style={[baseCellStyle, styles.dayCellOtherMonth, styles.dayCellEmpty]}
+          />
+        )
+      }
+      const cellDate = toDateOnly(cell.date)
+      const isStart = !isNil(startOnly) ? isSameDay(cell.date, startOnly) : false
+      const isEnd = !isNil(endOnly) ? isSameDay(cell.date, endOnly) : false
+      const inRange =
+        !isNil(startOnly) &&
+        !isNil(endOnly) &&
+        cellDate.getTime() > startOnly.getTime() &&
+        cellDate.getTime() < endOnly.getTime()
+      const isRangeStartOrEnd = isStart || isEnd
+      const isSingleDayRange = isStart && isEnd
+      const isToday = isSameDay(cell.date, todayOnly)
+
+      let rangeStyle = null
+      let textStyle: typeof styles.dayCellText = styles.dayCellText
+      if (isSingleDayRange) {
+        rangeStyle = styles.dayCellRangeStartEnd
+        textStyle = [
+          styles.dayCellText,
+          styles.dayCellRangeText,
+        ] as unknown as typeof styles.dayCellText
+      } else if (isStart) {
+        rangeStyle = styles.dayCellRangeStart
+        textStyle = [
+          styles.dayCellText,
+          styles.dayCellRangeText,
+        ] as unknown as typeof styles.dayCellText
+      } else if (isEnd) {
+        rangeStyle = styles.dayCellRangeEnd
+        textStyle = [
+          styles.dayCellText,
+          styles.dayCellRangeText,
+        ] as unknown as typeof styles.dayCellText
+      } else if (inRange) {
+        rangeStyle = styles.dayCellInRange
+      }
+
       return (
-        <View
-          key={`${idx}-other-month`}
-          style={[baseCellStyle, styles.dayCellOtherMonth, styles.dayCellEmpty]}
-        />
+        <MyPressable
+          key={`${idx}-day-cell`}
+          onPress={() => !cell.disabled && onSelectDay(cell.date)}
+          disabled={cell.disabled}
+          style={[
+            baseCellStyle,
+            isToday && styles.dayCellToday,
+            rangeStyle,
+            cell.disabled && styles.dayCellDisabled,
+          ]}
+          haptic={false}
+          animatedType="opacity"
+        >
+          <View style={styles.dayCellContent}>
+            <MyText typography="label" style={textStyle}>
+              {cell.date.getDate()}
+            </MyText>
+            {isToday ? (
+              <View
+                style={[
+                  styles.dayCellTodayDot,
+                  isRangeStartOrEnd && styles.dayCellTodayDotSelected,
+                ]}
+              />
+            ) : null}
+          </View>
+        </MyPressable>
       )
-    }
-    const cellDate = toDateOnly(cell.date)
-    const isStart = startOnly !== null && isSameDay(cell.date, startOnly)
-    const isEnd = endOnly !== null && isSameDay(cell.date, endOnly)
-    const inRange =
-      startOnly !== null &&
-      endOnly !== null &&
-      cellDate.getTime() > startOnly.getTime() &&
-      cellDate.getTime() < endOnly.getTime()
-    const isRangeStartOrEnd = isStart || isEnd
-    const isSingleDayRange = isStart && isEnd
-    const isToday = isSameDay(cell.date, todayOnly)
-
-    let rangeStyle = null
-    let textStyle = styles.dayCellText
-    if (isSingleDayRange) {
-      rangeStyle = styles.dayCellRangeStartEnd
-      textStyle = [styles.dayCellText, styles.dayCellRangeText] as typeof styles.dayCellText
-    } else if (isStart) {
-      rangeStyle = styles.dayCellRangeStart
-      textStyle = [styles.dayCellText, styles.dayCellRangeText] as typeof styles.dayCellText
-    } else if (isEnd) {
-      rangeStyle = styles.dayCellRangeEnd
-      textStyle = [styles.dayCellText, styles.dayCellRangeText] as typeof styles.dayCellText
-    } else if (inRange) {
-      rangeStyle = styles.dayCellInRange
-    }
-
-    return (
-      <MyPressable
-        key={`${idx}-day-cell`}
-        onPress={() => !cell.disabled && onSelectDay(cell.date)}
-        disabled={cell.disabled}
-        style={[
-          baseCellStyle,
-          isToday && styles.dayCellToday,
-          rangeStyle,
-          cell.disabled && styles.dayCellDisabled,
-        ]}
-        haptic={false}
-        animatedType="opacity"
-      >
-        <View style={styles.dayCellContent}>
-          <MyText typography="label" style={textStyle}>
-            {cell.date.getDate()}
-          </MyText>
-          {isToday ? (
-            <View
-              style={[
-                styles.dayCellTodayDot,
-                isRangeStartOrEnd && styles.dayCellTodayDotSelected,
-              ]}
-            />
-          ) : null}
-        </View>
-      </MyPressable>
-    )
-  }
+    },
+    [styles, cellStyle, startOnly, endOnly, todayOnly, onSelectDay],
+  )
 
   return (
-    <View>
-      <View style={styles.calendarHeader}>
-        <MyPressable onPress={goPrev} style={styles.calendarPrevNext}>
-          <MyIcon name="chevron-back" size={24} color="icon/active/primary" />
-        </MyPressable>
-        <MyText typography="label" style={styles.calendarMonthYear}>
-          {getMonthYearLabel(currentView)}
-        </MyText>
-        <MyPressable onPress={goNext} style={styles.calendarPrevNext}>
-          <MyIcon name="chevron-forward" size={24} color="icon/active/primary" />
-        </MyPressable>
-      </View>
-      <View
-        style={styles.calendarTableWrap}
-        onLayout={(e) => setGridWidth(e.nativeEvent.layout.width)}
-      >
-        <View style={styles.weekDayRow}>
-          {WEEKDAYS.map((wd) => (
-            <View key={`${wd}-week-day-cell`} style={[styles.weekDayCell, cellStyle]}>
-              <MyText typography="caption" style={styles.weekDayText}>
-                {wd}
-              </MyText>
-            </View>
-          ))}
-        </View>
-        <View style={styles.daysGrid}>
-          {rows.map((row, rowIdx) => (
-            <View key={`${rowIdx}-days-row`} style={styles.daysRow}>
-              {row.map((cell, cellIdx) => renderCell(cell, rowIdx * COLS + cellIdx))}
-            </View>
-          ))}
-        </View>
-      </View>
-    </View>
+    <CalendarBase
+      currentView={currentView}
+      goPrev={goPrev}
+      goNext={goNext}
+      cells={cells}
+      cellStyle={cellStyle}
+      renderCell={renderCell}
+      onGridLayout={setGridWidth}
+    />
   )
 })
 
