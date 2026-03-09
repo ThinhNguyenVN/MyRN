@@ -50,3 +50,7 @@ export interface CalendarRangeProps {
   maxDate?: Date
   onSelectDay: (date: Date) => void
 }
+
+export type CalendarPropsUnion =
+  | (CalendarProps & { mode: 'single' })
+  | (CalendarRangeProps & { mode: 'range' })

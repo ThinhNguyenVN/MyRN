@@ -2,7 +2,7 @@ import React, { memo, useCallback, useEffect } from 'react'
 import { View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
-import CalendarRange from '@/components/elements/my-date-picker/calendar-range'
+import { CalendarRange } from './calendar'
 import DatePickerShell from '@/components/elements/my-date-picker/date-picker-shell'
 import MyButton from '@/components/elements/my-button'
 import MyIcon from '@/components/elements/my-icon'
