@@ -50,9 +50,6 @@ export function generateStyles(theme: ThemeType) {
   return {
     stateColors,
     ...StyleSheet.create({
-      container: {
-        gap: getSpacing('x1'),
-      },
       triggerWrap: {
         width: '100%',
       },
@@ -138,6 +135,25 @@ export function generateStyles(theme: ThemeType) {
       dayCellSelectedText: {
         color: getColor('brand/white'),
       },
+      dayCellInRange: {
+        backgroundColor: getColor('fill/background/secondary'),
+      },
+      dayCellRangeStart: {
+        backgroundColor: getColor('fill/active/primary'),
+        borderTopLeftRadius: Radius.small,
+        borderBottomLeftRadius: Radius.small,
+      },
+      dayCellRangeEnd: {
+        backgroundColor: getColor('fill/active/primary'),
+        borderTopRightRadius: Radius.small,
+        borderBottomRightRadius: Radius.small,
+      },
+      dayCellRangeStartEnd: {
+        backgroundColor: getColor('fill/active/primary'),
+      },
+      dayCellRangeText: {
+        color: getColor('brand/white'),
+      },
       dayCellDisabled: {
         opacity: 0.4,
       },
@@ -156,14 +172,15 @@ export function generateStyles(theme: ThemeType) {
         textAlign: 'center',
         lineHeight: 13,
       },
-      sheetCalendarContent: {
-        paddingBottom: getSpacing('x4'),
-      },
+
       sheetFooter: {
         borderTopWidth: 1,
         borderTopColor: getColor('border/inactive/tertiary'),
-        paddingTop: getSpacing('x4'),
-        paddingBottom: getSpacing('x4'),
+      },
+      footerButtonRow: {
+        flexDirection: 'row',
+        gap: getSpacing('x2'),
+        marginTop: getSpacing('x6'),
       },
     }),
   }

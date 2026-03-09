@@ -5,11 +5,10 @@ import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
+import { DEFAULT_DATE_LOCALE } from '@/configs/themes'
 
 import { generateStyles } from './styles'
-import type { CalendarProps } from './type'
-import { isNil } from 'lodash'
-import { DEFAULT_DATE_LOCALE } from '@/configs/themes'
+import type { CalendarRangeProps } from './type'
 
 const COLS = 7
 const FALLBACK_CELL_WIDTH = 36
@@ -80,7 +79,13 @@ function getDaysForMonth(viewMonth: Date, minDate?: Date, maxDate?: Date) {
   return cells
 }
 
-const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }: CalendarProps) {
+const CalendarRange = memo(function CalendarRange({
+  startDate,
+  endDate,
+  minDate,
+  maxDate,
+  onSelectDay,
+}: CalendarRangeProps) {
   const styles = useThemedStyles(generateStyles)
   const { getSpacing } = useTheme()
   const [gridWidth, setGridWidth] = useState(0)
@@ -88,10 +93,9 @@ const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }
   const cellWidth = gridWidth > 0 ? (gridWidth - (COLS - 1) * gap) / COLS : FALLBACK_CELL_WIDTH
   const cellStyle = Platform.OS === 'web' ? undefined : { width: cellWidth, flex: 0 as const }
 
-  const [viewMonth, setViewMonth] = useState<Date>(() =>
-    value
-      ? new Date(value.getFullYear(), value.getMonth(), 1)
-      : new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+  const initialView = startDate ?? endDate ?? new Date()
+  const [viewMonth, setViewMonth] = useState<Date>(
+    () => new Date(initialView.getFullYear(), initialView.getMonth(), 1),
   )
 
   const currentView = useMemo(
@@ -119,7 +123,8 @@ const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }
     return result
   }, [cells])
 
-  const valueOnly = value ? toDateOnly(value) : null
+  const startOnly = startDate ? toDateOnly(startDate) : null
+  const endOnly = endDate ? toDateOnly(endDate) : null
   const todayOnly = useMemo(() => toDateOnly(new Date()), [])
 
   const renderCell = (cell: (typeof cells)[number], idx: number) => {
@@ -132,8 +137,33 @@ const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }
         />
       )
     }
-    const selected = !isNil(valueOnly) && isSameDay(cell.date, valueOnly)
+    const cellDate = toDateOnly(cell.date)
+    const isStart = startOnly !== null && isSameDay(cell.date, startOnly)
+    const isEnd = endOnly !== null && isSameDay(cell.date, endOnly)
+    const inRange =
+      startOnly !== null &&
+      endOnly !== null &&
+      cellDate.getTime() > startOnly.getTime() &&
+      cellDate.getTime() < endOnly.getTime()
+    const isRangeStartOrEnd = isStart || isEnd
+    const isSingleDayRange = isStart && isEnd
     const isToday = isSameDay(cell.date, todayOnly)
+
+    let rangeStyle = null
+    let textStyle = styles.dayCellText
+    if (isSingleDayRange) {
+      rangeStyle = styles.dayCellRangeStartEnd
+      textStyle = [styles.dayCellText, styles.dayCellRangeText] as typeof styles.dayCellText
+    } else if (isStart) {
+      rangeStyle = styles.dayCellRangeStart
+      textStyle = [styles.dayCellText, styles.dayCellRangeText] as typeof styles.dayCellText
+    } else if (isEnd) {
+      rangeStyle = styles.dayCellRangeEnd
+      textStyle = [styles.dayCellText, styles.dayCellRangeText] as typeof styles.dayCellText
+    } else if (inRange) {
+      rangeStyle = styles.dayCellInRange
+    }
+
     return (
       <MyPressable
         key={`${idx}-day-cell`}
@@ -142,21 +172,23 @@ const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }
         style={[
           baseCellStyle,
           isToday && styles.dayCellToday,
-          selected && styles.dayCellSelected,
+          rangeStyle,
           cell.disabled && styles.dayCellDisabled,
         ]}
         haptic={false}
         animatedType="opacity"
       >
         <View style={styles.dayCellContent}>
-          <MyText
-            typography="label"
-            style={[styles.dayCellText, selected && styles.dayCellSelectedText]}
-          >
+          <MyText typography="label" style={textStyle}>
             {cell.date.getDate()}
           </MyText>
           {isToday ? (
-            <View style={[styles.dayCellTodayDot, selected && styles.dayCellTodayDotSelected]} />
+            <View
+              style={[
+                styles.dayCellTodayDot,
+                isRangeStartOrEnd && styles.dayCellTodayDotSelected,
+              ]}
+            />
           ) : null}
         </View>
       </MyPressable>
@@ -201,6 +233,6 @@ const Calendar = memo(function Calendar({ value, minDate, maxDate, onSelectDay }
   )
 })
 
-Calendar.displayName = 'Calendar'
+CalendarRange.displayName = 'CalendarRange'
 
-export default Calendar
+export default CalendarRange

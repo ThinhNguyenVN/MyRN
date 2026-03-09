@@ -1,15 +1,17 @@
 import React, { memo, useCallback, useEffect } from 'react'
+import { View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
-import Calendar from '@/components/elements/my-date-picker/calendar'
+import CalendarRange from '@/components/elements/my-date-picker/calendar-range'
 import DatePickerShell from '@/components/elements/my-date-picker/date-picker-shell'
+import MyButton from '@/components/elements/my-button'
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
 import MyTextInput from '@/components/elements/my-text-input'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import type { MyDatePickerProps } from './type'
+import type { MyDateRangePickerProps } from './type'
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('vi-VN', {
@@ -19,7 +21,11 @@ function formatDate(date: Date): string {
   }).format(date)
 }
 
-interface DatePickerTriggerProps {
+function toDateOnly(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+}
+
+interface DateRangePickerTriggerProps {
   open: boolean
   openPicker: () => void
   disabled: boolean
@@ -32,7 +38,7 @@ interface DatePickerTriggerProps {
   triggerInputStyle: ReturnType<typeof generateStyles>['triggerInput']
 }
 
-const DatePickerTrigger = memo(function DatePickerTrigger({
+const DateRangePickerTrigger = memo(function DateRangePickerTrigger({
   open,
   openPicker,
   disabled,
@@ -43,7 +49,7 @@ const DatePickerTrigger = memo(function DatePickerTrigger({
   errorMessage,
   required,
   triggerInputStyle,
-}: DatePickerTriggerProps) {
+}: DateRangePickerTriggerProps) {
   const chevronRotation = useSharedValue(0)
   useEffect(() => {
     chevronRotation.value = withTiming(open ? -90 : 0)
@@ -75,10 +81,10 @@ const DatePickerTrigger = memo(function DatePickerTrigger({
   )
 })
 
-const MyDatePicker = memo(function MyDatePicker({
+const MyDateRangePicker = memo(function MyDateRangePicker({
   value,
   onValueChange,
-  placeholder = 'Chọn ngày',
+  placeholder = 'Chọn khoảng ngày',
   disabled = false,
   minDate,
   maxDate,
@@ -86,34 +92,51 @@ const MyDatePicker = memo(function MyDatePicker({
   error = false,
   errorMessage,
   required = false,
-  footer,
   style,
-}: MyDatePickerProps) {
+}: MyDateRangePickerProps) {
   const styles = useThemedStyles(generateStyles)
+  const startDate = value?.startDate ?? null
+  const endDate = value?.endDate ?? null
 
   const handleSelectDay = useCallback(
-    (date: Date, closePicker: () => void) => {
-      onValueChange?.(date)
-      const timer = setTimeout(closePicker, 300)
-      return () => clearTimeout(timer)
+    (date: Date) => {
+      const dateOnly = toDateOnly(date)
+      if (startDate === null || (startDate !== null && endDate !== null)) {
+        onValueChange?.({ startDate: dateOnly, endDate: null })
+      } else {
+        const startOnly = toDateOnly(startDate)
+        if (dateOnly.getTime() < startOnly.getTime()) {
+          onValueChange?.({ startDate: dateOnly, endDate: startOnly })
+        } else {
+          onValueChange?.({ startDate: startOnly, endDate: dateOnly })
+        }
+      }
     },
-    [onValueChange],
+    [startDate, endDate, onValueChange],
   )
 
-  const displayText = value ? formatDate(value) : ''
+  const handleClear = useCallback(() => {
+    onValueChange?.({ startDate: null, endDate: null })
+  }, [onValueChange])
+
+  let displayText = ''
+  if (startDate && endDate) {
+    displayText = `${formatDate(startDate)} - ${formatDate(endDate)}`
+  } else if (startDate) {
+    displayText = formatDate(startDate)
+  }
 
   return (
     <DatePickerShell
-      title={title ?? 'Chọn ngày'}
+      title={title ?? 'Chọn khoảng ngày'}
       disabled={disabled}
-      footer={footer}
       panelMinWidth={280}
       estimatedPanelHeight={380}
       contentContainerStyle={styles.sheetCalendarContent}
       footerContainerStyle={styles.sheetFooter}
       style={style}
       renderTrigger={({ openPicker, disabled: d, open }) => (
-        <DatePickerTrigger
+        <DateRangePickerTrigger
           open={open}
           openPicker={openPicker}
           disabled={d}
@@ -127,17 +150,24 @@ const MyDatePicker = memo(function MyDatePicker({
         />
       )}
       renderContent={(closePicker) => (
-        <Calendar
-          value={value}
-          minDate={minDate}
-          maxDate={maxDate}
-          onSelectDay={(date) => handleSelectDay(date, closePicker)}
-        />
+        <>
+          <CalendarRange
+            startDate={startDate}
+            endDate={endDate}
+            minDate={minDate}
+            maxDate={maxDate}
+            onSelectDay={handleSelectDay}
+          />
+          <View style={styles.footerButtonRow}>
+            <MyButton type="primary" text="Xác nhận" width="full" onPress={closePicker} />
+            <MyButton type="tertiary" text="Xóa" width="full" onPress={handleClear} />
+          </View>
+        </>
       )}
     />
   )
 })
 
-MyDatePicker.displayName = 'MyDatePicker'
+MyDateRangePicker.displayName = 'MyDateRangePicker'
 
-export default MyDatePicker
+export default MyDateRangePicker

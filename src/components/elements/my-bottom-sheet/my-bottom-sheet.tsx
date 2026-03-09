@@ -159,6 +159,8 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     )
 
     const windowHeight = Dimensions.get('window').height
+
+    const withFooterStyle = !!footerComponent ? { paddingBottom: 130 } : { paddingBottom: 100 }
     const modalPanelStyle = useMemo(
       () => [styles.modalPanel, { maxHeight: windowHeight * 0.8 }],
       [styles.modalPanel, windowHeight],
@@ -211,7 +213,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         {header ?? headerContent}
         {useScrollView ? (
           <BottomSheetScrollView
-            contentContainerStyle={[styles.content, contentContainerStyle]}
+            contentContainerStyle={[styles.content, withFooterStyle, contentContainerStyle]}
             keyboardShouldPersistTaps="handled"
           >
             {children}

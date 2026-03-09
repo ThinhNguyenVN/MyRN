@@ -40,7 +40,7 @@ function getStateColors(theme: ThemeType) {
 }
 
 export function generateStyles(theme: ThemeType) {
-  const { getColor, getSpacing } = theme
+  const { getColor, getSpacing, insets } = theme
   const stateColors = getStateColors(theme)
   return {
     stateColors,
@@ -71,6 +71,9 @@ export function generateStyles(theme: ThemeType) {
       dropdownPanel: {
         padding: 0,
       },
+      dropdownListDesktop: {
+        maxHeight: DROPDOWN_MAX_HEIGHT,
+      },
 
       optionRow: {
         flexDirection: 'row',
@@ -89,7 +92,9 @@ export function generateStyles(theme: ThemeType) {
       optionTextSelected: {
         color: getColor('icon/active/tertiary'),
       },
-      /** Mobile sheet: list content */
+      sheetContent: {
+        paddingBottom: (insets.bottom || 0) + getSpacing('x4'),
+      },
       sheetListContent: {
         paddingBottom: getSpacing('x6'),
       },

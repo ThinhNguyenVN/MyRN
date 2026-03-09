@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { ScrollView } from 'react-native'
 
 import MyButton from '@/components/elements/my-button'
-import MyDatePicker from '@/components/elements/my-date-picker'
+import MyDatePicker, {
+  MyDateRangePicker,
+  type DateRange,
+} from '@/components/elements/my-date-picker'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
@@ -14,6 +17,7 @@ export default function DatePickerScreen() {
   const [date1, setDate1] = useState<Date | null>(null)
   const [date2, setDate2] = useState<Date | null>(new Date())
   const [dateWithFooter, setDateWithFooter] = useState<Date | null>(new Date(2026, 2, 7))
+  const [range, setRange] = useState<DateRange | null>(null)
   const minDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
   const maxDate = new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0)
 
@@ -76,6 +80,26 @@ export default function DatePickerScreen() {
               text="Xóa"
               width="full"
               onPress={() => setDateWithFooter(null)}
+            />
+          }
+        />
+      </MyView>
+
+      <MyText typography="label" style={styles.sectionTitle}>
+        Date range (start – end)
+      </MyText>
+      <MyView style={styles.inputContainer}>
+        <MyDateRangePicker
+          value={range}
+          onValueChange={setRange}
+          placeholder="Chọn khoảng ngày"
+          title="Khoảng ngày"
+          footer={
+            <MyButton
+              type="tertiary"
+              text="Xóa"
+              width="full"
+              onPress={() => setRange(null)}
             />
           }
         />

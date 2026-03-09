@@ -216,6 +216,8 @@ const MyDropdownInput = memo(function MyDropdownInput({
       renderItem={renderOption}
       onScrollToIndexFailed={() => {}}
       contentContainerStyle={styles.sheetListContent}
+      showsVerticalScrollIndicator={false}
+      style={isMobile ? undefined : styles.dropdownListDesktop}
       keyboardShouldPersistTaps="handled"
     />
   )
@@ -234,6 +236,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
             pressBackdropToClose
             useScrollView={false}
             onChange={scrollToSelected}
+            contentContainerStyle={styles.sheetContent}
           >
             {optionsList}
           </MyBottomSheet>
