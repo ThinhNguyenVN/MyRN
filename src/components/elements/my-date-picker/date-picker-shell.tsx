@@ -104,7 +104,7 @@ const DatePickerShell = memo(function DatePickerShell({
           panelMinWidth={panelMinWidth}
           estimatedPanelHeight={estimatedPanelHeight}
           contentContainerStyle={contentContainerStyle}
-          footerContainerStyle={footerContainerStyle ?? styles.sheetFooter}
+          footerContainerStyle={footerContainerStyle}
         >
           {content}
         </TriggerModal>

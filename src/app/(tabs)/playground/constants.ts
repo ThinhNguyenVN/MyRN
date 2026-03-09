@@ -5,6 +5,7 @@ export const PLAYGROUND_LINKS: { label: string; href: string }[] = [
   { label: 'Switch', href: '/playground/switch' },
   { label: 'Dropdown', href: '/playground/dropdown' },
   { label: 'Date Picker', href: '/playground/date-picker' },
+  { label: 'Wheel Picker', href: '/playground/wheel-picker' },
   { label: 'Counter', href: '/playground/counter' },
   { label: 'Toast & Confirmation', href: '/playground/toast' },
   { label: 'Bottom Sheet', href: '/playground/bottom-sheet' },

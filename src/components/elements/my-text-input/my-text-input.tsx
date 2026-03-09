@@ -125,7 +125,7 @@ const MyTextInput = memo(
       : [styles.container, widthStyle, styleProp]
 
     return (
-      <MyView style={rootStyle}>
+      <MyView style={rootStyle} pointerEvents={editable && !disabled ? 'auto' : 'box-none'}>
         {hasTitleOrSubTitle && (
           <MyView style={styles.titleRow}>
             {!!title && (

@@ -141,17 +141,18 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       styles.headerTitle,
     ])
 
-    const footerComponent = useMemo(() => {
-      if (!footer) return undefined
-      function MyBottomSheetFooter(footerProps: BottomSheetFooterProps) {
+    const footerComponent = useCallback(
+      (footerProps: BottomSheetFooterProps) => {
+        if (!footer) return undefined
+
         return (
           <BottomSheetFooter {...footerProps}>
             <MyView style={styles.footer}>{footer}</MyView>
           </BottomSheetFooter>
         )
-      }
-      return MyBottomSheetFooter
-    }, [footer, styles.footer])
+      },
+      [footer, styles.footer],
+    )
 
     const backdropComponent = useMemo(
       () => createBackdropComponent(pressBackdropToClose),

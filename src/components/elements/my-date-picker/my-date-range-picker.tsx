@@ -132,7 +132,6 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
       disabled={disabled}
       panelMinWidth={280}
       estimatedPanelHeight={380}
-      footerContainerStyle={styles.sheetFooter}
       style={style}
       renderTrigger={({ openPicker, disabled: d, open }) => (
         <DateRangePickerTrigger
@@ -158,8 +157,20 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
             onSelectDay={handleSelectDay}
           />
           <View style={styles.footerButtonRow}>
-            <MyButton type="primary" text="Xác nhận" width="full" onPress={closePicker} />
-            <MyButton type="tertiary" text="Xóa" width="full" onPress={handleClear} />
+            <MyButton
+              type="primary"
+              text="Xác nhận"
+              width="full"
+              onPress={closePicker}
+              elevation={'none'}
+            />
+            <MyButton
+              type="tertiary"
+              text="Xóa"
+              width="full"
+              onPress={handleClear}
+              elevation={'none'}
+            />
           </View>
         </>
       )}

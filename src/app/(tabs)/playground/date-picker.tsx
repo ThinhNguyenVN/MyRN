@@ -80,6 +80,7 @@ export default function DatePickerScreen() {
               text="Xóa"
               width="full"
               onPress={() => setDateWithFooter(null)}
+              elevation={'none'}
             />
           }
         />
@@ -95,12 +96,7 @@ export default function DatePickerScreen() {
           placeholder="Chọn khoảng ngày"
           title="Khoảng ngày"
           footer={
-            <MyButton
-              type="tertiary"
-              text="Xóa"
-              width="full"
-              onPress={() => setRange(null)}
-            />
+            <MyButton type="tertiary" text="Xóa" width="full" onPress={() => setRange(null)} />
           }
         />
       </MyView>

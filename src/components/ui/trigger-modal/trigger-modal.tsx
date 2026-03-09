@@ -13,6 +13,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
 import type { TriggerModalProps } from './type'
+import MyView from '@/components/elements/my-view'
 
 const DEFAULT_ESTIMATED_HEIGHT = 320
 const DEFAULT_SAFE_INSET = 24
@@ -79,6 +80,14 @@ const TriggerModal = memo(function TriggerModal({
     }
   }, [visible, opacity, finishExit])
 
+  /** Khi unmount (vd: Metro reload), dọn state để lần mount sau không bị kẹt. */
+  useEffect(
+    () => () => {
+      wasVisibleRef.current = false
+    },
+    [],
+  )
+
   useEffect(() => {
     if (visible && contentReady) {
       opacity.value = withTiming(1, { duration: FADE_DURATION })
@@ -90,11 +99,19 @@ const TriggerModal = memo(function TriggerModal({
   if (!triggerLayout) return null
   if (!visible && !isExiting && !wasVisibleRef.current) return null
 
+  /** Khi đang thoát (isExiting), cho touch xuyên qua để tránh block màn hình nếu Metro reload / callback không chạy. */
+  const allowPointerEvents = visible && !isExiting
+
   return (
     <Portal hostName="root">
-      <Animated.View style={[StyleSheet.absoluteFillObject, animatedBackdropStyle]}>
+      <Animated.View
+        style={[StyleSheet.absoluteFillObject, animatedBackdropStyle]}
+        pointerEvents={allowPointerEvents ? 'auto' : 'none'}
+      >
         <Pressable style={[StyleSheet.absoluteFillObject, styles.backdrop]} onPress={onClose}>
-          <Pressable
+          <MyView
+            elevation={'soft/down/small'}
+            radius="medium"
             style={[
               styles.panel,
               panelLayout && {
@@ -106,18 +123,17 @@ const TriggerModal = memo(function TriggerModal({
               },
               panelStyle,
             ]}
-            onPress={() => {}}
           >
-            <View
+            <MyView
               style={[styles.contentWrap, contentContainerStyle]}
               onLayout={() => setContentReady(true)}
             >
               {children}
-            </View>
+            </MyView>
             {!!footer ? (
               <View style={[styles.footerWrap, footerContainerStyle]}>{footer}</View>
             ) : null}
-          </Pressable>
+          </MyView>
         </Pressable>
       </Animated.View>
     </Portal>

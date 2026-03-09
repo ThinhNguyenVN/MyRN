@@ -174,10 +174,6 @@ export function generateStyles(theme: ThemeType) {
         lineHeight: 13,
       },
 
-      sheetFooter: {
-        borderTopWidth: 1,
-        borderTopColor: getColor('border/inactive/tertiary'),
-      },
       footerButtonRow: {
         flexDirection: 'row',
         gap: getSpacing('x2'),

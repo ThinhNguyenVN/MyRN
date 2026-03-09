@@ -21,11 +21,7 @@ export function generateStyles(theme: ThemeType) {
       overflow: 'hidden',
     },
     footerWrap: {
-      borderTopWidth: 1,
-      borderTopColor: getColor('border/inactive/tertiary'),
       paddingTop: getSpacing('x4'),
-      paddingBottom: getSpacing('x4'),
-      marginTop: getSpacing('x2'),
     },
   })
 }
