@@ -11,32 +11,8 @@ import MyTextInput from '@/components/elements/my-text-input'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import type { MyDateRangePickerProps } from './type'
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date)
-}
-
-function toDateOnly(d: Date): Date {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
-}
-
-interface DateRangePickerTriggerProps {
-  open: boolean
-  openPicker: () => void
-  disabled: boolean
-  displayText: string
-  placeholder: string
-  title?: string
-  error?: boolean
-  errorMessage?: string
-  required?: boolean
-  triggerInputStyle: ReturnType<typeof generateStyles>['triggerInput']
-}
+import type { MyDateRangePickerProps, DateRangePickerTriggerProps } from './type'
+import { toDateOnly, formatDate } from './calendar-utils'
 
 const DateRangePickerTrigger = memo(function DateRangePickerTrigger({
   open,
@@ -147,7 +123,7 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
           triggerInputStyle={styles.triggerInput}
         />
       )}
-      renderContent={(closePicker) => (
+      renderContent={(closePicker, contentOpts) => (
         <>
           <CalendarRange
             startDate={startDate}
@@ -155,23 +131,26 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
             minDate={minDate}
             maxDate={maxDate}
             onSelectDay={handleSelectDay}
+            onYearMonthModeChange={contentOpts.setYearMonthMode}
           />
-          <View style={styles.footerButtonRow}>
-            <MyButton
-              type="primary"
-              text="Xác nhận"
-              width="full"
-              onPress={closePicker}
-              elevation={'none'}
-            />
-            <MyButton
-              type="tertiary"
-              text="Xóa"
-              width="full"
-              onPress={handleClear}
-              elevation={'none'}
-            />
-          </View>
+          {!contentOpts.yearMonthMode ? (
+            <View style={styles.footerButtonRow}>
+              <MyButton
+                type="primary"
+                text="Xác nhận"
+                width="full"
+                onPress={closePicker}
+                elevation="none"
+              />
+              <MyButton
+                type="tertiary"
+                text="Xóa"
+                width="full"
+                onPress={handleClear}
+                elevation="none"
+              />
+            </View>
+          ) : null}
         </>
       )}
     />

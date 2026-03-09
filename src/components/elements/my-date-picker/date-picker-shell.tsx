@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import React, { memo, useCallback, useRef, useState } from 'react'
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 import { View } from 'react-native'
 
@@ -9,6 +9,12 @@ import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
+import { BottomSheetView } from '@gorhom/bottom-sheet'
+
+export interface DatePickerContentOpts {
+  setYearMonthMode: (isOpen: boolean) => void
+  yearMonthMode: boolean
+}
 
 export interface DatePickerShellProps {
   title: string
@@ -16,7 +22,7 @@ export interface DatePickerShellProps {
   footer?: ReactNode
   renderFooter?: (closePicker: () => void) => ReactNode
   renderTrigger: (props: { openPicker: () => void; disabled: boolean; open: boolean }) => ReactNode
-  renderContent: (closePicker: () => void) => ReactNode
+  renderContent: (closePicker: () => void, contentOpts: DatePickerContentOpts) => ReactNode
   panelMinWidth?: number
   estimatedPanelHeight?: number
   contentContainerStyle?: StyleProp<ViewStyle>
@@ -48,6 +54,7 @@ const DatePickerShell = memo(function DatePickerShell({
     width: number
     height: number
   } | null>(null)
+  const [yearMonthMode, setYearMonthMode] = useState(false)
 
   const openPicker = useCallback(() => {
     if (disabled) return
@@ -68,6 +75,7 @@ const DatePickerShell = memo(function DatePickerShell({
     }
     setOpen(false)
     setTriggerLayout(null)
+    setYearMonthMode(false)
   }, [isMobile])
 
   const trigger = (
@@ -76,9 +84,13 @@ const DatePickerShell = memo(function DatePickerShell({
     </View>
   )
 
-  const content = renderContent(closePicker)
-  const contentWrapped = <View style={contentContainerStyle}>{content}</View>
-  const footerContent = renderFooter ? renderFooter(closePicker) : footer
+  const contentOpts = useMemo(() => ({ setYearMonthMode, yearMonthMode }), [yearMonthMode])
+  const content = renderContent(closePicker, contentOpts)
+
+  const footerContent = yearMonthMode ? null : renderFooter ? renderFooter(closePicker) : footer
+
+  const hasFooter = !!(footer ?? renderFooter)
+  const paddingBottom = hasFooter && !yearMonthMode ? 140 : 80
 
   return (
     <View style={style}>
@@ -92,8 +104,13 @@ const DatePickerShell = memo(function DatePickerShell({
           onClosed={closePicker}
           pressBackdropToClose
           footer={footerContent}
+          useScrollView={false}
         >
-          {contentWrapped}
+          <BottomSheetView
+            style={[styles.mobileContentContainer, { paddingBottom }, contentContainerStyle]}
+          >
+            {content}
+          </BottomSheetView>
         </MyBottomSheet>
       ) : (
         <TriggerModal
@@ -106,7 +123,7 @@ const DatePickerShell = memo(function DatePickerShell({
           contentContainerStyle={contentContainerStyle}
           footerContainerStyle={footerContainerStyle}
         >
-          {content}
+          <View style={contentContainerStyle}>{content}</View>
         </TriggerModal>
       )}
     </View>

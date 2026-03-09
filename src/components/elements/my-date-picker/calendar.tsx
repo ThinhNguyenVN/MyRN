@@ -1,5 +1,5 @@
-import React, { memo, useCallback, useMemo, useState } from 'react'
-import { Platform, View } from 'react-native'
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react'
+import { View } from 'react-native'
 
 import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
@@ -7,6 +7,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { isNil } from 'lodash'
 
 import { CalendarBase } from './calendar-base'
+import YearMonthPickerView from './year-month-picker-view'
 import {
   COLS,
   FALLBACK_CELL_WIDTH,
@@ -17,6 +18,7 @@ import {
 } from './calendar-utils'
 import { generateStyles } from './styles'
 import type { CalendarProps, CalendarPropsUnion, CalendarRangeProps } from './type'
+import { useIsMobile } from '@/hooks/dimenstions-hooks'
 
 function getInitialViewMonth(props: CalendarPropsUnion): Date {
   if (props.mode === 'single') {
@@ -30,18 +32,24 @@ function getInitialViewMonth(props: CalendarPropsUnion): Date {
 }
 
 const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnion) {
-  const { mode, minDate, maxDate, onSelectDay } = props
+  const { mode, minDate, maxDate, onSelectDay, onYearMonthModeChange } = props
   const styles = useThemedStyles(generateStyles)
+  const isMobile = useIsMobile()
   const { getSpacing } = useTheme()
   const [gridWidth, setGridWidth] = useState(0)
   const gap = getSpacing('x1')
   const cellWidth = gridWidth > 0 ? (gridWidth - (COLS - 1) * gap) / COLS : FALLBACK_CELL_WIDTH
   const cellStyle = useMemo(
-    () => (Platform.OS === 'web' ? undefined : { width: cellWidth, flex: 0 as const }),
-    [cellWidth],
+    () => (!isMobile ? undefined : { width: cellWidth, flex: 0 as const }),
+    [cellWidth, isMobile],
   )
 
   const [viewMonth, setViewMonth] = useState<Date>(() => getInitialViewMonth(props))
+  const [showYearMonthPicker, setShowYearMonthPicker] = useState(false)
+  const [pendingYear, setPendingYear] = useState(() => viewMonth.getFullYear())
+  const [pendingMonth, setPendingMonth] = useState(() => viewMonth.getMonth())
+  const pendingYearMonthRef = useRef({ year: pendingYear, month: pendingMonth })
+  pendingYearMonthRef.current = { year: pendingYear, month: pendingMonth }
 
   const currentView = useMemo(
     () => new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1),
@@ -180,6 +188,39 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
     [mode, styles, cellStyle, valueOnly, startOnly, endOnly, todayOnly, onSelectDay],
   )
 
+  const openYearMonthPicker = useCallback(() => {
+    const y = currentView.getFullYear()
+    const m = currentView.getMonth()
+    setPendingYear(y)
+    setPendingMonth(m)
+    pendingYearMonthRef.current = { year: y, month: m }
+    setShowYearMonthPicker(true)
+    onYearMonthModeChange?.(true)
+  }, [currentView, onYearMonthModeChange])
+
+  const handleYearMonthValueChange = useCallback(
+    (v: { year: number; month: number }) => {
+      pendingYearMonthRef.current = { year: v.year, month: v.month }
+      setPendingYear(v.year)
+      setPendingMonth(v.month)
+      setViewMonth(new Date(v.year, v.month, 1))
+      setShowYearMonthPicker(false)
+      onYearMonthModeChange?.(false)
+    },
+    [onYearMonthModeChange],
+  )
+
+  if (showYearMonthPicker) {
+    return (
+      <YearMonthPickerView
+        value={{ year: pendingYear, month: pendingMonth }}
+        onValueChange={handleYearMonthValueChange}
+        minDate={minDate}
+        maxDate={maxDate}
+      />
+    )
+  }
+
   return (
     <CalendarBase
       currentView={currentView}
@@ -189,6 +230,7 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
       cellStyle={cellStyle}
       renderCell={renderCell}
       onGridLayout={setGridWidth}
+      onHeaderPress={openYearMonthPicker}
     />
   )
 })

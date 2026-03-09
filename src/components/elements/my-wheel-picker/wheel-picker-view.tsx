@@ -88,7 +88,6 @@ const WheelPickerView = memo(function WheelPickerView({
 
   useEffect(() => {
     if (items.length === 0) return
-    /** Không force scroll khi selectedIndex vừa đổi do user scroll (list đã đúng vị trí). Chỉ scroll khi đổi từ ngoài (value/initial). */
     if (lastSelectedFromScrollRef.current === selectedIndex) {
       lastSelectedFromScrollRef.current = null
       return

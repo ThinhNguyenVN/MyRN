@@ -1,4 +1,5 @@
 import { DEFAULT_DATE_LOCALE } from '@/configs/themes'
+import type { WheelPickerItem } from '@/components/elements/my-wheel-picker'
 
 export const COLS = 7
 export const FALLBACK_CELL_WIDTH = 36
@@ -78,4 +79,41 @@ export function getRowsFromCells<T>(cells: T[]): T[][] {
     result.push(cells.slice(i, i + COLS))
   }
   return result
+}
+
+let monthItemsCache: { locale: string; items: WheelPickerItem[] } | null = null
+
+/** Tháng 0–11, label theo locale. */
+export function getMonthWheelItems(locale: string = DEFAULT_DATE_LOCALE): WheelPickerItem[] {
+  if (monthItemsCache?.locale === locale) return monthItemsCache.items
+  const formatter = new Intl.DateTimeFormat(locale, { month: 'short' })
+  const items: WheelPickerItem[] = Array.from({ length: 12 }, (_, i) => ({
+    label: formatter.format(new Date(2000, i, 1)),
+    value: i,
+  }))
+  monthItemsCache = { locale, items }
+  return items
+}
+
+export function getYearRange(minDate?: Date, maxDate?: Date): { minYear: number; maxYear: number } {
+  const now = new Date()
+  const minYear = minDate ? minDate.getFullYear() : now.getFullYear() - 50
+  const maxYear = maxDate ? maxDate.getFullYear() : now.getFullYear() + 10
+  return { minYear, maxYear: Math.max(maxYear, minYear) }
+}
+
+export function getYearWheelItems(minDate?: Date, maxDate?: Date): WheelPickerItem[] {
+  const { minYear, maxYear } = getYearRange(minDate, maxDate)
+  return Array.from({ length: maxYear - minYear + 1 }, (_, i) => {
+    const y = minYear + i
+    return { label: String(y), value: y }
+  })
+}
+
+export function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date)
 }

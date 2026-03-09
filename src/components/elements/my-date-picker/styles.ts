@@ -82,6 +82,12 @@ export function generateStyles(theme: ThemeType) {
       calendarMonthYear: {
         color: getColor('text/active/primary'),
       },
+      calendarMonthYearTouch: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: getSpacing('x2'),
+      },
       calendarPrevNext: {
         padding: getSpacing('x2'),
       },
@@ -178,6 +184,25 @@ export function generateStyles(theme: ThemeType) {
         flexDirection: 'row',
         gap: getSpacing('x2'),
         marginTop: getSpacing('x6'),
+      },
+
+      yearMonthPickerRow: {
+        flexDirection: 'row',
+        gap: getSpacing('x2'),
+        marginBottom: getSpacing('x3'),
+      },
+      yearMonthWheel: {
+        flex: 1,
+        minWidth: 0,
+      },
+      yearMonthPickerFooter: {
+        flexDirection: 'row',
+        gap: getSpacing('x2'),
+        marginTop: getSpacing('x4'),
+      },
+      mobileContentContainer: {
+        padding: getSpacing('x4'),
+        paddingBottom: 100,
       },
     }),
   }

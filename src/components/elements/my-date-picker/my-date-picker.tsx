@@ -124,12 +124,13 @@ const MyDatePicker = memo(function MyDatePicker({
           triggerInputStyle={styles.triggerInput}
         />
       )}
-      renderContent={(closePicker) => (
+      renderContent={(closePicker, contentOpts) => (
         <Calendar
           value={value}
           minDate={minDate}
           maxDate={maxDate}
           onSelectDay={(date) => handleSelectDay(date, closePicker)}
+          onYearMonthModeChange={contentOpts.setYearMonthMode}
         />
       )}
     />

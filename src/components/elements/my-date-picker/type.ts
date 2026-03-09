@@ -21,6 +21,8 @@ export interface CalendarProps {
   minDate?: Date
   maxDate?: Date
   onSelectDay: (date: Date) => void
+  /** Gọi khi mở/đóng panel chọn tháng-năm (để shell ẩn footer). */
+  onYearMonthModeChange?: (isOpen: boolean) => void
 }
 
 export interface DateRange {
@@ -49,8 +51,36 @@ export interface CalendarRangeProps {
   minDate?: Date
   maxDate?: Date
   onSelectDay: (date: Date) => void
+  /** Gọi khi mở/đóng panel chọn tháng-năm (để shell ẩn footer). */
+  onYearMonthModeChange?: (isOpen: boolean) => void
 }
 
 export type CalendarPropsUnion =
   | (CalendarProps & { mode: 'single' })
   | (CalendarRangeProps & { mode: 'range' })
+
+/** Month 0-indexed (0 = January). */
+export interface YearMonthValue {
+  year: number
+  month: number
+}
+
+export interface YearMonthPickerViewProps {
+  value: YearMonthValue
+  onValueChange: (value: YearMonthValue) => void
+  minDate?: Date
+  maxDate?: Date
+}
+
+export interface DateRangePickerTriggerProps {
+  open: boolean
+  openPicker: () => void
+  disabled: boolean
+  displayText: string
+  placeholder: string
+  title?: string
+  error?: boolean
+  errorMessage?: string
+  required?: boolean
+  triggerInputStyle: StyleProp<ViewStyle>
+}
