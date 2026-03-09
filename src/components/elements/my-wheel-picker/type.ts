@@ -12,6 +12,8 @@ export interface WheelPickerViewProps {
   onSelectIndex: (index: number) => void
   itemHeight?: number
   visibleCount?: number
+  /** Bật haptic khi scroll và dừng tại item mới. Mặc định true. */
+  haptic?: boolean
 }
 
 export interface MyWheelPickerProps {
@@ -21,6 +23,8 @@ export interface MyWheelPickerProps {
   title?: string
   placeholder?: string
   disabled?: boolean
+  /** Bật haptic khi scroll wheel. Mặc định true. */
+  haptic?: boolean
 }
 
 export interface WheelPickerRowProps {

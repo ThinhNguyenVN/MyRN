@@ -3,6 +3,7 @@ import { type NativeSyntheticEvent, type NativeScrollEvent, View } from 'react-n
 import { FlatList } from 'react-native-gesture-handler'
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated'
 
+import { triggerHaptic } from '@/components/elements/my-pressable/haptic'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles, ITEM_HEIGHT, VISIBLE_COUNT } from './styles'
@@ -17,6 +18,7 @@ const WheelPickerView = memo(function WheelPickerView({
   onSelectIndex,
   itemHeight = ITEM_HEIGHT,
   visibleCount = VISIBLE_COUNT,
+  haptic = true,
 }: WheelPickerViewProps) {
   const styles = useThemedStyles(generateStyles)
   const flatListRef = useRef<FlatList<WheelPickerItemType | null>>(null)
@@ -72,6 +74,7 @@ const WheelPickerView = memo(function WheelPickerView({
       const clamped = clampIndex(realIndex)
       if (clamped !== selectedIndex) {
         lastSelectedFromScrollRef.current = clamped
+        if (haptic) triggerHaptic()
         onSelectIndex(clamped)
       }
     },
@@ -83,7 +86,22 @@ const WheelPickerView = memo(function WheelPickerView({
       clampIndex,
       selectedIndex,
       onSelectIndex,
+      haptic,
     ],
+  )
+
+  /** Offset để item được chọn nằm giữa viewport (trùng với logic handleMomentumScrollEnd). */
+  const getCenteredOffsetForIndex = useCallback(
+    (index: number) => {
+      const clamped = clampIndex(index)
+      const maxOffset = Math.max(0, (paddedData.length - 1) * itemHeight)
+      const centered =
+        (visibleRest + clamped) * itemHeight +
+        itemHeight / 2 -
+        (containerHeight > 0 ? containerHeight / 2 : 0)
+      return Math.max(0, Math.min(maxOffset, centered))
+    },
+    [visibleRest, itemHeight, containerHeight, paddedData.length, clampIndex],
   )
 
   useEffect(() => {
@@ -93,10 +111,10 @@ const WheelPickerView = memo(function WheelPickerView({
       return
     }
     flatListRef.current?.scrollToOffset({
-      offset: (visibleRest + clampIndex(selectedIndex)) * itemHeight,
+      offset: getCenteredOffsetForIndex(selectedIndex),
       animated: false,
     })
-  }, [selectedIndex, items.length, itemHeight, visibleRest, clampIndex])
+  }, [selectedIndex, items.length, getCenteredOffsetForIndex])
 
   const getItemLayout = useCallback(
     (_: unknown, index: number) => ({
@@ -132,6 +150,11 @@ const WheelPickerView = memo(function WheelPickerView({
     return <View style={[styles.wrap, { height: containerHeight }]} />
   }
 
+  const initialScrollIndex = Math.min(
+    paddedData.length - 1,
+    Math.max(0, Math.round(getCenteredOffsetForIndex(selectedIndex) / itemHeight)),
+  )
+
   return (
     <View style={[styles.wrap, { height: containerHeight }]}>
       <View
@@ -156,7 +179,7 @@ const WheelPickerView = memo(function WheelPickerView({
         onScrollEndDrag={handleMomentumScrollEnd}
         snapToOffsets={snapToOffsets}
         decelerationRate={'fast' as const}
-        initialScrollIndex={Math.min(visibleRest + selectedIndex, paddedData.length - 1)}
+        initialScrollIndex={initialScrollIndex}
         nestedScrollEnabled
       />
     </View>

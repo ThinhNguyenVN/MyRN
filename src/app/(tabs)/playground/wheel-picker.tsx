@@ -25,9 +25,10 @@ const SAMPLE_ITEMS: WheelPickerItem[] = [
 
 export default function WheelPickerScreen() {
   const styles = useThemedStyles(generateStyles)
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [selectedIndex, setSelectedIndex] = useState(1)
   const [value, setValue] = useState<number | null>(null)
 
+  console.log('selectedIndex ====> ', selectedIndex)
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
       <MyText typography="subtitle" style={styles.sectionTitle}>
@@ -45,7 +46,10 @@ export default function WheelPickerScreen() {
         <WheelPickerView
           items={SAMPLE_ITEMS}
           selectedIndex={selectedIndex}
-          onSelectIndex={setSelectedIndex}
+          onSelectIndex={(value) => {
+            console.log('onSelectIndex ===> ', value)
+            setSelectedIndex(value)
+          }}
         />
         <MyText typography="body" style={styles.labelMargin}>
           Đã chọn: {SAMPLE_ITEMS[selectedIndex]?.label ?? '—'}

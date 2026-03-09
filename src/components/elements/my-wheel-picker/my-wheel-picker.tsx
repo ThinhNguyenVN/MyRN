@@ -23,6 +23,7 @@ const MyWheelPicker = memo(function MyWheelPicker({
   title = 'Chọn',
   placeholder = 'Chọn',
   disabled = false,
+  haptic = true,
 }: MyWheelPickerProps) {
   const styles = useThemedStyles(generateStyles)
   const useSheet = useIsMobile()
@@ -87,7 +88,12 @@ const MyWheelPicker = memo(function MyWheelPicker({
     : placeholder
 
   const wheelPicker = (
-    <WheelPickerView items={items} selectedIndex={pendingIndex} onSelectIndex={setPendingIndex} />
+    <WheelPickerView
+      items={items}
+      selectedIndex={pendingIndex}
+      onSelectIndex={setPendingIndex}
+      haptic={haptic}
+    />
   )
 
   const paddingBottom = isMobile ? 140 : 0
