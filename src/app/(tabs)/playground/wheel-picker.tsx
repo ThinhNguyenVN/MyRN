@@ -1,6 +1,6 @@
 import { isNil } from 'lodash'
 import { useState } from 'react'
-import { ScrollView } from 'react-native-gesture-handler'
+import { FlatList, View } from 'react-native'
 
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
@@ -12,6 +12,8 @@ import {
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
+
+const SCREEN_KEY = 'wheel-picker-screen'
 
 const SAMPLE_ITEMS: WheelPickerItem[] = [
   { label: 'Option 1', value: 1 },
@@ -28,8 +30,8 @@ export default function WheelPickerScreen() {
   const [selectedIndex, setSelectedIndex] = useState(1)
   const [value, setValue] = useState<number | null>(null)
 
-  return (
-    <ScrollView contentContainerStyle={styles.screenContent}>
+  const renderContent = () => (
+    <View style={styles.screenContent}>
       <MyText typography="subtitle" style={styles.sectionTitle}>
         Wheel Picker
       </MyText>
@@ -45,10 +47,7 @@ export default function WheelPickerScreen() {
         <WheelPickerView
           items={SAMPLE_ITEMS}
           selectedIndex={selectedIndex}
-          onSelectIndex={(value) => {
-            console.log('onSelectIndex ===> ', value)
-            setSelectedIndex(value)
-          }}
+          onSelectIndex={setSelectedIndex}
         />
         <MyText typography="body" style={styles.labelMargin}>
           Đã chọn: {SAMPLE_ITEMS[selectedIndex]?.label ?? '—'}
@@ -85,6 +84,15 @@ export default function WheelPickerScreen() {
           disabled
         />
       </MyView>
-    </ScrollView>
+    </View>
+  )
+
+  return (
+    <FlatList
+      data={[SCREEN_KEY]}
+      keyExtractor={(key) => key}
+      renderItem={() => renderContent()}
+      showsVerticalScrollIndicator={false}
+    />
   )
 }
