@@ -98,11 +98,6 @@ const MyWheelPicker = memo(function MyWheelPicker({
 
   const paddingBottom = isMobile ? 140 : 0
 
-  const wheelContentForModal = (
-    <View style={[styles.pickerContent, { paddingBottom }]}>{wheelPicker}</View>
-  )
-
-  /** Reference ổn định để footer trong bottom sheet không bị remount khi scroll (pendingIndex đổi). */
   const footerContent = useMemo(
     () => (
       <MyButton
@@ -148,7 +143,9 @@ const MyWheelPicker = memo(function MyWheelPicker({
           useScrollView={false}
           footer={footerContent}
         >
-          <BottomSheetView style={styles.pickerContent}>{wheelPicker}</BottomSheetView>
+          <BottomSheetView style={[styles.pickerContent, { paddingBottom }]}>
+            {wheelPicker}
+          </BottomSheetView>
         </MyBottomSheet>
       ) : (
         <TriggerModal
@@ -159,7 +156,7 @@ const MyWheelPicker = memo(function MyWheelPicker({
           footer={footerContent}
           footerContainerStyle={styles.sheetFooter}
         >
-          {wheelContentForModal}
+          <View style={styles.pickerContent}>{wheelPicker}</View>
         </TriggerModal>
       )}
     </View>

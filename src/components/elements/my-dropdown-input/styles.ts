@@ -94,6 +94,7 @@ export function generateStyles(theme: ThemeType) {
       },
       sheetContent: {
         paddingBottom: (insets.bottom || 0) + getSpacing('x4'),
+        minHeight: 240,
       },
       sheetListContent: {
         paddingBottom: getSpacing('x6'),

@@ -68,8 +68,7 @@ export const generateStyles = (theme: ThemeType) => {
       alignItems: 'center',
     },
     content: {
-      paddingHorizontal: getSpacing('x4'),
-      paddingVertical: getSpacing('x4'),
+      padding: getSpacing('x4'),
     },
     footer: {
       paddingHorizontal: getSpacing('x4'),

@@ -8,33 +8,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
 
-const dropdownOptions = [
-  { label: 'Option A', value: 'a' },
-  { label: 'Option B', value: 'b' },
-  { label: 'Option C', value: 'c' },
-  { label: 'Option D', value: 'd' },
-  { label: 'Option E', value: 'e' },
-  { label: 'Option F', value: 'f' },
-  { label: 'Option G', value: 'g' },
-  { label: 'Option H', value: 'h' },
-  { label: 'Option I', value: 'i' },
-  { label: 'Option J', value: 'j' },
-  { label: 'Option K', value: 'k' },
-  { label: 'Option L', value: 'l' },
-  { label: 'Option M', value: 'm' },
-  { label: 'Option N', value: 'n' },
-  { label: 'Option O', value: 'o' },
-  { label: 'Option P', value: 'p' },
-  { label: 'Option Q', value: 'q' },
-  { label: 'Option R', value: 'r' },
-  { label: 'Option S', value: 's' },
-  { label: 'Option T', value: 't' },
-  { label: 'Option U', value: 'u' },
-  { label: 'Option V', value: 'v' },
-  { label: 'Option W', value: 'w' },
-  { label: 'Option X', value: 'x' },
-  { label: 'Option Y', value: 'y' },
-]
+const dropdownOptions = [{ label: 'Option A', value: 'a' }]
 
 export default function DropdownScreen() {
   const styles = useThemedStyles(generateStyles)
