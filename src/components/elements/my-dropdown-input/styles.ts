@@ -3,7 +3,9 @@ import { StyleSheet } from 'react-native'
 
 export type DropdownInputState = 'default' | 'disabled' | 'error' | 'focus'
 
-export const DROPDOWN_MAX_HEIGHT = 240
+export const DROPDOWN_MIN_HEIGHT = 240
+export const DROPDOWN_MAX_HEIGHT = 400
+export const DROPDOWN_MIN_ITEMS = 5
 
 function getStateColors(theme: ThemeType) {
   const { getColor } = theme
@@ -71,9 +73,6 @@ export function generateStyles(theme: ThemeType) {
       dropdownPanel: {
         padding: 0,
       },
-      dropdownListDesktop: {
-        maxHeight: DROPDOWN_MAX_HEIGHT,
-      },
 
       optionRow: {
         flexDirection: 'row',
@@ -94,7 +93,6 @@ export function generateStyles(theme: ThemeType) {
       },
       sheetContent: {
         paddingBottom: (insets.bottom || 0) + getSpacing('x4'),
-        minHeight: 240,
       },
       sheetListContent: {
         paddingBottom: getSpacing('x6'),

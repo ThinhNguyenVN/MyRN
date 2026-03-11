@@ -28,8 +28,10 @@ export const generateStyles = (theme: ThemeType) => {
       gap: getSpacing('x2'),
       marginBottom: getSpacing('x4'),
     },
-    buttonMargin: {
-      marginBottom: 8,
+    content: {
+      paddingTop: 150,
+      alignItems: 'flex-end',
+      justifyContent: 'flex-end',
     },
     inputContainer: {
       marginBottom: 12,

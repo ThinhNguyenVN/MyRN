@@ -124,10 +124,7 @@ const TriggerModal = memo(function TriggerModal({
               panelStyle,
             ]}
           >
-            <MyView
-              style={[styles.contentWrap, contentContainerStyle]}
-              onLayout={() => setContentReady(true)}
-            >
+            <MyView style={contentContainerStyle} onLayout={() => setContentReady(true)}>
               {children}
             </MyView>
             {!!footer ? (

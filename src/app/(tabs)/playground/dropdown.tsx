@@ -8,7 +8,21 @@ import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
 
-const dropdownOptions = [{ label: 'Option A', value: 'a' }]
+const dropdownOptions = [
+  { label: 'Option A', value: 'a' },
+  { label: 'Option B', value: 'b' },
+  { label: 'Option C', value: 'c' },
+  { label: 'Option D', value: 'd' },
+  { label: 'Option E', value: 'e' },
+  { label: 'Option F', value: 'f' },
+  { label: 'Option G', value: 'g' },
+  { label: 'Option H', value: 'h' },
+  { label: 'Option I', value: 'i' },
+  { label: 'Option J', value: 'j' },
+  { label: 'Option K', value: 'k' },
+  { label: 'Option L', value: 'l' },
+  { label: 'Option M', value: 'm' },
+]
 
 export default function DropdownScreen() {
   const styles = useThemedStyles(generateStyles)
@@ -19,7 +33,7 @@ export default function DropdownScreen() {
       <MyText typography="subtitle" style={styles.sectionTitle}>
         Dropdown Input
       </MyText>
-      <MyView style={styles.buttonMargin}>
+      <MyView style={styles.content}>
         <MyDropdownInput
           options={dropdownOptions}
           value={dropdownValue}

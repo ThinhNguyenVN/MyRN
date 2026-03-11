@@ -16,10 +16,9 @@ export function generateStyles(theme: ThemeType) {
       borderColor: getColor('border/inactive/tertiary'),
       padding: getSpacing('x4'),
       zIndex: 100,
-    },
-    contentWrap: {
       overflow: 'hidden',
     },
+
     footerWrap: {
       paddingTop: getSpacing('x4'),
     },

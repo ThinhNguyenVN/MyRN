@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
-import { BottomSheetFlatList } from '@gorhom/bottom-sheet'
+import { BottomSheetFlatList, BottomSheetFlatListMethods } from '@gorhom/bottom-sheet'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import { TriggerModal } from '@/components/ui/trigger-modal'
@@ -15,7 +15,12 @@ import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import type { DropdownOption, MyDropdownInputProps } from './type'
-import { DROPDOWN_MAX_HEIGHT, generateStyles } from './styles'
+import {
+  DROPDOWN_MAX_HEIGHT,
+  DROPDOWN_MIN_HEIGHT,
+  DROPDOWN_MIN_ITEMS,
+  generateStyles,
+} from './styles'
 import { isNil } from 'lodash'
 
 const MyDropdownInput = memo(function MyDropdownInput({
@@ -208,16 +213,24 @@ const MyDropdownInput = memo(function MyDropdownInput({
     </View>
   )
 
+  const modalMaxHeigh =
+    options.length > DROPDOWN_MIN_ITEMS ? DROPDOWN_MAX_HEIGHT : DROPDOWN_MIN_HEIGHT
+
+  const modalMaxHeightStyle = useMemo(() => {
+    return {
+      maxHeight: modalMaxHeigh,
+    }
+  }, [modalMaxHeigh])
+
   const optionsList = (
     <ListComponent
-      ref={listRef as React.Ref<any>}
+      ref={listRef as React.Ref<BottomSheetFlatListMethods>}
       data={options}
       keyExtractor={(item, index) => `dropdown-option-${item.value}-${index}`}
       renderItem={renderOption}
-      onScrollToIndexFailed={() => {}}
       contentContainerStyle={styles.sheetListContent}
       showsVerticalScrollIndicator={false}
-      style={isMobile ? undefined : styles.dropdownListDesktop}
+      style={isMobile ? undefined : modalMaxHeightStyle}
       keyboardShouldPersistTaps="handled"
     />
   )
@@ -237,6 +250,8 @@ const MyDropdownInput = memo(function MyDropdownInput({
             useScrollView={false}
             onChange={scrollToSelected}
             contentContainerStyle={styles.sheetContent}
+            enableDynamicSizing={false}
+            snapPoints={[options.length > DROPDOWN_MIN_ITEMS ? '60%' : '30%', '90%']}
           >
             {optionsList}
           </MyBottomSheet>
@@ -245,7 +260,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
             visible={open}
             onClose={closePicker}
             triggerLayout={triggerLayout}
-            estimatedPanelHeight={DROPDOWN_MAX_HEIGHT}
+            estimatedPanelHeight={modalMaxHeigh}
             panelStyle={styles.dropdownPanel}
           >
             {optionsList}
