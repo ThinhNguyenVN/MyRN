@@ -60,8 +60,11 @@ const formSchema = z.object({
   notifications: z.boolean(),
   tags: z.array(z.string()).min(1, 'Chọn ít nhất một sở thích'),
   note: z.string(),
-  address: z.string(),
-  phone: z.string(),
+  address: z.string().min(10, 'Vui lòng nhập địa chỉ'),
+  phone: z
+    .string()
+    .regex(/^\d+$/, 'Chỉ được nhập số')
+    .min(10, 'Vui lòng nhập số điện thoại'),
 })
 
 type FormValues = z.input<typeof formSchema>
@@ -150,7 +153,12 @@ function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) 
         height={100}
       />
       <MyFormTextInput<FormValues> name="address" placeholder="Địa chỉ" title="Địa chỉ" />
-      <MyFormTextInput<FormValues> name="phone" placeholder="Số điện thoại" title="SĐT" />
+      <MyFormTextInput<FormValues>
+        name="phone"
+        placeholder="Số điện thoại"
+        title="SĐT"
+        keyboardType="phone-pad"
+      />
 
       <MyButton
         type="primary"
