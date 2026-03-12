@@ -39,12 +39,11 @@ export function getStateColors(theme: ThemeType) {
 }
 
 export function generateStyles(theme: ThemeType) {
-  const { getColor, getSpacing } = theme
+  const { getSpacing } = theme
   const stateColors = getStateColors(theme)
   return {
     stateColors,
     container: {
-      gap: getSpacing('x1'),
       maxWidth: MAX_INPUT_WIDTH,
     },
     inputRow: {
@@ -52,7 +51,6 @@ export function generateStyles(theme: ThemeType) {
       justifyContent: 'center' as const,
       borderWidth: 1,
       borderRadius: Radius.medium,
-      backgroundColor: getColor('fill/background/primary'),
       paddingHorizontal: getSpacing('x2'),
       gap: getSpacing('x1'),
       alignItems: 'center' as const,
@@ -78,6 +76,9 @@ export function generateStyles(theme: ThemeType) {
       alignItems: 'baseline' as const,
       gap: getSpacing('x1'),
       marginBottom: getSpacing('x1'),
+    },
+    error: {
+      marginTop: getSpacing('x1'),
     },
   }
 }

@@ -3,7 +3,6 @@ import {
   findNodeHandle,
   Platform,
   type StyleProp,
-  type ScrollView,
   UIManager,
   View,
   type ViewStyle,
@@ -29,12 +28,11 @@ const defaultContext: FormScrollContextValue = {
 export const FormScrollContext = createContext<FormScrollContextValue>(defaultContext)
 
 export interface FormScrollProviderProps {
-  scrollViewRef: React.RefObject<ScrollView | null>
-  /** Style cho View bọc content (scroll content container). */
+  scrollViewRef: React.RefObject<{
+    scrollTo: (opts: { y: number; animated?: boolean }) => void
+  } | null>
   containerStyle?: StyleProp<ViewStyle>
-  /** Khoảng cách từ top màn hình khi scroll (px). Mặc định 80. */
   scrollPadding?: number
-  /** Render prop nhận scrollToField để dùng trong onInvalid, tránh cần component con chỉ để gọi useFormScrollContext. */
   children: ((scrollToField: (name: string) => void) => React.ReactNode) | React.ReactNode
 }
 

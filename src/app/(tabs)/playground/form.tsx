@@ -1,8 +1,9 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { z } from 'zod'
-import { ScrollView, View } from 'react-native'
 
 import MyButton from '@/components/elements/my-button'
+import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
+import type { MyKeyboardAvoidingScrollViewRef } from '@/components/ui/my-keyboard-avoiding'
 import MyText from '@/components/elements/my-text'
 import {
   MyForm,
@@ -58,6 +59,9 @@ const formSchema = z.object({
   marketing: z.boolean(),
   notifications: z.boolean(),
   tags: z.array(z.string()).min(1, 'Chọn ít nhất một sở thích'),
+  note: z.string(),
+  address: z.string(),
+  phone: z.string(),
 })
 
 type FormValues = z.input<typeof formSchema>
@@ -73,6 +77,9 @@ const defaultValues: FormValues = {
   marketing: false,
   notifications: false,
   tags: [],
+  note: '',
+  address: '',
+  phone: '',
 }
 
 function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) {
@@ -98,7 +105,11 @@ function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) 
 
       <MyFormTextInput<FormValues> name="name" placeholder="Nhập họ tên" title="Họ tên" required />
 
-      <MyFormDatePicker<FormValues> name={'name'} placeholder="Chọn ngày sinh" title="Ngày sinh" />
+      <MyFormDatePicker<FormValues>
+        name="birthDate"
+        placeholder="Chọn ngày sinh"
+        title="Ngày sinh"
+      />
 
       <MyFormDropdown<FormValues>
         name="role"
@@ -108,7 +119,6 @@ function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) 
       />
 
       <MyFormCounter<FormValues> name="count" title="Số lượng" subTitle="1–99" min={1} max={99} />
-      <View style={{ height: 400 }} />
 
       <MyFormSwitch<FormValues> name="enabled" title="Tính năng" subTitle="Bật/tắt" />
 
@@ -128,6 +138,20 @@ function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) 
         multiSelect
       />
 
+      <MyText typography="label" style={styles.formTitle}>
+        Thông tin thêm (keyboard avoiding)
+      </MyText>
+      <MyFormTextInput<FormValues>
+        name="note"
+        placeholder="Ghi chú"
+        title="Ghi chú"
+        multiline
+        size={'large'}
+        height={100}
+      />
+      <MyFormTextInput<FormValues> name="address" placeholder="Địa chỉ" title="Địa chỉ" />
+      <MyFormTextInput<FormValues> name="phone" placeholder="Số điện thoại" title="SĐT" />
+
       <MyButton
         type="primary"
         text="Hoàn tất"
@@ -138,9 +162,26 @@ function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) 
   )
 }
 
+const scrollViewStyle = { flex: 1 }
+const contentContainerStyle = { paddingBottom: 24 }
+
 export default function FormPlaygroundScreen() {
-  const scrollViewRef = useRef<ScrollView>(null)
+  const scrollViewRef = useRef<MyKeyboardAvoidingScrollViewRef>(null)
   const styles = formScreenStyles(useTheme())
+
+  const commonScrollProps = {
+    style: [styles.screen, scrollViewStyle],
+    contentContainerStyle: [styles.content, contentContainerStyle],
+    showsVerticalScrollIndicator: false,
+  }
+
+  const content = useMemo(() => {
+    return (
+      <FormScrollProvider scrollViewRef={scrollViewRef} containerStyle={styles.formContainer}>
+        {(scrollToField) => <FormBody scrollToField={scrollToField} />}
+      </FormScrollProvider>
+    )
+  }, [scrollViewRef, styles.formContainer])
 
   return (
     <MyForm<FormValues>
@@ -149,16 +190,9 @@ export default function FormPlaygroundScreen() {
       mode={'onBlur'}
       reValidateMode={'onChange'}
     >
-      <ScrollView
-        ref={scrollViewRef}
-        style={styles.screen}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        <FormScrollProvider scrollViewRef={scrollViewRef} containerStyle={styles.formContainer}>
-          {(scrollToField) => <FormBody scrollToField={scrollToField} />}
-        </FormScrollProvider>
-      </ScrollView>
+      <MyKeyboardAvoiding.ScrollView ref={scrollViewRef} {...commonScrollProps}>
+        {content}
+      </MyKeyboardAvoiding.ScrollView>
     </MyForm>
   )
 }

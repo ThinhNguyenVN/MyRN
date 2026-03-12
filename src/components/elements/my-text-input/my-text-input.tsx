@@ -183,7 +183,10 @@ const MyTextInput = memo(
           </MyText>
         )}
 
-        <FormFieldError error={error && !!errorMessage ? { message: errorMessage } : undefined} />
+        <FormFieldError
+          error={error && !!errorMessage ? { message: errorMessage } : undefined}
+          style={error && !!errorMessage ? styles.error : undefined}
+        />
       </MyView>
     )
   }),

@@ -5,7 +5,7 @@ export const generateStyles = (theme: ThemeType) => {
   const { getSpacing } = theme
   return StyleSheet.create({
     error: {
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
     },
     titleRow: {
       flexDirection: 'row',
