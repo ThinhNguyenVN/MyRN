@@ -35,14 +35,13 @@ export default function BottomSheetScreen() {
         Bottom Sheet
       </MyText>
 
-      <MyView style={styles.buttonMargin}>
+      <MyView style={styles.bottomsheet}>
         <MyButton
           width="full"
           text="1. Simple (title + text)"
           size="small"
           type="primary"
           onPress={() => simpleRef.current?.open()}
-          style={styles.buttonMargin}
         />
         <MyButton
           width="full"
@@ -50,7 +49,6 @@ export default function BottomSheetScreen() {
           size="small"
           type="primary"
           onPress={() => formRef.current?.open()}
-          style={styles.buttonMargin}
         />
         <MyButton
           width="full"
@@ -58,7 +56,6 @@ export default function BottomSheetScreen() {
           size="small"
           type="secondary"
           onPress={() => listRef.current?.open()}
-          style={styles.buttonMargin}
         />
         <MyButton
           width="full"
@@ -66,7 +63,6 @@ export default function BottomSheetScreen() {
           size="small"
           type="tertiary"
           onPress={() => longRef.current?.open()}
-          style={styles.buttonMargin}
         />
         <MyButton
           width="full"
@@ -74,7 +70,6 @@ export default function BottomSheetScreen() {
           size="small"
           type="light"
           onPress={() => customHeaderRef.current?.open()}
-          style={styles.buttonMargin}
         />
         <MyButton
           width="full"
@@ -82,7 +77,6 @@ export default function BottomSheetScreen() {
           size="small"
           type="dark"
           onPress={() => noCloseRef.current?.open()}
-          style={styles.buttonMargin}
         />
       </MyView>
 
@@ -190,26 +184,26 @@ export default function BottomSheetScreen() {
         pressBackdropToClose
         contentContainerStyle={styles.sheetContent}
       >
-        <MyText typography="body" color="text/active/secondary" style={styles.buttonMargin}>
+        <MyText typography="body" color="text/active/secondary">
           Đoạn văn dài. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
           tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
           exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
           dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
         </MyText>
-        <MyText typography="body" color="text/active/secondary" style={styles.buttonMargin}>
+        <MyText typography="body" color="text/active/secondary">
           Đoạn văn dài. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
           tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
           exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
           dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
         </MyText>
-        <MyText typography="body" color="text/active/secondary" style={styles.buttonMargin}>
+        <MyText typography="body" color="text/active/secondary">
           Đoạn văn dài. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
           tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
           exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
           dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
         </MyText>
 
-        <MyText typography="body" color="text/active/secondary" style={styles.buttonMargin}>
+        <MyText typography="body" color="text/active/secondary">
           Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
           anim id est laborum.
         </MyText>

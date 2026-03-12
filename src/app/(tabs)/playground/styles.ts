@@ -97,5 +97,43 @@ export const generateStyles = (theme: ThemeType) => {
       alignItems: 'center',
       gap: 4,
     },
+    bottomsheet: {
+      gap: getSpacing('x4'),
+    },
+  })
+}
+
+export const formScreenStyles = (theme: ThemeType) => {
+  const { getSpacing } = theme
+  return StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: '#ffffff',
+    },
+    formContainer: {
+      gap: getSpacing('x2'),
+    },
+    content: {
+      paddingHorizontal: 16,
+      paddingTop: getSpacing('x4'),
+      paddingBottom: getSpacing('x4'),
+      gap: getSpacing('x4'),
+    },
+    formTitle: {
+      marginBottom: getSpacing('x4'),
+    },
+    field: {
+      marginBottom: getSpacing('x4'),
+      gap: getSpacing('x2'),
+    },
+    chipWrap: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: getSpacing('x2'),
+      marginBottom: 16,
+    },
+    submitBtn: {
+      marginTop: getSpacing('x2'),
+    },
   })
 }

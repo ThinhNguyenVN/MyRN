@@ -4,36 +4,46 @@ import type { FieldPath, FieldValues } from 'react-hook-form'
 import MyDropdownInput from '@/components/elements/my-dropdown-input'
 import type { MyDropdownInputProps } from '@/components/elements/my-dropdown-input/type'
 
+import MyFormField from '../my-form-field'
 import { useFormField } from '../use-form-field'
 
-export type MyFormDropdownProps<
-  TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
-> = Omit<MyDropdownInputProps, 'value' | 'onValueChange' | 'error' | 'errorMessage'> & {
-  name: TName
+export type MyFormDropdownProps<TFieldValues extends FieldValues> = Omit<
+  MyDropdownInputProps,
+  'value' | 'onValueChange' | 'error' | 'errorMessage' | 'title' | 'subTitle' | 'required'
+> & {
+  name: FieldPath<TFieldValues>
+  title?: string
+  subTitle?: string
+  required?: boolean
 }
 
-function MyFormDropdownInner<
-  TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
->({ name, ...rest }: MyFormDropdownProps<TFieldValues, TName>) {
-  const { value, onChange, error } = useFormField<TFieldValues, TName>(name)
+function MyFormDropdownInner<TFieldValues extends FieldValues>({
+  name,
+  title,
+  subTitle,
+  required,
+  ...rest
+}: MyFormDropdownProps<TFieldValues>) {
+  const { value, onChange, error, clearError } = useFormField<
+    TFieldValues,
+    FieldPath<TFieldValues>
+  >(name)
   return (
-    <MyDropdownInput
-      {...rest}
-      value={(value as string | string[] | null) ?? null}
-      onValueChange={(v) => onChange(v)}
-      error={!!error}
-      errorMessage={error?.message}
-    />
+    <MyFormField<TFieldValues> name={name} title={title} subTitle={subTitle} required={required}>
+      <MyDropdownInput
+        {...rest}
+        value={(value as string | string[] | null) ?? null}
+        onValueChange={(v) => {
+          if (error) clearError?.()
+          onChange(v)
+        }}
+      />
+    </MyFormField>
   )
 }
 
-const MyFormDropdown = memo(MyFormDropdownInner) as <
-  TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
->(
-  props: MyFormDropdownProps<TFieldValues, TName>,
+const MyFormDropdown = memo(MyFormDropdownInner) as <TFieldValues extends FieldValues>(
+  props: MyFormDropdownProps<TFieldValues>,
 ) => React.ReactElement
 
 export default MyFormDropdown

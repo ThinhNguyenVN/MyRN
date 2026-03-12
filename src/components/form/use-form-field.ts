@@ -1,21 +1,12 @@
 import { useController, useFormContext } from 'react-hook-form'
 
-import type { FieldPath, FieldValues } from './types'
+import type { FieldPath, FieldValues, UseFormFieldReturn } from './types'
 
-
-export interface UseFormFieldReturn<TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>> {
-  value: unknown
-  onChange: (value: unknown) => void
-  onBlur: () => void
-  ref: (instance: unknown) => void
-  error: { message?: string } | undefined
-  name: TName
-}
-
-export function useFormField<TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>>(
-  name: TName,
-): UseFormFieldReturn<TFieldValues, TName> {
-  const { control } = useFormContext<TFieldValues>()
+export function useFormField<
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+>(name: TName): UseFormFieldReturn<TFieldValues, TName> {
+  const { control, clearErrors } = useFormContext<TFieldValues>()
   const { field, fieldState } = useController<TFieldValues, TName>({ name, control })
   return {
     value: field.value,
@@ -24,5 +15,6 @@ export function useFormField<TFieldValues extends FieldValues, TName extends Fie
     ref: field.ref,
     error: fieldState.error,
     name,
+    clearError: () => clearErrors?.(name),
   }
 }

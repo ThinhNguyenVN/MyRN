@@ -13,6 +13,8 @@ import type { MyTextInputProps, MyTextInputRef } from './type'
 import { useThemedStyles } from '@/theme/theme-context'
 import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
 import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
+import FormFieldLabel from '@/components/form/form-field-label'
+import FormFieldError from '@/components/form/form-field-error'
 
 const INPUT_FONT_SIZE = 16
 const INPUT_HEIGHT = 40
@@ -117,30 +119,13 @@ const MyTextInput = memo(
       [],
     )
 
-    const hasTitleOrSubTitle =
-      (!isNil(title) && title !== '') || (!isNil(subTitle) && subTitle !== '')
-
     const rootStyle = hasContainerStyle
       ? [containerStyle, styles.container, widthStyle, styleProp]
       : [styles.container, widthStyle, styleProp]
 
     return (
       <MyView style={rootStyle} pointerEvents={editable && !disabled ? 'auto' : 'box-none'}>
-        {hasTitleOrSubTitle && (
-          <MyView style={styles.titleRow}>
-            {!!title && (
-              <MyText typography="label" color={stateColors.title}>
-                {title}
-                {required ? ' *' : ''}
-              </MyText>
-            )}
-            {!!subTitle && (
-              <MyText typography="caption" color={stateColors.subTitle}>
-                {subTitle}
-              </MyText>
-            )}
-          </MyView>
-        )}
+        <FormFieldLabel title={title} subTitle={subTitle} required={required} error={!!error} />
         <MyView style={[styles.inputRow, inputRowStyle]}>
           {!!startText && (
             <MyText typography="body" color="text/active/secondary">
@@ -197,11 +182,8 @@ const MyTextInput = memo(
             {value?.length ?? 0}/{maxLength}
           </MyText>
         )}
-        {error && !isNil(errorMessage) && errorMessage !== '' && (
-          <MyText typography="caption" color="text/alert/primary">
-            {errorMessage}
-          </MyText>
-        )}
+
+        <FormFieldError error={error && !!errorMessage ? { message: errorMessage } : undefined} />
       </MyView>
     )
   }),

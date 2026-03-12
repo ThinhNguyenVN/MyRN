@@ -1,48 +1,25 @@
+import { useRef } from 'react'
 import { z } from 'zod'
-import { ScrollView, StyleSheet } from 'react-native'
+import { ScrollView, View } from 'react-native'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
-import MyView from '@/components/elements/my-view'
 import {
   MyForm,
   useFormContext,
+  FormScrollProvider,
   MyFormTextInput,
   MyFormDatePicker,
   MyFormDropdown,
   MyFormCounter,
   MyFormSwitch,
   MyFormWheelPicker,
-  MyFormChip,
   MyFormChips,
 } from '@/components/form'
 import type { WheelPickerItem } from '@/components/elements/my-wheel-picker/type'
-const formScreenStyles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  content: {
-    paddingHorizontal: 16,
-    paddingTop: 24,
-    paddingBottom: 32,
-  },
-  formTitle: {
-    marginBottom: 20,
-  },
-  field: {
-    marginBottom: 16,
-  },
-  chipWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 16,
-  },
-  submitBtn: {
-    marginTop: 8,
-  },
-})
+import { formScreenStyles } from './styles'
+import { useTheme } from '@/theme/theme-context'
+import { isNil } from 'lodash'
 
 const DROPDOWN_OPTIONS = [
   { label: 'Admin', value: 'admin' },
@@ -61,37 +38,46 @@ const WHEEL_ITEMS: WheelPickerItem[] = [
 const TAG_OPTIONS = ['React', 'React Native', 'TypeScript', 'Expo', 'Zod']
 
 const formSchema = z.object({
-  name: z.string().min(1, 'Vui lòng nhập họ tên'),
-  birthDate: z.date().nullable(),
-  role: z.string().nullable(),
-  count: z.number().min(0).max(99),
-  enabled: z.boolean(),
-  level: z.number().nullable(),
-  accepted: z.boolean().refine((v) => v === true, 'Cần đồng ý điều khoản'),
+  name: z.string().nonempty('Vui lòng nhập họ tên'),
+  birthDate: z
+    .date()
+    .nullable()
+    .refine((v) => v !== null, 'Vui lòng chọn ngày sinh'),
+  role: z
+    .string()
+    .nullable()
+    .refine((v) => !isNil(v) && v !== '', 'Vui lòng chọn vai trò'),
+  count: z.number().min(3, 'Số lượng tối thiểu là 3').max(99, 'Số lượng tối đa là 99'),
+  enabled: z.boolean().refine((v) => v === true, 'Cần bật tính năng'),
+  level: z
+    .number()
+    .nullable()
+    .refine((v) => !isNil(v), 'Vui lòng chọn cấp độ'),
+
   newsletter: z.boolean(),
   marketing: z.boolean(),
   notifications: z.boolean(),
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).min(1, 'Chọn ít nhất một sở thích'),
 })
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.input<typeof formSchema>
 
 const defaultValues: FormValues = {
   name: '',
   birthDate: null,
   role: null,
-  count: 0,
+  count: 1,
   enabled: false,
   level: null,
-  accepted: false,
   newsletter: false,
   marketing: false,
   notifications: false,
   tags: [],
 }
 
-function FormContent() {
+function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) {
   const { handleSubmit } = useFormContext<FormValues>()
+  const styles = formScreenStyles(useTheme())
 
   const onSubmit = (data: FormValues) => {
     // eslint-disable-next-line no-console
@@ -99,95 +85,80 @@ function FormContent() {
     alert(JSON.stringify(data, null, 2))
   }
 
+  const onInvalid = (errors: Partial<Record<keyof FormValues, { message?: string }>>) => {
+    const first = Object.keys(errors)[0] as keyof FormValues | undefined
+    if (first) scrollToField(first)
+  }
+
   return (
-    <ScrollView
-      style={formScreenStyles.screen}
-      contentContainerStyle={formScreenStyles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      <MyText typography="subtitle" style={formScreenStyles.formTitle}>
+    <>
+      <MyText typography="subtitle" style={styles.formTitle}>
         Thông tin đăng ký
       </MyText>
 
-      <MyView style={formScreenStyles.field}>
-        <MyFormTextInput<FormValues, 'name'>
-          name="name"
-          placeholder="Nhập họ tên"
-          title="Họ tên"
-          required
-        />
-      </MyView>
+      <MyFormTextInput<FormValues> name="name" placeholder="Nhập họ tên" title="Họ tên" required />
 
-      <MyView style={formScreenStyles.field}>
-        <MyFormDatePicker<FormValues, 'birthDate'>
-          name="birthDate"
-          placeholder="Chọn ngày sinh"
-          title="Ngày sinh"
-        />
-      </MyView>
+      <MyFormDatePicker<FormValues> name={'name'} placeholder="Chọn ngày sinh" title="Ngày sinh" />
 
-      <MyView style={formScreenStyles.field}>
-        <MyFormDropdown<FormValues, 'role'>
-          name="role"
-          options={DROPDOWN_OPTIONS}
-          placeholder="Chọn vai trò"
-          title="Vai trò"
-        />
-      </MyView>
+      <MyFormDropdown<FormValues>
+        name="role"
+        options={DROPDOWN_OPTIONS}
+        placeholder="Chọn vai trò"
+        title="Vai trò"
+      />
 
-      <MyView style={formScreenStyles.field}>
-        <MyText typography="label" style={{ marginBottom: 8 }}>
-          Số lượng
-        </MyText>
-        <MyFormCounter<FormValues, 'count'> name="count" min={0} max={99} />
-      </MyView>
+      <MyFormCounter<FormValues> name="count" title="Số lượng" subTitle="1–99" min={1} max={99} />
+      <View style={{ height: 400 }} />
 
-      <MyView style={formScreenStyles.field}>
-        <MyFormSwitch<FormValues, 'enabled'> name="enabled" label="Bật tính năng" />
-      </MyView>
+      <MyFormSwitch<FormValues> name="enabled" title="Tính năng" subTitle="Bật/tắt" />
 
-      <MyView style={formScreenStyles.field}>
-        <MyFormWheelPicker<FormValues, 'level'>
-          name="level"
-          items={WHEEL_ITEMS}
-          title="Cấp độ"
-          placeholder="Chọn cấp độ"
-        />
-      </MyView>
+      <MyFormWheelPicker<FormValues>
+        name="level"
+        items={WHEEL_ITEMS}
+        title="Cấp độ"
+        subTitle="Chọn một cấp"
+        placeholder="Chọn cấp độ"
+      />
 
-      <MyView style={formScreenStyles.field}>
-        <MyText typography="label" style={{ marginBottom: 8 }}>
-          Sở thích (chọn nhiều)
-        </MyText>
-        <MyFormChips<FormValues, 'tags'> name="tags" data={TAG_OPTIONS} multiSelect />
-      </MyView>
-
-      <MyView style={formScreenStyles.field}>
-        <MyText typography="label" style={{ marginBottom: 8 }}>
-          Tùy chọn
-        </MyText>
-        <MyView style={formScreenStyles.chipWrap}>
-          <MyFormChip<FormValues, 'accepted'> name="accepted" label="Đồng ý điều khoản" />
-          <MyFormChip<FormValues, 'newsletter'> name="newsletter" label="Tin khuyến mãi" />
-          <MyFormChip<FormValues, 'marketing'> name="marketing" label="Quảng cáo" />
-          <MyFormChip<FormValues, 'notifications'> name="notifications" label="Thông báo đẩy" />
-        </MyView>
-      </MyView>
+      <MyFormChips<FormValues>
+        name="tags"
+        title="Sở thích"
+        subTitle="Chọn nhiều"
+        data={TAG_OPTIONS}
+        multiSelect
+      />
 
       <MyButton
         type="primary"
         text="Hoàn tất"
-        onPress={handleSubmit(onSubmit)}
-        style={formScreenStyles.submitBtn}
+        onPress={handleSubmit(onSubmit, onInvalid)}
+        style={styles.submitBtn}
       />
-    </ScrollView>
+    </>
   )
 }
 
 export default function FormPlaygroundScreen() {
+  const scrollViewRef = useRef<ScrollView>(null)
+  const styles = formScreenStyles(useTheme())
+
   return (
-    <MyForm<FormValues> schema={formSchema} defaultValues={defaultValues}>
-      <FormContent />
+    <MyForm<FormValues>
+      schema={formSchema}
+      defaultValues={defaultValues}
+      mode={'onBlur'}
+      reValidateMode={'onChange'}
+    >
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.screen}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <FormScrollProvider scrollViewRef={scrollViewRef} containerStyle={styles.formContainer}>
+          {(scrollToField) => <FormBody scrollToField={scrollToField} />}
+        </FormScrollProvider>
+      </ScrollView>
     </MyForm>
   )
 }
