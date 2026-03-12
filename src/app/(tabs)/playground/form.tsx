@@ -190,7 +190,7 @@ export default function FormPlaygroundScreen() {
       mode={'onBlur'}
       reValidateMode={'onChange'}
     >
-      <MyKeyboardAvoiding.ScrollView ref={scrollViewRef} {...commonScrollProps}>
+      <MyKeyboardAvoiding.ScrollView ref={scrollViewRef} {...commonScrollProps} showToolbar>
         {content}
       </MyKeyboardAvoiding.ScrollView>
     </MyForm>
