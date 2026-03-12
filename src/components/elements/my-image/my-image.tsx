@@ -1,12 +1,12 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image, type ImageErrorEventData, type ImageSource } from 'expo-image'
-import { TouchableOpacity } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import Skeleton from 'react-native-reanimated-skeleton'
 
 import { isNil } from 'lodash'
 
 import MyIcon from '../my-icon'
-import MySpinner from '../my-spinner'
 import MyText from '../my-text'
 import MyView from '../my-view'
 
@@ -157,9 +157,16 @@ const MyImage: React.FC<MyImageProps> = ({
         renderEmpty()
       )}
       {hasImage && isLoading && !hasPlaceholder && (
-        <MyView style={styles.loadingOverlay} pointerEvents="none">
-          <MySpinner size="small" color="primary" />
-        </MyView>
+        <View style={styles.loadingOverlay} pointerEvents="none">
+          <Skeleton
+            isLoading
+            containerStyle={styles.skeletonContainer}
+            layout={[{ key: 'img', width: '100%', height: '100%' }]}
+            boneColor="#E1E9EE"
+            highlightColor="#F2F8FC"
+            animationType="shiver"
+          />
+        </View>
       )}
       {hasImage && hasError && renderErrorOverlay()}
     </>

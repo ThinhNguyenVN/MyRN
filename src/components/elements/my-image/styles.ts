@@ -1,53 +1,60 @@
 import type { ThemeType } from '@/theme/theme-context'
+import { StyleSheet } from 'react-native'
 
 export function generateStyles(theme: ThemeType) {
   const { getColor, getSpacing } = theme
-  return {
+  return StyleSheet.create({
     container: {
       backgroundColor: getColor('fill/inactive/primary'),
-      justifyContent: 'center' as const,
-      alignItems: 'center' as const,
-      overflow: 'hidden' as const,
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'hidden',
       aspectRatio: 1,
     },
     image: {
       flex: 1,
-      alignSelf: 'stretch' as const,
+      alignSelf: 'stretch',
     },
     emptyPlaceholder: {
       padding: getSpacing('x4'),
       backgroundColor: getColor('fill/inactive/secondary'),
       borderRadius: getSpacing('x2'),
-      justifyContent: 'center' as const,
-      alignItems: 'center' as const,
+      justifyContent: 'center',
+      alignItems: 'center',
       gap: getSpacing('x2'),
     },
     loadingOverlay: {
-      position: 'absolute' as const,
+      position: 'absolute',
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
-      justifyContent: 'center' as const,
-      alignItems: 'center' as const,
-      backgroundColor: getColor('fill/inactive/primary'),
+    },
+    skeletonContainer: {
+      flex: 1,
+      width: '100%',
+      height: '100%',
+    },
+    skeletonBone: {
+      flex: 1,
+      alignSelf: 'stretch',
     },
     errorOverlay: {
-      position: 'absolute' as const,
+      position: 'absolute',
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
-      justifyContent: 'center' as const,
-      alignItems: 'center' as const,
+      justifyContent: 'center',
+      alignItems: 'center',
       backgroundColor: getColor('fill/inactive/primary'),
     },
     message: {
       marginTop: getSpacing('x1'),
-      textAlign: 'center' as const,
+      textAlign: 'center',
     },
     touchable: {
       flex: 1,
     },
-  }
+  })
 }
