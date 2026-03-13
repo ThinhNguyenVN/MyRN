@@ -80,5 +80,8 @@ export function generateStyles(theme: ThemeType) {
     error: {
       marginTop: getSpacing('x1'),
     },
+    title: {
+      marginBottom: getSpacing('x1'),
+    },
   }
 }

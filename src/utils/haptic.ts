@@ -1,8 +1,8 @@
 import * as Haptics from 'expo-haptics'
 
-export function triggerHaptic() {
+export function triggerHaptic(mode: keyof typeof Haptics.ImpactFeedbackStyle = 'Light') {
   try {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle[mode]).catch(() => {
       console.error('Failed to trigger haptic')
     })
   } catch (error) {

@@ -7,7 +7,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated'
 
-import { triggerHaptic } from '@/components/elements/my-pressable/haptic'
+import { triggerHaptic } from '@/utils/haptic'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles, ITEM_HEIGHT, VISIBLE_COUNT } from './styles'
@@ -17,7 +17,7 @@ import WheelPickerRow from './wheel-picker-item'
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<WheelPickerItemType | null>)
 
 const IS_WEB = Platform.OS === 'web'
-const VELOCITY_NEAR_ZERO = 1 // px/ms, dưới ngưỡng này coi là scroll đã dừng (chỉ web)
+const VELOCITY_NEAR_ZERO = 1
 
 const WheelPickerView = memo(function WheelPickerView({
   items,
@@ -72,6 +72,7 @@ const WheelPickerView = memo(function WheelPickerView({
       )
       const realIndex = paddedIndex - visibleRest
       const clamped = clampIndex(realIndex)
+
       if (clamped !== selectedIndex) {
         lastSelectedFromScrollRef.current = clamped
         if (haptic) triggerHaptic()
@@ -137,8 +138,6 @@ const WheelPickerView = memo(function WheelPickerView({
     },
     [commitScrollEnd],
   )
-
-  /** Offset để item được chọn nằm giữa viewport (trùng với logic handleMomentumScrollEnd). */
   const getCenteredOffsetForIndex = useCallback(
     (index: number) => {
       const clamped = clampIndex(index)

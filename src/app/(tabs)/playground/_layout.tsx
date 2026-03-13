@@ -2,6 +2,9 @@ import React, { useEffect } from 'react'
 import { router, Stack, usePathname } from 'expo-router'
 import { Platform, View } from 'react-native'
 
+import {
+  ScrollToHideHeader,
+} from '@/components/ui/scroll-to-hide'
 import { NavigationBarHeader } from '@/components/ui/navigation-bar'
 import SideBar, { SideBarItem } from '@/components/ui/side-bar'
 import { useShowSidebar } from '@/hooks/dimenstions-hooks'
@@ -39,9 +42,18 @@ export default function PlaygroundLayout() {
     return (
       <Stack
         screenOptions={({ route }) => {
+          const isMyListRoute = route.name === 'my-list/index'
           return {
             ...screenOptions,
             title: titleFromRoute(route.name ?? ''),
+            header: (props) =>
+              isMyListRoute ? (
+              <ScrollToHideHeader>
+                <NavigationBarHeader {...props} />
+              </ScrollToHideHeader>
+            ) : (
+              <NavigationBarHeader {...props} />
+            ),
             headerShown: route.name !== 'buttons',
           }
         }}
@@ -61,10 +73,18 @@ export default function PlaygroundLayout() {
           initialRouteName="buttons"
           screenOptions={({ route }) => {
             const isButtonsRoute = route.name === 'buttons'
+            const isMyListRoute = route.name === 'my-list/index'
             return {
               ...screenOptions,
               title: titleFromRoute(route.name ?? ''),
-              header: (props) => <NavigationBarHeader {...props} hideBackButton />,
+              header: (props) =>
+                isMyListRoute ? (
+                  <ScrollToHideHeader>
+                    <NavigationBarHeader {...props} hideBackButton />
+                  </ScrollToHideHeader>
+                ) : (
+                  <NavigationBarHeader {...props} hideBackButton />
+                ),
               headerShown: !isButtonsRoute,
             }
           }}

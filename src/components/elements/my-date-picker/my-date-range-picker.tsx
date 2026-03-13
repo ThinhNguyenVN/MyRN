@@ -136,17 +136,17 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
           {!contentOpts.yearMonthMode ? (
             <View style={styles.footerButtonRow}>
               <MyButton
-                type="primary"
-                text="Xác nhận"
-                width="full"
-                onPress={closePicker}
-                elevation="none"
-              />
-              <MyButton
                 type="tertiary"
                 text="Xóa"
                 width="full"
                 onPress={handleClear}
+                elevation="none"
+              />
+              <MyButton
+                type="primary"
+                text="Xác nhận"
+                width="full"
+                onPress={closePicker}
                 elevation="none"
               />
             </View>

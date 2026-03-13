@@ -4,6 +4,7 @@ import { View } from 'react-native'
 import MyText from '@/components/elements/my-text'
 import { MyList } from '@/components/ui/my-list'
 import type { ListRenderItemInfo } from '@/components/ui/my-list'
+import { ScrollToHideContent } from '@/components/ui/scroll-to-hide'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { useMyListData, type Post } from './hooks'
@@ -55,14 +56,16 @@ export default function MyListPlaygroundScreen() {
   }, [loading, styles.footer, styles.skeletonListContainer])
 
   return (
-    <MyList<Post>
-      data={list}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
-      ListEmptyComponent={listEmpty}
-      ListFooterComponent={listFooter}
-      onEndReached={hasMore && !loading && !loadingMore ? loadMore : undefined}
-      onEndReachedThreshold={0.5}
-    />
+    <ScrollToHideContent scrollEventThrottle={16}>
+      <MyList<Post>
+        data={list}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={listEmpty}
+        ListFooterComponent={listFooter}
+        onEndReached={hasMore && !loading && !loadingMore ? loadMore : undefined}
+        onEndReachedThreshold={0.5}
+      />
+    </ScrollToHideContent>
   )
 }

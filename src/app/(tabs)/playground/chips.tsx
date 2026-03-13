@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { ScrollView } from 'react-native'
 
 import MyChip, { MyChips } from '@/components/elements/my-chip'
 import MyIcon from '@/components/elements/my-icon'
@@ -8,6 +7,7 @@ import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
+import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
 
 export default function ChipsScreen() {
   const styles = useThemedStyles(generateStyles)
@@ -17,7 +17,7 @@ export default function ChipsScreen() {
   const [chipsSelected, setChipsSelected] = useState<string[]>(['React'])
 
   return (
-    <ScrollView contentContainerStyle={styles.screenContent}>
+    <MyKeyboardAvoiding.ScrollView contentContainerStyle={styles.screenContent}>
       <MyText typography="subtitle" style={styles.sectionTitle}>
         Chips
       </MyText>
@@ -127,6 +127,6 @@ export default function ChipsScreen() {
         chipProps={{ type: 'primary' }}
         style={styles.chipRow}
       />
-    </ScrollView>
+    </MyKeyboardAvoiding.ScrollView>
   )
 }

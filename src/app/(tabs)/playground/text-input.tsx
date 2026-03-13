@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { ScrollView } from 'react-native'
 
 import MyIcon from '@/components/elements/my-icon'
 import MyTextInput from '@/components/elements/my-text-input'
@@ -7,6 +6,7 @@ import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
+import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
 
 export default function TextInputScreen() {
   const styles = useThemedStyles(generateStyles)
@@ -14,7 +14,7 @@ export default function TextInputScreen() {
   const [password, setPassword] = useState('')
   const [showError, setShowError] = useState(false)
   return (
-    <ScrollView contentContainerStyle={styles.screenContent}>
+    <MyKeyboardAvoiding.ScrollView showToolbar contentContainerStyle={styles.screenContent}>
       <MyView style={styles.inputContainer}>
         <MyTextInput
           placeholder="Placeholder only"
@@ -116,6 +116,6 @@ export default function TextInputScreen() {
           value="Read only value"
         />
       </MyView>
-    </ScrollView>
+    </MyKeyboardAvoiding.ScrollView>
   )
 }

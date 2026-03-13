@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
-import { triggerHaptic } from './haptic'
+import { triggerHaptic } from '@/utils/haptic'
 
 import MyView from '@/components/elements/my-view'
 

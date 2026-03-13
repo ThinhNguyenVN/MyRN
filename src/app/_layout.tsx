@@ -14,6 +14,7 @@ import { ToastRoot, setToastRef } from '@/components/ui/toast'
 import type { ToastRef } from '@/components/ui/toast'
 import { NavigationBarHeader } from '@/components/ui/navigation-bar'
 import { MyThemeProvider } from '@/theme/theme-context'
+import { ScrollToHideProvider } from '@/components/ui/scroll-to-hide'
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -47,27 +48,29 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <PortalProvider shouldAddRootHost={false}>
-        <MyThemeProvider value={'light'}>
-          <BottomSheetModalProvider>
-            <ConfirmationRoot ref={confirmationRef} />
-            <ToastRoot ref={toastRef} />
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="home"
-                options={{
-                  header: (props) => <NavigationBarHeader {...props} />,
-                  headerShown: true,
-                  title: 'Home',
-                }}
-              />
-              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-            </Stack>
-            <View style={styles.portalHostOverlay} pointerEvents="box-none">
-              <PortalHost name="root" />
-            </View>
-            <StatusBar style="auto" />
-          </BottomSheetModalProvider>
+        <MyThemeProvider value={themeName}>
+          <ScrollToHideProvider>
+            <BottomSheetModalProvider>
+              <ConfirmationRoot ref={confirmationRef} />
+              <ToastRoot ref={toastRef} />
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="home"
+                  options={{
+                    header: (props) => <NavigationBarHeader {...props} />,
+                    headerShown: true,
+                    title: 'Home',
+                  }}
+                />
+                <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+              </Stack>
+              <View style={styles.portalHostOverlay} pointerEvents="box-none">
+                <PortalHost name="root" />
+              </View>
+              <StatusBar style="auto" />
+            </BottomSheetModalProvider>
+          </ScrollToHideProvider>
         </MyThemeProvider>
       </PortalProvider>
     </GestureHandlerRootView>

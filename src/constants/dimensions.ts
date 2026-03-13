@@ -8,5 +8,6 @@ export const BREAKPOINT_SIDEBAR = 600
 export const isMobileSize = Dimensions.get('window').width < BREAKPOINT_DESKTOP
 
 export const NAVIGATION_BAR_HEIGHT = 70
+export const TAB_BAR_HEIGHT = 50
 
 export const MAX_INPUT_WIDTH = 400

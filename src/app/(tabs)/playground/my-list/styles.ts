@@ -19,8 +19,8 @@ export function generateStyles(theme: ThemeType) {
       marginBottom: getSpacing('x2'),
     },
     thumb: {
-      width: 72,
-      height: 72,
+      width: 100,
+      height: 100,
       borderRadius: 6,
     },
     textBlock: {

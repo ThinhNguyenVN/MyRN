@@ -125,7 +125,13 @@ const MyTextInput = memo(
 
     return (
       <MyView style={rootStyle} pointerEvents={editable && !disabled ? 'auto' : 'box-none'}>
-        <FormFieldLabel title={title} subTitle={subTitle} required={required} error={!!error} />
+        <FormFieldLabel
+          title={title}
+          subTitle={subTitle}
+          required={required}
+          error={!!error}
+          style={styles.title}
+        />
         <MyView style={[styles.inputRow, inputRowStyle]}>
           {!!startText && (
             <MyText typography="body" color="text/active/secondary">

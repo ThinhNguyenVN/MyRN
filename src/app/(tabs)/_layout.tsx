@@ -1,6 +1,8 @@
 import { Tabs } from 'expo-router'
 import React from 'react'
 
+import { ScrollToHideFooter } from '@/components/ui/scroll-to-hide'
+import { BottomTabBar } from '@react-navigation/bottom-tabs'
 import { useTheme } from '@/theme/theme-context'
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable, { SCALE_SMALL } from '@/components/elements/my-pressable'
@@ -11,6 +13,11 @@ export default function TabLayout() {
   return (
     <MyView flex={1}>
       <Tabs
+        tabBar={(props) => (
+          <ScrollToHideFooter>
+            <BottomTabBar {...props} />
+          </ScrollToHideFooter>
+        )}
         screenOptions={{
           tabBarActiveTintColor: getColor('fill/active/primary'),
           headerShown: false,

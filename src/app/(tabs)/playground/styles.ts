@@ -2,7 +2,7 @@ import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
 export const generateStyles = (theme: ThemeType) => {
-  const { getSpacing } = theme
+  const { getSpacing, insets } = theme
   return StyleSheet.create({
     sideBarContainer: {
       flex: 1,
@@ -39,7 +39,7 @@ export const generateStyles = (theme: ThemeType) => {
     },
     screenContent: {
       paddingHorizontal: 16,
-      paddingBottom: 24,
+      paddingBottom: (insets.bottom ?? 0) + 100,
       gap: getSpacing('x4'),
     },
     sheetContent: {
