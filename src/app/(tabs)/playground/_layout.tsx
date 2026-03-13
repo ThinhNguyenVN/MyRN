@@ -2,9 +2,7 @@ import React, { useEffect } from 'react'
 import { router, Stack, usePathname } from 'expo-router'
 import { Platform, View } from 'react-native'
 
-import {
-  ScrollToHideHeader,
-} from '@/components/ui/scroll-to-hide'
+import { ScrollToHideHeader } from '@/components/ui/scroll-to-hide'
 import { NavigationBarHeader } from '@/components/ui/navigation-bar'
 import SideBar, { SideBarItem } from '@/components/ui/side-bar'
 import { useShowSidebar } from '@/hooks/dimenstions-hooks'
@@ -48,12 +46,12 @@ export default function PlaygroundLayout() {
             title: titleFromRoute(route.name ?? ''),
             header: (props) =>
               isMyListRoute ? (
-              <ScrollToHideHeader>
+                <ScrollToHideHeader>
+                  <NavigationBarHeader {...props} />
+                </ScrollToHideHeader>
+              ) : (
                 <NavigationBarHeader {...props} />
-              </ScrollToHideHeader>
-            ) : (
-              <NavigationBarHeader {...props} />
-            ),
+              ),
             headerShown: route.name !== 'buttons',
           }
         }}

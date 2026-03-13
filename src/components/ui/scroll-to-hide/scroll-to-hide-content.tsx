@@ -1,5 +1,4 @@
-import React, { cloneElement, isValidElement, useCallback, useEffect, useRef } from 'react'
-import { Platform } from 'react-native'
+import React, { cloneElement, isValidElement, useEffect } from 'react'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 
 import { useScrollToHide } from './context'
@@ -7,48 +6,20 @@ import type { ScrollToHideContentProps } from './types'
 import { useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 
-const WEB_SCROLL_END_DEBOUNCE_MS = 120
-
 export function ScrollToHideContent({
   children,
   scrollEventThrottle = 16,
 }: ScrollToHideContentProps) {
   const styles = useThemedStyles(generateStyles)
   const ctx = useScrollToHide()
-  const scrollEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const childOnScrollRef = useRef<((e: any) => void) | undefined>(undefined)
-  if (isValidElement(children)) {
-    childOnScrollRef.current = (children as React.ReactElement<any>).props?.onScroll
+  if (ctx && isValidElement(children)) {
+    ctx.childOnScrollRef.current = (children as React.ReactElement<any>).props?.onScroll
   }
 
   useEffect(() => {
     ctx?.register()
-    return () => {
-      ctx?.unregister()
-      if (scrollEndTimeoutRef.current) {
-        clearTimeout(scrollEndTimeoutRef.current)
-        scrollEndTimeoutRef.current = null
-      }
-    }
+    return () => ctx?.unregister()
   }, [ctx])
-
-  const handleScroll = useCallback(
-    (e: any) => {
-      childOnScrollRef.current?.(e)
-      ctx?.scrollHandler(e)
-      if (Platform.OS === 'web' && ctx?.scrollEndHandler) {
-        if (scrollEndTimeoutRef.current) clearTimeout(scrollEndTimeoutRef.current)
-        scrollEndTimeoutRef.current = setTimeout(() => {
-          scrollEndTimeoutRef.current = null
-          ctx?.scrollEndHandler?.()
-        }, WEB_SCROLL_END_DEBOUNCE_MS)
-      }
-    },
-    [ctx],
-  )
-
-  const scrollEndHandler = ctx?.scrollEndHandler
-  const scrollEndDragHandler = ctx?.scrollEndDragHandler
 
   const hideProgress = ctx?.hideProgress
   const measuredHeaderHeight = ctx?.measuredHeaderHeight
@@ -73,10 +44,7 @@ export function ScrollToHideContent({
   return (
     <Animated.View style={[styles.content, animatedPaddingStyle]}>
       {cloneElement(children as React.ReactElement<any>, {
-        onScroll: handleScroll,
-        onScrollEnd: scrollEndHandler,
-        onScrollEndDrag: scrollEndDragHandler,
-        onMomentumScrollEnd: scrollEndHandler,
+        onScroll: ctx.animatedScrollHandler,
         scrollEventThrottle,
       })}
     </Animated.View>

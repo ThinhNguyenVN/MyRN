@@ -6,6 +6,8 @@ import {
 } from '@shopify/flash-list'
 import { Platform } from 'react-native'
 
+import Animated from 'react-native-reanimated'
+
 import type { MyListProps, MyListRef } from './types'
 import { useTheme } from '@/theme/theme-context'
 import { generateStyles } from './styles'
@@ -14,6 +16,8 @@ import { isNil } from 'lodash'
 const DEFAULT_DRAW_DISTANCE = 350
 const DEFAULT_ON_END_REACHED_THRESHOLD = 0.5
 const WEB_SCROLL_END_DEBOUNCE_MS = 120
+
+const AnimatedFlashList = Animated.createAnimatedComponent(FlashList) as typeof FlashList
 
 function MyListInner<T>(
   {
@@ -75,7 +79,7 @@ function MyListInner<T>(
   const scrollProps = isWeb && onScrollEnd ? { onScroll: handleScroll } : { onScroll }
 
   return (
-    <FlashList<T>
+    <AnimatedFlashList<T>
       ref={safeRef}
       data={data ?? []}
       renderItem={wrappedRenderItem}

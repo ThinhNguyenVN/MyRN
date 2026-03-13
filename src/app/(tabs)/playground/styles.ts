@@ -10,7 +10,6 @@ export const generateStyles = (theme: ThemeType) => {
     },
     contentContainer: {
       flex: 1,
-      marginLeft: 16,
     },
     sectionTitle: {
       marginTop: 24,

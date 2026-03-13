@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback } from 'react'
-import { LayoutChangeEvent } from 'react-native'
+import { LayoutChangeEvent, View } from 'react-native'
 
 import MyButton from '@/components/elements/my-button'
 import MyGradient from '@/components/elements/my-gradient'
@@ -81,7 +81,7 @@ const MyAlert: React.FC<MyAlertProps> = ({
       {...(containerProps as Record<string, unknown>)}
     >
       {hasHeader && (
-        <MyView style={[styles.header, headerBorderStyle]} onLayout={onHeaderLayout}>
+        <View style={[styles.header, headerBorderStyle]} onLayout={onHeaderLayout}>
           {headerSize.w > 0 && headerSize.h > 0 && gradientColors && (
             <MyGradient
               width={headerSize.w}
@@ -93,50 +93,50 @@ const MyAlert: React.FC<MyAlertProps> = ({
               style={styles.headerGradient}
             />
           )}
-          <MyView style={styles.headerContent}>
-            <MyView style={headerTitleStyle}>
+          <View style={styles.headerContent}>
+            <View style={headerTitleStyle}>
               <MyText typography="subtitle" style={headerTitleTextStyle}>
                 {title}
               </MyText>
-            </MyView>
+            </View>
             {!!onClose && <CloseButton iconColor={iconColor} />}
-          </MyView>
-        </MyView>
+          </View>
+        </View>
       )}
       {(hasContent || closeInContent) && (
-        <MyView style={styles.content}>
+        <View style={styles.content}>
           {hasVisual && (
             <>
               {!!image ? (
                 <MyImage source={image} contentFit="cover" style={styles.imageWrap} />
               ) : (
-                <MyView style={styles.iconWrap}>
+                <View style={styles.iconWrap}>
                   <MyIcon name={iconName} size={28} color={iconColor as never} />
-                </MyView>
+                </View>
               )}
             </>
           )}
-          <MyView style={styles.textWrap}>
-            {!!message && <MyText style={styles.message}>{message}</MyText>}
-            {!!description && <MyText style={styles.description}>{description}</MyText>}
-          </MyView>
+          <View style={styles.textWrap}>
+            {!!message && <MyText>{message}</MyText>}
+            {!!description && <MyText>{description}</MyText>}
+          </View>
           {closeInContent && <CloseButton />}
-        </MyView>
+        </View>
       )}
+
       {!!buttons?.length && (
-        <MyView style={styles.footer}>
+        <View style={styles.footer}>
           {buttons.map((btn, i) => (
             <MyButton
-              key={i}
+              key={`footer-button-${i}`}
               text={btn.text}
-              elevation={'none'}
               type={btn.type ?? 'primary'}
               size="small"
               width="auto"
               onPress={btn.onPress}
             />
           ))}
-        </MyView>
+        </View>
       )}
     </MyView>
   )

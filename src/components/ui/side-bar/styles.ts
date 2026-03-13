@@ -9,7 +9,6 @@ export function generateStyles(theme: ThemeType) {
   const { getColor, getSpacing, insets, getRadius } = theme
   return StyleSheet.create({
     sidebarOuter: {
-      width: SIDEBAR_WIDTH,
       zIndex: 2,
     },
 
@@ -50,7 +49,6 @@ export function generateStyles(theme: ThemeType) {
       left: 0,
       top: 0,
     },
-
     highlight: {
       position: 'absolute',
       top: 0,

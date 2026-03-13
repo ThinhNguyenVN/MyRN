@@ -1,23 +1,19 @@
-import { NAVIGATION_BAR_HEIGHT, TAB_BAR_HEIGHT } from '@/constants/dimensions'
-import { useTheme } from '@/theme/theme-context'
 import React, { createContext, useCallback, useContext, useMemo, useRef } from 'react'
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { Platform } from 'react-native'
 import {
   Easing,
+  runOnJS,
+  useAnimatedScrollHandler,
   useSharedValue,
   withTiming,
-  type SharedValue,
 } from 'react-native-reanimated'
 
 import type { ScrollToHideContextValue, ScrollToHideProviderProps } from './types'
 
-const SCROLL_DISTANCE_FOR_FULL_HIDE = 90
 const SNAP_DURATION_MS = 380
 const SNAP_THRESHOLD = 0.5
 const SNAP_NEAR_THRESHOLD = 0.08
-const SHOW_VELOCITY_THRESHOLD = 80
-const SHOW_UP_DY_THRESHOLD = 8
-const SNAP_AFTER_DRAG_END_MS = 100
+const WEB_SCROLL_END_DEBOUNCE_MS = 120
 
 const SNAP_EASING = Easing.bezier(0.33, 1, 0.68, 1)
 const TIMING_CONFIG = {
@@ -27,93 +23,51 @@ const TIMING_CONFIG = {
 
 const ScrollToHideContext = createContext<ScrollToHideContextValue | null>(null)
 
-function clamp(min: number, max: number, value: number) {
-  return Math.min(max, Math.max(min, value))
-}
-
-export function ScrollToHideProvider({
-  children,
-  headerHeight = NAVIGATION_BAR_HEIGHT,
-  footerHeight = TAB_BAR_HEIGHT,
-}: ScrollToHideProviderProps) {
-  const { insets } = useTheme()
+export function ScrollToHideProvider({ children }: ScrollToHideProviderProps) {
   const hideProgress = useSharedValue(0)
-  const effectiveHeaderHeight = headerHeight + (insets?.top ?? 0)
-  const effectiveFooterHeight = footerHeight + (insets?.bottom ?? 0)
-  const measuredHeaderHeight = useSharedValue(effectiveHeaderHeight)
-  const measuredFooterHeight = useSharedValue(effectiveFooterHeight)
-  const lastScrollY = useRef(0)
-  const progressRef = useRef(0)
+  const measuredHeaderHeight = useSharedValue(0)
+  const measuredFooterHeight = useSharedValue(0)
+  const progressShared = useSharedValue(0)
+  const lastScrollYShared = useSharedValue(0)
+  const didTriggerShowShared = useSharedValue(0)
+  const isActiveShared = useSharedValue(0)
   const isRegistered = useRef(false)
   const snapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const didTriggerShowThisGestureRef = useRef(false)
+  const webScrollEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isWeb = Platform.OS === 'web'
+  const childOnScrollRef = useRef<((e: any) => void) | undefined>(undefined)
 
-  const scrollHandler = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { contentOffset, velocity } = event.nativeEvent
-      const y = contentOffset.y
-      const dy = y - lastScrollY.current
-      const vy = velocity?.y ?? 0
-      lastScrollY.current = y
-
-      if (!isRegistered.current) return
-      if (y <= 0) {
-        progressRef.current = 0
-        hideProgress.value = 0
-        return
-      }
-
-      if (dy > 0) {
-        const sensitivity = 1 / SCROLL_DISTANCE_FOR_FULL_HIDE
-        const delta = dy * sensitivity
-        progressRef.current = clamp(0, 1, progressRef.current + delta)
-        hideProgress.value = progressRef.current
-        return
-      }
-
-      const fastScrollUp =
-        vy < -SHOW_VELOCITY_THRESHOLD || dy < -SHOW_UP_DY_THRESHOLD
-      if (fastScrollUp && !didTriggerShowThisGestureRef.current) {
-        didTriggerShowThisGestureRef.current = true
-        progressRef.current = 0
-        hideProgress.value = withTiming(0, TIMING_CONFIG)
-      }
-    },
-    [hideProgress],
-  )
+  const callChildOnScroll = useCallback((e: any) => {
+    childOnScrollRef.current?.(e)
+  }, [])
 
   const performSnap = useCallback(() => {
-    didTriggerShowThisGestureRef.current = false
+    const didTriggerShow = didTriggerShowShared.value === 1
+    didTriggerShowShared.value = 0
     if (!isRegistered.current) return
-    const p = progressRef.current
+    const p = progressShared.value
     const target = p >= SNAP_THRESHOLD ? 1 : 0
-    progressRef.current = target
+    progressShared.value = target
+    if (didTriggerShow && target === 0) return
     if (p <= SNAP_NEAR_THRESHOLD || p >= 1 - SNAP_NEAR_THRESHOLD) {
       hideProgress.value = target
     } else {
       hideProgress.value = withTiming(target, TIMING_CONFIG)
     }
-  }, [hideProgress])
+  }, [hideProgress, progressShared, didTriggerShowShared])
 
-  const scrollEndHandler = useCallback(() => {
-    if (snapTimeoutRef.current) {
-      clearTimeout(snapTimeoutRef.current)
-      snapTimeoutRef.current = null
-    }
-    performSnap()
-  }, [performSnap])
-
-  const scrollEndDragHandler = useCallback(() => {
-    if (snapTimeoutRef.current) clearTimeout(snapTimeoutRef.current)
-    snapTimeoutRef.current = setTimeout(() => {
-      snapTimeoutRef.current = null
+  const webScrollEndDebounced = useCallback(() => {
+    if (webScrollEndTimeoutRef.current) clearTimeout(webScrollEndTimeoutRef.current)
+    webScrollEndTimeoutRef.current = setTimeout(() => {
+      webScrollEndTimeoutRef.current = null
       performSnap()
-    }, SNAP_AFTER_DRAG_END_MS)
+    }, WEB_SCROLL_END_DEBOUNCE_MS)
   }, [performSnap])
 
   const register = useCallback(() => {
     isRegistered.current = true
-  }, [])
+    isActiveShared.value = 1
+  }, [isActiveShared])
 
   const unregister = useCallback(() => {
     isRegistered.current = false
@@ -121,16 +75,82 @@ export function ScrollToHideProvider({
       clearTimeout(snapTimeoutRef.current)
       snapTimeoutRef.current = null
     }
-    progressRef.current = 0
+    if (webScrollEndTimeoutRef.current) {
+      clearTimeout(webScrollEndTimeoutRef.current)
+      webScrollEndTimeoutRef.current = null
+    }
+    isActiveShared.value = 0
+    progressShared.value = 0
     hideProgress.value = withTiming(0, TIMING_CONFIG)
-  }, [hideProgress])
+  }, [hideProgress, progressShared, isActiveShared])
 
-  const setMeasuredHeaderHeight = useCallback((h: number) => {
-    measuredHeaderHeight.value = h
-  }, [measuredHeaderHeight])
-  const setMeasuredFooterHeight = useCallback((h: number) => {
-    measuredFooterHeight.value = h
-  }, [measuredFooterHeight])
+  const setMeasuredHeaderHeight = useCallback(
+    (h: number) => {
+      measuredHeaderHeight.value = h
+    },
+    [measuredHeaderHeight],
+  )
+  const setMeasuredFooterHeight = useCallback(
+    (h: number) => {
+      measuredFooterHeight.value = h
+    },
+    [measuredFooterHeight],
+  )
+
+  const animatedScrollHandler = useAnimatedScrollHandler(
+    {
+      onScroll: (e) => {
+        'worklet'
+        runOnJS(callChildOnScroll)(e)
+        if (isActiveShared.value === 0) return
+        const y = e.contentOffset.y
+        const dy = y - lastScrollYShared.value
+        lastScrollYShared.value = y
+        const vy = e.velocity?.y ?? 0
+
+        if (y <= 0) {
+          progressShared.value = 0
+          hideProgress.value = 0
+          return
+        }
+        if (dy > 0) {
+          const sensitivity = 1 / 90
+          const next = progressShared.value + dy * sensitivity
+          progressShared.value = next <= 0 ? 0 : next >= 1 ? 1 : next
+          hideProgress.value = progressShared.value
+          return
+        }
+        const velThreshold = 80
+        const dyThreshold = 8
+        const fastScrollUp = vy < -velThreshold || dy < -dyThreshold
+        if (fastScrollUp && didTriggerShowShared.value === 0) {
+          didTriggerShowShared.value = 1
+          progressShared.value = 0
+          hideProgress.value = withTiming(0, { duration: 380 })
+        }
+        if (isWeb) runOnJS(webScrollEndDebounced)()
+      },
+      onEndDrag: () => {
+        'worklet'
+        if (!isWeb) runOnJS(performSnap)()
+      },
+      onMomentumEnd: () => {
+        'worklet'
+        if (!isWeb) runOnJS(performSnap)()
+      },
+    },
+    [
+      hideProgress,
+      progressShared,
+      lastScrollYShared,
+      didTriggerShowShared,
+      isActiveShared,
+      performSnap,
+      isWeb,
+      webScrollEndDebounced,
+      callChildOnScroll,
+    ],
+  )
 
   const value = useMemo<ScrollToHideContextValue>(
     () => ({
@@ -139,13 +159,10 @@ export function ScrollToHideProvider({
       measuredFooterHeight,
       setMeasuredHeaderHeight,
       setMeasuredFooterHeight,
-      scrollHandler,
-      scrollEndHandler,
-      scrollEndDragHandler,
       register,
       unregister,
-      headerHeight: effectiveHeaderHeight,
-      footerHeight: effectiveFooterHeight,
+      animatedScrollHandler,
+      childOnScrollRef,
     }),
     [
       hideProgress,
@@ -153,21 +170,14 @@ export function ScrollToHideProvider({
       measuredFooterHeight,
       setMeasuredHeaderHeight,
       setMeasuredFooterHeight,
-      scrollHandler,
-      scrollEndHandler,
-      scrollEndDragHandler,
       register,
       unregister,
-      effectiveHeaderHeight,
-      effectiveFooterHeight,
+      animatedScrollHandler,
+      childOnScrollRef,
     ],
   )
 
-  return (
-    <ScrollToHideContext.Provider value={value}>
-      {children}
-    </ScrollToHideContext.Provider>
-  )
+  return <ScrollToHideContext.Provider value={value}>{children}</ScrollToHideContext.Provider>
 }
 
 export function useScrollToHide() {

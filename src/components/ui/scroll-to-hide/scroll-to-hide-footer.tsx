@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 
@@ -7,8 +7,9 @@ import { useScrollToHide } from './context'
 import type { ScrollToHideFooterProps } from './types'
 import { useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
+import { isAndroid } from '@/constants/dimensions'
 
-export function ScrollToHideFooter({ children, style }: ScrollToHideFooterProps) {
+function ScrollToHideFooterInner({ children, style }: ScrollToHideFooterProps) {
   const ctx = useScrollToHide()
   const fallbackProgress = useSharedValue(0)
   const hideProgress = ctx?.hideProgress ?? fallbackProgress
@@ -20,7 +21,7 @@ export function ScrollToHideFooter({ children, style }: ScrollToHideFooterProps)
     const p = hideProgress.value
     const h = measuredFooterHeight?.value ?? 0
     return {
-      opacity: 1 - p,
+      opacity: isAndroid ? 1 : 1 - p,
       transform: [{ translateY: p * h }],
     }
   }, [hideProgress, measuredFooterHeight])
@@ -41,3 +42,5 @@ export function ScrollToHideFooter({ children, style }: ScrollToHideFooterProps)
     </Animated.View>
   )
 }
+
+export const ScrollToHideFooter = memo(ScrollToHideFooterInner)

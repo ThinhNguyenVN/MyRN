@@ -111,15 +111,7 @@ export const generateStyles = (theme: ThemeType) => {
       gap: getSpacing('x1'),
       justifyContent: 'center',
     },
-    message: {
-      fontSize: 15,
-      fontWeight: '500',
-      color: getColor('text/active/primary'),
-    },
-    description: {
-      fontSize: 14,
-      color: getColor('text/active/secondary'),
-    },
+
     footer: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -127,8 +119,7 @@ export const generateStyles = (theme: ThemeType) => {
       paddingHorizontal: getSpacing('x4'),
       paddingBottom: getSpacing('x3'),
       gap: getSpacing('x4'),
-      // borderTopWidth: 1,
-      // borderTopColor: getColor('border/inactive/tertiary'),
+      minHeight: 40 + getSpacing('x4'),
     },
   })
   return { ...sheet, headerGradientByType: headerByType }
