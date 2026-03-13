@@ -34,6 +34,7 @@ const WheelPickerView = memo(function WheelPickerView({
   const lastOffsetYRef = useRef(0)
   const lastTimeRef = useRef(0)
   const scrollEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastHapticIndexRef = useRef<number | null>(null)
 
   const visibleRest = Math.floor(visibleCount / 2)
   const containerHeight = (1 + visibleRest * 2) * itemHeight
@@ -62,7 +63,7 @@ const WheelPickerView = memo(function WheelPickerView({
     [items.length],
   )
 
-  const commitScrollEnd = useCallback(
+  const getCenteredIndexForOffset = useCallback(
     (offsetY: number) => {
       const offset = Math.min(itemHeight * (paddedData.length - 1), Math.max(offsetY, 0))
       const centerY = offset + (containerHeight > 0 ? containerHeight / 2 : 0)
@@ -72,23 +73,20 @@ const WheelPickerView = memo(function WheelPickerView({
       )
       const realIndex = paddedIndex - visibleRest
       const clamped = clampIndex(realIndex)
+      return clamped
+    },
+    [itemHeight, paddedData.length, containerHeight, visibleRest, clampIndex],
+  )
 
+  const commitScrollEnd = useCallback(
+    (offsetY: number) => {
+      const clamped = getCenteredIndexForOffset(offsetY)
       if (clamped !== selectedIndex) {
         lastSelectedFromScrollRef.current = clamped
-        if (haptic) triggerHaptic()
         onSelectIndex(clamped)
       }
     },
-    [
-      itemHeight,
-      containerHeight,
-      paddedData.length,
-      visibleRest,
-      clampIndex,
-      selectedIndex,
-      onSelectIndex,
-      haptic,
-    ],
+    [getCenteredIndexForOffset, selectedIndex, onSelectIndex],
   )
   const commitScrollEndRef = useRef(commitScrollEnd)
   commitScrollEndRef.current = commitScrollEnd
@@ -119,12 +117,24 @@ const WheelPickerView = memo(function WheelPickerView({
     }, 150)
   }, [])
 
+  const handleScrollHaptic = useCallback(
+    (offsetY: number) => {
+      if (!haptic) return
+      const idx = getCenteredIndexForOffset(offsetY)
+      if (idx === lastHapticIndexRef.current) return
+      lastHapticIndexRef.current = idx
+      triggerHaptic('Rigid')
+    },
+    [getCenteredIndexForOffset, haptic],
+  )
+
   const onScroll = useAnimatedScrollHandler({
     onScroll: (e) => {
       scrollY.value = e.contentOffset.y
       if (IS_WEB) {
         runOnJS(handleScrollOffsetForWeb)(e.contentOffset.y)
       }
+      runOnJS(handleScrollHaptic)(e.contentOffset.y)
     },
   })
 

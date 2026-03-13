@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { View } from 'react-native'
+import { Keyboard, View } from 'react-native'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
@@ -56,6 +56,7 @@ const MyWheelPicker = memo(function MyWheelPicker({
 
   const openPicker = useCallback(() => {
     if (disabled) return
+    Keyboard.dismiss()
     if (useSheet) {
       setOpen(true)
       requestAnimationFrame(() => {

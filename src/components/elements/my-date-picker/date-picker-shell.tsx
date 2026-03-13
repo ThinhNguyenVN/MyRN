@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
-import { View } from 'react-native'
+import { Keyboard, View } from 'react-native'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import { TriggerModal } from '@/components/ui/trigger-modal'
@@ -58,6 +58,7 @@ const DatePickerShell = memo(function DatePickerShell({
 
   const openPicker = useCallback(() => {
     if (disabled) return
+    Keyboard.dismiss()
     if (isMobile) {
       setOpen(true)
       sheetRef.current?.open()

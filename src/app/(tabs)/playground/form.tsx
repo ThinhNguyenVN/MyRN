@@ -61,10 +61,7 @@ const formSchema = z.object({
   tags: z.array(z.string()).min(1, 'Chọn ít nhất một sở thích'),
   note: z.string(),
   address: z.string().min(10, 'Vui lòng nhập địa chỉ'),
-  phone: z
-    .string()
-    .regex(/^\d+$/, 'Chỉ được nhập số')
-    .min(10, 'Vui lòng nhập số điện thoại'),
+  phone: z.string().regex(/^\d+$/, 'Chỉ được nhập số').min(10, 'Vui lòng nhập số điện thoại'),
 })
 
 type FormValues = z.input<typeof formSchema>
@@ -171,17 +168,10 @@ function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) 
 }
 
 const scrollViewStyle = { flex: 1 }
-const contentContainerStyle = { paddingBottom: 24 }
 
 export default function FormPlaygroundScreen() {
   const scrollViewRef = useRef<MyKeyboardAvoidingScrollViewRef>(null)
   const styles = formScreenStyles(useTheme())
-
-  const commonScrollProps = {
-    style: [styles.screen, scrollViewStyle],
-    contentContainerStyle: [styles.content, contentContainerStyle],
-    showsVerticalScrollIndicator: false,
-  }
 
   const content = useMemo(() => {
     return (
@@ -198,7 +188,13 @@ export default function FormPlaygroundScreen() {
       mode={'onBlur'}
       reValidateMode={'onChange'}
     >
-      <MyKeyboardAvoiding.ScrollView ref={scrollViewRef} {...commonScrollProps} showToolbar>
+      <MyKeyboardAvoiding.ScrollView
+        ref={scrollViewRef}
+        style={[styles.screen, scrollViewStyle]}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        showToolbar={true}
+      >
         {content}
       </MyKeyboardAvoiding.ScrollView>
     </MyForm>

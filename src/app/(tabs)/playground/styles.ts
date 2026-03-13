@@ -104,7 +104,7 @@ export const generateStyles = (theme: ThemeType) => {
 }
 
 export const formScreenStyles = (theme: ThemeType) => {
-  const { getSpacing } = theme
+  const { getSpacing, insets } = theme
   return StyleSheet.create({
     screen: {
       flex: 1,
@@ -116,7 +116,7 @@ export const formScreenStyles = (theme: ThemeType) => {
     content: {
       paddingHorizontal: 16,
       paddingTop: getSpacing('x4'),
-      paddingBottom: getSpacing('x4'),
+      paddingBottom: (insets.bottom || 0) + 100,
       gap: getSpacing('x4'),
     },
     formTitle: {

@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FlatList, View } from 'react-native'
+import { FlatList, View, Keyboard } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { BottomSheetFlatList, BottomSheetFlatListMethods } from '@gorhom/bottom-sheet'
 
@@ -107,7 +107,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
 
   const openPicker = useCallback(() => {
     if (disabled) return
-
+    Keyboard.dismiss()
     if (isMobile) {
       setOpen(true)
       sheetRef.current?.open()
