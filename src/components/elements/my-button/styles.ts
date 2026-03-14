@@ -1,12 +1,13 @@
 import type { ViewStyle } from 'react-native'
 import { Radius } from '@/theme/radius'
+import { StyleSheet } from 'react-native'
 import { ThemeType } from '@/theme/theme-context'
 
 export const BUTTON_SMALL_HEIGHT = 40
 export const BUTTON_LARGE_HEIGHT = 48
 
-export function generateStyles(theme: ThemeType): Record<string, ViewStyle> {
-  const { getColor, getSpacing } = theme
+export const generateStyles = (theme: ThemeType) => {
+  const { getColor, getSpacing, getRadius } = theme
 
   const base: ViewStyle = {
     borderRadius: Radius.large,
@@ -16,7 +17,7 @@ export function generateStyles(theme: ThemeType): Record<string, ViewStyle> {
     gap: getSpacing('x2'),
   }
   const withBorder: ViewStyle = { borderWidth: 1 }
-  return {
+  return StyleSheet.create({
     primary: {
       ...base,
       backgroundColor: getColor('fill/active/primary'),
@@ -50,14 +51,14 @@ export function generateStyles(theme: ThemeType): Record<string, ViewStyle> {
       backgroundColor: getColor('fill/disabled/primary'),
       borderWidth: 0,
     },
-    touchable: { flex: 1, minWidth: 70 },
+    touchable: { minWidth: 70 },
     touchableFull: { flex: 1, width: '100%', alignSelf: 'stretch' },
     iconButtonSmall: {
       width: BUTTON_SMALL_HEIGHT,
       height: BUTTON_SMALL_HEIGHT,
       minWidth: BUTTON_SMALL_HEIGHT,
       minHeight: BUTTON_SMALL_HEIGHT,
-      borderRadius: 999,
+      borderRadius: getRadius('full'),
       padding: 0,
       paddingHorizontal: 0,
       paddingVertical: 0,
@@ -68,11 +69,11 @@ export function generateStyles(theme: ThemeType): Record<string, ViewStyle> {
       height: BUTTON_LARGE_HEIGHT,
       minWidth: BUTTON_LARGE_HEIGHT,
       minHeight: BUTTON_LARGE_HEIGHT,
-      borderRadius: 999,
+      borderRadius: getRadius('full'),
       padding: 0,
       paddingHorizontal: 0,
       paddingVertical: 0,
       gap: 0,
     },
-  }
+  })
 }

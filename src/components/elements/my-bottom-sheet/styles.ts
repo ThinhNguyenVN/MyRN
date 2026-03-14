@@ -1,10 +1,10 @@
+import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
 import { Radius } from '@/theme/radius'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
 const HANDLE_HEIGHT = 10
 const HEADER_HEIGHT = 50
-export const MODAL_MAX_WIDTH = 480
 
 export const generateStyles = (theme: ThemeType) => {
   const { getColor, getSpacing, isMobileSize, insets } = theme
@@ -25,7 +25,7 @@ export const generateStyles = (theme: ThemeType) => {
     },
     modalPanel: {
       width: '100%',
-      maxWidth: MODAL_MAX_WIDTH,
+      maxWidth: MAX_INPUT_WIDTH,
       borderRadius: Radius.medium,
       backgroundColor: getColor('fill/background/tertiary'),
       overflow: 'hidden',
@@ -77,6 +77,10 @@ export const generateStyles = (theme: ThemeType) => {
       left: 0,
       right: 0,
       position: 'absolute',
+    },
+    modalFooter: {
+      paddingHorizontal: getSpacing('x4'),
+      paddingBottom: insets.bottom || getSpacing('x4'),
     },
   })
 }

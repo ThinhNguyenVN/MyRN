@@ -1,3 +1,4 @@
+import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
@@ -103,11 +104,11 @@ export const generateStyles = (theme: ThemeType) => {
 }
 
 export const formScreenStyles = (theme: ThemeType) => {
-  const { getSpacing, insets } = theme
+  const { getSpacing, insets, getColor, isMobileSize } = theme
   return StyleSheet.create({
     screen: {
       flex: 1,
-      backgroundColor: '#ffffff',
+      backgroundColor: getColor('fill/background/primary'),
     },
     formContainer: {
       gap: getSpacing('x2'),
@@ -133,6 +134,9 @@ export const formScreenStyles = (theme: ThemeType) => {
     },
     submitBtn: {
       marginTop: getSpacing('x2'),
+    },
+    formContent: {
+      maxWidth: isMobileSize ? '100%' : MAX_INPUT_WIDTH,
     },
   })
 }

@@ -46,12 +46,16 @@ const MyButton: React.FC<MyButtonProps> = ({
   const hasContainerPropsStyle = Object.keys(containerPropsStyle).length > 0
   const pressableProps = omitContainerProps(rest as Record<string, unknown>)
 
-  const widthStyle: ViewStyle | null =
-    width === 'full'
-      ? { width: '100%', alignSelf: 'stretch' }
-      : typeof width === 'number'
-        ? { width }
-        : null
+  const widthStyle: ViewStyle | null = useMemo(() => {
+    switch (width) {
+      case 'full':
+        return { width: '100%', alignSelf: 'stretch', flexShrink: 1 }
+      case 'auto':
+        return { width: 'auto' }
+      default:
+        return { width }
+    }
+  }, [width])
 
   const buttonStyle: ViewStyle[] = [
     styles?.[type],

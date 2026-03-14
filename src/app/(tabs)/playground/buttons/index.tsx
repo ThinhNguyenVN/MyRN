@@ -37,14 +37,19 @@ export default function ButtonsScreen() {
       <MyView style={styles.buttonRow}>
         <MyButton
           width={'full'}
-          text="Primary"
+          text="Primary In Row"
           size={'small'}
           type="primary"
-          loading
           onPress={() => {}}
           left={<MyIcon name="home" color="icon/active/tertiary" />}
         />
-        <MyButton width={'full'} text="Primary" size={'small'} type="primary" onPress={() => {}} />
+        <MyButton
+          width={'full'}
+          text="Primary In Row"
+          size={'small'}
+          type="primary"
+          onPress={() => {}}
+        />
       </MyView>
       <MyButton
         text="Secondary"

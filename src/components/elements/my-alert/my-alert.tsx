@@ -131,6 +131,7 @@ const MyAlert: React.FC<MyAlertProps> = ({
               key={`footer-button-${i}`}
               text={btn.text}
               type={btn.type ?? 'primary'}
+              elevation="none"
               size="small"
               width="auto"
               onPress={btn.onPress}

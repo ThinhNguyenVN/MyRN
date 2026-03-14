@@ -184,11 +184,10 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
               <ScrollView
                 contentContainerStyle={[styles.content, contentContainerStyle]}
                 keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
               >
                 {children}
               </ScrollView>
-              {footer ? <MyView style={styles.footer}>{footer}</MyView> : null}
+              {footer ? <MyView style={styles.modalFooter}>{footer}</MyView> : null}
             </Pressable>
           </Pressable>
         </Modal>

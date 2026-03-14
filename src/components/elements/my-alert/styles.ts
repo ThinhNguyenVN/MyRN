@@ -119,7 +119,7 @@ export const generateStyles = (theme: ThemeType) => {
       paddingHorizontal: getSpacing('x4'),
       paddingBottom: getSpacing('x3'),
       gap: getSpacing('x4'),
-      minHeight: 40 + getSpacing('x4'),
+      // minHeight: 40 + getSpacing('x4'),
     },
   })
   return { ...sheet, headerGradientByType: headerByType }

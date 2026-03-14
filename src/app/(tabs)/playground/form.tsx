@@ -19,8 +19,9 @@ import {
 } from '@/components/form'
 import type { WheelPickerItem } from '@/components/elements/my-wheel-picker/type'
 import { formScreenStyles } from './styles'
-import { useTheme } from '@/theme/theme-context'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { isNil } from 'lodash'
+import { View } from 'react-native'
 
 const DROPDOWN_OPTIONS = [
   { label: 'Admin', value: 'admin' },
@@ -84,7 +85,7 @@ const defaultValues: FormValues = {
 
 function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) {
   const { handleSubmit } = useFormContext<FormValues>()
-  const styles = formScreenStyles(useTheme())
+  const styles = useThemedStyles(formScreenStyles)
 
   const onSubmit = (data: FormValues) => {
     // eslint-disable-next-line no-console
@@ -98,7 +99,7 @@ function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) 
   }
 
   return (
-    <>
+    <View style={styles.formContent}>
       <MyText typography="subtitle" style={styles.formTitle}>
         Thông tin đăng ký
       </MyText>
@@ -160,10 +161,11 @@ function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) 
       <MyButton
         type="primary"
         text="Hoàn tất"
+        width="full"
         onPress={handleSubmit(onSubmit, onInvalid)}
         style={styles.submitBtn}
       />
-    </>
+    </View>
   )
 }
 
