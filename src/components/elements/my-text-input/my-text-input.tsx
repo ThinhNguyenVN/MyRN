@@ -95,8 +95,15 @@ const MyTextInput = memo(
           : 'default'
     const stateColors = styles.stateColors[state]
 
-    const widthStyle: ViewStyle =
-      width === 'auto' ? { width: '100%' as const, alignSelf: 'stretch' as const } : { width }
+    const widthStyle: ViewStyle = useMemo(() => {
+      switch (width) {
+        case 'auto':
+          return { width: '100%' as const, alignSelf: 'stretch' as const }
+        default:
+          return { width }
+      }
+    }, [width])
+
     const inputRowStyle = useMemo(
       () => ({ borderColor: stateColors.border, height }),
       [stateColors.border, height],

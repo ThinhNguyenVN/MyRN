@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { ScrollView } from 'react-native'
+import { ScrollView, View } from 'react-native'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import MyButton from '@/components/elements/my-button'
@@ -110,7 +110,7 @@ export default function BottomSheetScreen() {
           />
         }
       >
-        <MyView style={styles.inputContainer}>
+        <View style={styles.inputContainer}>
           <MyTextInput
             useBottomSheetTextInput
             title="Email"
@@ -123,8 +123,7 @@ export default function BottomSheetScreen() {
             required
             startIcon={<MyIcon name="mail-outline" size={20} color="icon/active/primary" />}
           />
-        </MyView>
-        <MyView style={styles.inputContainer}>
+
           <MyTextInput
             useBottomSheetTextInput
             title="Password"
@@ -135,8 +134,7 @@ export default function BottomSheetScreen() {
             required
             startIcon={<MyIcon name="lock-closed-outline" size={20} color="icon/active/primary" />}
           />
-        </MyView>
-        <MyView style={styles.inputContainer}>
+
           <MyTextInput
             useBottomSheetTextInput
             title="With error"
@@ -150,7 +148,7 @@ export default function BottomSheetScreen() {
             onEndIconPress={() => setShowError(true)}
             endIcon={<MyIcon name="alert-circle-outline" size={20} color="icon/alert/primary" />}
           />
-        </MyView>
+        </View>
       </MyBottomSheet>
 
       {/* 3. List */}

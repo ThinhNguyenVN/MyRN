@@ -29,13 +29,10 @@ export const generateStyles = (theme: ThemeType) => {
       marginBottom: getSpacing('x4'),
     },
     content: {
-      paddingTop: 150,
-      alignItems: 'flex-end',
-      justifyContent: 'flex-end',
+      gap: getSpacing('x4'),
     },
     inputContainer: {
-      marginBottom: 12,
-      alignSelf: 'stretch',
+      gap: getSpacing('x2'),
     },
     screenContent: {
       paddingHorizontal: 16,
@@ -43,7 +40,9 @@ export const generateStyles = (theme: ThemeType) => {
       gap: getSpacing('x4'),
     },
     sheetContent: {
-      gap: 8,
+      gap: getSpacing('x2'),
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     labelMargin: {
       marginBottom: 8,

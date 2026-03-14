@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useRef, useState } from 'react'
+import React, { memo, useCallback, useRef, useState, useEffect } from 'react'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
@@ -58,6 +58,12 @@ const MyCounter = memo(function MyCounter({
     }
   }, [])
 
+  useEffect(() => {
+    return () => {
+      clearTimers()
+    }
+  }, [clearTimers])
+
   const onMinus = useCallback(() => {
     if (disabled) return
     updateValue(-step)
@@ -72,7 +78,7 @@ const MyCounter = memo(function MyCounter({
     if (disabled) return
     delayRef.current = setTimeout(() => {
       delayRef.current = null
-      updateValue(-step)
+
       intervalRef.current = setInterval(() => updateValue(-step), REPEAT_INTERVAL_MS)
     }, LONG_PRESS_DELAY_MS)
   }, [disabled, updateValue, step])
@@ -81,7 +87,7 @@ const MyCounter = memo(function MyCounter({
     if (disabled) return
     delayRef.current = setTimeout(() => {
       delayRef.current = null
-      updateValue(step)
+
       intervalRef.current = setInterval(() => updateValue(step), REPEAT_INTERVAL_MS)
     }, LONG_PRESS_DELAY_MS)
   }, [disabled, updateValue, step])

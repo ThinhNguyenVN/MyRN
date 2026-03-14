@@ -26,10 +26,6 @@ export default function DatePickerScreen() {
       <MyText typography="subtitle" style={styles.sectionTitle}>
         Date Picker
       </MyText>
-      <MyText typography="body" color="text/active/secondary" style={styles.sectionCaption}>
-        Phân theo isMobileSize: mobile = BottomSheet + calendar, desktop = dropdown panel +
-        calendar.
-      </MyText>
 
       <MyText typography="label" style={styles.sectionTitle}>
         Basic

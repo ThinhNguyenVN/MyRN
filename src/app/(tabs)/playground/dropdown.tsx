@@ -42,7 +42,6 @@ export default function DropdownScreen() {
           title="Dropdown"
           subTitle="Mobile: bottom sheet + checkbox"
           required
-          style={styles.inputContainer}
         />
         <MyDropdownInput
           options={dropdownOptions}
@@ -51,7 +50,6 @@ export default function DropdownScreen() {
           placeholder="Chọn..."
           error={!!dropdownValue && dropdownValue === 'a'}
           errorMessage="Demo lỗi khi chọn A"
-          style={styles.inputContainer}
         />
         <MyDropdownInput
           options={dropdownOptions}
@@ -60,7 +58,6 @@ export default function DropdownScreen() {
           multiSelect
           placeholder="Chọn nhiều..."
           title="Multi select"
-          style={styles.inputContainer}
         />
         <MyDropdownInput
           options={dropdownOptions}
@@ -69,7 +66,6 @@ export default function DropdownScreen() {
           placeholder="Chọn..."
           title="Disabled"
           disabled
-          style={styles.inputContainer}
         />
       </MyView>
     </ScrollView>

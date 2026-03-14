@@ -17,31 +17,16 @@ export default function CounterScreen() {
       <MyText typography="subtitle" style={styles.sectionTitle}>
         Counter
       </MyText>
-      <MyView style={styles.buttonMargin}>
-        <MyCounter
-          value={counterValue}
-          onValueChange={setCounterValue}
-          min={0}
-          max={99}
-          step={1}
-          style={styles.inputContainer}
-        />
+      <MyView style={styles.inputContainer}>
+        <MyCounter value={counterValue} onValueChange={setCounterValue} min={0} max={99} step={1} />
         <MyCounter
           value={counterValue2}
           onValueChange={setCounterValue2}
           min={-10}
           max={10}
           step={2}
-          style={styles.inputContainer}
         />
-        <MyCounter
-          value={5}
-          onValueChange={() => {}}
-          min={0}
-          max={10}
-          disabled
-          style={styles.inputContainer}
-        />
+        <MyCounter value={5} onValueChange={() => {}} min={0} max={10} disabled />
       </MyView>
     </ScrollView>
   )
