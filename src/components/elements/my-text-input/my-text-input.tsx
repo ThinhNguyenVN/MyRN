@@ -1,5 +1,12 @@
 import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react'
-import { TouchableOpacity, Platform, TextInput, type ViewStyle, type TextStyle } from 'react-native'
+import {
+  TouchableOpacity,
+  Platform,
+  View,
+  TextInput,
+  type ViewStyle,
+  type TextStyle,
+} from 'react-native'
 
 import { isNil } from 'lodash'
 
@@ -98,7 +105,7 @@ const MyTextInput = memo(
     const widthStyle: ViewStyle = useMemo(() => {
       switch (width) {
         case 'auto':
-          return { width: '100%' as const, alignSelf: 'stretch' as const }
+          return { width: '100%' }
         default:
           return { width }
       }
@@ -127,11 +134,11 @@ const MyTextInput = memo(
     )
 
     const rootStyle = hasContainerStyle
-      ? [containerStyle, styles.container, widthStyle, styleProp]
+      ? [styles.container, widthStyle, containerStyle, styleProp]
       : [styles.container, widthStyle, styleProp]
 
     return (
-      <MyView style={rootStyle} pointerEvents={editable && !disabled ? 'auto' : 'box-none'}>
+      <View style={rootStyle} pointerEvents={editable && !disabled ? 'auto' : 'box-none'}>
         <FormFieldLabel
           title={title}
           subTitle={subTitle}
@@ -200,7 +207,7 @@ const MyTextInput = memo(
           error={error && !!errorMessage ? { message: errorMessage } : undefined}
           style={error && !!errorMessage ? styles.error : undefined}
         />
-      </MyView>
+      </View>
     )
   }),
 )

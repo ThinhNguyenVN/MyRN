@@ -1,27 +1,28 @@
 import { useMemo, useRef } from 'react'
+import { View } from 'react-native'
 import { z } from 'zod'
+import { isNil } from 'lodash'
 
-import MyButton from '@/components/elements/my-button'
-import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
-import type { MyKeyboardAvoidingScrollViewRef } from '@/components/ui/my-keyboard-avoiding'
-import MyText from '@/components/elements/my-text'
 import {
   MyForm,
-  useFormContext,
-  FormScrollProvider,
-  MyFormTextInput,
+  MyFormChips,
+  MyFormCounter,
   MyFormDatePicker,
   MyFormDropdown,
-  MyFormCounter,
   MyFormSwitch,
+  MyFormTextInput,
   MyFormWheelPicker,
-  MyFormChips,
+  FormScrollProvider,
+  useFormContext,
 } from '@/components/form'
+import MyButton from '@/components/elements/my-button'
+import MyText from '@/components/elements/my-text'
 import type { WheelPickerItem } from '@/components/elements/my-wheel-picker/type'
-import { formScreenStyles } from './styles'
+import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
+import type { MyKeyboardAvoidingScrollViewRef } from '@/components/ui/my-keyboard-avoiding'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
-import { isNil } from 'lodash'
-import { View } from 'react-native'
+
+import { formScreenStyles } from './styles'
 
 const DROPDOWN_OPTIONS = [
   { label: 'Admin', value: 'admin' },

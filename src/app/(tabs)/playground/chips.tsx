@@ -4,10 +4,10 @@ import MyChip, { MyChips } from '@/components/elements/my-chip'
 import MyIcon from '@/components/elements/my-icon'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
+import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
 
 export default function ChipsScreen() {
   const styles = useThemedStyles(generateStyles)

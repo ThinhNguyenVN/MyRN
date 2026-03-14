@@ -7,7 +7,6 @@ import MyDatePicker, {
   type DateRange,
 } from '@/components/elements/my-date-picker'
 import MyText from '@/components/elements/my-text'
-import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
@@ -27,75 +26,43 @@ export default function DatePickerScreen() {
         Date Picker
       </MyText>
 
-      <MyText typography="label" style={styles.sectionTitle}>
-        Basic
-      </MyText>
-      <MyView style={styles.inputContainer}>
-        <MyDatePicker value={date1} onValueChange={setDate1} placeholder="Chọn ngày" title="Ngày" />
-      </MyView>
+      <MyDatePicker value={date1} onValueChange={setDate1} placeholder="Chọn ngày" title="Ngày" />
 
-      <MyText typography="label" style={styles.sectionTitle}>
-        With value
-      </MyText>
-      <MyView style={styles.inputContainer}>
-        <MyDatePicker value={date2} onValueChange={setDate2} title="Ngày đã chọn" />
-      </MyView>
+      <MyDatePicker value={date2} onValueChange={setDate2} title="Ngày đã chọn" />
 
-      <MyText typography="label" style={styles.sectionTitle}>
-        Disabled
-      </MyText>
-      <MyView style={styles.inputContainer}>
-        <MyDatePicker value={null} disabled placeholder="Disabled" title="Ngày" />
-      </MyView>
+      <MyDatePicker value={null} disabled placeholder="Disabled" title="Ngày" />
 
-      <MyText typography="label" style={styles.sectionTitle}>
-        Min / max date
-      </MyText>
-      <MyView style={styles.inputContainer}>
-        <MyDatePicker
-          value={date1}
-          onValueChange={setDate1}
-          minDate={minDate}
-          maxDate={maxDate}
-          placeholder="Chọn trong 2 tháng tới"
-          title="Khoảng ngày"
-        />
-      </MyView>
+      <MyDatePicker
+        value={date1}
+        onValueChange={setDate1}
+        minDate={minDate}
+        maxDate={maxDate}
+        placeholder="Chọn trong 2 tháng tới"
+        title="Khoảng ngày"
+      />
 
-      <MyText typography="label" style={styles.sectionTitle}>
-        With footer
-      </MyText>
-      <MyView style={styles.inputContainer}>
-        <MyDatePicker
-          value={dateWithFooter}
-          onValueChange={setDateWithFooter}
-          title="Ngày đã chọn"
-          footer={
-            <MyButton
-              type="tertiary"
-              text="Xóa"
-              width="full"
-              onPress={() => setDateWithFooter(null)}
-              elevation={'none'}
-            />
-          }
-        />
-      </MyView>
+      <MyDatePicker
+        value={dateWithFooter}
+        onValueChange={setDateWithFooter}
+        title="Ngày đã chọn"
+        footer={
+          <MyButton
+            type="tertiary"
+            text="Xóa"
+            width="full"
+            onPress={() => setDateWithFooter(null)}
+            elevation={'none'}
+          />
+        }
+      />
 
-      <MyText typography="label" style={styles.sectionTitle}>
-        Date range (start – end)
-      </MyText>
-      <MyView style={styles.inputContainer}>
-        <MyDateRangePicker
-          value={range}
-          onValueChange={setRange}
-          placeholder="Chọn khoảng ngày"
-          title="Khoảng ngày"
-          footer={
-            <MyButton type="tertiary" text="Xóa" width="full" onPress={() => setRange(null)} />
-          }
-        />
-      </MyView>
+      <MyDateRangePicker
+        value={range}
+        onValueChange={setRange}
+        placeholder="Chọn khoảng ngày"
+        title="Khoảng ngày"
+        footer={<MyButton type="tertiary" text="Xóa" width="full" onPress={() => setRange(null)} />}
+      />
     </ScrollView>
   )
 }

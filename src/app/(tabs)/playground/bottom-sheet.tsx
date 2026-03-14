@@ -88,9 +88,11 @@ export default function BottomSheetScreen() {
         pressBackdropToClose
         contentContainerStyle={styles.sheetContent}
       >
-        <MyText typography="body" color="text/active/secondary">
-          Nội dung ngắn. Đóng bằng nút X hoặc chạm backdrop.
-        </MyText>
+        <View style={styles.bottomsheetContent}>
+          <MyText typography="body" color="text/active/secondary">
+            Nội dung ngắn. Đóng bằng nút X hoặc chạm backdrop.
+          </MyText>
+        </View>
       </MyBottomSheet>
 
       {/* 2. Form */}
@@ -99,7 +101,6 @@ export default function BottomSheetScreen() {
         title="Form"
         showClose
         onClosed={() => {}}
-        contentContainerStyle={styles.sheetContent}
         pressBackdropToClose
         footer={
           <MyButton
@@ -110,7 +111,7 @@ export default function BottomSheetScreen() {
           />
         }
       >
-        <View style={styles.inputContainer}>
+        <View style={styles.bottomsheetContent}>
           <MyTextInput
             useBottomSheetTextInput
             title="Email"
@@ -157,7 +158,6 @@ export default function BottomSheetScreen() {
         title="Chọn option"
         showClose
         pressBackdropToClose
-        contentContainerStyle={styles.sheetContent}
         footer={
           <MyButton
             width="full"

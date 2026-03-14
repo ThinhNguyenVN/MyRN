@@ -5,22 +5,55 @@ import { StyleSheet } from 'react-native'
 export const generateStyles = (theme: ThemeType) => {
   const { getSpacing, insets } = theme
   return StyleSheet.create({
+    // ─── Screen & layout ─────────────────────────────────────────────────────
+    contentContainer: {
+      flex: 1,
+    },
     sideBarContainer: {
       flex: 1,
       flexDirection: 'row',
     },
-    contentContainer: {
-      flex: 1,
+    screenContent: {
+      paddingHorizontal: getSpacing('x4'),
+      paddingBottom: (insets.bottom ?? 0) + 100,
+      gap: getSpacing('x4'),
     },
+
+    // ─── Section titles & labels ───────────────────────────────────────────
     sectionTitle: {
-      marginTop: 24,
-      marginBottom: 8,
+      marginTop: getSpacing('x6'),
+      marginBottom: getSpacing('x2'),
     },
+    sectionCaption: {
+      marginBottom: getSpacing('x3'),
+    },
+    labelMargin: {
+      marginBottom: getSpacing('x2'),
+    },
+    introText: {
+      marginBottom: getSpacing('x3'),
+    },
+
+    // ─── Content blocks ────────────────────────────────────────────────────
+    content: {
+      gap: getSpacing('x4'),
+    },
+    inputContainer: {
+      gap: getSpacing('x2'),
+    },
+    alertMargin: {
+      marginBottom: getSpacing('x4'),
+    },
+
+    // ─── Buttons & chips ───────────────────────────────────────────────────
     buttonRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      gap: 18,
+      gap: getSpacing('x4'),
       alignSelf: 'stretch',
+    },
+    buttonMargin: {
+      marginBottom: getSpacing('x2'),
     },
     chipRow: {
       flexDirection: 'row',
@@ -28,34 +61,18 @@ export const generateStyles = (theme: ThemeType) => {
       gap: getSpacing('x2'),
       marginBottom: getSpacing('x4'),
     },
-    content: {
-      gap: getSpacing('x4'),
-    },
-    inputContainer: {
-      gap: getSpacing('x2'),
-    },
-    screenContent: {
-      paddingHorizontal: 16,
-      paddingBottom: (insets.bottom ?? 0) + 100,
+
+    // ─── Bottom sheet ──────────────────────────────────────────────────────
+    bottomsheet: {
       gap: getSpacing('x4'),
     },
     sheetContent: {
       gap: getSpacing('x2'),
-      justifyContent: 'center',
-      alignItems: 'center',
+      // justifyContent: 'center',
+      // alignItems: 'center',
     },
-    labelMargin: {
-      marginBottom: 8,
-    },
-    alertMargin: {
-      marginBottom: 16,
-    },
-    sectionCaption: {
-      marginBottom: 12,
-    },
-    introText: {
-      marginBottom: 12,
-    },
+
+    // ─── Images ─────────────────────────────────────────────────────────────
     smallImage: {
       width: 100,
       height: 100,
@@ -65,39 +82,44 @@ export const generateStyles = (theme: ThemeType) => {
       width: 100,
       height: 100,
       alignSelf: 'center',
-      marginBottom: 16,
-    },
-    image200x120: {
-      width: 200,
-      height: 120,
-      alignSelf: 'center',
-      marginBottom: 16,
-    },
-    image200x100: {
-      width: 200,
-      height: 100,
-      alignSelf: 'center',
-      marginBottom: 16,
-    },
-    image180x100: {
-      width: 180,
-      height: 100,
-      alignSelf: 'center',
-      marginBottom: 16,
+      marginBottom: getSpacing('x4'),
     },
     image150x150: {
       width: 150,
       height: 150,
       alignSelf: 'center',
-      marginBottom: 16,
+      marginBottom: getSpacing('x4'),
     },
+    image180x100: {
+      width: 180,
+      height: 100,
+      alignSelf: 'center',
+      marginBottom: getSpacing('x4'),
+    },
+    image200x100: {
+      width: 200,
+      height: 100,
+      alignSelf: 'center',
+      marginBottom: getSpacing('x4'),
+    },
+    image200x120: {
+      width: 200,
+      height: 120,
+      alignSelf: 'center',
+      marginBottom: getSpacing('x4'),
+    },
+
+    // ─── Misc ───────────────────────────────────────────────────────────────
     errorContent: {
-      padding: 16,
+      padding: getSpacing('x4'),
       alignItems: 'center',
-      gap: 4,
+      gap: getSpacing('x1'),
     },
-    bottomsheet: {
-      gap: getSpacing('x4'),
+
+    bottomsheetContent: {
+      gap: getSpacing('x2'),
+      justifyContent: 'center',
+      alignItems: 'center',
     },
   })
 }
@@ -112,14 +134,17 @@ export const formScreenStyles = (theme: ThemeType) => {
     formContainer: {
       gap: getSpacing('x2'),
     },
-    content: {
-      paddingHorizontal: 16,
-      paddingTop: getSpacing('x4'),
-      paddingBottom: (insets.bottom || 0) + 100,
-      gap: getSpacing('x4'),
+    formContent: {
+      maxWidth: isMobileSize ? '100%' : MAX_INPUT_WIDTH,
     },
     formTitle: {
       marginBottom: getSpacing('x4'),
+    },
+    content: {
+      paddingHorizontal: getSpacing('x4'),
+      paddingTop: getSpacing('x4'),
+      paddingBottom: (insets.bottom ?? 0) + 100,
+      gap: getSpacing('x4'),
     },
     field: {
       marginBottom: getSpacing('x4'),
@@ -129,13 +154,10 @@ export const formScreenStyles = (theme: ThemeType) => {
       flexDirection: 'row',
       flexWrap: 'wrap',
       gap: getSpacing('x2'),
-      marginBottom: 16,
+      marginBottom: getSpacing('x4'),
     },
     submitBtn: {
       marginTop: getSpacing('x2'),
-    },
-    formContent: {
-      maxWidth: isMobileSize ? '100%' : MAX_INPUT_WIDTH,
     },
   })
 }
