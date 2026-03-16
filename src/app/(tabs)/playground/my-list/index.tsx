@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { View } from 'react-native'
 
 import MyText from '@/components/elements/my-text'
@@ -18,6 +18,7 @@ const SKELETON_LOAD_MORE_COUNT = 3
 export default function MyListPlaygroundScreen() {
   const styles = useThemedStyles(generateStyles)
   const { list, loading, loadingMore, loadMore, hasMore } = useMyListData()
+  const [refreshing, setRefreshing] = useState(false)
 
   const renderItem = useCallback((info: ListRenderItemInfo<Post>) => {
     return <PostRow item={info.item} />
@@ -63,6 +64,14 @@ export default function MyListPlaygroundScreen() {
         keyExtractor={keyExtractor}
         ListEmptyComponent={listEmpty}
         ListFooterComponent={listFooter}
+        refreshing={refreshing}
+        onRefresh={() => {
+          setRefreshing(true)
+          console.log('onRefresh')
+          setTimeout(() => {
+            setRefreshing(false)
+          }, 3000)
+        }}
         onEndReached={hasMore && !loading && !loadingMore ? loadMore : undefined}
         onEndReachedThreshold={0.5}
       />

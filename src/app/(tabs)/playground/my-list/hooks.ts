@@ -30,28 +30,31 @@ export function useMyListData() {
   const seedRef = useRef<Post[]>([])
   const nextIdRef = useRef(101)
 
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
+  const fetchPosts = useCallback((onDone?: () => void) => {
     fetch(POSTS_API)
       .then((res) => res.json())
       .then((raw: { id: number; title: string; body: string }[]) => {
-        if (cancelled) return
         const posts = raw.map((r) => toPost(r))
         seedRef.current = posts
         nextIdRef.current = 101
         setList(posts)
       })
-      .catch(() => {
-        if (!cancelled) setList([])
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
+      .catch(() => setList([]))
+      .finally(() => onDone?.())
   }, [])
+
+  useEffect(() => {
+    setLoading(true)
+    fetchPosts(() => setLoading(false))
+  }, [fetchPosts])
+
+  const refresh = useCallback(
+    () =>
+      new Promise<void>((resolve) => {
+        fetchPosts(resolve)
+      }),
+    [fetchPosts],
+  )
 
   const loadMore = useCallback(() => {
     const seed = seedRef.current
@@ -68,5 +71,5 @@ export function useMyListData() {
 
   const hasMore = list.length < TARGET_TOTAL
 
-  return { list, loading, loadingMore, loadMore, hasMore }
+  return { list, loading, loadingMore, loadMore, hasMore, refresh }
 }
