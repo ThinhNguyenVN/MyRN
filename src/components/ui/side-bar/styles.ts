@@ -1,7 +1,7 @@
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
-const SIDEBAR_WIDTH = 260
+export const SIDEBAR_WIDTH = 260
 export const ITEM_ROW_HEIGHT = 44
 export const ANIMATION_DURATION = 350
 

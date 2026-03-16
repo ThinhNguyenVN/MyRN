@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { router, Stack, usePathname } from 'expo-router'
 import { Platform, View } from 'react-native'
 
@@ -36,6 +36,14 @@ export default function PlaygroundLayout() {
     }
   }, [pathname, showSidebar])
 
+  const handleSelected = useCallback(
+    (item: SideBarItem) => {
+      if (item.href === pathname) return
+      router.replace(item.href as any)
+    },
+    [pathname],
+  )
+
   if (!showSidebar) {
     return (
       <Stack
@@ -59,14 +67,10 @@ export default function PlaygroundLayout() {
     )
   }
 
-  const handleSelected = (item: SideBarItem) => {
-    router.replace(item.href as any)
-  }
-
   return (
     <View style={styles.sideBarContainer}>
-      <SideBar data={PLAYGROUND_LINKS} onSelected={handleSelected} />
-      <View style={styles.contentContainer}>
+      <SideBar data={PLAYGROUND_LINKS} onSelected={handleSelected} style={styles.sidebarWrapper} />
+      <View style={styles.contentContainer} collapsable={false}>
         <Stack
           initialRouteName="buttons"
           screenOptions={({ route }) => {

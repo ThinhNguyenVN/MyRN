@@ -1,22 +1,33 @@
 import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
+import { SIDEBAR_WIDTH } from '@/components/ui/side-bar/styles'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
 export const generateStyles = (theme: ThemeType) => {
-  const { getSpacing, insets } = theme
+  const { getSpacing, insets, getColor } = theme
+
   return StyleSheet.create({
-    // ─── Screen & layout ─────────────────────────────────────────────────────
-    contentContainer: {
-      flex: 1,
-    },
     sideBarContainer: {
       flex: 1,
-      flexDirection: 'row',
+    },
+    contentContainer: {
+      flex: 1,
+      paddingLeft: SIDEBAR_WIDTH + getSpacing('x2'),
+    },
+    sidebarWrapper: {
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      bottom: 0,
+      width: SIDEBAR_WIDTH,
+      zIndex: 2,
     },
     screenContent: {
       paddingHorizontal: getSpacing('x4'),
       paddingBottom: (insets.bottom ?? 0) + 100,
+      paddingLeft: getSpacing('x6'),
       gap: getSpacing('x4'),
+      backgroundColor: getColor('fill/background/primary'),
     },
 
     // ─── Section titles & labels ───────────────────────────────────────────

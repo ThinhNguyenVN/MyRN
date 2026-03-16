@@ -120,8 +120,8 @@ function SideBarInner({
   )
 
   return (
-    <View style={styles.sidebarOuter}>
-      <MyView elevation={elevation} style={[styles.sidebar, style]} radius="medium">
+    <View style={[styles.sidebarOuter, style]}>
+      <MyView elevation={elevation} style={styles.sidebar} radius="medium">
         {listContent}
       </MyView>
     </View>
