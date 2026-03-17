@@ -6,6 +6,11 @@ import { Radius, RadiusType } from '@/theme/radius'
 import { ElevationToken, getElevation } from '@/theme/elevation'
 import { SurfaceStyle } from './type'
 import { splitSurfaceStyle } from './utils'
+import { isAndroid, isIOS, isWeb } from '@/constants/dimensions'
+
+/** Android SVG shadow: giảm đậm, tăng blur (tránh shadow quá đậm/sắc) */
+const ANDROID_OPACITY_FACTOR = 0.5
+const ANDROID_BLUR_FACTOR = 2
 
 export interface MySurfaceProps extends Omit<
   SurfaceStyle,
@@ -84,12 +89,15 @@ const MySurface: React.FC<MySurfaceProps> = ({
   const elevationConfig = useMemo(() => getElevation(elevation as ElevationToken), [elevation])
   const { dx, dy, blur, opacity } = elevationConfig
   const r = Radius[radius]
+  /** Android: giảm đậm, tăng blur — SVG shadow render đậm hơn iOS/Web */
+  const shadowBlur = isAndroid ? blur * ANDROID_BLUR_FACTOR : blur
+  const shadowOpacity = isAndroid ? opacity * ANDROID_OPACITY_FACTOR : opacity
 
   const borderWidth = typeof fs.borderWidth === 'number' ? fs.borderWidth : 0
   const borderColor = typeof fs.borderColor === 'string' ? fs.borderColor : undefined
 
   // Inset đủ để shadow (blur + offset) không bị cắt
-  const blurExtent = Math.ceil(blur * BLUR_EXTENT_FACTOR)
+  const blurExtent = Math.ceil(shadowBlur * BLUR_EXTENT_FACTOR)
   const insetTop = Math.max(MIN_INSET, blurExtent + Math.max(0, -dy))
   const insetBottom = Math.max(MIN_INSET, blurExtent + Math.max(0, dy))
   const insetLeft = Math.max(MIN_INSET, blurExtent + Math.max(0, -dx))
@@ -119,23 +127,55 @@ const MySurface: React.FC<MySurfaceProps> = ({
     return base as ViewStyle
   }, [containerStyle, elevation])
 
-  // Inner content: nhận overflow hidden để clip children; cần borderRadius để clip bo góc
+  // Inner content: clip, border, background. iOS/Web: native shadow; Android: SVG
   const finalContentStyle = useMemo(() => {
     const base: ViewStyle = { ...contentStyle }
-    if (hasUserOverflowHidden && elevation && elevation !== 'none') {
-      base.overflow = 'hidden'
-      base.borderRadius = r
+    if (!(elevation && elevation !== 'none')) return base
+
+    base.backgroundColor = resolvedBackgroundColor as string
+    base.borderRadius = r
+    if (borderWidth > 0) {
+      base.borderWidth = borderWidth
+      base.borderColor = borderColor
+    }
+    if (hasUserOverflowHidden) base.overflow = 'hidden'
+
+    // // iOS: native shadow — nhanh, không cần SVG
+    // if (!isWeb && !isAndroid) {
+    //   base.shadowColor = '#000'
+    //   base.shadowOffset = { width: dx, height: dy }
+    //   base.shadowOpacity = opacity
+    //   base.shadowRadius = blur
+    // }
+    // Web: CSS boxShadow — nhanh, không cần SVG
+    if (isWeb) {
+      ;(base as Record<string, unknown>).boxShadow =
+        `${dx}px ${dy}px ${blur * 2}px rgba(0,0,0,${opacity})`
     }
     return base
-  }, [contentStyle, hasUserOverflowHidden, elevation, r])
+  }, [
+    contentStyle,
+    elevation,
+    r,
+    resolvedBackgroundColor,
+    borderWidth,
+    borderColor,
+    hasUserOverflowHidden,
+    dx,
+    dy,
+    opacity,
+    blur,
+  ])
+
+  const needsSvgShadow = (isAndroid || isIOS) && elevation && elevation !== 'none' && w > 0 && h > 0
 
   return (
     <View style={finalContainerStyle} onLayout={onLayout}>
-      {w > 0 && h > 0 && (
+      {needsSvgShadow && (
         <Svg width={svgWidth} height={svgHeight} style={svgStyle}>
           <Defs>
             <Filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
-              <FeGaussianBlur in="SourceGraphic" stdDeviation={blur} />
+              <FeGaussianBlur in="SourceGraphic" stdDeviation={shadowBlur} />
             </Filter>
           </Defs>
           {/* Shadow layer */}
@@ -146,7 +186,7 @@ const MySurface: React.FC<MySurfaceProps> = ({
             height={h}
             rx={r}
             ry={r}
-            fill={`rgba(0,0,0,${opacity})`}
+            fill={`rgba(0,0,0,${shadowOpacity})`}
             filter={`url(#${filterId})`}
           />
           {/* Fill layer */}
