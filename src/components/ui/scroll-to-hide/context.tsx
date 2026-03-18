@@ -1,5 +1,4 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef } from 'react'
-import { Platform } from 'react-native'
 import {
   Easing,
   runOnJS,
@@ -9,6 +8,7 @@ import {
 } from 'react-native-reanimated'
 
 import type { ScrollToHideContextValue, ScrollToHideProviderProps } from './types'
+import { isWeb } from '@/constants/dimensions'
 
 const SNAP_DURATION_MS = 380
 const SNAP_THRESHOLD = 0.5
@@ -30,11 +30,14 @@ export function ScrollToHideProvider({ children }: ScrollToHideProviderProps) {
   const progressShared = useSharedValue(0)
   const lastScrollYShared = useSharedValue(0)
   const didTriggerShowShared = useSharedValue(0)
+  // Debounce fastScrollUp trigger (Android can occasionally enter the branch twice).
+  // 1 = cooling down, 0 = ready.
+  const showCooldownShared = useSharedValue(0)
   const isActiveShared = useSharedValue(0)
   const isRegistered = useRef(false)
   const snapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const webScrollEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const isWeb = Platform.OS === 'web'
+
   const childOnScrollRef = useRef<((e: any) => void) | undefined>(undefined)
 
   const callChildOnScroll = useCallback((e: any) => {
@@ -43,12 +46,12 @@ export function ScrollToHideProvider({ children }: ScrollToHideProviderProps) {
 
   const performSnap = useCallback(() => {
     const didTriggerShow = didTriggerShowShared.value === 1
-    didTriggerShowShared.value = 0
     if (!isRegistered.current) return
     const p = progressShared.value
-    const target = p >= SNAP_THRESHOLD ? 1 : 0
+
+    const target = didTriggerShow ? 0 : p >= SNAP_THRESHOLD ? 1 : 0
     progressShared.value = target
-    if (didTriggerShow && target === 0) return
+
     if (p <= SNAP_NEAR_THRESHOLD || p >= 1 - SNAP_NEAR_THRESHOLD) {
       hideProgress.value = target
     } else {
@@ -111,9 +114,14 @@ export function ScrollToHideProvider({ children }: ScrollToHideProviderProps) {
         if (y <= 0) {
           progressShared.value = 0
           hideProgress.value = 0
+          didTriggerShowShared.value = 0
+          showCooldownShared.value = 0
           return
         }
         if (dy > 0) {
+          // User is scrolling down again -> clear "show" latch.
+          didTriggerShowShared.value = 0
+          showCooldownShared.value = 0
           const sensitivity = 1 / 90
           const next = progressShared.value + dy * sensitivity
           progressShared.value = next <= 0 ? 0 : next >= 1 ? 1 : next
@@ -123,10 +131,13 @@ export function ScrollToHideProvider({ children }: ScrollToHideProviderProps) {
         const velThreshold = 80
         const dyThreshold = 8
         const fastScrollUp = vy < -velThreshold || dy < -dyThreshold
-        if (fastScrollUp && didTriggerShowShared.value === 0) {
+        if (fastScrollUp && didTriggerShowShared.value === 0 && showCooldownShared.value < 0.5) {
           didTriggerShowShared.value = 1
+          showCooldownShared.value = 1
+          // Cooldown window: prevent occasional double trigger.
+          showCooldownShared.value = withTiming(0, { duration: 300 })
           progressShared.value = 0
-          hideProgress.value = withTiming(0, { duration: 380 })
+          hideProgress.value = withTiming(0, { duration: 300 })
         }
         if (isWeb) runOnJS(webScrollEndDebounced)()
       },
