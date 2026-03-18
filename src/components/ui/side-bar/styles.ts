@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native'
 export const SIDEBAR_WIDTH = 260
 export const ITEM_ROW_HEIGHT = 44
 export const ANIMATION_DURATION = 350
+export const HIGHLIGHT_ANIMATION_DURATION = Math.round(ANIMATION_DURATION * 1.25)
 
 export function generateStyles(theme: ThemeType) {
   const { getColor, getSpacing, insets, getRadius } = theme

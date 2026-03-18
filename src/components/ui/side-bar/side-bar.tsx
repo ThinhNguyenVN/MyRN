@@ -1,12 +1,17 @@
 import React, { memo, useCallback, useEffect, useRef } from 'react'
 import { FlatList, View } from 'react-native'
 import { usePathname } from 'expo-router'
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated'
 
 import MyView from '@/components/elements/my-view'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
-import { ANIMATION_DURATION, generateStyles, ITEM_ROW_HEIGHT } from './styles'
+import { HIGHLIGHT_ANIMATION_DURATION, generateStyles, ITEM_ROW_HEIGHT } from './styles'
 import type { SideBarItem, SideBarProps } from './type'
 import SideBarRow from './sider-bar-item'
 
@@ -23,6 +28,7 @@ function SideBarInner({
   const listContentRef = useRef<View>(null)
   const layoutsRef = useRef<Record<number, { y: number; height: number }>>({})
   const activeIndexRef = useRef(0)
+  const navigateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const pathMatchesHref = (href: string) => {
     if (!href) return false
@@ -34,22 +40,21 @@ function SideBarInner({
 
   const highlightY = useSharedValue(0)
   const highlightHeight = useSharedValue(ITEM_ROW_HEIGHT)
-  const userTappedSidebar = useSharedValue(false)
+  const isAnimating = useSharedValue(0)
 
   const highlightStyle = useAnimatedStyle(() => {
-    const duration = userTappedSidebar.value ? ANIMATION_DURATION : 0
-
     return {
       transform: [
         {
-          translateY: withTiming(highlightY.value, { duration }),
+          translateY: highlightY.value,
         },
       ],
-      height: withTiming(highlightHeight.value, { duration }),
+      height: highlightHeight.value,
     }
   }, [])
 
   const syncHighlightFromLayouts = useCallback(() => {
+    if (isAnimating.value === 1) return
     const layout = layoutsRef.current?.[activeIndexRef.current]
     if (layout) {
       highlightY.value = layout.y
@@ -58,7 +63,7 @@ function SideBarInner({
       highlightY.value = 0
       highlightHeight.value = ITEM_ROW_HEIGHT
     }
-  }, [highlightY, highlightHeight])
+  }, [highlightY, highlightHeight, isAnimating])
 
   useEffect(() => {
     syncHighlightFromLayouts()
@@ -70,19 +75,45 @@ function SideBarInner({
       if (prev?.y === y && prev?.height === height) return
       layoutsRef.current = { ...layoutsRef.current, [index]: { y, height } }
       if (index === activeIndexRef.current) {
+        if (isAnimating.value === 1) return
         highlightY.value = y
         highlightHeight.value = height
       }
     },
-    [highlightY, highlightHeight],
+    [highlightY, highlightHeight, isAnimating],
   )
 
   const handleSelected = useCallback(
     (item: SideBarItem, index: number) => () => {
-      userTappedSidebar.value = true
+      if (navigateTimeoutRef.current) {
+        clearTimeout(navigateTimeoutRef.current)
+        navigateTimeoutRef.current = null
+      }
+
+      const layout = layoutsRef.current?.[index]
+      if (layout) {
+        isAnimating.value = 1
+        const config = {
+          duration: HIGHLIGHT_ANIMATION_DURATION,
+          easing: Easing.out(Easing.cubic),
+        }
+        highlightY.value = withTiming(layout.y, config)
+        highlightHeight.value = withTiming(layout.height, config, (finished) => {
+          if (!finished) return
+          isAnimating.value = 0
+        })
+
+        // Navigate after ~half animation: feels responsive, still reduces jank vs immediate navigate.
+        const navigateDelay = Math.max(0, Math.round(HIGHLIGHT_ANIMATION_DURATION * 0.5))
+        navigateTimeoutRef.current = setTimeout(() => {
+          onSelectedProp?.(item, index)
+        }, navigateDelay)
+        return
+      }
+
       onSelectedProp?.(item, index)
     },
-    [onSelectedProp, userTappedSidebar],
+    [highlightHeight, highlightY, isAnimating, onSelectedProp],
   )
 
   const renderItem = useCallback(

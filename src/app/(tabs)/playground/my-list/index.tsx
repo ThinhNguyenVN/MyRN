@@ -67,7 +67,6 @@ export default function MyListPlaygroundScreen() {
         refreshing={refreshing}
         onRefresh={() => {
           setRefreshing(true)
-          console.log('onRefresh')
           setTimeout(() => {
             setRefreshing(false)
           }, 3000)
