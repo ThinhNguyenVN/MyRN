@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo } from 'react'
 
+import { ThemeConfigs } from '@/configs/themes'
 import { getColor as getColorFromTokens, Themes, ThemeName, TokensType } from '@/theme/colors'
 import type { ColorToken } from '@/theme/colors'
 import { ElevationToken, getElevation } from './elevation'
@@ -24,6 +25,10 @@ export interface ThemeType {
   insets: Insets
   isMobileSize: boolean
   isMobile: boolean
+  /** Default elevation từ ThemeConfigs (button, alert, checkbox, sidebar, ...). */
+  defaultElevation: ElevationToken | 'none'
+  /** Haptic mặc định từ ThemeConfigs (pressable, wheel picker, ...). */
+  hapticEnabled: boolean
 }
 
 const ThemeContext = createContext<ThemeType | null>(null)
@@ -53,6 +58,8 @@ export function MyThemeProvider({ value = 'light', children }: MyThemeProviderPr
       isMobileSize,
       getRadius,
       isMobile,
+      defaultElevation: ThemeConfigs.elevation,
+      hapticEnabled: ThemeConfigs.haptic,
     }),
     [themeName, tokens, getColor, insets, isMobileSize, getRadius, isMobile],
   )

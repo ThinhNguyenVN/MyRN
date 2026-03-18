@@ -6,7 +6,7 @@ import { Radius, RadiusType } from '@/theme/radius'
 import { ElevationToken, getElevation } from '@/theme/elevation'
 import { SurfaceStyle } from './type'
 import { splitSurfaceStyle } from './utils'
-import { isAndroid, isIOS, isWeb } from '@/constants/dimensions'
+import { isAndroid, isIos, isWeb } from '@/constants/dimensions'
 
 /** Android SVG shadow: giảm đậm, tăng blur (tránh shadow quá đậm/sắc) */
 const ANDROID_OPACITY_FACTOR = 0.5
@@ -140,13 +140,13 @@ const MySurface: React.FC<MySurfaceProps> = ({
     }
     if (hasUserOverflowHidden) base.overflow = 'hidden'
 
-    // // iOS: native shadow — nhanh, không cần SVG
-    // if (!isWeb && !isAndroid) {
-    //   base.shadowColor = '#000'
-    //   base.shadowOffset = { width: dx, height: dy }
-    //   base.shadowOpacity = opacity
-    //   base.shadowRadius = blur
-    // }
+    // iOS: native shadow — nhanh, không cần SVG
+    if (isIos) {
+      base.shadowColor = '#000'
+      base.shadowOffset = { width: dx, height: dy }
+      base.shadowOpacity = opacity
+      base.shadowRadius = blur
+    }
     // Web: CSS boxShadow — nhanh, không cần SVG
     if (isWeb) {
       ;(base as Record<string, unknown>).boxShadow =
@@ -167,7 +167,7 @@ const MySurface: React.FC<MySurfaceProps> = ({
     blur,
   ])
 
-  const needsSvgShadow = (isAndroid || isIOS) && elevation && elevation !== 'none' && w > 0 && h > 0
+  const needsSvgShadow = isAndroid && elevation && elevation !== 'none' && w > 0 && h > 0
 
   return (
     <View style={finalContainerStyle} onLayout={onLayout}>

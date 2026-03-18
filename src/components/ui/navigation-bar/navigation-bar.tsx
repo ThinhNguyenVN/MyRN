@@ -31,7 +31,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
 
   const padding = Math.max(leftWidth, rightWidth)
   return (
-    <View style={styles.bar}>
+    <MyView style={styles.bar} fillParent={false}>
       <MyView style={styles.left} onLayout={onLeftLayout}>
         {shouldShowBack ? (
           <MyButton.Icon icon="arrow-back" type="light" size="small" onPress={onBackPress} />
@@ -57,7 +57,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
       <MyView style={styles.right} onLayout={onRightLayout}>
         {right ?? null}
       </MyView>
-    </View>
+    </MyView>
   )
 }
 

@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
+import { useTheme } from '@/theme/theme-context'
 import { triggerHaptic } from '@/utils/haptic'
 
 import MyView from '@/components/elements/my-view'
@@ -32,11 +33,13 @@ const MyPressable: React.FC<MyPressableProps> = ({
   scaleValue = SCALE_LARGE,
   scaleBySize = true,
   animatedType = 'scale',
-  haptic = true,
+  haptic: hapticProp,
   style,
   surfaceProps,
   ...rest
 }) => {
+  const { hapticEnabled } = useTheme()
+  const haptic = hapticProp ?? hapticEnabled
   const containerStyle = useMemo(
     () =>
       getContainerStyle(

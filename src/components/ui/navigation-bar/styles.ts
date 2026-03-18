@@ -14,6 +14,8 @@ export function generateStyles(theme: ThemeType) {
       paddingVertical: getSpacing('x2'),
       paddingTop: insets.top || getSpacing('x4'),
       backgroundColor: getColor('fill/background/primary'),
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: getColor('border/inactive/secondary'),
     },
     left: {
       flexDirection: 'row',

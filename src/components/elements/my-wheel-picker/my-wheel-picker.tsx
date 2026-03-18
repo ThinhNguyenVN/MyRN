@@ -9,7 +9,7 @@ import MyPressable from '@/components/elements/my-pressable'
 import MyTextInput from '@/components/elements/my-text-input'
 import { TriggerModal } from '@/components/ui/trigger-modal'
 import { useIsMobile } from '@/hooks/dimenstions-hooks'
-import { useThemedStyles } from '@/theme/theme-context'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import WheelPickerView from './wheel-picker-view'
 import type { MyWheelPickerProps } from './type'
@@ -23,8 +23,10 @@ const MyWheelPicker = memo(function MyWheelPicker({
   title = 'Chọn',
   placeholder = 'Chọn',
   disabled = false,
-  haptic = true,
+  haptic: hapticProp,
 }: MyWheelPickerProps) {
+  const { hapticEnabled } = useTheme()
+  const haptic = hapticProp ?? hapticEnabled
   const styles = useThemedStyles(generateStyles)
   const useSheet = useIsMobile()
   const sheetRef = useRef<MyBottomSheetRef>(null)

@@ -13,7 +13,6 @@ import { generateStyles } from './styles'
 import type { ChipType, MyChipProps } from './type'
 
 const TEXT_ON_PRIMARY = '#ffffff'
-const DEFAULT_ELEVATION: MyChipProps['elevation'] = 'none'
 
 function getStyleKey(type: ChipType, selected: boolean): string {
   if (selected) return `${type}Selected`
@@ -31,12 +30,13 @@ const MyChip: React.FC<MyChipProps> = ({
   showClose = false,
   onClose,
   onPress,
-  elevation = DEFAULT_ELEVATION,
+  elevation: elevationProp,
   style,
   containerStyle,
   ...rest
 }) => {
-  const { getColor } = useTheme()
+  const { getColor, defaultElevation } = useTheme()
+  const elevation = elevationProp ?? defaultElevation
   const styles = useThemedStyles(generateStyles)
 
   const containerPropsStyle = useMemo(

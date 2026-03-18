@@ -8,7 +8,7 @@ import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
-import { useThemedStyles } from '@/theme/theme-context'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import type { MyAlertProps, MyAlertType } from './type'
 import { generateStyles } from './styles'
@@ -34,12 +34,14 @@ const MyAlert: React.FC<MyAlertProps> = ({
   icon: iconProp,
   image,
   type = 'info',
-  elevation = 'soft/down/small',
+  elevation: elevationProp,
   onClose,
   buttons,
   style,
   ...rest
 }) => {
+  const { defaultElevation } = useTheme()
+  const elevation = elevationProp ?? defaultElevation
   const styles = useThemedStyles(generateStyles)
 
   const iconName = iconProp ?? TYPE_ICON_MAP[type]

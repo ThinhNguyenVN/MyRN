@@ -9,6 +9,7 @@ export const generateStyles = (theme: ThemeType) => {
   return StyleSheet.create({
     sideBarContainer: {
       flex: 1,
+      backgroundColor: getColor('fill/background/secondary'),
     },
     contentContainer: {
       flex: 1,
@@ -27,7 +28,7 @@ export const generateStyles = (theme: ThemeType) => {
       paddingBottom: (insets.bottom ?? 0) + 100,
       paddingLeft: getSpacing('x6'),
       gap: getSpacing('x4'),
-      backgroundColor: getColor('fill/background/primary'),
+      backgroundColor: getColor('fill/background/secondary'),
     },
 
     // ─── Section titles & labels ───────────────────────────────────────────
@@ -140,7 +141,7 @@ export const formScreenStyles = (theme: ThemeType) => {
   return StyleSheet.create({
     screen: {
       flex: 1,
-      backgroundColor: getColor('fill/background/primary'),
+      backgroundColor: getColor('fill/background/secondary'),
     },
     formContainer: {
       gap: getSpacing('x2'),

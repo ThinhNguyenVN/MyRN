@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import { triggerHaptic } from '@/utils/haptic'
-import { useThemedStyles } from '@/theme/theme-context'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles, ITEM_HEIGHT, VISIBLE_COUNT } from './styles'
 import type { WheelPickerViewProps, WheelPickerItem as WheelPickerItemType } from './type'
@@ -25,8 +25,10 @@ const WheelPickerView = memo(function WheelPickerView({
   onSelectIndex,
   itemHeight = ITEM_HEIGHT,
   visibleCount = VISIBLE_COUNT,
-  haptic = true,
+  haptic: hapticProp,
 }: WheelPickerViewProps) {
+  const { hapticEnabled } = useTheme()
+  const haptic = hapticProp ?? hapticEnabled
   const styles = useThemedStyles(generateStyles)
   const flatListRef = useRef<FlatList<WheelPickerItemType | null>>(null)
   const scrollY = useSharedValue(0)

@@ -4,7 +4,7 @@ import { usePathname } from 'expo-router'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
 import MyView from '@/components/elements/my-view'
-import { useThemedStyles } from '@/theme/theme-context'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import { ANIMATION_DURATION, generateStyles, ITEM_ROW_HEIGHT } from './styles'
 import type { SideBarItem, SideBarProps } from './type'
@@ -12,11 +12,13 @@ import SideBarRow from './sider-bar-item'
 
 function SideBarInner({
   data,
-  elevation = 'soft/right/small',
+  elevation: elevationProp,
   style,
   onSelected: onSelectedProp,
 }: SideBarProps) {
   const pathname = usePathname()
+  const { defaultElevation } = useTheme()
+  const elevation = elevationProp ?? defaultElevation
   const styles = useThemedStyles(generateStyles)
   const listContentRef = useRef<View>(null)
   const layoutsRef = useRef<Record<number, { y: number; height: number }>>({})

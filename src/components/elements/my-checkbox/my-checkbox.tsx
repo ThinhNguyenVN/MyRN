@@ -6,12 +6,11 @@ import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
-import { useThemedStyles } from '@/theme/theme-context'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import type { MyCheckboxProps } from './type'
 import { generateStyles } from './styles'
 
-const DEFAULT_ELEVATION = 'soft/down/small' as const
 const SPRING_CONFIG = { damping: 30, stiffness: 200 }
 
 const MyCheckbox = memo(function MyCheckbox({
@@ -19,12 +18,14 @@ const MyCheckbox = memo(function MyCheckbox({
   checked = false,
   onValueChange,
   disabled = false,
-  elevation = DEFAULT_ELEVATION,
+  elevation: elevationProp,
   label,
   isLeftLabel = true,
   labelStyle,
   style,
 }: MyCheckboxProps) {
+  const { defaultElevation } = useTheme()
+  const elevation = elevationProp ?? defaultElevation
   const styles = useThemedStyles(generateStyles)
   const scale = useSharedValue(checked ? 1 : 0)
 

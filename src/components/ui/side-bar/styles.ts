@@ -19,6 +19,8 @@ export function generateStyles(theme: ThemeType) {
       backgroundColor: getColor('fill/background/primary'),
       paddingTop: insets.top || getSpacing('x4'),
       paddingVertical: getSpacing('x4'),
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: getColor('border/inactive/secondary'),
     },
     listContent: {
       flex: 1,

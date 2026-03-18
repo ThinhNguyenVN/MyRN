@@ -15,7 +15,6 @@ import MyPressable from '../my-pressable'
 import MyButtonIcon from './my-button-icon'
 
 const TEXT_ON_PRIMARY = '#ffffff'
-const DEFAULT_ELEVATION: MyButtonProps['elevation'] = 'soft/down/small'
 
 const MyButton: React.FC<MyButtonProps> = ({
   text,
@@ -25,13 +24,14 @@ const MyButton: React.FC<MyButtonProps> = ({
   size = 'large',
   type = 'primary',
   width = 'full',
-  elevation = DEFAULT_ELEVATION,
+  elevation: elevationProp,
   left,
   right,
   containerStyle,
   ...rest
 }) => {
-  const { getColor } = useTheme()
+  const { getColor, defaultElevation } = useTheme()
+  const elevation = elevationProp ?? defaultElevation
   const styles = useThemedStyles(generateStyles)
 
   const containerPropsStyle = useMemo(

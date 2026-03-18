@@ -46,7 +46,7 @@ const ANIMATION_DURATION_WEB = 400
 
 const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
   const styles = useThemedStyles(generateStyles)
-  const { getSpacing } = useTheme()
+  const { getSpacing, defaultElevation } = useTheme()
   const gap = getSpacing('x3')
   const [options, setOptions] = useState<ToastOptions | null>(null)
   const [visible, setVisible] = useState(false)
@@ -142,11 +142,12 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
   )
 
   const elevation =
-    options.elevation !== 'none' ? (options.elevation ?? 'soft/down/medium') : undefined
+    options.elevation !== 'none' ? (options.elevation ?? defaultElevation) : undefined
+  const elevationFinal = elevation && elevation !== 'none' ? elevation : undefined
 
   const wrapper = (
     <MyView
-      elevation={elevation}
+      elevation={elevationFinal}
       radius="medium"
       fillParent={false}
       style={[styles.container, containerStyle]}
