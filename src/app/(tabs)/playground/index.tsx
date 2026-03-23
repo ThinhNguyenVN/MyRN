@@ -1,4 +1,4 @@
-import { router } from 'expo-router'
+import { Href, router } from 'expo-router'
 
 import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
@@ -35,7 +35,7 @@ export default function PlaygroundScreen() {
           {PLAYGROUND_LINKS.map((item) => (
             <MyPressable
               key={`${item.href}-${item.label}`}
-              onPress={() => router.push(item.href as any)}
+              onPress={() => router.push(item.href as Href)}
               style={styles.linkRow}
             >
               <MyView style={styles.linkRowLabel}>

@@ -62,7 +62,6 @@ export const generateStyles = (theme: ThemeType) => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       gap: getSpacing('x4'),
-      alignSelf: 'stretch',
     },
     buttonMargin: {
       marginBottom: getSpacing('x2'),

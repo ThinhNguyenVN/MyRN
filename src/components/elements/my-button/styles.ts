@@ -15,6 +15,7 @@ export const generateStyles = (theme: ThemeType) => {
     alignItems: 'center',
     justifyContent: 'center',
     gap: getSpacing('x2'),
+    width: '100%',
   }
   const withBorder: ViewStyle = { borderWidth: 1 }
   return StyleSheet.create({
@@ -51,7 +52,9 @@ export const generateStyles = (theme: ThemeType) => {
       backgroundColor: getColor('fill/disabled/primary'),
       borderWidth: 0,
     },
-    touchable: { minWidth: 70 },
+    touchable: {
+      flex: 1,
+    },
     touchableFull: { flex: 1, width: '100%', alignSelf: 'stretch' },
     iconButtonSmall: {
       width: BUTTON_SMALL_HEIGHT,

@@ -15,11 +15,13 @@ function MyFormFieldInner<TFieldValues extends FieldValues>({
   title,
   subTitle,
   required,
+  externalInvalid = false,
   children,
 }: MyFormFieldProps<TFieldValues>) {
   const styles = useThemedStyles(generateStyles)
   const { error } = useFormField<TFieldValues, FieldPath<TFieldValues>>(name)
   const { registerFieldRef, unregisterFieldRef } = useFormScrollContext()
+  const showErrorVisual = !!error || externalInvalid
 
   return (
     <View
@@ -30,7 +32,12 @@ function MyFormFieldInner<TFieldValues extends FieldValues>({
       style={styles.field}
       collapsable={false}
     >
-      <FormFieldLabel title={title} subTitle={subTitle} required={required} error={!!error} />
+      <FormFieldLabel
+        title={title}
+        subTitle={subTitle}
+        required={required}
+        error={showErrorVisual}
+      />
       {children}
       <FormFieldError error={error ?? null} />
     </View>

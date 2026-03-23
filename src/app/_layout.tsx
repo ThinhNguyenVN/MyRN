@@ -15,6 +15,9 @@ import type { ToastRef } from '@/components/ui/toast'
 import { NavigationBarHeader } from '@/components/ui/navigation-bar'
 import { MyThemeProvider } from '@/theme/theme-context'
 import { ScrollToHideProvider } from '@/components/ui/scroll-to-hide'
+import { Provider } from 'react-redux'
+
+import { store } from '@/store/store'
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -49,28 +52,31 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.root}>
       <PortalProvider shouldAddRootHost={false}>
         <MyThemeProvider value={themeName}>
-          <ScrollToHideProvider>
-            <BottomSheetModalProvider>
-              <ConfirmationRoot ref={confirmationRef} />
-              <ToastRoot ref={toastRef} />
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="home"
-                  options={{
-                    header: (props) => <NavigationBarHeader {...props} />,
-                    headerShown: true,
-                    title: 'Home',
-                  }}
-                />
-                <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-              </Stack>
-              <View style={styles.portalHostOverlay} pointerEvents="box-none">
-                <PortalHost name="root" />
-              </View>
-              <StatusBar style="auto" />
-            </BottomSheetModalProvider>
-          </ScrollToHideProvider>
+          <Provider store={store}>
+            <ScrollToHideProvider>
+              <BottomSheetModalProvider>
+                <ConfirmationRoot ref={confirmationRef} />
+                <ToastRoot ref={toastRef} />
+                <Stack>
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="login" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="home"
+                    options={{
+                      header: (props) => <NavigationBarHeader {...props} />,
+                      headerShown: true,
+                      title: 'Home',
+                    }}
+                  />
+                  <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+                </Stack>
+                <View style={styles.portalHostOverlay} pointerEvents="box-none">
+                  <PortalHost name="root" />
+                </View>
+                <StatusBar style="auto" />
+              </BottomSheetModalProvider>
+            </ScrollToHideProvider>
+          </Provider>
         </MyThemeProvider>
       </PortalProvider>
     </GestureHandlerRootView>
