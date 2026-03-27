@@ -2,6 +2,7 @@ import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useRef, useEffect } from 'react'
 import 'react-native-reanimated'
+import * as SplashScreen from 'expo-splash-screen'
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { PortalHost, PortalProvider } from '@gorhom/portal'
@@ -18,6 +19,8 @@ import { Provider } from 'react-redux'
 
 import { useAppInit } from '@/hooks/app-init-hooks'
 import { store } from '@/store/store'
+
+SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
   const colorScheme = useColorScheme()
@@ -72,7 +75,14 @@ export default function RootLayout() {
 }
 
 function AppInitGate({ children }: { children: React.ReactNode }) {
-  const { isInitializing } = useAppInit()
+  const { isInitialized, isInitializing } = useAppInit()
+
+  useEffect(() => {
+    if (isInitialized) {
+      SplashScreen.hideAsync()
+    }
+  }, [isInitialized])
+
   if (isInitializing) {
     return <View style={styles.root} />
   }
