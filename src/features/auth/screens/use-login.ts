@@ -2,14 +2,16 @@ import { router } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import type { ApiFailureType } from '@/api/axios-base-query'
-import { useLoginMutation } from '@/features/auth/authApi'
+import { isNormalizedApiError } from '@/api/errors'
+import { loginThunk } from '@/features/auth/auth-thunks'
+import { useAppDispatch } from '@/store/hooks'
 
 import type { LoginForm } from './login-screen.types'
 
 export function useLogin(scrollToField: (name: string) => void) {
-  const [login, { isLoading }] = useLoginMutation()
+  const dispatch = useAppDispatch()
   const { handleSubmit, control } = useFormContext<LoginForm>()
+  const [isLoading, setIsLoading] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const username = useWatch({ control, name: 'username' })
@@ -22,18 +24,26 @@ export function useLogin(scrollToField: (name: string) => void) {
   const onSubmit = useCallback(
     async (values: LoginForm) => {
       setSubmitError(null)
+      setIsLoading(true)
       try {
-        await login({
-          username: values.username.trim(),
-          password: values.password,
-        }).unwrap()
+        await dispatch(
+          loginThunk({
+            username: values.username.trim(),
+            password: values.password,
+          }),
+        ).unwrap()
         router.replace('/(tabs)')
       } catch (err) {
-        const error = err as ApiFailureType
-        setSubmitError(error.message)
+        if (isNormalizedApiError(err)) {
+          setSubmitError(err.message)
+          return
+        }
+        setSubmitError('Sign in failed')
+      } finally {
+        setIsLoading(false)
       }
     },
-    [login],
+    [dispatch],
   )
 
   const onInvalid = useCallback(

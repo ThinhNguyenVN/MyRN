@@ -1,19 +1,9 @@
-import axios, {
-  type AxiosError,
-  AxiosHeaders,
-  type InternalAxiosRequestConfig,
-  isAxiosError,
-} from 'axios'
+import axios, { type AxiosError, type InternalAxiosRequestConfig, isAxiosError } from 'axios'
 
+import { refreshAuthToken } from '@/api/auth-client'
 import { normalizeAxiosError } from '@/api/errors'
-import {
-  API_AXIOS_CONFIG,
-  API_BASE_URL,
-  API_TIMEOUT,
-  AUTH_SKIP_REFRESH_PATHS,
-  Endpoints,
-} from '@/configs/api'
-import { logout, selectRefreshToken, updateTokens } from '@/features/auth/authSlice'
+import { API_AXIOS_CONFIG, AUTH_SKIP_REFRESH_PATHS } from '@/configs/api'
+import { logout, selectRefreshToken, updateTokens } from '@/features/auth/auth-slice'
 import { getStore, tryGetStore } from '@/store/store-ref'
 import type { RootStateWithAuth } from '@/store/types'
 
@@ -32,13 +22,7 @@ function performRefresh(refreshToken: string): Promise<string> {
   if (!refreshInFlight) {
     refreshInFlight = (async () => {
       try {
-        const res = await axios.post<{ accessToken: string; refreshToken: string }>(
-          `${API_BASE_URL}${Endpoints.refresh}`,
-          { refreshToken },
-          { headers: API_AXIOS_CONFIG.headers as AxiosHeaders, timeout: API_TIMEOUT },
-        )
-
-        const { accessToken, refreshToken: newRefresh } = res.data
+        const { accessToken, refreshToken: newRefresh } = await refreshAuthToken(refreshToken)
         tryGetStore()?.dispatch(updateTokens({ accessToken, refreshToken: newRefresh }))
 
         return accessToken

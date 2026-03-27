@@ -3,7 +3,7 @@ import { http, HttpResponse } from 'msw'
 
 import { API_BASE_URL, Endpoints } from '@/configs/api'
 import { apiClient } from '@/api/axios-instance'
-import { authSlice, setCredentials } from '@/features/auth/authSlice'
+import { authSlice, setCredentials } from '@/features/auth/auth-slice'
 import { injectStore } from '@/store/store-ref'
 import { server } from '@/test/server'
 
@@ -82,7 +82,8 @@ describe('apiClient refresh token flow', () => {
     )
 
     await expect(apiClient.get('/secure')).rejects.toMatchObject({
-      response: { status: 401 },
+      status: 401,
+      code: 'UNAUTHORIZED',
     })
 
     expect(store.getState().auth.accessToken).toBeNull()
@@ -117,7 +118,8 @@ describe('apiClient refresh token flow', () => {
     )
 
     await expect(apiClient.get('/secure')).rejects.toMatchObject({
-      response: { status: 401 },
+      status: 401,
+      code: 'UNAUTHORIZED',
     })
     expect(refreshCount).toBe(1)
   })

@@ -2,7 +2,6 @@ import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useRef, useEffect } from 'react'
 import 'react-native-reanimated'
-import { useFonts } from 'expo-font'
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { PortalHost, PortalProvider } from '@gorhom/portal'
@@ -17,11 +16,8 @@ import { MyThemeProvider } from '@/theme/theme-context'
 import { ScrollToHideProvider } from '@/components/ui/scroll-to-hide'
 import { Provider } from 'react-redux'
 
+import { useAppInit } from '@/hooks/app-init-hooks'
 import { store } from '@/store/store'
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme()
@@ -37,15 +33,6 @@ export default function RootLayout() {
     }
   }, [])
 
-  const [fontsLoaded] = useFonts({
-    Roboto: require('@/assets/fonts/Roboto-Regular.ttf'),
-    'Roboto-Medium': require('@/assets/fonts/Roboto-Medium.ttf'),
-    'Roboto-Bold': require('@/assets/fonts/Roboto-Bold.ttf'),
-  })
-  if (!fontsLoaded) {
-    return null
-  }
-
   const themeName = colorScheme === 'dark' ? 'dark' : 'light'
 
   return (
@@ -53,34 +40,43 @@ export default function RootLayout() {
       <PortalProvider shouldAddRootHost={false}>
         <MyThemeProvider value={themeName}>
           <Provider store={store}>
-            <ScrollToHideProvider>
-              <BottomSheetModalProvider>
-                <ConfirmationRoot ref={confirmationRef} />
-                <ToastRoot ref={toastRef} />
-                <Stack>
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                  <Stack.Screen name="login" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="home"
-                    options={{
-                      header: (props) => <NavigationBarHeader {...props} />,
-                      headerShown: true,
-                      title: 'Home',
-                    }}
-                  />
-                  <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-                </Stack>
-                <View style={styles.portalHostOverlay} pointerEvents="box-none">
-                  <PortalHost name="root" />
-                </View>
-                <StatusBar style="auto" />
-              </BottomSheetModalProvider>
-            </ScrollToHideProvider>
+            <AppInitGate>
+              <ScrollToHideProvider>
+                <BottomSheetModalProvider>
+                  <ConfirmationRoot ref={confirmationRef} />
+                  <ToastRoot ref={toastRef} />
+                  <Stack>
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                    <Stack.Screen name="login" options={{ headerShown: false }} />
+                    <Stack.Screen
+                      name="home"
+                      options={{
+                        header: (props) => <NavigationBarHeader {...props} />,
+                        headerShown: true,
+                        title: 'Home',
+                      }}
+                    />
+                  </Stack>
+                  <View style={styles.portalHostOverlay} pointerEvents="box-none">
+                    <PortalHost name="root" />
+                  </View>
+                  <StatusBar style="auto" />
+                </BottomSheetModalProvider>
+              </ScrollToHideProvider>
+            </AppInitGate>
           </Provider>
         </MyThemeProvider>
       </PortalProvider>
     </GestureHandlerRootView>
   )
+}
+
+function AppInitGate({ children }: { children: React.ReactNode }) {
+  const { isInitializing } = useAppInit()
+  if (isInitializing) {
+    return <View style={styles.root} />
+  }
+  return <>{children}</>
 }
 
 const styles = StyleSheet.create({

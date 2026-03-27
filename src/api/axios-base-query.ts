@@ -14,7 +14,6 @@ export type AxiosBaseQueryArgs = {
 
 export type ApiFailureType = {
   status?: number | string
-  isSuccess: false
   errorCode: ApiErrorCodeType
   message: string
 }
@@ -35,7 +34,6 @@ export const axiosBaseQuery: BaseQueryFn<AxiosBaseQueryArgs, unknown, ApiFailure
     return {
       error: {
         status: serialized.status,
-        isSuccess: false,
         errorCode: serialized.data.code,
         message: serialized.data.message,
       },
