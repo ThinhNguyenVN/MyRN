@@ -12,6 +12,7 @@ import { generateStyles } from './styles'
 
 function titleFromRoute(routeName: string): string {
   if (routeName === 'toast') return 'Toast & Confirmation'
+  if (routeName === 'swipeable-item') return 'Swipeable item'
   return routeName.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 

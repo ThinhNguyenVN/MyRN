@@ -4,9 +4,11 @@ import {
   type FlashListRef,
   ListRenderItemInfo as FlashListRenderItemInfo,
 } from '@shopify/flash-list'
-import { Platform, StyleSheet, View } from 'react-native'
+import type { ListRenderItemInfo as RNListRenderItemInfo } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { GestureDetector } from 'react-native-gesture-handler'
-import Animated from 'react-native-reanimated'
+import Animated, { LinearTransition, type FlatListPropsWithLayout } from 'react-native-reanimated'
+import { isNil, omit } from 'lodash'
 
 import type { MyListProps, MyListRef } from './types'
 import { useThemedStyles } from '@/theme/theme-context'
@@ -14,7 +16,7 @@ import { generateStyles } from './styles'
 import { usePullToRefresh } from './hooks'
 import { RefreshIndicator } from './refresh-indicator'
 import { useScrollToHide } from '../scroll-to-hide'
-import { isNil } from 'lodash'
+import { isWeb } from '@/constants/dimensions'
 
 const DEFAULT_DRAW_DISTANCE = 500
 const DEFAULT_ON_END_REACHED_THRESHOLD = 0.5
@@ -22,6 +24,22 @@ const WEB_SCROLL_END_DEBOUNCE_MS = 120
 const EMPTY_ARRAY: readonly any[] = Object.freeze([])
 
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList) as typeof FlashList
+
+const LIST_ITEM_LAYOUT = LinearTransition.springify(200).damping(22).stiffness(260)
+
+/** Props chỉ có trên FlashList — không truyền xuống RN FlatList. */
+const REST_OMIT_FOR_FLAT_LIST: string[] = [
+  'drawDistance',
+  'onLoad',
+  'overrideItemLayout',
+  'getItemType',
+  'overrideProps',
+  'maxItemsInRecyclePool',
+  'masonry',
+  'optimizeItemArrangement',
+  'onCommitLayoutEffect',
+  'CellRendererComponent',
+]
 
 function MyListInner<T>(
   {
@@ -41,6 +59,7 @@ function MyListInner<T>(
     scrollEventThrottle = 16,
     refreshing,
     onRefresh,
+    enableLayoutAnimated,
     ...rest
   }: MyListProps<T>,
   ref: React.ForwardedRef<MyListRef<T>>,
@@ -54,12 +73,15 @@ function MyListInner<T>(
   const scrollToHideCtx = useScrollToHide()
   const hasScrollToHide = !isNil(scrollToHideCtx)
 
-  const wrappedRenderItem = useCallback(
+  const wrappedFlashRenderItem = useCallback(
     (info: FlashListRenderItemInfo<T>) => renderItem({ item: info.item, index: info.index }),
     [renderItem],
   )
 
-  const isWeb = Platform.OS === 'web'
+  const flatListRenderItem = useCallback(
+    (info: RNListRenderItemInfo<T>) => renderItem({ item: info.item, index: info.index }),
+    [renderItem],
+  )
 
   const pullScrollHandlerRef = useRef(pull.scrollHandler)
   pullScrollHandlerRef.current = pull.scrollHandler
@@ -76,16 +98,14 @@ function MyListInner<T>(
         }, WEB_SCROLL_END_DEBOUNCE_MS)
       }
     },
-    [onScroll, onScrollEnd, isWeb, hasPullToRefresh],
+    [onScroll, onScrollEnd, hasPullToRefresh],
   )
 
   if (hasScrollToHide && hasPullToRefresh) {
     scrollToHideCtx.childOnScrollRef.current = handleScroll
   }
 
-  // Only use AnimatedFlashList when an animated scroll handler is required
-  // (Reanimated's useAnimatedScrollHandler needs it). Regular FlashList is lighter.
-  const needsAnimatedList = hasScrollToHide
+  const needsAnimatedFlashList = hasScrollToHide && !enableLayoutAnimated
 
   const needsJsCallback = hasPullToRefresh || (isWeb && onScrollEnd)
   let scrollProp: any
@@ -115,12 +135,12 @@ function MyListInner<T>(
   )
 
   const safeData = data ?? (EMPTY_ARRAY as T[])
-  const safeRef = !isNil(ref) ? (ref as React.RefObject<FlashListRef<T>>) : undefined
+  const safeRef = !isNil(ref) ? ref : undefined
 
-  const listProps = {
-    ref: safeRef,
+  const flashListProps = {
+    ref: safeRef as React.Ref<FlashListRef<T>> | undefined,
     data: safeData,
-    renderItem: wrappedRenderItem,
+    renderItem: wrappedFlashRenderItem,
     keyExtractor,
     drawDistance,
     ListEmptyComponent,
@@ -136,11 +156,36 @@ function MyListInner<T>(
     ...rest,
   }
 
-  const list = needsAnimatedList ? (
-    <AnimatedFlashList<T> {...listProps} />
-  ) : (
-    <FlashList<T> {...listProps} />
-  )
+  const restForFlatList = omit(rest, REST_OMIT_FOR_FLAT_LIST)
+
+  const flatListProps = {
+    ref: safeRef,
+    data: safeData as readonly T[],
+    renderItem: flatListRenderItem,
+    keyExtractor,
+    ListEmptyComponent,
+    ListHeaderComponent,
+    ListFooterComponent,
+    onEndReached: onEndReached ?? undefined,
+    onEndReachedThreshold: onEndReachedThreshold ?? undefined,
+    scrollEventThrottle,
+    contentContainerStyle: contentStyle,
+    style,
+    onScroll: scrollProp,
+    itemLayoutAnimation: LIST_ITEM_LAYOUT,
+    ...(hasPullToRefresh && { bounces: false, overScrollMode: 'never' as const }),
+    ...restForFlatList,
+  } as FlatListPropsWithLayout<T>
+
+  let list: React.ReactElement
+
+  if (enableLayoutAnimated) {
+    list = <Animated.FlatList<T> {...flatListProps} />
+  } else if (needsAnimatedFlashList) {
+    list = <AnimatedFlashList<T> {...flashListProps} />
+  } else {
+    list = <FlashList<T> {...flashListProps} />
+  }
 
   if (!hasPullToRefresh) return list
 

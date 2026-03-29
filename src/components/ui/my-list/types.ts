@@ -1,4 +1,5 @@
 import type { FlashListProps, FlashListRef } from '@shopify/flash-list'
+import type { FlatList as RNFlatList } from 'react-native'
 import type { SharedValue } from 'react-native-reanimated'
 
 export interface ListRenderItemInfo<T> {
@@ -9,20 +10,17 @@ export interface ListRenderItemInfo<T> {
 export interface MyListProps<T> extends Omit<FlashListProps<T>, 'data' | 'renderItem'> {
   data: readonly T[] | null | undefined
   renderItem: (info: ListRenderItemInfo<T>) => React.ReactElement | null
-  /** Called when scroll stops. On web (no onMomentumScrollEnd) MyList debounces onScroll and calls this. */
   onScrollEnd?: () => void
-  /** Pull-to-refresh: controlled refreshing state from parent. */
   refreshing?: boolean
-  /** Pull-to-refresh: called when user pulls past threshold. */
   onRefresh?: () => void | Promise<void>
+  enableLayoutAnimated?: boolean
 }
 
-export type MyListRef<T> = FlashListRef<T> | null
+/** FlashList hoặc RN FlatList tùy `enableLayoutAnimated`. */
+export type MyListRef<T> = FlashListRef<T> | RNFlatList<T> | null
 
 export interface UsePullToRefreshOptions {
   onRefresh?: () => void | Promise<void>
-  /** When provided, refreshing is controlled externally (MyList mode).
-   *  When omitted, the hook manages refreshing internally via Promise (standalone mode). */
   refreshing?: boolean
   maxDistance?: number
   threshold?: number

@@ -1,6 +1,7 @@
 export const PLAYGROUND_LINKS: { label: string; href: string }[] = [
   { label: 'Login (DummyJSON + RTK)', href: '/login' },
   { label: 'My List', href: '/playground/my-list' },
+  { label: 'Swipeable item', href: '/playground/swipeable-item' },
   { label: 'Form (RHF + Zod)', href: '/playground/form' },
   { label: 'Buttons', href: '/playground/buttons' },
   { label: 'Chips', href: '/playground/chips' },
