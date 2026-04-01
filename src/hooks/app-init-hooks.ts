@@ -20,7 +20,7 @@ export function useAppInit() {
 
   const initNotifications = useCallback(async () => {
     await new Promise<void>((resolve) => {
-      setTimeout(resolve, 3000)
+      setTimeout(resolve, 500)
     })
   }, [])
 

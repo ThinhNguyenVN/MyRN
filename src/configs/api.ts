@@ -16,6 +16,10 @@ export const Endpoints = {
   login: '/auth/login',
   refresh: '/auth/refresh',
   me: '/auth/me',
+  todos: '/todos',
+  addTodo: '/todos/add',
+  todoById: (id: number | string) => `/todos/${id}`,
+  todosByUser: (userId: number | string) => `/todos/user/${userId}`,
 }
 
 export const AUTH_SKIP_REFRESH_PATHS = [Endpoints.login, Endpoints.refresh] as const
