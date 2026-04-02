@@ -1,6 +1,6 @@
 import axios, { AxiosHeaders } from 'axios'
 
-import { API_AXIOS_CONFIG, API_BASE_URL, API_TIMEOUT, Endpoints } from '@/configs/api'
+import { API_AXIOS_CONFIG, API_BASE_URL, API_TIMEOUT, Endpoints } from '@/constants/api'
 
 export type RefreshTokenResponse = {
   accessToken: string

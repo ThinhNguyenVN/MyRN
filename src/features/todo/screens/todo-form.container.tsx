@@ -1,8 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { MyForm } from '@/components/form'
-import { selectAuthUser, selectIsAuthenticated } from '@/features/auth/auth-slice'
+import { selectAuthUser } from '@/features/auth/auth-slice'
 import {
   useCreateTodoMutation,
   useGetTodoByIdQuery,
@@ -15,19 +15,12 @@ import { TodoFormView } from './todo-form.view'
 
 export default function TodoFormScreenContainer() {
   const params = useLocalSearchParams<{ id?: string }>()
-  const isAuthenticated = useAppSelector(selectIsAuthenticated)
   const authUser = useAppSelector(selectAuthUser)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/login')
-    }
-  }, [isAuthenticated])
-
   const todoId = Number(params.id)
   const isEditMode = Number.isFinite(todoId)
-  const { data } = useGetTodoByIdQuery(todoId, { skip: !isAuthenticated || !isEditMode })
+  const { data } = useGetTodoByIdQuery(todoId, { skip: !isEditMode })
   const [createTodo] = useCreateTodoMutation()
   const [updateTodo] = useUpdateTodoMutation()
 
@@ -67,8 +60,6 @@ export default function TodoFormScreenContainer() {
     },
     [isEditMode, updateTodo, todoId, createTodo, authUser],
   )
-
-  if (!isAuthenticated) return null
 
   return (
     <MyForm<TodoFormInput>

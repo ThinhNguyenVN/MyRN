@@ -1,4 +1,4 @@
-import { router, Stack } from 'expo-router'
+import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useRef, useEffect } from 'react'
 import 'react-native-reanimated'
@@ -12,8 +12,6 @@ import { ConfirmationRoot, setConfirmationRef } from '@/components/ui/confirmati
 import type { ConfirmationRef } from '@/components/ui/confirmation'
 import { ToastRoot, setToastRef } from '@/components/ui/toast'
 import type { ToastRef } from '@/components/ui/toast'
-import { NavigationBarHeader } from '@/components/ui/navigation-bar'
-import MyButton from '@/components/elements/my-button'
 import { MyThemeProvider } from '@/theme/theme-context'
 import { ScrollToHideProvider } from '@/components/ui/scroll-to-hide'
 import { Provider } from 'react-redux'
@@ -51,39 +49,8 @@ export default function RootLayout() {
                   <ToastRoot ref={toastRef} />
                   <Stack>
                     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                    <Stack.Screen name="login" options={{ headerShown: false }} />
-                    <Stack.Screen
-                      name="home"
-                      options={{
-                        header: (props) => <NavigationBarHeader {...props} />,
-                        headerShown: true,
-                        title: 'Home',
-                      }}
-                    />
-                    <Stack.Screen
-                      name="todo/index"
-                      options={{
-                        header: (props) => <NavigationBarHeader {...props} />,
-                        headerShown: true,
-                        title: 'Todo',
-                        headerRight: () => (
-                          <MyButton.Icon
-                            icon="add"
-                            type="light"
-                            size="small"
-                            onPress={() => router.push('/todo/form')}
-                          />
-                        ),
-                      }}
-                    />
-                    <Stack.Screen
-                      name="todo/form"
-                      options={{
-                        header: (props) => <NavigationBarHeader {...props} />,
-                        headerShown: true,
-                        title: 'Todo Editor',
-                      }}
-                    />
+                    <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                    <Stack.Screen name="(private)" options={{ headerShown: false }} />
                   </Stack>
                   <View style={styles.portalHostOverlay} pointerEvents="box-none">
                     <PortalHost name="root" />
@@ -107,6 +74,8 @@ function AppInitGate({ children }: { children: React.ReactNode }) {
       SplashScreen.hideAsync()
     }
   }, [isInitialized])
+
+  if (!isInitialized) return null
 
   return <>{children}</>
 }

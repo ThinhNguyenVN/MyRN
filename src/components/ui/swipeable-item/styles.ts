@@ -52,8 +52,6 @@ export function generateStyles(theme: ThemeType) {
     foreground: {
       zIndex: 2,
       width: '100%',
-      alignSelf: 'stretch',
-      backgroundColor: getColor('fill/background/tertiary'),
     },
   })
 }

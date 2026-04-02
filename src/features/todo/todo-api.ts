@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
 
 import { axiosBaseQuery } from '@/api/axios-base-query'
-import { Endpoints } from '@/configs/api'
+import { Endpoints } from '@/constants/api'
 import type {
   CreateTodoPayload,
   DeleteTodoResponse,

@@ -17,11 +17,12 @@ export function generateStyles(theme: ThemeType) {
       gap: getSpacing('x3'),
     },
     itemCard: {
-      borderRadius: getRadius('small'),
-      backgroundColor: getColor('fill/background/tertiary'),
+      borderRadius: getRadius('medium'),
+      backgroundColor: getColor('fill/background/primary'),
       paddingHorizontal: getSpacing('x4'),
       paddingVertical: getSpacing('x3'),
       gap: getSpacing('x1'),
+      overflow: 'hidden',
     },
     itemTitle: {
       textDecorationLine: 'none',

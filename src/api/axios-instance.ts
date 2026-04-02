@@ -2,7 +2,7 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig, isAxiosError }
 
 import { refreshAuthToken } from '@/api/auth-client'
 import { normalizeAxiosError } from '@/api/errors'
-import { API_AXIOS_CONFIG, AUTH_SKIP_REFRESH_PATHS } from '@/configs/api'
+import { API_AXIOS_CONFIG, AUTH_SKIP_REFRESH_PATHS } from '@/constants/api'
 import { logout, selectRefreshToken, updateTokens } from '@/features/auth/auth-slice'
 import { getStore, tryGetStore } from '@/store/store-ref'
 import type { RootStateWithAuth } from '@/store/types'

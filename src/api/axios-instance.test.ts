@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { http, HttpResponse } from 'msw'
 
-import { API_BASE_URL, Endpoints } from '@/configs/api'
+import { API_BASE_URL, Endpoints } from '@/constants/api'
 import { apiClient } from '@/api/axios-instance'
 import { authSlice, setCredentials } from '@/features/auth/auth-slice'
 import { injectStore } from '@/store/store-ref'

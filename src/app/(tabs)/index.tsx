@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
+import { Routes } from '@/constants/routes'
 import ParallaxScrollView from '@/components/ui/parallax-scroll-view'
 import { useGetMeQuery } from '@/features/auth/auth-api'
 import { selectIsAuthenticated } from '@/features/auth/auth-slice'
@@ -68,7 +69,7 @@ export default function HomeScreen() {
             text="Vào Todo"
             size="large"
             type="secondary"
-            onPress={() => router.push('/todo')}
+            onPress={() => router.push(Routes.todo)}
           />
         ) : (
           <MyButton
@@ -76,7 +77,7 @@ export default function HomeScreen() {
             text="Login"
             size="large"
             type="secondary"
-            onPress={() => router.push('/login')}
+            onPress={() => router.push(Routes.login)}
           />
         )}
       </MyView>
