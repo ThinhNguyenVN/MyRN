@@ -12,3 +12,8 @@ export const loginDefaultValues: LoginFormInput = {
   username: '',
   password: '',
 }
+
+export type LoginScreenViewProps = {
+  scrollToField: (name: string) => void
+  onClosePress: () => void
+}

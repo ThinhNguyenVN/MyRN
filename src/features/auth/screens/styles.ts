@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native'
 import type { ThemeType } from '@/theme/theme-context'
 
 export const generateStyles = (theme: ThemeType) => {
-  const { getSpacing, getColor } = theme
+  const { getSpacing, getColor, insets } = theme
 
   return StyleSheet.create({
     safeArea: {
@@ -14,19 +14,23 @@ export const generateStyles = (theme: ThemeType) => {
       flex: 1,
     },
     scrollContent: {
-      paddingTop: getSpacing('x6'),
+      paddingTop: 150,
       paddingBottom: getSpacing('x8'),
       paddingHorizontal: getSpacing('x4'),
       gap: getSpacing('x4'),
     },
     formContainer: {
-      paddingTop: 50,
-
-      // alignItems: 'center',
+      // flex: 1,
     },
     header: {
       gap: getSpacing('x2'),
       marginBottom: getSpacing('x2'),
+    },
+    closeWrap: {
+      position: 'absolute',
+      top: insets?.top || 0 + getSpacing('x4'),
+      left: getSpacing('x4'),
+      zIndex: 2,
     },
     title: {
       marginBottom: getSpacing('x1'),

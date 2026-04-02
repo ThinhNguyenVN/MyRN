@@ -6,7 +6,7 @@ import { isNormalizedApiError } from '@/api/errors'
 import { loginThunk } from '@/features/auth/auth-thunks'
 import { useAppDispatch } from '@/store/hooks'
 
-import type { LoginForm } from './login-screen.types'
+import type { LoginForm } from './types'
 
 export function useLogin(scrollToField: (name: string) => void) {
   const dispatch = useAppDispatch()

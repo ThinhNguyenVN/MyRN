@@ -3,22 +3,21 @@ import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { MyFormTextInput } from '@/components/form'
 import { useThemedStyles } from '@/theme/theme-context'
+import { useLogin } from './use-login'
 
 import { generateStyles } from './styles'
-import type { LoginForm } from './login-screen.types'
+import type { LoginForm, LoginScreenViewProps } from './types'
 import { View } from 'react-native'
 
-export type LoginScreenViewProps = {
-  submitError: string | null
-  isLoading: boolean
-  onSignInPress: () => void
-}
-
-export function LoginScreenView({ submitError, isLoading, onSignInPress }: LoginScreenViewProps) {
+export function LoginScreenView({ scrollToField, onClosePress }: LoginScreenViewProps) {
   const styles = useThemedStyles(generateStyles)
+  const { submitError, isLoading, onSignInPress } = useLogin(scrollToField)
 
   return (
     <View style={styles.scrollContent}>
+      <MyView style={styles.closeWrap}>
+        <MyButton.Icon icon="close" type="light" size="small" onPress={onClosePress} />
+      </MyView>
       <MyView style={styles.header}>
         <MyText typography="h1" style={styles.title}>
           Sign in
