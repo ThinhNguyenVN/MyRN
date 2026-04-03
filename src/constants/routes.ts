@@ -1,5 +1,5 @@
 export const Routes = {
-  defaultRoute: '/(tabs)',
+  defaultRoute: '/',
   login: '/login',
   todo: '/todo',
   todoForm: '/todo/form',

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { isNormalizedApiError } from '@/api/errors'
+import { Routes } from '@/constants/routes'
 import { loginThunk } from '@/features/auth/auth-thunks'
 import { useAppDispatch } from '@/store/hooks'
 
@@ -32,7 +33,7 @@ export function useLogin(scrollToField: (name: string) => void) {
             password: values.password,
           }),
         ).unwrap()
-        router.replace('/(tabs)')
+        router.replace(Routes.defaultRoute)
       } catch (err) {
         if (isNormalizedApiError(err)) {
           setSubmitError(err.message)

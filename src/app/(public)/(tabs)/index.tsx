@@ -78,7 +78,7 @@ export default function HomeScreen() {
           text="Xem Component Playground"
           size={'large'}
           type="primary"
-          onPress={() => router.push('/(tabs)/playground')}
+          onPress={() => router.push('/playground')}
           style={styles.introButton}
         />
         {isAuthenticated ? (

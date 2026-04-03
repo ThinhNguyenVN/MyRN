@@ -48,14 +48,7 @@ export default function RootLayout() {
                   <ConfirmationRoot ref={confirmationRef} />
                   <ToastRoot ref={toastRef} />
                   <Stack>
-                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                    <Stack.Screen
-                      name="(auth)"
-                      options={{
-                        headerShown: false,
-                        animation: 'slide_from_bottom',
-                      }}
-                    />
+                    <Stack.Screen name="(public)" options={{ headerShown: false }} />
                     <Stack.Screen name="(private)" options={{ headerShown: false }} />
                   </Stack>
                   <View style={styles.portalHostOverlay} pointerEvents="box-none">

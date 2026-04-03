@@ -1,34 +1,18 @@
 app/
- ├ (auth)/
+ ├ (public)/          # Không bắt buộc đăng nhập: tabs (home, playground), login, home
+ │   ├ (tabs)/
  │   ├ login.tsx
- │   ├ register.tsx
- │
- ├ (main)/
- │   ├ index.tsx
- │   ├ list.tsx
- │
+ │   └ home.tsx
+ ├ (private)/         # Cần đăng nhập (todo, …)
  ├ _layout.tsx
 
 features/
  ├ auth/
  │   ├ screens/
- │   │   ├ LoginScreen/
- │   │   │   └ index.tsx
- │   │   └ RegisterScreen/
- │   │       └ index.tsx
- │   │
  │   ├ components/
  │   ├ hooks/
- │   ├ authSlice.ts
- │   ├ authApi.ts
- │
- ├ list/
- │   ├ screens/
- │   │   ├ ListScreen/
- │   │   └ DetailScreen/
- │   │
- │   ├ listSlice.ts
- │   └ listApi.ts
+ │   ├ auth-slice.ts
+ │   └ auth-api.ts
 
 components/
 hooks/
