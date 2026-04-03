@@ -64,10 +64,10 @@ const ConfirmationRoot = forwardRef<ConfirmationRef, object>(function Confirmati
   const { confirmText, cancelText, buttons: customButtons, hideClose, ...alertProps } = options
 
   const buttons = customButtons ?? [
-    ...(cancelText ? [{ text: cancelText, type: 'tertiary' as const, onPress: handleCancel }] : []),
     ...(confirmText
       ? [{ text: confirmText, type: 'primary' as const, onPress: handleConfirm }]
       : []),
+    ...(cancelText ? [{ text: cancelText, type: 'tertiary' as const, onPress: handleCancel }] : []),
   ]
 
   return (

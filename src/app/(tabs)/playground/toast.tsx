@@ -1,4 +1,4 @@
-import { ScrollView } from 'react-native'
+import { ScrollView, View } from 'react-native'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
@@ -28,21 +28,29 @@ export default function ToastAndConfirmationScreen() {
         type="secondary"
         onPress={() => Toast.show({ text: 'Đã lưu thành công', type: 'success' })}
       />
+      <View style={styles.buttonRow}>
+        <MyButton
+          text="Warning"
+          size="small"
+          type="tertiary"
+          onPress={() =>
+            Toast.show({ text: 'Cảnh báo', description: 'Vui lòng kiểm tra lại.', type: 'warning' })
+          }
+        />
+        <MyButton
+          text="Error"
+          size="small"
+          type="primary"
+          onPress={() =>
+            Toast.show({ text: 'Có lỗi xảy ra', description: 'Thử lại sau.', type: 'error' })
+          }
+        />
+      </View>
       <MyButton
-        text="Warning"
+        text="Error + elevation"
         size="small"
-        type="tertiary"
-        onPress={() =>
-          Toast.show({ text: 'Cảnh báo', description: 'Vui lòng kiểm tra lại.', type: 'warning' })
-        }
-      />
-      <MyButton
-        text="Error"
-        size="small"
-        type="primary"
-        onPress={() =>
-          Toast.show({ text: 'Có lỗi xảy ra', description: 'Thử lại sau.', type: 'error' })
-        }
+        type="secondary"
+        onPress={() => Toast.show({ text: 'Lỗi', type: 'error', elevation: 'soft/down/small' })}
       />
       <MyButton
         text="Error + elevation"

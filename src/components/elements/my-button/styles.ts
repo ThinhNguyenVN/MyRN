@@ -55,7 +55,6 @@ export const generateStyles = (theme: ThemeType) => {
     touchable: {
       flex: 1,
     },
-    touchableFull: { flex: 1, width: '100%', alignSelf: 'stretch' },
     iconButtonSmall: {
       width: BUTTON_SMALL_HEIGHT,
       height: BUTTON_SMALL_HEIGHT,

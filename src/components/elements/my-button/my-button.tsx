@@ -85,7 +85,7 @@ const MyButton: React.FC<MyButtonProps> = ({
   const surfaceStyle = [buttonStyle, disabled && styles.disabled, style]
   const touchableStyle = [
     styles.touchable,
-    // ...(widthStyle ? [widthStyle] : []),
+    ...(width === 'full' && widthStyle ? [widthStyle] : []),
     ...(hasContainerPropsStyle ? [containerPropsStyle] : []),
     containerStyle,
   ]

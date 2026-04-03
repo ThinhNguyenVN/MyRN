@@ -28,8 +28,10 @@ export default function HomeScreen() {
       message: 'Bạn có chắc muốn đăng xuất?',
       description: 'Bạn sẽ cần đăng nhập lại để dùng các tính năng cần xác thực.',
       type: 'warning',
-      confirmText: 'Đăng xuất',
+
+      icon: 'log-out-outline',
       cancelText: 'Hủy',
+      confirmText: 'Đăng xuất',
     })
     if (!ok) return
     await dispatch(logoutThunk())
@@ -70,8 +72,9 @@ export default function HomeScreen() {
         <MyText typography="caption" color="text/active/tertiary">
           {authSummary}
         </MyText>
+      </MyView>
+      <MyView style={styles.buttonContainer}>
         <MyButton
-          width={'full'}
           text="Xem Component Playground"
           size={'large'}
           type="primary"
@@ -81,27 +84,27 @@ export default function HomeScreen() {
         {isAuthenticated ? (
           <>
             <MyButton
-              width="full"
               text="Vào Todo"
               size="large"
               type="secondary"
               onPress={() => router.push(Routes.todo)}
+              style={styles.introButton}
             />
             <MyButton
-              width="full"
               text="Logout"
               size="large"
               type="tertiary"
               onPress={handleLogout}
+              style={styles.introButton}
             />
           </>
         ) : (
           <MyButton
-            width="full"
             text="Login"
             size="large"
             type="secondary"
             onPress={() => router.push(Routes.login)}
+            style={styles.introButton}
           />
         )}
       </MyView>

@@ -73,7 +73,7 @@ export const generateStyles = (theme: ThemeType) => {
       textAlign: 'center',
     },
     introButton: {
-      marginTop: getSpacing('x2'),
+      width: '100%',
     },
     buttonRow: {
       flexDirection: 'row',
@@ -95,6 +95,10 @@ export const generateStyles = (theme: ThemeType) => {
       paddingHorizontal: getSpacing('x4'),
       paddingBottom: getSpacing('x6'),
       gap: getSpacing('x4'),
+    },
+    buttonContainer: {
+      gap: getSpacing('x4'),
+      alignItems: 'center',
     },
   })
 }

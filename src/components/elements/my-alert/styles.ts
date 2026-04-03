@@ -111,7 +111,10 @@ export const generateStyles = (theme: ThemeType) => {
       gap: getSpacing('x1'),
       justifyContent: 'center',
     },
-
+    footerContainer: {
+      width: '100%',
+      height: 240,
+    },
     footer: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -119,7 +122,8 @@ export const generateStyles = (theme: ThemeType) => {
       paddingHorizontal: getSpacing('x4'),
       paddingBottom: getSpacing('x3'),
       gap: getSpacing('x4'),
-      // minHeight: 40 + getSpacing('x4'),
+
+      minHeight: 40 + getSpacing('x4'),
     },
   })
   return { ...sheet, headerGradientByType: headerByType }
