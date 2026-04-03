@@ -3,6 +3,7 @@ import { ScrollView, View } from 'react-native'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import MyButton from '@/components/elements/my-button'
+import MyCheckbox from '@/components/elements/my-checkbox'
 import MyIcon from '@/components/elements/my-icon'
 import MyText from '@/components/elements/my-text'
 import MyTextInput from '@/components/elements/my-text-input'
@@ -22,6 +23,7 @@ export default function BottomSheetScreen() {
   const [longPhone, setLongPhone] = useState('')
   const [longAddress, setLongAddress] = useState('')
   const [longNote, setLongNote] = useState('')
+  const [listSelection, setListSelection] = useState<string | null>(null)
   const simpleRef = useRef<MyBottomSheetRef>(null)
   const formRef = useRef<MyBottomSheetRef>(null)
   const listRef = useRef<MyBottomSheetRef>(null)
@@ -168,8 +170,16 @@ export default function BottomSheetScreen() {
         }
       >
         {LIST_ITEMS.map((item) => (
-          <MyView key={item} paddingVertical={12} paddingHorizontal={0}>
-            <MyText typography="body">{item}</MyText>
+          <MyView key={item} paddingVertical={8} paddingHorizontal={0}>
+            <MyCheckbox
+              type="radio"
+              label={item}
+              labelStyle={styles.sheetRadioStretch}
+              checked={listSelection === item}
+              onValueChange={(v) => {
+                if (v) setListSelection(item)
+              }}
+            />
           </MyView>
         ))}
       </MyBottomSheet>
@@ -292,9 +302,11 @@ export default function BottomSheetScreen() {
           />
         }
       >
-        <MyText typography="body" color="text/active/secondary">
-          Không có nút X. Đóng bằng nút bên dưới hoặc chạm backdrop.
-        </MyText>
+        <MyView style={styles.bottomsheetContent}>
+          <MyText typography="body" color="text/active/secondary">
+            Không có nút X. Đóng bằng nút bên dưới hoặc chạm backdrop.
+          </MyText>
+        </MyView>
       </MyBottomSheet>
     </ScrollView>
   )

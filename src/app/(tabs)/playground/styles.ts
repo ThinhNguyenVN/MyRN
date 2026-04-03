@@ -131,6 +131,10 @@ export const generateStyles = (theme: ThemeType) => {
       gap: getSpacing('x2'),
       justifyContent: 'center',
       alignItems: 'center',
+      paddingBottom: 100,
+    },
+    sheetRadioStretch: {
+      flex: 1,
     },
   })
 }
