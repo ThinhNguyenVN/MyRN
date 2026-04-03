@@ -5,6 +5,7 @@ import { useCallback, useMemo } from 'react'
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
+import { getEnv } from '@/utils/env'
 import { Routes } from '@/constants/routes'
 import { Confirmation } from '@/components/ui/confirmation'
 import ParallaxScrollView from '@/components/ui/parallax-scroll-view'
@@ -71,6 +72,12 @@ export default function HomeScreen() {
         </MyText>
         <MyText typography="caption" color="text/active/tertiary">
           {authSummary}
+        </MyText>
+        <MyText typography="caption" color="text/active/tertiary">
+          Env: {getEnv('EXPO_PUBLIC_APP_ENV')}
+        </MyText>
+        <MyText typography="caption" color="text/active/tertiary">
+          Support: {getEnv('EXPO_PUBLIC_SUPPORT_EMAIL', 'n/a')}
         </MyText>
       </MyView>
       <MyView style={styles.buttonContainer}>

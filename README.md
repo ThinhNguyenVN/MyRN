@@ -23,6 +23,54 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
+## Environments (test/staging/production)
+
+This project supports three runtime environments via root env files:
+
+- `.env.test`
+- `.env.staging`
+- `.env.production`
+
+Only `EXPO_PUBLIC_*` variables are available in app runtime.
+
+### Run commands
+
+```bash
+# Start metro
+npm run start:test
+npm run start:staging
+npm run start:production
+
+# Android / iOS / Web
+npm run android:test
+npm run ios:staging
+npm run web:production
+```
+
+### Reset Metro cache when switching env
+
+```bash
+npm run start:test:clean
+npm run start:staging:clean
+npm run start:production:clean
+```
+
+Use `:clean` variants after frequent env switches or when Metro appears to cache stale values.
+
+### Build-ready for EAS (later)
+
+`eas.json` already defines `test`, `staging`, `production` build profiles and maps `EXPO_PUBLIC_APP_ENV` for each profile.
+
+When ready, use:
+
+```bash
+eas build -p android --profile test
+eas build -p android --profile staging
+eas build -p android --profile production
+```
+
+Never store real secrets in `EXPO_PUBLIC_*` variables because they are bundled into client apps.
+
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
 ## Get a fresh project
