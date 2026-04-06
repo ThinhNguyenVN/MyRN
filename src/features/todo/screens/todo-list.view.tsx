@@ -76,8 +76,8 @@ function TodoListViewInner({
           style={styles.screen}
           contentContainerStyle={styles.contentContainer}
           renderItem={renderItem}
-          // refreshing={isRefreshing}
-          // onRefresh={onRefresh}
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
           removeClippedSubviews={false}
           keyboardShouldPersistTaps="handled"
           enableLayoutAnimated

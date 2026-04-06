@@ -15,6 +15,9 @@ export const generateStyles = (theme: ThemeType) => {
       top: 0,
       left: 0,
       right: 0,
+      // Giữ overlay indicator luôn nằm trên item list.
+      zIndex: 999,
+      elevation: 999,
       overflow: 'hidden',
       alignItems: 'center',
       justifyContent: 'center',

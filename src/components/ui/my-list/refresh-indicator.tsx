@@ -12,6 +12,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
+import { isAndroid, isIos } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import type { RefreshIndicatorProps } from './types'
 import { generateStyles } from './styles'
@@ -23,6 +24,16 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
 const CHECK_PATH = 'M 8 17 L 14 23 L 24 10'
 const CHECK_LENGTH = 25
+const IOS_INDICATOR_FIXED_OFFSET_PX = 16
+const IOS_INDICATOR_MIN_CONTAINER_HEIGHT = SPINNER_SIZE + IOS_INDICATOR_FIXED_OFFSET_PX
+
+/** Android: RefreshControl thu hồi nhanh, pullDistance ≈ 0 — cần giữ slot + giữ check lâu hơn iOS. */
+const CHECK_LEAD_MS = isAndroid ? 120 : 150
+const CHECK_DRAW_MS = isAndroid ? 380 : 350
+const CHECK_HOLD_MS = isAndroid ? 620 : 450
+const CHECK_FADE_OUT_MS = isAndroid ? 240 : 200
+const DONE_RESET_MS =
+  CHECK_LEAD_MS + 50 + CHECK_HOLD_MS + CHECK_FADE_OUT_MS + (isAndroid ? 120 : 60)
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle)
 const AnimatedPath = Animated.createAnimatedComponent(Path)
@@ -31,6 +42,7 @@ export function RefreshIndicator({
   pullDistance,
   refreshing,
   threshold = 75,
+  fixedLayoutSlotHeight,
 }: RefreshIndicatorProps) {
   const { getColor } = useTheme()
   const styles = useThemedStyles(generateStyles)
@@ -53,11 +65,14 @@ export function RefreshIndicator({
     prevRefreshing.current = refreshing
 
     if (refreshing) {
+      cancelAnimation(process)
+      cancelAnimation(rotation)
       isRefreshing.value = 1
       isDone.value = 0
       spinnerFade.value = 1
       checkDraw.value = 0
       checkOpacity.value = 0
+      rotation.value = 0
 
       process.value = withRepeat(
         withSequence(
@@ -76,6 +91,7 @@ export function RefreshIndicator({
       isDone.value = 1
       isRefreshing.value = 0
       cancelAnimation(process)
+      cancelAnimation(rotation)
 
       rotation.value = withTiming(rotation.value + 180, {
         duration: 350,
@@ -89,21 +105,27 @@ export function RefreshIndicator({
       )
 
       checkOpacity.value = withSequence(
-        withTiming(0, { duration: 150 }),
+        withTiming(0, { duration: CHECK_LEAD_MS }),
         withTiming(1, { duration: 50 }),
-        withTiming(1, { duration: 450 }),
-        withTiming(0, { duration: 200 }),
+        withTiming(1, { duration: CHECK_HOLD_MS }),
+        withTiming(0, { duration: CHECK_FADE_OUT_MS }),
       )
       checkDraw.value = withSequence(
-        withTiming(0, { duration: 150 }),
-        withTiming(1, { duration: 350, easing: Easing.out(Easing.ease) }),
+        withTiming(0, { duration: CHECK_LEAD_MS }),
+        withTiming(1, { duration: CHECK_DRAW_MS, easing: Easing.out(Easing.ease) }),
       )
 
-      setTimeout(() => {
+      const doneTimer = setTimeout(() => {
         isDone.value = 0
         checkDraw.value = 0
         checkOpacity.value = 0
-      }, 900)
+        cancelAnimation(rotation)
+        const r = rotation.value
+        rotation.value = ((r % 360) + 360) % 360
+        process.value = 0
+        spinnerFade.value = 1
+      }, DONE_RESET_MS)
+      return () => clearTimeout(doneTimer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshing])
@@ -111,7 +133,8 @@ export function RefreshIndicator({
   useAnimatedReaction(
     () => pullDistance.value,
     (dist, prev) => {
-      if (isRefreshing.value === 1 || isDone.value === 1) return
+      // Chỉ chặn khi đang refresh; không chặn isDone — tránh lần kéo sau bị lệch ~900ms.
+      if (isRefreshing.value === 1) return
       if (dist > 0 && (prev ?? 0) <= 0) {
         spinnerFade.value = 1
       }
@@ -121,21 +144,61 @@ export function RefreshIndicator({
     },
   )
 
-  const containerStyle = useAnimatedStyle(() => ({
-    height: pullDistance.value,
-  }))
+  const minHeightRefreshing = 52
+
+  const fixedSlot =
+    typeof fixedLayoutSlotHeight === 'number' && fixedLayoutSlotHeight > 0
+      ? fixedLayoutSlotHeight
+      : 0
+
+  const containerStyle = useAnimatedStyle(() => {
+    if (fixedSlot > 0) {
+      return { height: fixedSlot }
+    }
+    const minH = refreshing || isDone.value === 1 ? minHeightRefreshing : 0
+    const iosMinH = isIos && pullDistance.value > 0 ? IOS_INDICATOR_MIN_CONTAINER_HEIGHT : 0
+    return {
+      height: Math.max(pullDistance.value, minH, iosMinH),
+    }
+  }, [refreshing, fixedSlot])
+
+  const containerPinStyle = useMemo(
+    () =>
+      isIos
+        ? {
+            justifyContent: 'flex-start' as const,
+            paddingTop: IOS_INDICATOR_FIXED_OFFSET_PX,
+          }
+        : null,
+    [],
+  )
 
   const spinnerStyle = useAnimatedStyle(() => {
     const phase = Math.min(1, Math.max(0, pullDistance.value / threshold))
+    const pullOpacity =
+      refreshing || isDone.value === 1 ? 1 : Math.min(1, pullDistance.value / (threshold * 0.88))
+    // Android: indicator overlay trên content — không scale từ nhỏ → lớn như iOS overscroll.
+    const scale = isAndroid ? 1 : 0.3 + phase * 0.7
     return {
-      opacity: Math.min(1, pullDistance.value / (threshold * 0.4)) * spinnerFade.value,
-      transform: [{ scale: 0.3 + phase * 0.7 }, { rotate: `${rotation.value}deg` }],
+      opacity: pullOpacity * spinnerFade.value,
+      transform: [{ scale }, { rotate: `${rotation.value}deg` }],
     }
-  })
+  }, [refreshing, threshold])
 
   const checkStyle = useAnimatedStyle(() => ({
     opacity: checkOpacity.value,
   }))
+
+  const checkPinStyle = useMemo(
+    () =>
+      isIos
+        ? {
+            top: IOS_INDICATOR_FIXED_OFFSET_PX,
+            alignSelf: 'center' as const,
+          }
+        : null,
+    [],
+  )
 
   const arcProps = useAnimatedProps(() => ({
     strokeDashoffset: CIRCUMFERENCE * (1 - process.value),
@@ -148,7 +211,10 @@ export function RefreshIndicator({
   const svgSize = useMemo(() => ({ width: SPINNER_SIZE, height: SPINNER_SIZE }), [])
 
   return (
-    <Animated.View style={[styles.indicatorContainer, containerStyle]} pointerEvents="none">
+    <Animated.View
+      style={[styles.indicatorContainer, containerStyle, containerPinStyle]}
+      pointerEvents="none"
+    >
       <Animated.View style={[styles.iconBox, spinnerStyle]}>
         <Svg {...svgSize}>
           <Circle
@@ -174,7 +240,7 @@ export function RefreshIndicator({
         </Svg>
       </Animated.View>
 
-      <Animated.View style={[styles.iconBox, styles.checkAbsolute, checkStyle]}>
+      <Animated.View style={[styles.iconBox, styles.checkAbsolute, checkPinStyle, checkStyle]}>
         <Svg {...svgSize}>
           <AnimatedPath
             d={CHECK_PATH}

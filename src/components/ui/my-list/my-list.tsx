@@ -5,16 +5,16 @@ import {
   ListRenderItemInfo as FlashListRenderItemInfo,
 } from '@shopify/flash-list'
 import type { ListRenderItemInfo as RNListRenderItemInfo } from 'react-native'
-import { StyleSheet, View } from 'react-native'
-import { GestureDetector } from 'react-native-gesture-handler'
+import { RefreshControl, View } from 'react-native'
 import Animated, { LinearTransition, type FlatListPropsWithLayout } from 'react-native-reanimated'
 import { isNil, omit } from 'lodash'
 
 import type { MyListProps, MyListRef } from './types'
 import { useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
-import { usePullToRefresh } from './hooks'
 import { RefreshIndicator } from './refresh-indicator'
+import { PULL_TO_REFRESH_OVERSCROLL_THRESHOLD } from './constants'
+import { usePullToRefresh } from './use-pull-to-refresh'
 import { useScrollToHide } from '../scroll-to-hide'
 import { isWeb } from '@/constants/dimensions'
 
@@ -55,6 +55,8 @@ function MyListInner<T>(
     contentContainerStyle,
     style,
     onScroll,
+    onScrollBeginDrag: userOnScrollBeginDrag,
+    onScrollEndDrag: userOnScrollEndDrag,
     onScrollEnd,
     scrollEventThrottle = 16,
     refreshing,
@@ -66,9 +68,15 @@ function MyListInner<T>(
 ) {
   const styles = useThemedStyles(generateStyles)
   const scrollEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const hasPullToRefresh = !!onRefresh
+  const hasPullToRefresh = !!onRefresh && !isWeb
 
-  const pull = usePullToRefresh({ onRefresh, refreshing })
+  const pullToRefresh = usePullToRefresh({
+    onRefresh: hasPullToRefresh ? onRefresh : undefined,
+    refreshing: hasPullToRefresh ? refreshing : undefined,
+  })
+
+  const pullScrollRef = useRef(pullToRefresh.scrollProps)
+  pullScrollRef.current = pullToRefresh.scrollProps
 
   const scrollToHideCtx = useScrollToHide()
   const hasScrollToHide = !isNil(scrollToHideCtx)
@@ -83,12 +91,9 @@ function MyListInner<T>(
     [renderItem],
   )
 
-  const pullScrollHandlerRef = useRef(pull.scrollHandler)
-  pullScrollHandlerRef.current = pull.scrollHandler
-
   const handleScroll = useCallback(
     (e: any) => {
-      if (hasPullToRefresh) pullScrollHandlerRef.current(e)
+      if (hasPullToRefresh) pullScrollRef.current.onScroll(e)
       if (typeof onScroll === 'function') onScroll(e)
       if (isWeb && onScrollEnd) {
         if (scrollEndTimeoutRef.current) clearTimeout(scrollEndTimeoutRef.current)
@@ -99,6 +104,22 @@ function MyListInner<T>(
       }
     },
     [onScroll, onScrollEnd, hasPullToRefresh],
+  )
+
+  const handleScrollBeginDrag = useCallback(
+    (e: any) => {
+      if (hasPullToRefresh) pullScrollRef.current.onScrollBeginDrag(e)
+      userOnScrollBeginDrag?.(e)
+    },
+    [hasPullToRefresh, userOnScrollBeginDrag],
+  )
+
+  const handleScrollEndDrag = useCallback(
+    (e: any) => {
+      if (hasPullToRefresh) pullScrollRef.current.onScrollEndDrag(e)
+      userOnScrollEndDrag?.(e)
+    },
+    [hasPullToRefresh, userOnScrollEndDrag],
   )
 
   if (hasScrollToHide && hasPullToRefresh) {
@@ -134,6 +155,18 @@ function MyListInner<T>(
     [styles.contentContainer, contentContainerStyle],
   )
 
+  const refreshControlEl = useMemo(
+    () =>
+      hasPullToRefresh && !isWeb ? (
+        <RefreshControl {...pullToRefresh.refreshControlProps} />
+      ) : undefined,
+    [hasPullToRefresh, pullToRefresh.refreshControlProps],
+  )
+
+  const listScrollThrottle = hasPullToRefresh
+    ? pullToRefresh.scrollProps.scrollEventThrottle
+    : scrollEventThrottle
+
   const safeData = data ?? (EMPTY_ARRAY as T[])
   const safeRef = !isNil(ref) ? ref : undefined
 
@@ -148,11 +181,13 @@ function MyListInner<T>(
     ListFooterComponent,
     onEndReached,
     onEndReachedThreshold,
-    scrollEventThrottle,
+    scrollEventThrottle: listScrollThrottle,
     contentContainerStyle: contentStyle,
     style,
     onScroll: scrollProp,
-    ...(hasPullToRefresh && { bounces: false, overScrollMode: 'never' as const }),
+    onScrollBeginDrag: handleScrollBeginDrag,
+    onScrollEndDrag: handleScrollEndDrag,
+    ...(hasPullToRefresh && refreshControlEl ? { refreshControl: refreshControlEl } : {}),
     ...rest,
   }
 
@@ -168,14 +203,16 @@ function MyListInner<T>(
     ListFooterComponent,
     onEndReached: onEndReached ?? undefined,
     onEndReachedThreshold: onEndReachedThreshold ?? undefined,
-    scrollEventThrottle,
+    scrollEventThrottle: listScrollThrottle,
     contentContainerStyle: contentStyle,
     style,
     onScroll: scrollProp,
+    onScrollBeginDrag: handleScrollBeginDrag,
+    onScrollEndDrag: handleScrollEndDrag,
     itemLayoutAnimation: LIST_ITEM_LAYOUT,
-    ...(hasPullToRefresh && { bounces: false, overScrollMode: 'never' as const }),
+    ...(hasPullToRefresh && refreshControlEl ? { refreshControl: refreshControlEl } : {}),
     ...restForFlatList,
-  } as FlatListPropsWithLayout<T>
+  } as unknown as FlatListPropsWithLayout<T>
 
   let list: React.ReactElement
 
@@ -190,12 +227,17 @@ function MyListInner<T>(
   if (!hasPullToRefresh) return list
 
   return (
-    <GestureDetector gesture={pull.gesture}>
-      <View style={styles.flex}>
-        <RefreshIndicator pullDistance={pull.pullDistance} refreshing={pull.refreshing} />
-        <Animated.View style={[StyleSheet.absoluteFill, pull.listStyle]}>{list}</Animated.View>
-      </View>
-    </GestureDetector>
+    <View style={styles.flex}>
+      {list}
+      <RefreshIndicator
+        pullDistance={pullToRefresh.pullDistance}
+        refreshing={pullToRefresh.refreshingForPullIndicator}
+        threshold={PULL_TO_REFRESH_OVERSCROLL_THRESHOLD}
+        fixedLayoutSlotHeight={
+          pullToRefresh.iosListTopInset > 0 ? pullToRefresh.iosListTopInset : undefined
+        }
+      />
+    </View>
   )
 }
 

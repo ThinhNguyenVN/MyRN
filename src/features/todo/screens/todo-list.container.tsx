@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Routes } from '@/constants/routes'
 import { useDeleteTodoMutation, useGetTodosQuery } from '@/features/todo/todo-api'
@@ -10,10 +10,18 @@ import { TodoListView } from './todo-list.view'
 export default function TodoListScreenContainer() {
   const { data, isLoading, isFetching, refetch } = useGetTodosQuery({ limit: 30, skip: 0 })
   const [deleteTodo] = useDeleteTodoMutation()
+  const [isPullRefreshing, setIsPullRefreshing] = useState(false)
 
   const handleRefresh = useCallback(() => {
+    setIsPullRefreshing(true)
     void refetch()
   }, [refetch])
+
+  useEffect(() => {
+    if (isFetching) return
+    if (!isPullRefreshing) return
+    setIsPullRefreshing(false)
+  }, [isFetching, isPullRefreshing])
 
   const handleEdit = useCallback((item: TodoItem) => {
     router.push({
@@ -33,7 +41,7 @@ export default function TodoListScreenContainer() {
     <TodoListView
       todos={data?.todos ?? []}
       isLoading={isLoading}
-      isRefreshing={isFetching}
+      isRefreshing={isPullRefreshing}
       onRefresh={handleRefresh}
       onEdit={handleEdit}
       onDelete={handleDelete}

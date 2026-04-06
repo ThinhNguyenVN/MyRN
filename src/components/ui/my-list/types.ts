@@ -30,4 +30,6 @@ export interface RefreshIndicatorProps {
   pullDistance: SharedValue<number>
   refreshing: boolean
   threshold?: number
+  /** iOS: chiều cao cố định cho vùng indicator — tránh layout giật khi `pullDistance` đổi; khớp `paddingTop` list. */
+  fixedLayoutSlotHeight?: number
 }
