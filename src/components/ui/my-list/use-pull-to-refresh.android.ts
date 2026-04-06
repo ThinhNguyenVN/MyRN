@@ -2,8 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cancelAnimation, useSharedValue, withTiming } from 'react-native-reanimated'
 
 import {
+  PULL_TO_REFRESH_ANDROID_CLEAR_BELOW_Y,
   PULL_TO_REFRESH_ANDROID_NATIVE_OFFSET_DP,
+  PULL_TO_REFRESH_ANDROID_STEP_PX,
   PULL_TO_REFRESH_HIDE_DELAY_MS,
+  PULL_TO_REFRESH_MAX_PULL_VISUAL_PX,
   PULL_TO_REFRESH_OVERSCROLL_THRESHOLD,
 } from './constants'
 import {
@@ -13,10 +16,6 @@ import {
   type UsePullToRefreshOptions,
   type UsePullToRefreshResult,
 } from './utils'
-
-const MAX_PULL_VISUAL_PX = 120
-const ANDROID_PULL_STEP_PX = 1.75
-const ANDROID_CLEAR_BELOW_Y = 10
 
 export function usePullToRefresh({
   onRefresh,
@@ -81,7 +80,7 @@ export function usePullToRefresh({
       const y = getScrollOffsetY(e)
       if (y === undefined) return
 
-      if (!refreshing && y > ANDROID_CLEAR_BELOW_Y) {
+      if (!refreshing && y > PULL_TO_REFRESH_ANDROID_CLEAR_BELOW_Y) {
         androidPullAccumRef.current = 0
         pullDistance.value = 0
         progress.value = 0
@@ -90,8 +89,8 @@ export function usePullToRefresh({
 
       if (draggingRef.current && y <= 1 && !refreshing) {
         androidPullAccumRef.current = Math.min(
-          MAX_PULL_VISUAL_PX,
-          androidPullAccumRef.current + ANDROID_PULL_STEP_PX,
+          PULL_TO_REFRESH_MAX_PULL_VISUAL_PX,
+          androidPullAccumRef.current + PULL_TO_REFRESH_ANDROID_STEP_PX,
         )
         const d = androidPullAccumRef.current
         pullDistance.value = d

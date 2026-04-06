@@ -3,8 +3,12 @@ import { cancelAnimation, useSharedValue, withTiming } from 'react-native-reanim
 
 import { triggerHaptic } from '@/utils/haptic'
 import {
+  PULL_TO_REFRESH_IOS_CLEAR_AFTER_REFRESH_MS,
+  PULL_TO_REFRESH_IOS_CLEAR_AFTER_RELEASE_MS,
+  PULL_TO_REFRESH_IOS_RESET_BELOW_Y,
   PULL_TO_REFRESH_HIDE_DELAY_MS,
   PULL_TO_REFRESH_IOS_TOP_INSET_PX,
+  PULL_TO_REFRESH_MAX_PULL_VISUAL_PX,
   PULL_TO_REFRESH_OVERSCROLL_THRESHOLD,
 } from './constants'
 import {
@@ -14,11 +18,6 @@ import {
   type UsePullToRefreshOptions,
   type UsePullToRefreshResult,
 } from './utils'
-
-const MAX_PULL_VISUAL_PX = 120
-const IOS_PULL_RESET_BELOW_Y = 10
-const IOS_LIST_TOP_INSET_CLEAR_AFTER_REFRESH_MS = 910
-const IOS_LIST_TOP_INSET_CLEAR_AFTER_RELEASE_MS = 260
 
 export function usePullToRefresh({
   onRefresh,
@@ -85,7 +84,7 @@ export function usePullToRefresh({
     const prev = prevRefreshingWhenPullActiveRef.current
     prevRefreshingWhenPullActiveRef.current = refreshing
     if (!prev || refreshing) return
-    scheduleSlotHide(IOS_LIST_TOP_INSET_CLEAR_AFTER_REFRESH_MS, () => {
+    scheduleSlotHide(PULL_TO_REFRESH_IOS_CLEAR_AFTER_REFRESH_MS, () => {
       setPullRefreshChromeActive(false)
     })
   }, [refreshing, pullRefreshChromeActive, scheduleSlotHide])
@@ -141,7 +140,7 @@ export function usePullToRefresh({
       if (y === undefined) return
 
       if (y < 0) {
-        const d = Math.min(-y, MAX_PULL_VISUAL_PX)
+        const d = Math.min(-y, PULL_TO_REFRESH_MAX_PULL_VISUAL_PX)
         pullDistance.value = d
         const p = Math.min(d / PULL_TO_REFRESH_OVERSCROLL_THRESHOLD, 1)
         progress.value = p
@@ -149,7 +148,7 @@ export function usePullToRefresh({
           hapticFiredRef.current = true
           triggerHaptic('Light')
         }
-      } else if (!refreshing && y > IOS_PULL_RESET_BELOW_Y && !draggingRef.current) {
+      } else if (!refreshing && y > PULL_TO_REFRESH_IOS_RESET_BELOW_Y && !draggingRef.current) {
         pullDistance.value = 0
         progress.value = 0
         hapticFiredRef.current = false
@@ -169,7 +168,7 @@ export function usePullToRefresh({
     const d = pullDistance.value
     const readyToRefresh = progress.value >= 1
     if (d >= PULL_TO_REFRESH_IOS_TOP_INSET_PX && readyToRefresh) {
-      scheduleSlotHide(IOS_LIST_TOP_INSET_CLEAR_AFTER_RELEASE_MS)
+      scheduleSlotHide(PULL_TO_REFRESH_IOS_CLEAR_AFTER_RELEASE_MS)
     }
   }, [refreshing, progress, pullDistance, scheduleSlotHide])
 
