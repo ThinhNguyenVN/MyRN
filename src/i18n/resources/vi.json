@@ -1,0 +1,15 @@
+{
+  "common": {
+    "emptyState": "Khong co du lieu"
+  },
+  "tabs": {
+    "home": "Trang chủ",
+    "playground": "Luyện tập"
+  },
+  "todo": {
+    "emptyTitle": "Chua co cong viec",
+    "emptyDescription": "Nhan + tren header de tao moi.",
+    "statusCompleted": "Hoan thanh",
+    "statusPending": "Dang cho"
+  }
+}

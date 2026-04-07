@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar'
 import { useRef, useEffect } from 'react'
 import 'react-native-reanimated'
 import * as SplashScreen from 'expo-splash-screen'
+import '@/i18n'
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { PortalHost, PortalProvider } from '@gorhom/portal'

@@ -3,7 +3,7 @@ import { getEnv } from '@/utils/env'
 
 export const API_TIMEOUT = 30_000
 
-export const API_BASE_URL = getEnv('EXPO_PUBLIC_API_BASE_URL')
+export const API_BASE_URL = getEnv('EXPO_PUBLIC_API_BASE_URL', '')
 
 export const API_AXIOS_CONFIG: CreateAxiosDefaults = {
   baseURL: API_BASE_URL,

@@ -7,7 +7,7 @@ import { authSlice, setCredentials } from '@/features/auth/auth-slice'
 import { injectStore } from '@/store/store-ref'
 import { server } from '@/test/server'
 
-const baseUrl = new URL(API_BASE_URL)
+const baseUrl = new URL(API_BASE_URL ?? '')
 const origin = baseUrl.origin
 
 function createTestStore() {

@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyText from '@/components/elements/my-text'
 import { MyList, type ListRenderItemInfo } from '@/components/ui/my-list'
@@ -32,6 +33,7 @@ function TodoListViewInner({
   onDelete,
 }: TodoListViewProps) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
 
   const renderItem = ({ item }: ListRenderItemInfo<TodoItem>) => {
     const rightActions: SwipeableItemAction[] = [
@@ -61,7 +63,7 @@ function TodoListViewInner({
             {item.todo}
           </MyText>
           <MyText typography="caption" color="text/active/tertiary">
-            User #{item.userId} · {item.completed ? 'Completed' : 'Pending'}
+            User #{item.userId} · {item.completed ? t('todo.statusCompleted') : t('todo.statusPending')}
           </MyText>
         </View>
       </SwipeableItem>
@@ -86,9 +88,9 @@ function TodoListViewInner({
               <TodoListLoadingSkeleton />
             ) : (
               <View style={styles.emptyWrap}>
-                <MyText typography="body">No todo items</MyText>
+                <MyText typography="body">{t('todo.emptyTitle')}</MyText>
                 <MyText typography="caption" color="text/active/tertiary">
-                  Tap + on the header to add one.
+                  {t('todo.emptyDescription')}
                 </MyText>
               </View>
             )

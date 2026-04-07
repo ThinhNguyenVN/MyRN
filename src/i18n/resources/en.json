@@ -1,0 +1,15 @@
+{
+  "common": {
+    "emptyState": "No data"
+  },
+  "tabs": {
+    "home": "Home",
+    "playground": "Playground"
+  },
+  "todo": {
+    "emptyTitle": "No todo items",
+    "emptyDescription": "Tap + on the header to add one.",
+    "statusCompleted": "Completed",
+    "statusPending": "Pending"
+  }
+}
