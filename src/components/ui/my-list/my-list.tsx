@@ -68,7 +68,7 @@ function MyListInner<T>(
 ) {
   const styles = useThemedStyles(generateStyles)
   const scrollEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const hasPullToRefresh = !!onRefresh && !isWeb
+  const hasPullToRefresh = !!onRefresh
 
   const pullToRefresh = usePullToRefresh({
     onRefresh: hasPullToRefresh ? onRefresh : undefined,
@@ -215,8 +215,9 @@ function MyListInner<T>(
   } as unknown as FlatListPropsWithLayout<T>
 
   let list: React.ReactElement
+  const shouldUseAnimatedFlatList = enableLayoutAnimated || (isWeb && hasScrollToHide)
 
-  if (enableLayoutAnimated) {
+  if (shouldUseAnimatedFlatList) {
     list = <Animated.FlatList<T> {...flatListProps} />
   } else if (needsAnimatedFlashList) {
     list = <AnimatedFlashList<T> {...flashListProps} />

@@ -63,7 +63,8 @@ function TodoListViewInner({
             {item.todo}
           </MyText>
           <MyText typography="caption" color="text/active/tertiary">
-            User #{item.userId} · {item.completed ? t('todo.statusCompleted') : t('todo.statusPending')}
+            User #{item.userId} ·{' '}
+            {item.completed ? t('todo.statusCompleted') : t('todo.statusPending')}
           </MyText>
         </View>
       </SwipeableItem>
