@@ -33,7 +33,7 @@ export const ColorPaletteLight = {
   info: '#0e7490',
   infoMuted: '#a5f3fc',
   // Background
-  background: '#fafaf9',
+  background: '#FFFFFF',
   backgroundSecondary: '#f5f5f4',
   surface: '#ffffff',
 } as const

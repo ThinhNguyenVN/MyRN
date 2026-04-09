@@ -6,7 +6,6 @@ import MyDatePicker, {
   MyDateRangePicker,
   type DateRange,
 } from '@/components/elements/my-date-picker'
-import MyText from '@/components/elements/my-text'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
@@ -22,10 +21,6 @@ export default function DatePickerScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
-      <MyText typography="subtitle" style={styles.sectionTitle}>
-        Date Picker
-      </MyText>
-
       <MyDatePicker value={date1} onValueChange={setDate1} placeholder="Chọn ngày" title="Ngày" />
 
       <MyDatePicker value={date2} onValueChange={setDate2} title="Ngày đã chọn" />

@@ -14,36 +14,23 @@ export default function SwitchScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
-      <MyText typography="subtitle" style={styles.sectionTitle}>
-        Switch
-      </MyText>
-      <MyText typography="body" color="text/active/secondary" style={styles.sectionCaption}>
-        value, onValueChange, disabled, label, isLeftLabel.
-      </MyText>
-
       <MyText typography="label" style={styles.sectionTitle}>
         Basic
       </MyText>
 
-      <MySwitch value={on1} onValueChange={setOn1} label="Off" style={styles.inputContainer} />
-      <MySwitch value={on2} onValueChange={setOn2} label="On" style={styles.inputContainer} />
+      <MySwitch value={on1} onValueChange={setOn1} label="Off" />
+      <MySwitch value={on2} onValueChange={setOn2} label="On" />
 
       <MyText typography="label" style={styles.sectionTitle}>
         Label on right
       </MyText>
-      <MySwitch
-        value={on1}
-        onValueChange={setOn1}
-        label="Label on right"
-        isLeftLabel={false}
-        style={styles.inputContainer}
-      />
+      <MySwitch value={on1} onValueChange={setOn1} label="Label on right" isLeftLabel={false} />
 
       <MyText typography="label" style={styles.sectionTitle}>
         Disabled
       </MyText>
-      <MySwitch value={false} disabled label="Disabled off" style={styles.inputContainer} />
-      <MySwitch value={true} disabled label="Disabled on" style={styles.inputContainer} />
+      <MySwitch value={false} disabled label="Disabled off" />
+      <MySwitch value={true} disabled label="Disabled on" />
     </ScrollView>
   )
 }

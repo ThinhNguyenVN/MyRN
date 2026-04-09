@@ -7,7 +7,7 @@ import { NavigationBarHeader } from '@/components/ui/navigation-bar'
 import SideBar, { SideBarItem } from '@/components/ui/side-bar'
 import { useShowSidebar } from '@/hooks/dimenstions-hooks'
 import { PLAYGROUND_LINKS } from './constants'
-import { useThemedStyles } from '@/theme/theme-context'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 
 function titleFromRoute(routeName: string): string {
@@ -25,6 +25,7 @@ const screenOptions = {
 export default function PlaygroundLayout() {
   const showSidebar = useShowSidebar()
   const pathname = usePathname()
+  const { getColor } = useTheme()
 
   const styles = useThemedStyles(generateStyles)
 
@@ -33,7 +34,7 @@ export default function PlaygroundLayout() {
     const path = pathname.replace(/\?.*$/, '').replace(/\/$/, '')
     const isPlaygroundIndex = path === '/playground' || path === '/(tabs)/playground'
     if (isPlaygroundIndex) {
-      router.replace('/playground/buttons')
+      router.replace('/playground/my-list')
     }
   }, [pathname, showSidebar])
 
@@ -53,6 +54,7 @@ export default function PlaygroundLayout() {
           return {
             ...screenOptions,
             title: titleFromRoute(route.name ?? ''),
+            contentStyle: { backgroundColor: getColor('brand/white') },
             header: (props) =>
               isMyListRoute ? (
                 <ScrollToHideHeader>
@@ -61,7 +63,7 @@ export default function PlaygroundLayout() {
               ) : (
                 <NavigationBarHeader {...props} />
               ),
-            headerShown: route.name !== 'buttons',
+            headerShown: route.name !== 'my-list',
           }
         }}
       />
@@ -80,6 +82,7 @@ export default function PlaygroundLayout() {
             return {
               ...screenOptions,
               title: titleFromRoute(route.name ?? ''),
+              contentStyle: { backgroundColor: getColor('brand/white') },
               header: (props) =>
                 isMyListRoute ? (
                   <ScrollToHideHeader>

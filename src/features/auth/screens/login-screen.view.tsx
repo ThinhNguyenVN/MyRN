@@ -8,16 +8,17 @@ import { useLogin } from './use-login'
 import { generateStyles } from './styles'
 import type { LoginForm, LoginScreenViewProps } from './types'
 import { View } from 'react-native'
+import MyIcon from '@/components/elements/my-icon'
+import { useState } from 'react'
 
-export function LoginScreenView({ scrollToField, onClosePress }: LoginScreenViewProps) {
+export function LoginScreenView({ scrollToField }: LoginScreenViewProps) {
   const styles = useThemedStyles(generateStyles)
   const { submitError, isLoading, onSignInPress } = useLogin(scrollToField)
 
+  const [showPassword, setShowPassword] = useState(false)
+
   return (
     <View style={styles.scrollContent}>
-      <MyView style={styles.closeWrap}>
-        <MyButton.Icon icon="close" type="light" size="small" onPress={onClosePress} />
-      </MyView>
       <MyView style={styles.header}>
         <MyText typography="h1" style={styles.title}>
           Sign in
@@ -41,8 +42,10 @@ export function LoginScreenView({ scrollToField, onClosePress }: LoginScreenView
         name="password"
         title="Password"
         forceError={!!submitError}
-        secureTextEntry
+        secureTextEntry={!showPassword}
         autoComplete="password"
+        onEndIconPress={() => setShowPassword(!showPassword)}
+        endIcon={<MyIcon name={showPassword ? 'eye-off' : 'eye'} color="icon/active/primary" />}
         style={styles.inputFullWidth}
       />
 

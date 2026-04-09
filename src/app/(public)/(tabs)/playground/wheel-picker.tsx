@@ -32,14 +32,6 @@ export default function WheelPickerScreen() {
 
   const renderContent = () => (
     <View style={styles.screenContent}>
-      <MyText typography="subtitle" style={styles.sectionTitle}>
-        Wheel Picker
-      </MyText>
-      <MyText typography="body" color="text/active/secondary" style={styles.sectionCaption}>
-        Sample 1: WheelPickerView (chỉ wheel, dùng ở bất cứ đâu). Sample 2: MyWheelPicker (trigger +
-        sheet/modal).
-      </MyText>
-
       <MyText typography="label" style={styles.sectionTitle}>
         Sample 1 – WheelPickerView only
       </MyText>

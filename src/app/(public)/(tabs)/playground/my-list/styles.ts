@@ -9,13 +9,20 @@ export const skeletonTextLayout = [
 ]
 
 export function generateStyles(theme: ThemeType) {
-  const { getSpacing } = theme
+  const { getSpacing, getColor } = theme
   return StyleSheet.create({
+    list: {
+      backgroundColor: getColor('fill/background/primary'),
+    },
+    listContent: {
+      padding: getSpacing('x2'),
+      backgroundColor: getColor('fill/background/primary'),
+    },
     row: {
       flexDirection: 'row',
       padding: getSpacing('x2'),
       gap: getSpacing('x2'),
-      marginHorizontal: 16,
+
       marginBottom: getSpacing('x2'),
     },
     thumb: {

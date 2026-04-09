@@ -8,10 +8,13 @@ export const generateStyles = (theme: ThemeType) => {
   return StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: getColor('fill/background/secondary'),
+      backgroundColor: getColor('fill/background/primary'),
     },
     flex: {
       flex: 1,
+    },
+    scrollView: {
+      backgroundColor: getColor('fill/background/primary'),
     },
     scrollContent: {
       paddingTop: 150,
@@ -19,9 +22,7 @@ export const generateStyles = (theme: ThemeType) => {
       paddingHorizontal: getSpacing('x4'),
       gap: getSpacing('x4'),
     },
-    formContainer: {
-      // flex: 1,
-    },
+
     header: {
       gap: getSpacing('x2'),
       marginBottom: getSpacing('x2'),

@@ -25,12 +25,10 @@ export default function PlaygroundScreen() {
       }
     >
       <MyView style={styles.playgroundContent}>
-        <MyText typography="subtitle" style={styles.playgroundTitle}>
+        <MyText typography={'h3'} style={styles.playgroundTitle}>
           Component Playground
         </MyText>
-        <MyText typography="body" color="text/active/tertiary" style={styles.playgroundSubtitle}>
-          Chọn component để xem showcase
-        </MyText>
+
         <MyView style={styles.linkListContent}>
           {PLAYGROUND_LINKS.map((item) => (
             <MyPressable
@@ -38,16 +36,7 @@ export default function PlaygroundScreen() {
               onPress={() => router.push(item.href as Href)}
               style={styles.linkRow}
             >
-              <MyView style={styles.linkRowLabel}>
-                <MyText typography="body">{item.label}</MyText>
-              </MyView>
-              <MyText
-                typography="caption"
-                color="text/inactive/primary"
-                style={styles.linkRowArrow}
-              >
-                →
-              </MyText>
+              <MyText typography="body">{item.label}</MyText>
             </MyPressable>
           ))}
         </MyView>

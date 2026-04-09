@@ -64,6 +64,8 @@ export default function MyListPlaygroundScreen() {
         keyExtractor={keyExtractor}
         ListEmptyComponent={listEmpty}
         ListFooterComponent={listFooter}
+        style={styles.list}
+        contentContainerStyle={styles.listContent}
         refreshing={refreshing}
         onRefresh={() => {
           setRefreshing(true)

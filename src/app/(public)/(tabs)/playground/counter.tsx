@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { ScrollView } from 'react-native'
 
 import MyCounter from '@/components/elements/my-counter'
-import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
@@ -14,10 +13,7 @@ export default function CounterScreen() {
   const [counterValue2, setCounterValue2] = useState(0)
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
-      <MyText typography="subtitle" style={styles.sectionTitle}>
-        Counter
-      </MyText>
-      <MyView style={styles.inputContainer}>
+      <MyView paddingTop={50} gap={16}>
         <MyCounter value={counterValue} onValueChange={setCounterValue} min={0} max={99} step={1} />
         <MyCounter
           value={counterValue2}

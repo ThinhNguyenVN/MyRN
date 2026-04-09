@@ -18,15 +18,6 @@ export default function ChipsScreen() {
 
   return (
     <MyKeyboardAvoiding.ScrollView contentContainerStyle={styles.screenContent}>
-      <MyText typography="subtitle" style={styles.sectionTitle}>
-        Chips
-      </MyText>
-
-      <MyText typography="body" color="text/active/secondary" style={styles.sectionCaption}>
-        Types: primary, secondary, outlined, filled. Sizes: small, medium. Selected state and
-        showClose (input chip).
-      </MyText>
-
       <MyText typography="label" style={styles.sectionTitle}>
         Types
       </MyText>

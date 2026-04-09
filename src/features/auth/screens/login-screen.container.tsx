@@ -9,6 +9,8 @@ import { useThemedStyles } from '@/theme/theme-context'
 import { LoginScreenView } from './login-screen.view'
 import { loginDefaultValues, loginSchema, type LoginFormInput } from './types'
 import { generateStyles } from './styles'
+import MyView from '@/components/elements/my-view'
+import MyButton from '@/components/elements/my-button'
 
 export default function LoginScreenContainer() {
   const styles = useThemedStyles(generateStyles)
@@ -18,13 +20,11 @@ export default function LoginScreenContainer() {
 
   const content = useMemo(
     () => (
-      <FormScrollProvider scrollViewRef={scrollViewRef} containerStyle={styles.formContainer}>
-        {(scrollToField) => (
-          <LoginScreenView scrollToField={scrollToField} onClosePress={onClosePress} />
-        )}
+      <FormScrollProvider scrollViewRef={scrollViewRef}>
+        {(scrollToField) => <LoginScreenView scrollToField={scrollToField} />}
       </FormScrollProvider>
     ),
-    [styles.formContainer, onClosePress],
+    [],
   )
 
   return (
@@ -34,10 +34,12 @@ export default function LoginScreenContainer() {
       mode="onSubmit"
       reValidateMode="onChange"
     >
+      <MyView style={styles.closeWrap}>
+        <MyButton.Icon icon="close" type="light" size="small" onPress={onClosePress} />
+      </MyView>
       <MyKeyboardAvoiding.ScrollView
         ref={scrollViewRef}
-        style={styles.flex}
-        contentContainerStyle={styles.formContainer}
+        style={styles.scrollView}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         showToolbar={true}

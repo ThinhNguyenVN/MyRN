@@ -2,49 +2,32 @@ import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
 export const generateStyles = (theme: ThemeType) => {
-  const { getColor, getSpacing } = theme
+  const { getColor, getSpacing, getRadius } = theme
   return StyleSheet.create({
     // ─── Playground index ───────────────────────────────────────────────────
     playgroundHeaderImage: {
       alignSelf: 'center',
     },
     playgroundContent: {
-      paddingHorizontal: getSpacing('x4'),
-      paddingBottom: getSpacing('x6'),
-      alignSelf: 'stretch',
+      paddingBottom: getSpacing('x10'),
+
       width: '100%',
     },
     playgroundTitle: {
-      marginTop: getSpacing('x6'),
-      marginBottom: getSpacing('x2'),
+      paddingVertical: getSpacing('x4'),
     },
     playgroundSubtitle: {
       marginBottom: getSpacing('x4'),
     },
     linkListContent: {
-      paddingBottom: getSpacing('x6'),
-      alignSelf: 'stretch',
-      width: '100%',
+      paddingBottom: getSpacing('x10'),
+      gap: getSpacing('x2'),
     },
     linkRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: getSpacing('x3'),
-      paddingHorizontal: getSpacing('x2'),
-      marginBottom: getSpacing('x1'),
-      borderRadius: 10,
+      paddingVertical: getSpacing('x4'),
+      paddingHorizontal: getSpacing('x4'),
+      borderRadius: getRadius('medium'),
       backgroundColor: getColor('fill/background/secondary'),
-      alignSelf: 'stretch',
-      width: '100%',
-    },
-    linkRowLabel: {
-      flex: 1,
-      flexGrow: 1,
-      minWidth: 0,
-    },
-    linkRowArrow: {
-      flexShrink: 0,
     },
 
     // ─── Shared (other tabs / playground buttons) ───────────────────────────
@@ -99,6 +82,7 @@ export const generateStyles = (theme: ThemeType) => {
     buttonContainer: {
       gap: getSpacing('x4'),
       alignItems: 'center',
+      paddingTop: getSpacing('x4'),
     },
   })
 }

@@ -63,37 +63,18 @@ export default function HomeScreen() {
     >
       <MyView style={styles.titleContainer}>
         <MyText typography="subtitle" style={styles.sectionTitle}>
-          MyRN
+          Welcome to MyRN
         </MyText>
-        <MyText typography="body" color="text/active/secondary" style={styles.introText}>
-          React Native app với bộ component dùng chung (MyView, MyText, MyButton, MyTextInput,
-          MyDropdownInput, MyCheckbox, MyCounter, Toast, Bottom Sheet, Confirmation, Alert, Image…).
-          Theme, spacing và elevation thống nhất.
-        </MyText>
-        <MyText typography="caption" color="text/active/tertiary">
-          {authSummary}
-        </MyText>
-        <MyText typography="caption" color="text/active/tertiary">
-          Env: {getEnv('EXPO_PUBLIC_APP_ENV')}
-        </MyText>
-        <MyText typography="caption" color="text/active/tertiary">
-          Support: {getEnv('EXPO_PUBLIC_SUPPORT_EMAIL', 'n/a')}
-        </MyText>
+
+        <MyText typography="body">{authSummary}</MyText>
+        <MyText typography="body">Env: {getEnv('EXPO_PUBLIC_APP_ENV')}</MyText>
       </MyView>
       <MyView style={styles.buttonContainer}>
-        <MyButton
-          text="Xem Component Playground"
-          size={'large'}
-          type="primary"
-          onPress={() => router.push('/playground')}
-          style={styles.introButton}
-        />
         {isAuthenticated ? (
           <>
             <MyButton
               text="Vào Todo"
               size="large"
-              type="secondary"
               onPress={() => router.push(Routes.todo)}
               style={styles.introButton}
             />
@@ -109,7 +90,6 @@ export default function HomeScreen() {
           <MyButton
             text="Login"
             size="large"
-            type="secondary"
             onPress={() => router.push(Routes.login)}
             style={styles.introButton}
           />

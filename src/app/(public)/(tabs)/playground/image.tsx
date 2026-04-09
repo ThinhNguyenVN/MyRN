@@ -12,9 +12,6 @@ export default function ImageScreen() {
   const styles = useThemedStyles(generateStyles)
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
-      <MyText typography="caption" color="text/active/tertiary" style={styles.sectionCaption}>
-        Các trường hợp sử dụng MyImage
-      </MyText>
       <MyText typography="label" style={styles.labelMargin}>
         1. url hợp lệ
       </MyText>

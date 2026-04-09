@@ -10,9 +10,6 @@ export default function AlertScreen() {
   const styles = useThemedStyles(generateStyles)
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
-      <MyText typography="caption" color="text/active/tertiary" style={styles.sectionCaption}>
-        Các loại alert
-      </MyText>
       <MyText typography="label" style={styles.labelMargin}>
         1. Info
       </MyText>
