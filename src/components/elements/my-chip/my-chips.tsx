@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useState } from 'react'
 import { TextInput, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyChip from '@/components/elements/my-chip'
 import MyIcon from '@/components/elements/my-icon'
@@ -24,6 +25,7 @@ const MyChips: React.FC<MyChipsProps> = ({
   style,
 }) => {
   const { getColor } = useTheme()
+  const { t } = useTranslation()
   const styles = useThemedStyles(generateStyles)
   const [isAdding, setIsAdding] = useState(false)
   const [addValue, setAddValue] = useState('')
@@ -95,7 +97,7 @@ const MyChips: React.FC<MyChipsProps> = ({
               onChangeText={setAddValue}
               onSubmitEditing={handleAddSubmit}
               onBlur={handleAddBlur}
-              placeholder="Add..."
+              placeholder={t('components.chipsAdd')}
               placeholderTextColor={getColor('text/inactive/primary')}
               style={[
                 styles.addInput,

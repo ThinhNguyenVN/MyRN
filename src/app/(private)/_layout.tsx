@@ -1,4 +1,5 @@
 import { Redirect, Stack, router } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 
 import MyButton from '@/components/elements/my-button'
 import { NavigationBarHeader } from '@/components/ui/navigation-bar'
@@ -7,6 +8,7 @@ import { selectIsAuthenticated } from '@/features/auth/auth-slice'
 import { useAppSelector } from '@/store/hooks'
 
 export default function PrivateLayout() {
+  const { t } = useTranslation()
   const isAuthenticated = useAppSelector(selectIsAuthenticated)
 
   if (!isAuthenticated) {
@@ -20,7 +22,7 @@ export default function PrivateLayout() {
         options={{
           header: (props) => <NavigationBarHeader {...props} />,
           headerShown: true,
-          title: 'Todo',
+          title: t('todo.screenTitle'),
           headerRight: () => (
             <MyButton.Icon
               icon="add"
@@ -36,7 +38,7 @@ export default function PrivateLayout() {
         options={{
           header: (props) => <NavigationBarHeader {...props} />,
           headerShown: true,
-          title: 'Todo Editor',
+          title: t('todo.editorTitle'),
         }}
       />
     </Stack>

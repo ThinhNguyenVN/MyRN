@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useEffect } from 'react'
 import { View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { useTranslation } from 'react-i18next'
 
 import { CalendarRange } from './calendar'
 import DatePickerShell from '@/components/elements/my-date-picker/date-picker-shell'
@@ -60,7 +61,7 @@ const DateRangePickerTrigger = memo(function DateRangePickerTrigger({
 const MyDateRangePicker = memo(function MyDateRangePicker({
   value,
   onValueChange,
-  placeholder = 'Chọn khoảng ngày',
+  placeholder,
   disabled = false,
   minDate,
   maxDate,
@@ -71,6 +72,7 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
   style,
 }: MyDateRangePickerProps) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const startDate = value?.startDate ?? null
   const endDate = value?.endDate ?? null
 
@@ -102,9 +104,12 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
     displayText = formatDate(startDate)
   }
 
+  const resolvedPlaceholder = placeholder ?? t('components.datePickRange')
+  const resolvedTitle = title ?? t('components.datePickRange')
+
   return (
     <DatePickerShell
-      title={title ?? 'Chọn khoảng ngày'}
+      title={resolvedTitle}
       disabled={disabled}
       panelMinWidth={280}
       estimatedPanelHeight={380}
@@ -115,8 +120,8 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
           openPicker={openPicker}
           disabled={d}
           displayText={displayText}
-          placeholder={placeholder}
-          title={title}
+          placeholder={resolvedPlaceholder}
+          title={resolvedTitle}
           error={error}
           errorMessage={errorMessage}
           required={required}
@@ -137,14 +142,14 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
             <View style={styles.footerButtonRow}>
               <MyButton
                 type="tertiary"
-                text="Xóa"
+                text={t('common.clear')}
                 width="full"
                 onPress={handleClear}
                 elevation="none"
               />
               <MyButton
                 type="primary"
-                text="Xác nhận"
+                text={t('common.confirm')}
                 width="full"
                 onPress={closePicker}
                 elevation="none"

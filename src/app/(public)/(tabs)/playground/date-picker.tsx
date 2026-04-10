@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ScrollView } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyButton from '@/components/elements/my-button'
 import MyDatePicker, {
@@ -12,6 +13,7 @@ import { generateStyles } from './styles'
 
 export default function DatePickerScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const [date1, setDate1] = useState<Date | null>(null)
   const [date2, setDate2] = useState<Date | null>(new Date())
   const [dateWithFooter, setDateWithFooter] = useState<Date | null>(new Date(2026, 2, 7))
@@ -21,29 +23,43 @@ export default function DatePickerScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
-      <MyDatePicker value={date1} onValueChange={setDate1} placeholder="Chọn ngày" title="Ngày" />
+      <MyDatePicker
+        value={date1}
+        onValueChange={setDate1}
+        placeholder={t('playground.datePickerPickDate')}
+        title={t('playground.datePickerDateLabel')}
+      />
 
-      <MyDatePicker value={date2} onValueChange={setDate2} title="Ngày đã chọn" />
+      <MyDatePicker
+        value={date2}
+        onValueChange={setDate2}
+        title={t('playground.datePickerSelectedDate')}
+      />
 
-      <MyDatePicker value={null} disabled placeholder="Disabled" title="Ngày" />
+      <MyDatePicker
+        value={null}
+        disabled
+        placeholder={t('common.disabled')}
+        title={t('playground.datePickerDateLabel')}
+      />
 
       <MyDatePicker
         value={date1}
         onValueChange={setDate1}
         minDate={minDate}
         maxDate={maxDate}
-        placeholder="Chọn trong 2 tháng tới"
-        title="Khoảng ngày"
+        placeholder={t('playground.datePickerWithinTwoMonths')}
+        title={t('playground.datePickerRange')}
       />
 
       <MyDatePicker
         value={dateWithFooter}
         onValueChange={setDateWithFooter}
-        title="Ngày đã chọn"
+        title={t('playground.datePickerSelectedDate')}
         footer={
           <MyButton
             type="tertiary"
-            text="Xóa"
+            text={t('common.clear')}
             width="full"
             onPress={() => setDateWithFooter(null)}
             elevation={'none'}
@@ -54,9 +70,16 @@ export default function DatePickerScreen() {
       <MyDateRangePicker
         value={range}
         onValueChange={setRange}
-        placeholder="Chọn khoảng ngày"
-        title="Khoảng ngày"
-        footer={<MyButton type="tertiary" text="Xóa" width="full" onPress={() => setRange(null)} />}
+        placeholder={t('playground.datePickerRange')}
+        title={t('playground.datePickerRange')}
+        footer={
+          <MyButton
+            type="tertiary"
+            text={t('common.clear')}
+            width="full"
+            onPress={() => setRange(null)}
+          />
+        }
       />
     </ScrollView>
   )

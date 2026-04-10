@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useEffect } from 'react'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { useTranslation } from 'react-i18next'
 
 import Calendar from '@/components/elements/my-date-picker/calendar'
 import DatePickerShell from '@/components/elements/my-date-picker/date-picker-shell'
@@ -78,7 +79,7 @@ const DatePickerTrigger = memo(function DatePickerTrigger({
 const MyDatePicker = memo(function MyDatePicker({
   value,
   onValueChange,
-  placeholder = 'Chọn ngày',
+  placeholder,
   disabled = false,
   minDate,
   maxDate,
@@ -90,6 +91,7 @@ const MyDatePicker = memo(function MyDatePicker({
   style,
 }: MyDatePickerProps) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
 
   const handleSelectDay = useCallback(
     (date: Date, closePicker: () => void) => {
@@ -102,9 +104,12 @@ const MyDatePicker = memo(function MyDatePicker({
 
   const displayText = value ? formatDate(value) : ''
 
+  const resolvedPlaceholder = placeholder ?? t('components.datePickOne')
+  const resolvedTitle = title ?? t('components.datePickOne')
+
   return (
     <DatePickerShell
-      title={title ?? 'Chọn ngày'}
+      title={resolvedTitle}
       disabled={disabled}
       footer={footer}
       panelMinWidth={280}
@@ -116,8 +121,8 @@ const MyDatePicker = memo(function MyDatePicker({
           openPicker={openPicker}
           disabled={d}
           displayText={displayText}
-          placeholder={placeholder}
-          title={title}
+          placeholder={resolvedPlaceholder}
+          title={resolvedTitle}
           error={error}
           errorMessage={errorMessage}
           required={required}

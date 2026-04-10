@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import MyChip, { MyChips } from '@/components/elements/my-chip'
 import MyIcon from '@/components/elements/my-icon'
@@ -11,6 +12,7 @@ import { generateStyles } from './styles'
 
 export default function ChipsScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const [selectedFilter, setSelectedFilter] = useState<string | null>('all')
   const [removableItems, setRemovableItems] = useState(['Tag 1', 'Tag 2', 'Tag 3'])
   const [chipsData, setChipsData] = useState(['React', 'Native', 'Expo'])
@@ -19,35 +21,40 @@ export default function ChipsScreen() {
   return (
     <MyKeyboardAvoiding.ScrollView contentContainerStyle={styles.screenContent}>
       <MyText typography="label" style={styles.sectionTitle}>
-        Types
+        {t('playground.chipsTypes')}
       </MyText>
       <MyView style={styles.chipRow}>
-        <MyChip label="Primary" type="primary" onPress={() => {}} />
-        <MyChip label="Secondary" type="secondary" onPress={() => {}} />
-        <MyChip label="Outlined" type="outlined" onPress={() => {}} />
-        <MyChip label="Filled" type="filled" onPress={() => {}} />
+        <MyChip label={t('playground.chipsPrimary')} type="primary" onPress={() => {}} />
+        <MyChip label={t('playground.chipsSecondary')} type="secondary" onPress={() => {}} />
+        <MyChip label={t('playground.chipsOutlined')} type="outlined" onPress={() => {}} />
+        <MyChip label={t('playground.chipsFilled')} type="filled" onPress={() => {}} />
       </MyView>
 
       <MyText typography="label" style={styles.sectionTitle}>
-        Sizes
+        {t('playground.chipsSizes')}
       </MyText>
       <MyView style={styles.chipRow}>
-        <MyChip label="Small" type="filled" size="small" onPress={() => {}} />
-        <MyChip label="Medium" type="filled" size="medium" onPress={() => {}} />
+        <MyChip label={t('playground.chipsSmall')} type="filled" size="small" onPress={() => {}} />
+        <MyChip
+          label={t('playground.chipsMedium')}
+          type="filled"
+          size="medium"
+          onPress={() => {}}
+        />
       </MyView>
 
       <MyText typography="label" style={styles.sectionTitle}>
-        With icons
+        {t('playground.chipsWithIcons')}
       </MyText>
       <MyView style={styles.chipRow}>
         <MyChip
-          label="Left icon"
+          label={t('playground.chipsLeftIcon')}
           type="primary"
           left={<MyIcon name="heart" size={16} color="#ffffff" />}
           onPress={() => {}}
         />
         <MyChip
-          label="Right icon"
+          label={t('playground.chipsRightIcon')}
           type="secondary"
           right={<MyIcon name="chevron-forward" size={16} color="icon/active/primary" />}
           onPress={() => {}}
@@ -55,13 +62,19 @@ export default function ChipsScreen() {
       </MyView>
 
       <MyText typography="label" style={styles.sectionTitle}>
-        Filter (selected state)
+        {t('playground.chipsFilter')}
       </MyText>
       <MyView style={styles.chipRow}>
         {(['all', 'active', 'done'] as const).map((key) => (
           <MyChip
             key={key}
-            label={key === 'all' ? 'All' : key === 'active' ? 'Active' : 'Done'}
+            label={
+              key === 'all'
+                ? t('playground.chipsAll')
+                : key === 'active'
+                  ? t('playground.chipsActive')
+                  : t('playground.chipsDone')
+            }
             type={'primary'}
             selected={selectedFilter === key}
             onPress={() => setSelectedFilter(key)}
@@ -70,15 +83,15 @@ export default function ChipsScreen() {
       </MyView>
 
       <MyText typography="label" style={styles.sectionTitle}>
-        Disabled
+        {t('common.disabled')}
       </MyText>
       <MyView style={styles.chipRow}>
-        <MyChip label="Disabled" type="primary" disabled onPress={() => {}} />
-        <MyChip label="Disabled outlined" type="outlined" disabled />
+        <MyChip label={t('playground.chipsDisabled')} type="primary" disabled onPress={() => {}} />
+        <MyChip label={t('playground.chipsDisabledOutlined')} type="outlined" disabled />
       </MyView>
 
       <MyText typography="label" style={styles.sectionTitle}>
-        Input chips (removable)
+        {t('playground.chipsInputRemovable')}
       </MyText>
       <MyView style={styles.chipRow}>
         {removableItems.map((label) => (
@@ -93,15 +106,15 @@ export default function ChipsScreen() {
       </MyView>
 
       <MyText typography="label" style={styles.sectionTitle}>
-        Display only (no onPress)
+        {t('playground.chipsDisplayOnly')}
       </MyText>
       <MyView style={styles.chipRow}>
-        <MyChip label="Tag" type="filled" />
-        <MyChip label="Label" type="outlined" />
+        <MyChip label={t('playground.chipsTag')} type="filled" />
+        <MyChip label={t('playground.chipsLabel')} type="outlined" />
       </MyView>
 
       <MyText typography="label" style={styles.sectionTitle}>
-        MyChips (multiSelect, canRemove, canAdd)
+        {t('playground.chipsMyChips')}
       </MyText>
       <MyChips
         data={chipsData}

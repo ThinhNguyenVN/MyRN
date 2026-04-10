@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const todoFormSchema = z.object({
-  todo: z.string().trim().min(1, 'Please enter todo content'),
+  todo: z.string().trim().min(1, 'todo.formValidationTodo'),
   completed: z.boolean(),
 })
 

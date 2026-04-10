@@ -30,12 +30,7 @@ function MyFormCounterInner<TFieldValues extends FieldValues>({
   >(name)
   const num = typeof value === 'number' ? value : 0
   return (
-    <MyFormField<TFieldValues>
-      name={name}
-      title={title}
-      subTitle={subTitle}
-      required={required}
-    >
+    <MyFormField<TFieldValues> name={name} title={title} subTitle={subTitle} required={required}>
       <MyCounter
         {...rest}
         value={num}

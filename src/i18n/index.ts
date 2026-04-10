@@ -17,6 +17,7 @@ const resources = {
 
 if (!i18n.isInitialized) {
   const lng = resolveSystemLocale()
+  // eslint-disable-next-line import/no-named-as-default-member
   i18n.use(initReactI18next).init({
     compatibilityJSON: 'v4',
     resources,
@@ -31,6 +32,7 @@ if (!i18n.isInitialized) {
 
 export function setAppLocale(locale: AppLocale) {
   if (i18n.language === locale) return
+  // eslint-disable-next-line import/no-named-as-default-member
   void i18n.changeLanguage(locale)
 }
 

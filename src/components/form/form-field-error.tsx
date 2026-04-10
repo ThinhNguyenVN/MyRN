@@ -1,5 +1,6 @@
 import React, { memo, useEffect } from 'react'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { useTranslation } from 'react-i18next'
 
 import MyText from '@/components/elements/my-text'
 import { useThemedStyles } from '@/theme/theme-context'
@@ -13,6 +14,7 @@ const MAX_HEIGHT_VISIBLE = 20
 
 function FormFieldError({ error, style: styleProp }: FormFieldErrorProps) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const visible = useSharedValue(!!error?.message)
   useEffect(() => {
     visible.value = !!error?.message
@@ -27,7 +29,7 @@ function FormFieldError({ error, style: styleProp }: FormFieldErrorProps) {
     <Animated.View style={[styles.error, styleProp, animatedStyle]}>
       {error?.message ? (
         <MyText typography="caption" color="text/alert/primary">
-          {error.message}
+          {t(error.message)}
         </MyText>
       ) : null}
     </Animated.View>

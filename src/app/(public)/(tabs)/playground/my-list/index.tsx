@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyText from '@/components/elements/my-text'
 import { MyList } from '@/components/ui/my-list'
@@ -17,6 +18,7 @@ const SKELETON_LOAD_MORE_COUNT = 3
 
 export default function MyListPlaygroundScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const { list, loading, loadingMore, loadMore, hasMore } = useMyListData()
   const [refreshing, setRefreshing] = useState(false)
 
@@ -50,11 +52,11 @@ export default function MyListPlaygroundScreen() {
     return (
       <View style={styles.footer}>
         <MyText typography="body" color="text/active/tertiary">
-          Không có bài viết
+          {t('playground.myListEmpty')}
         </MyText>
       </View>
     )
-  }, [loading, styles.footer, styles.skeletonListContainer])
+  }, [loading, styles.footer, styles.skeletonListContainer, t])
 
   return (
     <ScrollToHideContent scrollEventThrottle={16}>

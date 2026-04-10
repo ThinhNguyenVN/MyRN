@@ -1,5 +1,6 @@
 import { ScrollView } from 'react-native'
 import { router } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 
 import MyButton from '@/components/elements/my-button'
 import MyIcon from '@/components/elements/my-icon'
@@ -11,15 +12,16 @@ import { generateStyles } from '../styles'
 
 export default function ButtonsScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
       <MyText typography="subtitle" style={styles.sectionTitle}>
-        Buttons
+        {t('playground.linksButtons')}
       </MyText>
 
       <MyButton
         width={'full'}
-        text="Open screen con (Buttons Detail)"
+        text={t('playground.buttonsOpenDetail')}
         size={'large'}
         type="secondary"
         onPress={() => router.push('/playground/buttons/detail')}
@@ -27,7 +29,7 @@ export default function ButtonsScreen() {
       />
       <MyButton
         width={'full'}
-        text="Primary large"
+        text={t('playground.buttonsPrimaryLarge')}
         size={'large'}
         type="primary"
         onPress={() => {}}
@@ -37,7 +39,7 @@ export default function ButtonsScreen() {
       <MyView style={styles.buttonRow}>
         <MyButton
           width={'full'}
-          text="Primary In Row"
+          text={t('playground.buttonsPrimaryInRow')}
           size={'small'}
           type="primary"
           onPress={() => {}}
@@ -45,34 +47,44 @@ export default function ButtonsScreen() {
         />
         <MyButton
           width={'full'}
-          text="Primary In Row"
+          text={t('playground.buttonsPrimaryInRow')}
           size={'small'}
           type="primary"
           onPress={() => {}}
         />
       </MyView>
       <MyButton
-        text="Secondary"
+        text={t('playground.buttonsSecondary')}
         width={'auto'}
         size={'small'}
         type="secondary"
         onPress={() => {}}
       />
-      <MyButton text="Tertiary" width={'auto'} type="tertiary" onPress={() => {}} />
-      <MyButton text="Light" width={'auto'} type="light" onPress={() => {}} />
-      <MyButton text="Dark" width={'auto'} type="dark" onPress={() => {}} />
       <MyButton
-        text="Small"
+        text={t('playground.buttonsTertiary')}
+        width={'auto'}
+        type="tertiary"
+        onPress={() => {}}
+      />
+      <MyButton
+        text={t('playground.buttonsLight')}
+        width={'auto'}
+        type="light"
+        onPress={() => {}}
+      />
+      <MyButton text={t('playground.buttonsDark')} width={'auto'} type="dark" onPress={() => {}} />
+      <MyButton
+        text={t('playground.buttonsSmall')}
         type="primary"
         size="small"
         onPress={() => {}}
         left={<MyIcon name="key" color="icon/active/tertiary" />}
       />
-      <MyButton text="Loading" type="secondary" loading onPress={() => {}} />
-      <MyButton text="Disabled" type="primary" onPress={() => {}} disabled />
+      <MyButton text={t('common.loading')} type="secondary" loading onPress={() => {}} />
+      <MyButton text={t('common.disabled')} type="primary" onPress={() => {}} disabled />
 
       <MyText typography="subtitle" style={styles.sectionTitle}>
-        Button Icon
+        {t('playground.buttonsIconSection')}
       </MyText>
       <MyView flexDirection="row" flexWrap="wrap" gap={8}>
         <MyButton.Icon icon="home" type="primary" onPress={() => {}} />

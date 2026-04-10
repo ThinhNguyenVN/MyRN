@@ -29,12 +29,7 @@ function MyFormDatePickerInner<TFieldValues extends FieldValues>({
     FieldPath<TFieldValues>
   >(name)
   return (
-    <MyFormField<TFieldValues>
-      name={name}
-      title={title}
-      subTitle={subTitle}
-      required={required}
-    >
+    <MyFormField<TFieldValues> name={name} title={title} subTitle={subTitle} required={required}>
       <MyDatePicker
         {...rest}
         value={(value as Date | null) ?? null}

@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 
 import { isNormalizedApiError } from '@/api/errors'
 import { Routes } from '@/constants/routes'
@@ -10,6 +11,7 @@ import { useAppDispatch } from '@/store/hooks'
 import type { LoginForm } from './types'
 
 export function useLogin(scrollToField: (name: string) => void) {
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { handleSubmit, control } = useFormContext<LoginForm>()
   const [isLoading, setIsLoading] = useState(false)
@@ -39,12 +41,12 @@ export function useLogin(scrollToField: (name: string) => void) {
           setSubmitError(err.message)
           return
         }
-        setSubmitError('Sign in failed')
+        setSubmitError(t('auth.signInFailed'))
       } finally {
         setIsLoading(false)
       }
     },
-    [dispatch],
+    [dispatch, t],
   )
 
   const onInvalid = useCallback(

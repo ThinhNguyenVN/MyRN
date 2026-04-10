@@ -4,6 +4,7 @@ import MyView from '@/components/elements/my-view'
 import { MyFormTextInput } from '@/components/form'
 import { useThemedStyles } from '@/theme/theme-context'
 import { useLogin } from './use-login'
+import { useTranslation } from 'react-i18next'
 
 import { generateStyles } from './styles'
 import type { LoginForm, LoginScreenViewProps } from './types'
@@ -13,6 +14,7 @@ import { useState } from 'react'
 
 export function LoginScreenView({ scrollToField }: LoginScreenViewProps) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const { submitError, isLoading, onSignInPress } = useLogin(scrollToField)
 
   const [showPassword, setShowPassword] = useState(false)
@@ -21,16 +23,16 @@ export function LoginScreenView({ scrollToField }: LoginScreenViewProps) {
     <View style={styles.scrollContent}>
       <MyView style={styles.header}>
         <MyText typography="h1" style={styles.title}>
-          Sign in
+          {t('auth.signInTitle')}
         </MyText>
         <MyText typography="body" color="text/active/secondary">
-          DummyJSON demo - e.g. emilys / emilyspass
+          {t('auth.signInHint')}
         </MyText>
       </MyView>
 
       <MyFormTextInput<LoginForm>
         name="username"
-        title="Username"
+        title={t('auth.usernameLabel')}
         forceError={!!submitError}
         autoCapitalize="none"
         autoCorrect={false}
@@ -40,7 +42,7 @@ export function LoginScreenView({ scrollToField }: LoginScreenViewProps) {
 
       <MyFormTextInput<LoginForm>
         name="password"
-        title="Password"
+        title={t('auth.passwordLabel')}
         forceError={!!submitError}
         secureTextEntry={!showPassword}
         autoComplete="password"
@@ -56,7 +58,7 @@ export function LoginScreenView({ scrollToField }: LoginScreenViewProps) {
       ) : null}
 
       <MyButton
-        text="Sign in"
+        text={t('auth.signInButton')}
         width="full"
         loading={isLoading}
         disabled={isLoading}

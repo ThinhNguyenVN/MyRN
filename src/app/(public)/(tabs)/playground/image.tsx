@@ -1,4 +1,5 @@
 import { ScrollView } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyImage from '@/components/elements/my-image'
 import MyIcon from '@/components/elements/my-icon'
@@ -10,10 +11,11 @@ import { generateStyles } from './styles'
 
 export default function ImageScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
       <MyText typography="label" style={styles.labelMargin}>
-        1. url hợp lệ
+        {t('playground.imageSection1')}
       </MyText>
       <MyImage
         url="https://picsum.photos/200/150"
@@ -23,40 +25,40 @@ export default function ImageScreen() {
         alignSelf="center"
       />
       <MyText typography="label" style={styles.labelMargin}>
-        2. source local (require)
+        {t('playground.imageSection2')}
       </MyText>
       <MyImage source={require('@/assets/images/react-logo.png')} style={styles.smallImageMargin} />
       <MyText typography="label" style={styles.labelMargin}>
-        3. Không có url/source (empty)
+        {t('playground.imageSection3')}
       </MyText>
       <MyImage style={styles.image200x120} />
       <MyText typography="label" style={styles.labelMargin}>
-        4. Empty + showMessage
+        {t('playground.imageSection4')}
       </MyText>
-      <MyImage showMessage emptyMessage="Chưa có ảnh" style={styles.image200x120} />
+      <MyImage showMessage emptyMessage={t('components.imageEmpty')} style={styles.image200x120} />
       <MyText typography="label" style={styles.labelMargin}>
-        5. URL lỗi (error state)
+        {t('playground.imageSection5')}
       </MyText>
       <MyImage url="https://invalid-url-will-fail.example/img.jpg" width={100} alignSelf="center" />
       <MyText typography="label" style={styles.labelMargin}>
-        6. Error + showMessage
+        {t('playground.imageSection6')}
       </MyText>
       <MyImage
         url="https://invalid-url-will-fail.example/img.jpg"
         showMessage
-        errorMessage="Tải ảnh thất bại"
+        errorMessage={t('components.imageError')}
         style={styles.image200x120}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        7. onPress
+        {t('playground.imageSection7')}
       </MyText>
       <MyImage
         url="https://picsum.photos/200/100"
-        onPress={() => alert('Image pressed')}
+        onPress={() => alert(t('playground.imagePressed'))}
         style={styles.image200x100}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        8. elevation
+        {t('playground.imageSection8')}
       </MyText>
       <MyImage
         url="https://picsum.photos/180/100"
@@ -64,7 +66,7 @@ export default function ImageScreen() {
         style={styles.image180x100}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        9. contentFit: contain
+        {t('playground.imageSection9')}
       </MyText>
       <MyImage
         url="https://picsum.photos/200/200"
@@ -72,25 +74,25 @@ export default function ImageScreen() {
         style={styles.image150x150}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        10. emptyContent custom
+        {t('playground.imageSection10')}
       </MyText>
       <MyImage
         emptyContent={
           <MyView padding={24} alignItems="center" gap={8}>
             <MyIcon name="add-circle-outline" size={40} color="icon/inactive/primary" />
             <MyText typography="caption" color="text/inactive/primary">
-              Thêm ảnh
+              {t('playground.imageAdd')}
             </MyText>
           </MyView>
         }
         style={styles.image200x100}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        11. priority (high) + loading
+        {t('playground.imageSection11')}
       </MyText>
       <MyImage url="https://picsum.photos/200/120" priority="high" style={styles.image200x120} />
       <MyText typography="label" style={styles.labelMargin}>
-        12. errorContent custom
+        {t('playground.imageSection12')}
       </MyText>
       <MyImage
         url="https://invalid-url.example/img.jpg"
@@ -98,7 +100,7 @@ export default function ImageScreen() {
           <MyView style={styles.errorContent}>
             <MyIcon name="refresh-outline" size={28} color="icon/alert/primary" />
             <MyText typography="caption" color="text/alert/primary">
-              Lỗi tải ảnh
+              {t('components.imageError')}
             </MyText>
           </MyView>
         }

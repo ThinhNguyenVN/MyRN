@@ -1,6 +1,7 @@
 import { isNil } from 'lodash'
 import { useState } from 'react'
 import { FlatList, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
@@ -15,25 +16,21 @@ import { generateStyles } from './styles'
 
 const SCREEN_KEY = 'wheel-picker-screen'
 
-const SAMPLE_ITEMS: WheelPickerItem[] = [
-  { label: 'Option 1', value: 1 },
-  { label: 'Option 2', value: 2 },
-  { label: 'Option 3', value: 3 },
-  { label: 'Option 4', value: 4 },
-  { label: 'Option 5', value: 5 },
-  { label: 'Option 6', value: 6 },
-  { label: 'Option 7', value: 7 },
-]
+const SAMPLE_ITEMS: WheelPickerItem[] = Array.from({ length: 7 }, (_, i) => ({
+  label: `Option ${i + 1}`,
+  value: i + 1,
+}))
 
 export default function WheelPickerScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const [selectedIndex, setSelectedIndex] = useState(1)
   const [value, setValue] = useState<number | null>(null)
 
   const renderContent = () => (
     <View style={styles.screenContent}>
       <MyText typography="label" style={styles.sectionTitle}>
-        Sample 1 – WheelPickerView only
+        {t('playground.wheelSample1')}
       </MyText>
       <MyView style={styles.inputContainer}>
         <WheelPickerView
@@ -42,37 +39,37 @@ export default function WheelPickerScreen() {
           onSelectIndex={setSelectedIndex}
         />
         <MyText typography="body" style={styles.labelMargin}>
-          Đã chọn: {SAMPLE_ITEMS[selectedIndex]?.label ?? '—'}
+          {t('playground.wheelSelected')}: {SAMPLE_ITEMS[selectedIndex]?.label ?? '—'}
         </MyText>
       </MyView>
 
       <MyText typography="label" style={styles.sectionTitle}>
-        Sample 2 – MyWheelPicker (trigger + sheet/modal)
+        {t('playground.wheelSample2')}
       </MyText>
       <MyView style={styles.inputContainer}>
         <MyWheelPicker
           items={SAMPLE_ITEMS}
           value={value}
           onValueChange={setValue}
-          title="Chọn option"
-          placeholder="Chọn option"
+          title={t('components.wheelSelect')}
+          placeholder={t('components.wheelSelect')}
         />
         <MyText typography="body" style={styles.labelMargin}>
-          Giá trị:{' '}
+          {t('playground.wheelValue')}:{' '}
           {!isNil(value) ? (SAMPLE_ITEMS.find((i) => i.value === value)?.label ?? value) : '—'}
         </MyText>
       </MyView>
 
       <MyText typography="label" style={styles.sectionTitle}>
-        Disabled
+        {t('common.disabled')}
       </MyText>
       <MyView style={styles.inputContainer}>
         <MyWheelPicker
           items={SAMPLE_ITEMS}
           value={2}
           onValueChange={() => {}}
-          title="Chọn option"
-          placeholder="Chọn option"
+          title={t('components.wheelSelect')}
+          placeholder={t('components.wheelSelect')}
           disabled
         />
       </MyView>

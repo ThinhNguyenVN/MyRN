@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { ScrollView, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import MyButton from '@/components/elements/my-button'
@@ -12,10 +13,16 @@ import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
 
-const LIST_ITEMS = ['Option A', 'Option B', 'Option C', 'Option D']
+const LIST_ITEMS = [
+  'playground.dropdownOptionA',
+  'playground.dropdownOptionB',
+  'playground.dropdownOptionC',
+  'playground.dropdownOptionD',
+]
 
 export default function BottomSheetScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showError, setShowError] = useState(false)
@@ -33,49 +40,45 @@ export default function BottomSheetScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
-      <MyText typography="subtitle" style={styles.sectionTitle}>
-        Bottom Sheet
-      </MyText>
-
       <MyView style={styles.bottomsheet}>
         <MyButton
           width="full"
-          text="1. Simple (title + text)"
+          text={t('playground.bottomSheetDemo1')}
           size="small"
           type="primary"
           onPress={() => simpleRef.current?.open()}
         />
         <MyButton
           width="full"
-          text="2. Form (inputs + footer)"
+          text={t('playground.bottomSheetDemo2')}
           size="small"
           type="primary"
           onPress={() => formRef.current?.open()}
         />
         <MyButton
           width="full"
-          text="3. List content"
+          text={t('playground.bottomSheetDemo3')}
           size="small"
           type="secondary"
           onPress={() => listRef.current?.open()}
         />
         <MyButton
           width="full"
-          text="4. Long content (scroll)"
+          text={t('playground.bottomSheetDemo4')}
           size="small"
           type="tertiary"
           onPress={() => longRef.current?.open()}
         />
         <MyButton
           width="full"
-          text="5. Custom header"
+          text={t('playground.bottomSheetDemo5')}
           size="small"
           type="light"
           onPress={() => customHeaderRef.current?.open()}
         />
         <MyButton
           width="full"
-          text="6. No close button"
+          text={t('playground.bottomSheetDemo6')}
           size="small"
           type="dark"
           onPress={() => noCloseRef.current?.open()}
@@ -85,14 +88,14 @@ export default function BottomSheetScreen() {
       {/* 1. Simple */}
       <MyBottomSheet
         ref={simpleRef}
-        title="Simple"
+        title={t('playground.bottomSheetSimple')}
         showClose
         pressBackdropToClose
         contentContainerStyle={styles.sheetContent}
       >
         <View style={styles.bottomsheetContent}>
           <MyText typography="body" color="text/active/secondary">
-            Nội dung ngắn. Đóng bằng nút X hoặc chạm backdrop.
+            {t('playground.bottomSheetSimpleDesc')}
           </MyText>
         </View>
       </MyBottomSheet>
@@ -100,14 +103,14 @@ export default function BottomSheetScreen() {
       {/* 2. Form */}
       <MyBottomSheet
         ref={formRef}
-        title="Form"
+        title={t('playground.linksForm')}
         showClose
         onClosed={() => {}}
         pressBackdropToClose
         footer={
           <MyButton
             width="full"
-            text="Đóng"
+            text={t('common.close')}
             type="primary"
             onPress={() => formRef.current?.close()}
           />
@@ -116,8 +119,8 @@ export default function BottomSheetScreen() {
         <View style={styles.bottomsheetContent}>
           <MyTextInput
             useBottomSheetTextInput
-            title="Email"
-            subTitle="Nhập email"
+            title={t('playground.textInputEmail')}
+            subTitle={t('playground.textInputEmailSubtitle')}
             placeholder="you@example.com"
             value={email}
             onChangeText={setEmail}
@@ -129,8 +132,8 @@ export default function BottomSheetScreen() {
 
           <MyTextInput
             useBottomSheetTextInput
-            title="Password"
-            placeholder="Mật khẩu"
+            title={t('playground.textInputPassword')}
+            placeholder={t('auth.passwordLabel')}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -140,9 +143,9 @@ export default function BottomSheetScreen() {
 
           <MyTextInput
             useBottomSheetTextInput
-            title="With error"
+            title={t('playground.textInputWithError')}
             error={showError}
-            errorMessage={showError ? 'Không được để trống' : undefined}
+            errorMessage={showError ? t('playground.textInputRequiredError') : undefined}
             value={email}
             onChangeText={(t) => {
               setEmail(t)
@@ -157,13 +160,13 @@ export default function BottomSheetScreen() {
       {/* 3. List */}
       <MyBottomSheet
         ref={listRef}
-        title="Chọn option"
+        title={t('components.dropdownSelect')}
         showClose
         pressBackdropToClose
         footer={
           <MyButton
             width="full"
-            text="Xong"
+            text={t('common.done')}
             type="secondary"
             onPress={() => listRef.current?.close()}
           />
@@ -173,7 +176,7 @@ export default function BottomSheetScreen() {
           <MyView key={item} paddingVertical={8} paddingHorizontal={0}>
             <MyCheckbox
               type="radio"
-              label={item}
+              label={t(item)}
               labelStyle={styles.sheetRadioStretch}
               checked={listSelection === item}
               onValueChange={(v) => {
@@ -187,7 +190,7 @@ export default function BottomSheetScreen() {
       {/* 4. Long content */}
       <MyBottomSheet
         ref={longRef}
-        title="Long content"
+        title={t('playground.bottomSheetLongContent')}
         showClose
         pressBackdropToClose
         contentContainerStyle={styles.sheetContent}
@@ -218,8 +221,8 @@ export default function BottomSheetScreen() {
         <MyView style={styles.inputContainer}>
           <MyTextInput
             useBottomSheetTextInput
-            title="Họ tên"
-            placeholder="Nhập họ tên"
+            title={t('playground.formName')}
+            placeholder={t('playground.formNamePlaceholder')}
             value={longName}
             onChangeText={setLongName}
           />
@@ -227,8 +230,8 @@ export default function BottomSheetScreen() {
         <MyView style={styles.inputContainer}>
           <MyTextInput
             useBottomSheetTextInput
-            title="Số điện thoại"
-            placeholder="Nhập SĐT"
+            title={t('playground.formPhone')}
+            placeholder={t('playground.formPhone')}
             value={longPhone}
             onChangeText={setLongPhone}
             keyboardType="phone-pad"
@@ -237,8 +240,8 @@ export default function BottomSheetScreen() {
         <MyView style={styles.inputContainer}>
           <MyTextInput
             useBottomSheetTextInput
-            title="Địa chỉ"
-            placeholder="Nhập địa chỉ"
+            title={t('playground.formAddress')}
+            placeholder={t('playground.formAddress')}
             value={longAddress}
             onChangeText={setLongAddress}
           />
@@ -246,8 +249,8 @@ export default function BottomSheetScreen() {
         <MyView style={styles.inputContainer}>
           <MyTextInput
             useBottomSheetTextInput
-            title="Ghi chú"
-            placeholder="Ghi chú thêm..."
+            title={t('playground.formNote')}
+            placeholder={t('playground.bottomSheetMoreNote')}
             value={longNote}
             onChangeText={setLongNote}
             multiline
@@ -269,7 +272,7 @@ export default function BottomSheetScreen() {
             paddingVertical={12}
           >
             <MyIcon name="information-circle-outline" size={24} color="icon/active/primary" />
-            <MyText typography="subtitle">Custom header</MyText>
+            <MyText typography="subtitle">{t('playground.bottomSheetCustomHeader')}</MyText>
             <MyButton.Icon
               icon="close"
               type="light"
@@ -282,21 +285,21 @@ export default function BottomSheetScreen() {
         contentContainerStyle={styles.sheetContent}
       >
         <MyText typography="body" color="text/active/secondary">
-          Header tùy chỉnh, không dùng title mặc định.
+          {t('playground.bottomSheetCustomHeaderDesc')}
         </MyText>
       </MyBottomSheet>
 
       {/* 6. No close button */}
       <MyBottomSheet
         ref={noCloseRef}
-        title="Chỉ đóng bằng footer"
+        title={t('playground.bottomSheetFooterOnly')}
         showClose={false}
         pressBackdropToClose
         contentContainerStyle={styles.sheetContent}
         footer={
           <MyButton
             width="full"
-            text="Đóng"
+            text={t('common.close')}
             type="primary"
             onPress={() => noCloseRef.current?.close()}
           />
@@ -304,7 +307,7 @@ export default function BottomSheetScreen() {
       >
         <MyView style={styles.bottomsheetContent}>
           <MyText typography="body" color="text/active/secondary">
-            Không có nút X. Đóng bằng nút bên dưới hoặc chạm backdrop.
+            {t('playground.bottomSheetNoCloseDesc')}
           </MyText>
         </MyView>
       </MyBottomSheet>

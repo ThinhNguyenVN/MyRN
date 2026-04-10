@@ -2,6 +2,7 @@ import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from '
 import { FlatList, View, Keyboard } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { BottomSheetFlatList, BottomSheetFlatListMethods } from '@gorhom/bottom-sheet'
+import { useTranslation } from 'react-i18next'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import { TriggerModal } from '@/components/ui/trigger-modal'
@@ -27,7 +28,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
   options,
   value,
   onValueChange,
-  placeholder = 'Chọn...',
+  placeholder,
   disabled = false,
   multiSelect = false,
   title,
@@ -38,6 +39,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
   style,
 }: MyDropdownInputProps) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const isMobile = useIsMobileSize()
   const sheetRef = useRef<MyBottomSheetRef>(null)
   const [open, setOpen] = useState(false)
@@ -47,6 +49,8 @@ const MyDropdownInput = memo(function MyDropdownInput({
     width: number
     height: number
   } | null>(null)
+
+  const resolvedPlaceholder = placeholder ?? t('components.dropdownSelect')
 
   const selectedValues = useMemo<string[]>(
     () =>
@@ -67,8 +71,8 @@ const MyDropdownInput = memo(function MyDropdownInput({
     ? selectedValues
         .map((v) => options.find((o) => o.value === v)?.label)
         .filter(Boolean)
-        .join(', ') || placeholder
-    : (selectedOption?.label ?? placeholder)
+        .join(', ') || resolvedPlaceholder
+    : (selectedOption?.label ?? resolvedPlaceholder)
 
   const triggerRef = useRef<View>(null)
   const listRef = useRef<FlatList<DropdownOption> | null>(null)
@@ -195,7 +199,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
           title={title}
           subTitle={subTitle}
           value={displayText}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           editable={false}
           disabled={disabled}
           error={error}
@@ -243,7 +247,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
         {isMobile ? (
           <MyBottomSheet
             ref={sheetRef}
-            title={title ?? 'Chọn'}
+            title={title ?? t('components.wheelSelect')}
             showClose
             onClosed={closePicker}
             pressBackdropToClose

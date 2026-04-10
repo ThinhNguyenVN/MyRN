@@ -30,12 +30,7 @@ function MyFormChipsInner<TFieldValues extends FieldValues>({
   >(name)
   const selected = Array.isArray(value) ? (value as string[]) : []
   return (
-    <MyFormField<TFieldValues>
-      name={name}
-      title={title}
-      subTitle={subTitle}
-      required={required}
-    >
+    <MyFormField<TFieldValues> name={name} title={title} subTitle={subTitle} required={required}>
       <MyChips
         {...rest}
         selected={selected}

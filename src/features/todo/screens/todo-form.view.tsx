@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import { MyFormSwitch, MyFormTextInput, useFormContext } from '@/components/form'
 import MyButton from '@/components/elements/my-button'
@@ -17,26 +18,29 @@ type TodoFormViewProps = {
 
 function TodoFormViewInner({ mode, isSubmitting, onSubmit }: TodoFormViewProps) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const { handleSubmit } = useFormContext<TodoFormInput>()
 
   return (
     <View style={styles.contentContainer}>
       <View style={styles.fieldGroup}>
-        <MyText typography="subtitle">{mode === 'add' ? 'Create Todo' : 'Edit Todo'}</MyText>
+        <MyText typography="subtitle">
+          {mode === 'add' ? t('todo.createTitle') : t('todo.editTitle')}
+        </MyText>
 
         <MyFormTextInput<TodoFormInput>
           name="todo"
-          title="Title"
+          title={t('todo.formTitleLabel')}
           required
-          placeholder="What needs to be done?"
+          placeholder={t('todo.formPlaceholder')}
         />
 
-        <MyFormSwitch<TodoFormInput> name="completed" title="Completed" />
+        <MyFormSwitch<TodoFormInput> name="completed" title={t('todo.formCompleted')} />
       </View>
 
       <MyButton
         type="primary"
-        text={mode === 'add' ? 'Add Todo' : 'Save Changes'}
+        text={mode === 'add' ? t('todo.addButton') : t('todo.saveButton')}
         width="full"
         loading={isSubmitting}
         onPress={() => void handleSubmit(onSubmit)()}

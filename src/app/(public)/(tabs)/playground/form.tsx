@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react'
 import { View } from 'react-native'
 import { z } from 'zod'
 import { isNil } from 'lodash'
+import { useTranslation } from 'react-i18next'
 
 import {
   MyForm,
@@ -25,45 +26,48 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { formScreenStyles } from './styles'
 
 const DROPDOWN_OPTIONS = [
-  { label: 'Admin', value: 'admin' },
-  { label: 'Editor', value: 'editor' },
-  { label: 'Viewer', value: 'viewer' },
+  { label: 'playground.formRoleAdmin', value: 'admin' },
+  { label: 'playground.formRoleEditor', value: 'editor' },
+  { label: 'playground.formRoleViewer', value: 'viewer' },
 ]
 
 const WHEEL_ITEMS: WheelPickerItem[] = [
-  { label: 'Cấp 1', value: 1 },
-  { label: 'Cấp 2', value: 2 },
-  { label: 'Cấp 3', value: 3 },
-  { label: 'Cấp 4', value: 4 },
-  { label: 'Cấp 5', value: 5 },
+  { label: 'playground.formLevel1', value: 1 },
+  { label: 'playground.formLevel2', value: 2 },
+  { label: 'playground.formLevel3', value: 3 },
+  { label: 'playground.formLevel4', value: 4 },
+  { label: 'playground.formLevel5', value: 5 },
 ]
 
 const TAG_OPTIONS = ['React', 'React Native', 'TypeScript', 'Expo', 'Zod']
 
 const formSchema = z.object({
-  name: z.string().nonempty('Vui lòng nhập họ tên'),
+  name: z.string().nonempty('playground.formErrName'),
   birthDate: z
     .date()
     .nullable()
-    .refine((v) => v !== null, 'Vui lòng chọn ngày sinh'),
+    .refine((v) => v !== null, 'playground.formErrBirthDate'),
   role: z
     .string()
     .nullable()
-    .refine((v) => !isNil(v) && v !== '', 'Vui lòng chọn vai trò'),
-  count: z.number().min(3, 'Số lượng tối thiểu là 3').max(99, 'Số lượng tối đa là 99'),
-  enabled: z.boolean().refine((v) => v === true, 'Cần bật tính năng'),
+    .refine((v) => !isNil(v) && v !== '', 'playground.formErrRole'),
+  count: z.number().min(3, 'playground.formErrCountMin').max(99, 'playground.formErrCountMax'),
+  enabled: z.boolean().refine((v) => v === true, 'playground.formErrEnable'),
   level: z
     .number()
     .nullable()
-    .refine((v) => !isNil(v), 'Vui lòng chọn cấp độ'),
+    .refine((v) => !isNil(v), 'playground.formErrLevel'),
 
   newsletter: z.boolean(),
   marketing: z.boolean(),
   notifications: z.boolean(),
-  tags: z.array(z.string()).min(1, 'Chọn ít nhất một sở thích'),
+  tags: z.array(z.string()).min(1, 'playground.formErrTags'),
   note: z.string(),
-  address: z.string().min(10, 'Vui lòng nhập địa chỉ'),
-  phone: z.string().regex(/^\d+$/, 'Chỉ được nhập số').min(10, 'Vui lòng nhập số điện thoại'),
+  address: z.string().min(10, 'playground.formErrAddress'),
+  phone: z
+    .string()
+    .regex(/^\d+$/, 'playground.formErrPhoneNumberOnly')
+    .min(10, 'playground.formErrPhone'),
 })
 
 type FormValues = z.input<typeof formSchema>
@@ -87,6 +91,9 @@ const defaultValues: FormValues = {
 function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) {
   const { handleSubmit } = useFormContext<FormValues>()
   const styles = useThemedStyles(formScreenStyles)
+  const { t } = useTranslation()
+  const roleOptions = DROPDOWN_OPTIONS.map((opt) => ({ ...opt, label: t(opt.label) }))
+  const levelItems = WHEEL_ITEMS.map((item) => ({ ...item, label: t(item.label) }))
 
   const onSubmit = (data: FormValues) => {
     // eslint-disable-next-line no-console
@@ -102,66 +109,85 @@ function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) 
   return (
     <View style={styles.formContent}>
       <MyText typography="subtitle" style={styles.formTitle}>
-        Thông tin đăng ký
+        {t('playground.formTitle')}
       </MyText>
 
-      <MyFormTextInput<FormValues> name="name" placeholder="Nhập họ tên" title="Họ tên" required />
+      <MyFormTextInput<FormValues>
+        name="name"
+        placeholder={t('playground.formNamePlaceholder')}
+        title={t('playground.formName')}
+        required
+      />
 
       <MyFormDatePicker<FormValues>
         name="birthDate"
-        placeholder="Chọn ngày sinh"
-        title="Ngày sinh"
+        placeholder={t('playground.formBirthDatePlaceholder')}
+        title={t('playground.formBirthDate')}
       />
 
       <MyFormDropdown<FormValues>
         name="role"
-        options={DROPDOWN_OPTIONS}
-        placeholder="Chọn vai trò"
-        title="Vai trò"
+        options={roleOptions}
+        placeholder={t('playground.formRolePlaceholder')}
+        title={t('playground.formRole')}
       />
 
-      <MyFormCounter<FormValues> name="count" title="Số lượng" subTitle="1–99" min={1} max={99} />
+      <MyFormCounter<FormValues>
+        name="count"
+        title={t('playground.formCount')}
+        subTitle={t('playground.formCountRange')}
+        min={1}
+        max={99}
+      />
 
-      <MyFormSwitch<FormValues> name="enabled" title="Tính năng" subTitle="Bật/tắt" />
+      <MyFormSwitch<FormValues>
+        name="enabled"
+        title={t('playground.formFeature')}
+        subTitle={t('playground.formOnOff')}
+      />
 
       <MyFormWheelPicker<FormValues>
         name="level"
-        items={WHEEL_ITEMS}
-        title="Cấp độ"
-        subTitle="Chọn một cấp"
-        placeholder="Chọn cấp độ"
+        items={levelItems}
+        title={t('playground.formLevel')}
+        subTitle={t('playground.formPickOne')}
+        placeholder={t('playground.formLevelPlaceholder')}
       />
 
       <MyFormChips<FormValues>
         name="tags"
-        title="Sở thích"
-        subTitle="Chọn nhiều"
+        title={t('playground.formTags')}
+        subTitle={t('playground.formPickMany')}
         data={TAG_OPTIONS}
         multiSelect
       />
 
       <MyText typography="label" style={styles.formTitle}>
-        Thông tin thêm (keyboard avoiding)
+        {t('playground.formMoreInfo')}
       </MyText>
       <MyFormTextInput<FormValues>
         name="note"
-        placeholder="Ghi chú"
-        title="Ghi chú"
+        placeholder={t('playground.formNote')}
+        title={t('playground.formNote')}
         multiline
         size={'large'}
         height={100}
       />
-      <MyFormTextInput<FormValues> name="address" placeholder="Địa chỉ" title="Địa chỉ" />
+      <MyFormTextInput<FormValues>
+        name="address"
+        placeholder={t('playground.formAddress')}
+        title={t('playground.formAddress')}
+      />
       <MyFormTextInput<FormValues>
         name="phone"
-        placeholder="Số điện thoại"
-        title="SĐT"
+        placeholder={t('playground.formPhone')}
+        title={t('playground.formPhoneShort')}
         keyboardType="phone-pad"
       />
 
       <MyButton
         type="primary"
-        text="Hoàn tất"
+        text={t('playground.formComplete')}
         width="full"
         onPress={handleSubmit(onSubmit, onInvalid)}
         style={styles.submitBtn}

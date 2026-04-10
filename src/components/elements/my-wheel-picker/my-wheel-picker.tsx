@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Keyboard, View } from 'react-native'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
+import { useTranslation } from 'react-i18next'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import MyButton from '@/components/elements/my-button'
@@ -20,11 +21,12 @@ const MyWheelPicker = memo(function MyWheelPicker({
   items,
   value,
   onValueChange,
-  title = 'Chọn',
-  placeholder = 'Chọn',
+  title,
+  placeholder,
   disabled = false,
   haptic: hapticProp,
 }: MyWheelPickerProps) {
+  const { t } = useTranslation()
   const { hapticEnabled } = useTheme()
   const haptic = hapticProp ?? hapticEnabled
   const styles = useThemedStyles(generateStyles)
@@ -86,9 +88,12 @@ const MyWheelPicker = memo(function MyWheelPicker({
 
   confirmHandlerRef.current = handleConfirm
 
+  const resolvedTitle = title ?? t('components.wheelSelect')
+  const resolvedPlaceholder = placeholder ?? t('components.wheelSelect')
+
   const triggerLabel = !isNil(value)
-    ? (items.find((i) => i.value === value)?.label ?? placeholder)
-    : placeholder
+    ? (items.find((i) => i.value === value)?.label ?? resolvedPlaceholder)
+    : resolvedPlaceholder
 
   const wheelPicker = (
     <WheelPickerView
@@ -105,12 +110,12 @@ const MyWheelPicker = memo(function MyWheelPicker({
     () => (
       <MyButton
         type="primary"
-        text="Xác nhận"
+        text={t('common.confirm')}
         width="full"
         onPress={() => confirmHandlerRef.current()}
       />
     ),
-    [],
+    [t],
   )
 
   return (
@@ -126,7 +131,7 @@ const MyWheelPicker = memo(function MyWheelPicker({
           <View pointerEvents="none">
             <MyTextInput
               value={triggerLabel}
-              placeholder={placeholder}
+              placeholder={resolvedPlaceholder}
               disabled={disabled}
               editable={false}
               endIcon={<MyIcon name="chevron-down" size={20} color="icon/active/primary" />}
@@ -139,7 +144,7 @@ const MyWheelPicker = memo(function MyWheelPicker({
       {useSheet ? (
         <MyBottomSheet
           ref={sheetRef}
-          title={title}
+          title={resolvedTitle}
           showClose
           onClosed={closePicker}
           pressBackdropToClose

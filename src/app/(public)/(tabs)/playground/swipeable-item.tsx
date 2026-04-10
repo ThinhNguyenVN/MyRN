@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { Alert, StyleSheet, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
@@ -29,58 +30,73 @@ function makeId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
 }
 
-const INITIAL_ROWS: DemoRow[] = [
-  {
-    id: '1',
-    title: 'Hai phía · swipeToRemove=both',
-    caption:
-      'Vuốt mở hai menu; quá ngưỡng + thả xóa **cả hai hướng**. Không set prop = không vuốt xóa',
-    swipeToRemove: 'both',
-    left: [
-      {
-        icon: 'archive-outline',
-        type: 'secondary',
-        onPress: () => Alert.alert('Archive'),
-      },
-      {
-        icon: 'trash-outline',
-        type: 'tertiary',
-        onPress: () => Alert.alert('Trash'),
-      },
-    ],
-    right: [
-      {
-        icon: 'mail-unread-outline',
-        type: 'secondary',
-        onPress: () => Alert.alert('Unread'),
-      },
-      {
-        icon: 'flag-outline',
-        type: 'primary',
-        onPress: () => Alert.alert('Flag'),
-      },
-    ],
-  },
-  {
-    id: '2',
-    title: 'Chỉ menu phải · swipeToRemove=left',
-    caption: 'Chỉ vuốt trái (mở phải) mới xóa được; vuốt phải quá ngưỡng chỉ bung menu trái',
-    swipeToRemove: 'left',
-    left: [],
-    right: [
-      { icon: 'add-circle', type: 'secondary', onPress: () => Alert.alert('Reply') },
-      { icon: 'trash-outline', type: 'tertiary', onPress: () => Alert.alert('Trash') },
-    ],
-  },
-  {
-    id: '3',
-    title: 'Chỉ menu trái · swipeToRemove=right',
-    caption: 'Chỉ vuốt phải (mở trái) mới xóa; vuốt trái chỉ mở folder, không commit xóa',
-    swipeToRemove: 'right',
-    left: [{ icon: 'folder-outline', type: 'secondary', onPress: () => Alert.alert('Move') }],
-    right: [],
-  },
-]
+function getInitialRows(t: (k: string, options?: Record<string, unknown>) => string): DemoRow[] {
+  return [
+    {
+      id: '1',
+      title: t('playground.swipeDemoTitleBoth'),
+      caption: t('playground.swipeDemoCaptionBoth'),
+      swipeToRemove: 'both',
+      left: [
+        {
+          icon: 'archive-outline',
+          type: 'secondary',
+          onPress: () => Alert.alert(t('playground.swipeActionArchive')),
+        },
+        {
+          icon: 'trash-outline',
+          type: 'tertiary',
+          onPress: () => Alert.alert(t('playground.swipeActionTrash')),
+        },
+      ],
+      right: [
+        {
+          icon: 'mail-unread-outline',
+          type: 'secondary',
+          onPress: () => Alert.alert(t('playground.swipeActionUnread')),
+        },
+        {
+          icon: 'flag-outline',
+          type: 'primary',
+          onPress: () => Alert.alert(t('playground.swipeActionFlag')),
+        },
+      ],
+    },
+    {
+      id: '2',
+      title: t('playground.swipeDemoTitleRightMenu'),
+      caption: t('playground.swipeDemoCaptionRightMenu'),
+      swipeToRemove: 'left',
+      left: [],
+      right: [
+        {
+          icon: 'add-circle',
+          type: 'secondary',
+          onPress: () => Alert.alert(t('playground.swipeActionReply')),
+        },
+        {
+          icon: 'trash-outline',
+          type: 'tertiary',
+          onPress: () => Alert.alert(t('playground.swipeActionTrash')),
+        },
+      ],
+    },
+    {
+      id: '3',
+      title: t('playground.swipeDemoTitleLeftMenu'),
+      caption: t('playground.swipeDemoCaptionLeftMenu'),
+      swipeToRemove: 'right',
+      left: [
+        {
+          icon: 'folder-outline',
+          type: 'secondary',
+          onPress: () => Alert.alert(t('playground.swipeActionMove')),
+        },
+      ],
+      right: [],
+    },
+  ]
+}
 
 function localStyles(theme: ThemeType) {
   const { getSpacing, getColor } = theme
@@ -101,7 +117,8 @@ function localStyles(theme: ThemeType) {
 function SwipeableItemListBody() {
   const base = useThemedStyles(generateStyles)
   const styles = useThemedStyles(localStyles)
-  const [rows, setRows] = useState<DemoRow[]>(INITIAL_ROWS)
+  const { t } = useTranslation()
+  const [rows, setRows] = useState<DemoRow[]>(() => getInitialRows(t))
 
   const remove = useCallback((id: string) => {
     setRows((prev) => prev.filter((r) => r.id !== id))
@@ -112,14 +129,26 @@ function SwipeableItemListBody() {
       ...prev,
       {
         id: makeId(),
-        title: `Dòng mới #${prev.length + 1}`,
-        caption: 'Vuốt như các dòng khác',
-        left: [{ icon: 'star-outline', type: 'light', onPress: () => Alert.alert('Star') }],
-        right: [{ icon: 'trash-outline', type: 'tertiary', onPress: () => Alert.alert('Trash') }],
+        title: t('playground.swipeNewRowTitle', { index: prev.length + 1 }),
+        caption: t('playground.swipeNewRowCaption'),
+        left: [
+          {
+            icon: 'star-outline',
+            type: 'light',
+            onPress: () => Alert.alert(t('playground.swipeActionStar')),
+          },
+        ],
+        right: [
+          {
+            icon: 'trash-outline',
+            type: 'tertiary',
+            onPress: () => Alert.alert(t('playground.swipeActionTrash')),
+          },
+        ],
         swipeToRemove: 'left',
       },
     ])
-  }, [])
+  }, [t])
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<DemoRow>) => (
@@ -144,10 +173,10 @@ function SwipeableItemListBody() {
   const header = useMemo(
     () => (
       <MyView height={48}>
-        <MyButton text="Thêm dòng" onPress={addRow} />
+        <MyButton text={t('playground.swipeAddRow')} onPress={addRow} />
       </MyView>
     ),
-    [addRow],
+    [addRow, t],
   )
 
   return (

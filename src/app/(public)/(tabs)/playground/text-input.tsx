@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import MyIcon from '@/components/elements/my-icon'
 import MyTextInput from '@/components/elements/my-text-input'
@@ -10,6 +11,7 @@ import { generateStyles } from './styles'
 
 export default function TextInputScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showError, setShowError] = useState(false)
@@ -17,14 +19,14 @@ export default function TextInputScreen() {
     <MyKeyboardAvoiding.ScrollView showToolbar contentContainerStyle={styles.screenContent}>
       <MyView style={styles.inputContainer}>
         <MyTextInput
-          placeholder="Placeholder only"
-          title="Default"
+          placeholder={t('playground.textInputPlaceholderOnly')}
+          title={t('playground.textInputDefault')}
           value={email}
           onChangeText={setEmail}
         />
         <MyTextInput
-          title="Email"
-          subTitle="Nhập email đăng nhập"
+          title={t('playground.textInputEmail')}
+          subTitle={t('playground.textInputEmailSubtitle')}
           placeholder="you@example.com"
           value={email}
           onChangeText={setEmail}
@@ -33,8 +35,8 @@ export default function TextInputScreen() {
           required
         />
         <MyTextInput
-          title="Password"
-          placeholder="Mật khẩu"
+          title={t('playground.textInputPassword')}
+          placeholder={t('auth.passwordLabel')}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -43,11 +45,11 @@ export default function TextInputScreen() {
           endIcon={<MyIcon name="eye-outline" size={20} color="icon/active/primary" />}
         />
         <MyTextInput
-          title="With error"
+          title={t('playground.textInputWithError')}
           subTitle="(Demo)"
-          placeholder="Nhập gì đó"
+          placeholder={t('playground.textInputEnterSomething')}
           error={showError}
-          errorMessage={showError ? 'Trường này không được để trống' : undefined}
+          errorMessage={showError ? t('playground.textInputRequiredError') : undefined}
           value={email}
           onChangeText={(t) => {
             setEmail(t)
@@ -56,24 +58,33 @@ export default function TextInputScreen() {
           onEndIconPress={() => setShowError(true)}
           endIcon={<MyIcon name="alert-circle-outline" size={20} color="icon/alert/primary" />}
         />
-        <MyTextInput title="URL" startText="https://" endText=".com" placeholder="domain" />
-        <MyTextInput title="Fixed width (200)" placeholder="width={200}" width={200} />
         <MyTextInput
-          title="Max length"
-          placeholder="Tối đa 20 ký tự"
+          title="URL"
+          startText="https://"
+          endText=".com"
+          placeholder={t('playground.textInputDomain')}
+        />
+        <MyTextInput
+          title={t('playground.textInputFixedWidth')}
+          placeholder="width={200}"
+          width={200}
+        />
+        <MyTextInput
+          title={t('playground.textInputMaxLength')}
+          placeholder={t('playground.textInputMax20')}
           maxLength={20}
           showCurrentLength
           value="1234567890"
         />
         <MyTextInput
-          title="Disabled"
-          placeholder="Không chỉnh sửa được"
+          title={t('common.disabled')}
+          placeholder={t('playground.textInputNotEditable')}
           disabled
-          value="Disabled value"
+          value={t('playground.textInputDisabledValue')}
         />
         <MyTextInput
-          title="Multiple lines"
-          placeholder="Multiple lines"
+          title={t('playground.textInputMultipleLines')}
+          placeholder={t('playground.textInputMultipleLines')}
           multiline
           value={email}
           numberOfLines={4}
@@ -83,10 +94,10 @@ export default function TextInputScreen() {
           height={100}
         />
         <MyTextInput
-          title="Read only"
+          title={t('playground.textInputReadOnly')}
           placeholder="editable={false}"
           editable={false}
-          value="Read only value"
+          value={t('playground.textInputReadOnlyValue')}
         />
       </MyView>
     </MyKeyboardAvoiding.ScrollView>

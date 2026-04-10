@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react'
 import { memo, useEffect, useState } from 'react'
-import { TouchableOpacity, useColorScheme } from 'react-native'
+import { TouchableOpacity } from 'react-native'
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -10,19 +10,18 @@ import Animated, {
 
 import MyText from '@/components/elements/my-text'
 import { IconSymbol } from '@/components/ui/icon-symbol'
-import { Colors } from '@/constants/theme'
+import { useThemedStyles, useTheme } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
 import CollapsibleContent from './collapsible-content'
-import { useThemedStyles } from '@/theme/theme-context'
 import MyView from '@/components/elements/my-view'
 
 const ANIM_DURATION = 250
 
 const Collapsible: React.FC<PropsWithChildren<{ title: string }>> = ({ children, title }) => {
   const styles = useThemedStyles(generateStyles)
+  const { getColor } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
-  const theme = useColorScheme() ?? 'light'
   const rotation = useSharedValue(0)
 
   useEffect(() => {
@@ -33,7 +32,7 @@ const Collapsible: React.FC<PropsWithChildren<{ title: string }>> = ({ children,
     transform: [{ rotate: `${interpolate(rotation.value, [0, 1], [0, 90])}deg` }],
   }))
 
-  const iconColor = theme === 'light' ? Colors.light.icon : Colors.dark.icon
+  const iconColor = getColor('icon/active/primary')
 
   return (
     <MyView style={styles.container}>

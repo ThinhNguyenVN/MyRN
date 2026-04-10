@@ -3,6 +3,7 @@ import { Image, type ImageErrorEventData, type ImageSource } from 'expo-image'
 import { TouchableOpacity, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import Skeleton from 'react-native-reanimated-skeleton'
+import { useTranslation } from 'react-i18next'
 
 import { isNil } from 'lodash'
 
@@ -18,9 +19,6 @@ import { getContainerStyle, pickContainerProps } from '@/utils/styles'
 const FADE_MS = 200
 const CACHE_POLICY = 'memory-disk'
 
-const DEFAULT_EMPTY_MESSAGE = 'Không có ảnh'
-const DEFAULT_ERROR_MESSAGE = 'Không thể tải ảnh'
-
 const MyImage: React.FC<MyImageProps> = ({
   style,
   imageStyle,
@@ -31,8 +29,8 @@ const MyImage: React.FC<MyImageProps> = ({
   onLoadEnd,
   onError,
   showMessage = false,
-  emptyMessage = DEFAULT_EMPTY_MESSAGE,
-  errorMessage = DEFAULT_ERROR_MESSAGE,
+  emptyMessage,
+  errorMessage,
   elevation = 'none',
   cachePolicy = CACHE_POLICY,
   contentFit = 'cover',
@@ -45,6 +43,12 @@ const MyImage: React.FC<MyImageProps> = ({
   ...rest
 }) => {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
+  const defaultEmptyMessage = t('components.imageEmpty')
+  const defaultErrorMessage = t('components.imageError')
+  const resolvedEmptyMessage = emptyMessage ?? defaultEmptyMessage
+  const resolvedErrorMessage = errorMessage ?? defaultErrorMessage
+
   const containerPropsStyle = useMemo(
     () =>
       getContainerStyle(
@@ -111,7 +115,7 @@ const MyImage: React.FC<MyImageProps> = ({
         <MyIcon name="image-outline" size={32} color="icon/inactive/primary" />
         {showMessage && (
           <MyText typography="caption" color="text/inactive/primary" style={styles.message}>
-            {emptyMessage}
+            {resolvedEmptyMessage}
           </MyText>
         )}
       </MyView>
@@ -127,7 +131,7 @@ const MyImage: React.FC<MyImageProps> = ({
           <MyIcon name="alert-circle-outline" size={32} color="icon/alert/primary" />
           {showMessage && (
             <MyText typography="caption" color="text/alert/primary" style={styles.message}>
-              {errorMessage}
+              {resolvedErrorMessage}
             </MyText>
           )}
         </MyView>

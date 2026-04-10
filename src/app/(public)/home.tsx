@@ -1,5 +1,6 @@
 import React from 'react'
 import { StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
@@ -16,6 +17,7 @@ const styles = StyleSheet.create({
 })
 
 const Home: React.FC = () => {
+  const { t } = useTranslation()
   return (
     <>
       <Stack.Screen
@@ -27,11 +29,11 @@ const Home: React.FC = () => {
             </MyView>
           ),
           header: (props) => <NavigationBarHeader {...props} />,
-          title: 'Home',
+          title: t('tabs.home'),
         }}
       />
       <MyView style={styles.container}>
-        <MyText typography="h5">Welcome Home</MyText>
+        <MyText typography="h5">{t('home.welcome')}</MyText>
       </MyView>
     </>
   )

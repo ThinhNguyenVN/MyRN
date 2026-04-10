@@ -1,6 +1,7 @@
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
@@ -18,6 +19,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 
 export default function HomeScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const isAuthenticated = useAppSelector(selectIsAuthenticated)
   const { data: meData, isFetching: isFetchingMe } = useGetMeQuery(undefined, {
@@ -26,30 +28,30 @@ export default function HomeScreen() {
 
   const handleLogout = useCallback(async () => {
     const ok = await Confirmation.confirm({
-      message: 'Bạn có chắc muốn đăng xuất?',
-      description: 'Bạn sẽ cần đăng nhập lại để dùng các tính năng cần xác thực.',
+      message: t('home.confirmLogoutMessage'),
+      description: t('home.confirmLogoutDescription'),
       type: 'warning',
 
       icon: 'log-out-outline',
-      cancelText: 'Hủy',
-      confirmText: 'Đăng xuất',
+      cancelText: t('common.cancel'),
+      confirmText: t('home.confirmLogoutAction'),
     })
     if (!ok) return
     await dispatch(logoutThunk())
-  }, [dispatch])
+  }, [dispatch, t])
 
   const authSummary = useMemo(() => {
     if (!isAuthenticated) {
-      return 'Bạn chưa đăng nhập.'
+      return t('home.authNotLoggedIn')
     }
     if (isFetchingMe && !meData) {
-      return 'Đang tải thông tin user...'
+      return t('home.authLoadingUser')
     }
     if (!meData) {
-      return 'Đã đăng nhập, chưa lấy được thông tin user.'
+      return t('home.authMissingUser')
     }
     return `${meData.firstName} ${meData.lastName} · @${meData.username}`
-  }, [isAuthenticated, isFetchingMe, meData])
+  }, [isAuthenticated, isFetchingMe, meData, t])
 
   return (
     <ParallaxScrollView
@@ -63,23 +65,25 @@ export default function HomeScreen() {
     >
       <MyView style={styles.titleContainer}>
         <MyText typography="subtitle" style={styles.sectionTitle}>
-          Welcome to MyRN
+          {t('home.welcome')}
         </MyText>
 
         <MyText typography="body">{authSummary}</MyText>
-        <MyText typography="body">Env: {getEnv('EXPO_PUBLIC_APP_ENV')}</MyText>
+        <MyText typography="body">
+          {t('home.envLabel')}: {getEnv('EXPO_PUBLIC_APP_ENV')}
+        </MyText>
       </MyView>
       <MyView style={styles.buttonContainer}>
         {isAuthenticated ? (
           <>
             <MyButton
-              text="Vào Todo"
+              text={t('home.goTodo')}
               size="large"
               onPress={() => router.push(Routes.todo)}
               style={styles.introButton}
             />
             <MyButton
-              text="Logout"
+              text={t('home.logout')}
               size="large"
               type="tertiary"
               onPress={handleLogout}
@@ -88,7 +92,7 @@ export default function HomeScreen() {
           </>
         ) : (
           <MyButton
-            text="Login"
+            text={t('home.login')}
             size="large"
             onPress={() => router.push(Routes.login)}
             style={styles.introButton}

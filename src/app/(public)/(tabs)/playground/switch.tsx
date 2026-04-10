@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ScrollView } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MySwitch from '@/components/elements/my-switch'
 import MyText from '@/components/elements/my-text'
@@ -9,28 +10,34 @@ import { generateStyles } from './styles'
 
 export default function SwitchScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const [on1, setOn1] = useState(false)
   const [on2, setOn2] = useState(true)
 
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
       <MyText typography="label" style={styles.sectionTitle}>
-        Basic
+        {t('playground.switchBasic')}
       </MyText>
 
-      <MySwitch value={on1} onValueChange={setOn1} label="Off" />
-      <MySwitch value={on2} onValueChange={setOn2} label="On" />
-
-      <MyText typography="label" style={styles.sectionTitle}>
-        Label on right
-      </MyText>
-      <MySwitch value={on1} onValueChange={setOn1} label="Label on right" isLeftLabel={false} />
+      <MySwitch value={on1} onValueChange={setOn1} label={t('playground.switchOff')} />
+      <MySwitch value={on2} onValueChange={setOn2} label={t('playground.switchOn')} />
 
       <MyText typography="label" style={styles.sectionTitle}>
-        Disabled
+        {t('playground.switchLabelOnRightTitle')}
       </MyText>
-      <MySwitch value={false} disabled label="Disabled off" />
-      <MySwitch value={true} disabled label="Disabled on" />
+      <MySwitch
+        value={on1}
+        onValueChange={setOn1}
+        label={t('playground.switchLabelOnRight')}
+        isLeftLabel={false}
+      />
+
+      <MyText typography="label" style={styles.sectionTitle}>
+        {t('common.disabled')}
+      </MyText>
+      <MySwitch value={false} disabled label={t('playground.switchDisabledOff')} />
+      <MySwitch value={true} disabled label={t('playground.switchDisabledOn')} />
     </ScrollView>
   )
 }

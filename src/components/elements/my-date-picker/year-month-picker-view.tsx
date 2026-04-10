@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyButton from '@/components/elements/my-button'
 import { WheelPickerView } from '@/components/elements/my-wheel-picker'
@@ -16,6 +17,7 @@ const YearMonthPickerView = memo(function YearMonthPickerView({
   maxDate,
 }: YearMonthPickerViewProps) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const [internal, setInternal] = useState<YearMonthValue>(() => ({
     year: value.year,
     month: value.month,
@@ -80,10 +82,16 @@ const YearMonthPickerView = memo(function YearMonthPickerView({
         </View>
       </View>
       <View style={styles.yearMonthPickerFooter}>
-        <MyButton type="tertiary" text="Hủy" width="full" onPress={handleCancel} elevation="none" />
+        <MyButton
+          type="tertiary"
+          text={t('common.cancel')}
+          width="full"
+          onPress={handleCancel}
+          elevation="none"
+        />
         <MyButton
           type="primary"
-          text="Xác nhận"
+          text={t('common.confirm')}
           width="full"
           onPress={handleConfirm}
           elevation="none"

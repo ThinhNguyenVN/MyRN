@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { router, Stack, usePathname } from 'expo-router'
 import { Platform, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import { ScrollToHideHeader } from '@/components/ui/scroll-to-hide'
 import { NavigationBarHeader } from '@/components/ui/navigation-bar'
@@ -11,8 +12,8 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 
 function titleFromRoute(routeName: string): string {
-  if (routeName === 'toast') return 'Toast & Confirmation'
-  if (routeName === 'swipeable-item') return 'Swipeable item'
+  if (routeName === 'toast') return 'playground.toastAndConfirmation'
+  if (routeName === 'swipeable-item') return 'playground.swipeableItem'
   return routeName.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
@@ -26,8 +27,13 @@ export default function PlaygroundLayout() {
   const showSidebar = useShowSidebar()
   const pathname = usePathname()
   const { getColor } = useTheme()
+  const { t } = useTranslation()
 
   const styles = useThemedStyles(generateStyles)
+  const sideBarLinks = useMemo(
+    () => PLAYGROUND_LINKS.map((item) => ({ href: item.href, label: t(item.labelKey) })),
+    [t],
+  )
 
   useEffect(() => {
     if (Platform.OS !== 'web' || !showSidebar) return
@@ -53,7 +59,7 @@ export default function PlaygroundLayout() {
           const isMyListRoute = route.name === 'my-list/index'
           return {
             ...screenOptions,
-            title: titleFromRoute(route.name ?? ''),
+            title: t(titleFromRoute(route.name ?? '')),
             contentStyle: { backgroundColor: getColor('brand/white') },
             header: (props) =>
               isMyListRoute ? (
@@ -63,7 +69,7 @@ export default function PlaygroundLayout() {
               ) : (
                 <NavigationBarHeader {...props} />
               ),
-            headerShown: route.name !== 'my-list',
+            headerShown: route.name !== 'buttons',
           }
         }}
       />
@@ -72,7 +78,7 @@ export default function PlaygroundLayout() {
 
   return (
     <View style={styles.sideBarContainer}>
-      <SideBar data={PLAYGROUND_LINKS} onSelected={handleSelected} style={styles.sidebarWrapper} />
+      <SideBar data={sideBarLinks} onSelected={handleSelected} style={styles.sidebarWrapper} />
       <View style={styles.contentContainer} collapsable={false}>
         <Stack
           initialRouteName="buttons"
@@ -81,7 +87,7 @@ export default function PlaygroundLayout() {
             const isMyListRoute = route.name === 'my-list/index'
             return {
               ...screenOptions,
-              title: titleFromRoute(route.name ?? ''),
+              title: t(titleFromRoute(route.name ?? '')),
               contentStyle: { backgroundColor: getColor('brand/white') },
               header: (props) =>
                 isMyListRoute ? (

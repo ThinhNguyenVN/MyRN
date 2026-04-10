@@ -1,4 +1,5 @@
 import { ScrollView } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import MyAlert from '@/components/elements/my-alert'
 import MyText from '@/components/elements/my-text'
@@ -8,100 +9,105 @@ import { generateStyles } from './styles'
 
 export default function AlertScreen() {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
       <MyText typography="label" style={styles.labelMargin}>
-        1. Info
+        {t('playground.alertSectionInfo')}
       </MyText>
       <MyAlert
         type="info"
-        title="Thông tin"
-        message="Đây là thông báo thông tin"
-        description="Mô tả chi tiết của alert loại info."
+        title={t('playground.alertInfoTitle')}
+        message={t('playground.alertInfoMessage')}
+        description={t('playground.alertInfoDescription')}
         onClose={() => {}}
         style={styles.alertMargin}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        2. Success
+        {t('playground.alertSectionSuccess')}
       </MyText>
       <MyAlert
         type="success"
-        title="Thành công"
-        message="Thao tác đã hoàn tất"
-        description="Dữ liệu đã được lưu thành công."
+        title={t('playground.alertSuccessTitle')}
+        message={t('playground.alertSuccessMessage')}
+        description={t('playground.alertSuccessDescription')}
         onClose={() => {}}
         style={styles.alertMargin}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        3. Warning
+        {t('playground.alertSectionWarning')}
       </MyText>
       <MyAlert
         type="warning"
-        title="Cảnh báo"
-        message="Vui lòng kiểm tra lại"
-        description="Có một số thông tin cần được xác nhận."
+        title={t('playground.alertWarningTitle')}
+        message={t('playground.alertWarningMessage')}
+        description={t('playground.alertWarningDescription')}
         onClose={() => {}}
         style={styles.alertMargin}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        4. Error
+        {t('playground.alertSectionError')}
       </MyText>
       <MyAlert
         type="error"
-        title="Lỗi"
-        message="Đã xảy ra lỗi"
-        description="Không thể thực hiện thao tác. Vui lòng thử lại sau."
+        title={t('playground.alertErrorTitle')}
+        message={t('playground.alertErrorMessage')}
+        description={t('playground.alertErrorDescription')}
         onClose={() => {}}
         style={styles.alertMargin}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        5. Custom icon
+        {t('playground.alertSectionCustomIcon')}
       </MyText>
       <MyAlert
         type="info"
         icon="notifications"
-        message="Thông báo mới"
-        description="Bạn có 3 thông báo chưa đọc."
+        message={t('playground.alertCustomIconMessage')}
+        description={t('playground.alertCustomIconDescription')}
         style={styles.alertMargin}
         onClose={() => {}}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        6. With image
+        {t('playground.alertSectionWithImage')}
       </MyText>
       <MyAlert
         type="success"
         image={require('@/assets/images/react-logo.png')}
-        message="Cập nhật profile"
-        description="Ảnh đại diện đã được cập nhật."
+        message={t('playground.alertImageMessage')}
+        description={t('playground.alertImageDescription')}
         style={styles.alertMargin}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        7. Minimal (no header)
+        {t('playground.alertSectionMinimal')}
       </MyText>
-      <MyAlert type="warning" message="Phiên đăng nhập sắp hết hạn" style={styles.alertMargin} />
+      <MyAlert
+        type="warning"
+        message={t('playground.alertMinimalMessage')}
+        style={styles.alertMargin}
+      />
       <MyText typography="label" style={styles.labelMargin}>
-        8. With elevation
+        {t('playground.alertSectionWithElevation')}
       </MyText>
       <MyAlert
         type="success"
-        title="Thành công"
-        message="Có shadow"
+        title={t('playground.alertSuccessTitle')}
+        message={t('playground.alertElevationMessage')}
         elevation="soft/down/small"
         onClose={() => {}}
         style={styles.alertMargin}
       />
       <MyText typography="label" style={styles.labelMargin}>
-        9. With buttons
+        {t('playground.alertSectionWithButtons')}
       </MyText>
       <MyAlert
         type="info"
-        title="Xác nhận"
-        message="Bạn có muốn tiếp tục?"
-        description="Thao tác này không thể hoàn tác."
+        title={t('playground.alertButtonsTitle')}
+        message={t('playground.alertButtonsMessage')}
+        description={t('playground.alertButtonsDescription')}
         onClose={() => {}}
         buttons={[
-          { text: 'Hủy', type: 'tertiary', onPress: () => {} },
-          { text: 'Xác nhận', type: 'primary', onPress: () => {} },
+          { text: t('common.cancel'), type: 'tertiary', onPress: () => {} },
+          { text: t('common.confirm'), type: 'primary', onPress: () => {} },
         ]}
         style={styles.alertMargin}
       />
