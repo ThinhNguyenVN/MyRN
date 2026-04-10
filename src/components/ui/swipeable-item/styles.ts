@@ -14,16 +14,17 @@ export function stripWidthPx(actionCount: number) {
   )
 }
 
-export function generateStyles(theme: ThemeType) {
-  const { getColor } = theme
+export function generateStyles(_: ThemeType) {
   return StyleSheet.create({
     root: {
-      overflow: 'hidden',
+      overflow: 'visible',
       position: 'relative',
+    },
+    underlayClip: {
+      overflow: 'hidden',
     },
     underlayBg: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: getColor('fill/inactive/tertiary'),
     },
     leftStripAbs: {
       position: 'absolute',

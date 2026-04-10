@@ -286,7 +286,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
       >
         <View style={styles.root} testID={testID}>
           <Animated.View
-            style={[StyleSheet.absoluteFillObject, underlayWrapStyle]}
+            style={[StyleSheet.absoluteFillObject, styles.underlayClip, underlayWrapStyle]}
             pointerEvents="box-none"
           >
             <View style={styles.underlayBg} pointerEvents="box-none" />

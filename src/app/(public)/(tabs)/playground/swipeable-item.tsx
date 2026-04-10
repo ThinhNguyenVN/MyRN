@@ -3,7 +3,6 @@ import { Alert, StyleSheet, View } from 'react-native'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
-import MyView from '@/components/elements/my-view'
 import {
   SwipeableItemProvider,
   SwipeableItem,
@@ -15,6 +14,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
 import { ListRenderItemInfo, MyList } from '@/components/ui/my-list'
+import MyView from '@/components/elements/my-view'
 
 type DemoRow = {
   id: string
@@ -83,25 +83,24 @@ const INITIAL_ROWS: DemoRow[] = [
 ]
 
 function localStyles(theme: ThemeType) {
-  const { getSpacing, getColor, getRadius } = theme
+  const { getSpacing, getColor } = theme
   return StyleSheet.create({
     screen: { flex: 1 },
     list: { flex: 1 },
     rowCard: {
-      marginBottom: getSpacing('x2'),
-      borderRadius: getRadius('small'),
-      backgroundColor: getColor('fill/background/tertiary'),
-      paddingVertical: getSpacing('x3'),
-      paddingHorizontal: getSpacing('x4'),
+      backgroundColor: getColor('fill/background/primary'),
+      padding: getSpacing('x3'),
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: getColor('border/inactive/secondary'),
     },
-    header: { gap: getSpacing('x2'), marginBottom: getSpacing('x4') },
+
     captionMargin: { marginTop: getSpacing('x2') },
   })
 }
 
 function SwipeableItemListBody() {
   const base = useThemedStyles(generateStyles)
-  const local = useThemedStyles(localStyles)
+  const styles = useThemedStyles(localStyles)
   const [rows, setRows] = useState<DemoRow[]>(INITIAL_ROWS)
 
   const remove = useCallback((id: string) => {
@@ -131,34 +130,30 @@ function SwipeableItemListBody() {
         swipeToRemove={item.swipeToRemove}
         onDelete={() => remove(item.id)}
       >
-        <View style={local.rowCard}>
+        <MyView style={styles.rowCard} elevation={'soft/down/small'} radius="small">
           <MyText typography="body">{item.title}</MyText>
-          <MyText typography="caption" color="text/active/tertiary" style={local.captionMargin}>
+          <MyText typography="caption" color="text/active/tertiary" style={styles.captionMargin}>
             {item.caption}
           </MyText>
-        </View>
+        </MyView>
       </SwipeableItem>
     ),
-    [local.captionMargin, local.rowCard, remove],
+    [styles.captionMargin, styles.rowCard, remove],
   )
 
   const header = useMemo(
     () => (
-      <MyView style={local.header}>
-        <MyText typography="subtitle" style={base.sectionTitle}>
-          Swipeable item
-        </MyText>
-
-        <MyButton text="Thêm dòng" size="small" type="secondary" onPress={addRow} />
+      <MyView height={48}>
+        <MyButton text="Thêm dòng" onPress={addRow} />
       </MyView>
     ),
-    [addRow, base.sectionTitle, local.header],
+    [addRow],
   )
 
   return (
-    <View style={local.screen}>
+    <View style={styles.screen}>
       <MyList<DemoRow>
-        style={local.list}
+        style={styles.list}
         data={rows}
         renderItem={renderItem}
         ListHeaderComponent={header}
