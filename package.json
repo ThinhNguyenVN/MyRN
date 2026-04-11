@@ -7,6 +7,7 @@
     "start:staging": "dotenv -e .env.staging -- expo start",
     "start:prod": "dotenv -e .env.production -- expo start",
     "reset-project": "node ./scripts/reset-project.js",
+    "check:branch-name": "node ./scripts/check-branch-name.js",
     "test": "jest --runInBand",
     "lint": "eslint src",
     "fix": "eslint src --fix",
