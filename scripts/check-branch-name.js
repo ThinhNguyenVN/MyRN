@@ -1,7 +1,6 @@
 const { execSync } = require('node:child_process')
 
 const allowedPattern = /^(feat|fix|issue)\/[a-z0-9._-]+$/
-const automationException = /^cursor\/.+-a06f$/
 
 const candidate =
   process.env.BRANCH_NAME ||
@@ -25,7 +24,7 @@ if (branchName === 'main' || branchName === 'master') {
   process.exit(0)
 }
 
-if (allowedPattern.test(branchName) || automationException.test(branchName)) {
+if (allowedPattern.test(branchName)) {
   console.log(`Branch "${branchName}" is allowed.`)
   process.exit(0)
 }

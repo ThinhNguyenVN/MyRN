@@ -17,6 +17,7 @@ Examples:
 - `issue/123-login-error`
 
 The repository validates branch names locally on `git push` and again in GitHub Actions.
+Branches using `cursor/` are not allowed.
 
 You can also generate a valid branch name from the CLI:
 
