@@ -8,14 +8,9 @@ import { NavigationBarHeader } from '@/components/ui/navigation-bar'
 import SideBar, { SideBarItem } from '@/components/ui/side-bar'
 import { useShowSidebar } from '@/hooks/dimenstions-hooks'
 import { PLAYGROUND_LINKS } from './constants'
+import { titleFromRoute } from './title-from-route'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
-
-function titleFromRoute(routeName: string): string {
-  if (routeName === 'toast') return 'playground.toastAndConfirmation'
-  if (routeName === 'swipeable-item') return 'playground.swipeableItem'
-  return routeName.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-}
 
 const screenOptions = {
   header: (props: any) => <NavigationBarHeader {...props} />,
