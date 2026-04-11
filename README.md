@@ -18,6 +18,14 @@ Examples:
 
 The repository validates branch names locally on `git push` and again in GitHub Actions.
 
+You can also generate a valid branch name from the CLI:
+
+```bash
+yarn branch:create feat auth login
+yarn branch:create fix token refresh
+yarn branch:create issue 123 login error
+```
+
 ## Get started
 
 1. Install dependencies
