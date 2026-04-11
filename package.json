@@ -7,9 +7,12 @@
     "start:staging": "dotenv -e .env.staging -- expo start",
     "start:prod": "dotenv -e .env.production -- expo start",
     "reset-project": "node ./scripts/reset-project.js",
+    "check:branch-name": "node ./scripts/check-branch-name.js",
     "test": "jest --runInBand",
     "lint": "eslint src",
     "fix": "eslint src --fix",
+    "check:commit": "yarn lint && npx dotenv -e .env.test -- yarn test",
+    "prepare": "husky",
     "postinstall": "mkdir public; cp $(node -p \"require.resolve('canvaskit-wasm/bin/full/canvaskit.wasm', { paths: [require.resolve('@shopify/react-native-skia')] })\") public/canvaskit.wasm"
   },
   "dependencies": {
@@ -75,6 +78,7 @@
     "eslint-plugin-react-native": "5.0.0",
     "eslint-plugin-simple-import-sort": "12.1.1",
     "eslint-plugin-unused-imports": "4.3.0",
+    "husky": "^9.1.7",
     "jest": "30.3.0",
     "msw": "2.12.14",
     "prettier": "3.7.4",

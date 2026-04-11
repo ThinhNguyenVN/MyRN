@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+set -e
+
+echo "Running lint and unit tests before commit..."
+yarn check:commit

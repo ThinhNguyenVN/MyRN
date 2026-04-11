@@ -2,6 +2,22 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+## Branch naming
+
+Use branch names in this format:
+
+- `feat/<description>`
+- `fix/<description>`
+- `issue/<description>`
+
+Examples:
+
+- `feat/auth-login`
+- `fix/token-refresh`
+- `issue/123-login-error`
+
+The repository validates branch names locally on `git push` and again in GitHub Actions.
+
 ## Get started
 
 1. Install dependencies
