@@ -16,8 +16,6 @@ Examples:
 - `fix/token-refresh`
 - `issue/123-login-error`
 
-The repository validates branch names locally on `git push` and again in GitHub Actions.
-Branches using `cursor/` are not allowed.
 
 You can also generate a valid branch name from the CLI:
 
@@ -71,16 +69,6 @@ npm run android:test
 npm run ios:staging
 npm run web:production
 ```
-
-### Reset Metro cache when switching env
-
-```bash
-npm run start:test:clean
-npm run start:staging:clean
-npm run start:production:clean
-```
-
-Use `:clean` variants after frequent env switches or when Metro appears to cache stale values.
 
 ### Build-ready for EAS (later)
 
