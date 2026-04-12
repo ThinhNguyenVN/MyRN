@@ -9,12 +9,14 @@ Use branch names in this format:
 - `feat/<description>`
 - `fix/<description>`
 - `issue/<description>`
+- `release/<description>`
 
 Examples:
 
 - `feat/auth-login`
 - `fix/token-refresh`
 - `issue/123-login-error`
+- `release/1-2-0`
 
 The repository validates branch names locally on `git push` and again in GitHub Actions.
 Branches using `cursor/` are not allowed.
@@ -25,6 +27,7 @@ You can also generate a valid branch name from the CLI:
 yarn branch:create feat auth login
 yarn branch:create fix token refresh
 yarn branch:create issue 123 login error
+yarn branch:create release 1 2 0
 ```
 
 ## Get started

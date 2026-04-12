@@ -6,9 +6,9 @@ This is an **Expo SDK 55 React Native** app (`myrn`) targeting iOS, Android, and
 
 ### Git branch naming
 
-- Use branch names in the format `feat/<description>`, `fix/<description>`, or `issue/<description>`.
+- Use branch names in the format `feat/<description>`, `fix/<description>`, `issue/<description>`, or `release/<description>`.
 - Do not create or use `cursor/` branches for normal development work.
-- If you need a helper, run `yarn branch:create <feat|fix|issue> <description words>` and use the printed branch name with `git checkout -b`.
+- If you need a helper, run `yarn branch:create <feat|fix|issue|release> <description words>` and use the printed branch name with `git checkout -b`.
 
 ### Key commands
 
