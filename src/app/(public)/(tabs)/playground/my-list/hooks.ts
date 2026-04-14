@@ -3,13 +3,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 const POSTS_API = 'https://jsonplaceholder.typicode.com/posts'
 const TARGET_TOTAL = 1100
 
-export type Post = {
-  id: number
-  title: string
-  body: string
-  imageUrl: string
-}
-
 export function toPost(
   raw: { id: number; title: string; body: string },
   syntheticId?: number,
