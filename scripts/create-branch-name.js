@@ -1,16 +1,18 @@
-const allowedTypes = new Set(['feat', 'fix', 'issue'])
+const allowedTypes = new Set(['feat', 'fix', 'issue', 'release'])
 
 const [, , typeArg, ...nameParts] = process.argv
 
 if (!allowedTypes.has(typeArg)) {
-  console.error('Branch type must be one of: feat, fix, issue.')
+  console.error('Branch type must be one of: feat, fix, issue, release.')
   process.exit(1)
 }
 
 const rawName = nameParts.join(' ').trim()
 
 if (!rawName) {
-  console.error('Branch description is required. Example: yarn branch:create feat login screen')
+  console.error(
+    'Branch description is required. Example: yarn branch:create release 1 2 0',
+  )
   process.exit(1)
 }
 
