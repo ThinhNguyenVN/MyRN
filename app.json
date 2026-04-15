@@ -1,11 +1,8 @@
 {
   "expo": {
-    "name": "MyRN",
-    "slug": "myrn",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myrn",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true
@@ -48,11 +45,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "1fac2f1d-cc51-4917-8310-c06ff1250a1c"
-      }
-    },
-    "owner": "confusion"
+      "router": {}
+    }
   }
 }
