@@ -11,6 +11,8 @@ The goal is not to document every file in the repo. The goal is to give humans a
 - `src/features/auth` and `src/features/todo` are the canonical reference features.
 - `src/app/(public)/(tabs)/playground` stays in the app as a component usage catalog.
 - `playground` is not a structure reference for production code.
+- Branch names must use `feat/`, `fix/`, `issue/`, or `release/`.
+- Do not create or use `cursor/` branches for normal development work.
 
 ## Read this file first, then pick the matching spec
 

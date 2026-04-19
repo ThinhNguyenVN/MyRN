@@ -33,6 +33,11 @@ Use branch names in this format:
 - `issue/<description>`
 - `release/<description>`
 
+Rules:
+
+- Do not create or use `cursor/` branches for normal development work.
+- Prefer the existing helper script to generate a valid branch name.
+
 Examples:
 
 - `feat/auth-login`
