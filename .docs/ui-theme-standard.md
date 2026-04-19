@@ -1,6 +1,6 @@
-# UI, component, and theme standard for `my-rn`
+# UI, component, and theme standard
 
-This file defines how production features should compose UI in apps generated from `create-myrn-app`.
+This file defines how production features should compose UI in this codebase.
 
 ## Core rules
 
@@ -175,7 +175,7 @@ Rules:
 
 ## `playground` policy
 
-`playground` remains part of the starter kit because it helps developers and AI discover how shared components behave.
+`playground` remains part of this codebase because it helps developers and AI discover how shared components behave.
 
 However:
 

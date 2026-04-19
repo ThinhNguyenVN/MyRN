@@ -1,6 +1,6 @@
-# Screen standard for `my-rn`
+# Screen standard
 
-This file defines the required shape for new production screens in apps generated from `create-myrn-app`.
+This file defines the required shape for new production screens in this codebase.
 
 ## Core rule
 
@@ -149,6 +149,12 @@ The corresponding file in `src/app` should stay thin:
 - do a redirect/auth check and then mount the container
 
 The route file must not become the real screen implementation.
+
+### Route path constants
+
+- Prefer shared route constants for reusable app paths.
+- Do not spread hardcoded route strings across feature screens when a route is reused in more than one place.
+- If the app already has a route constants module, extend it instead of inventing feature-local path strings.
 
 ## Anti-patterns
 

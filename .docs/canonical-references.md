@@ -1,6 +1,8 @@
-# Canonical references for `my-rn`
+# Canonical references
 
 Use this file when a contributor or AI needs to know which parts of the repo are the real production references.
+
+These are reference implementations, not mandatory business features for every app. A new app may have different domains and route names, but it should still copy the same structural boundaries and coding patterns.
 
 ## Source of truth order
 
@@ -67,7 +69,7 @@ What to copy from `todo`:
 
 ## `playground`: allowed use and forbidden use
 
-`src/app/(public)/(tabs)/playground` stays in the starter kit because it is useful for:
+`src/app/(public)/(tabs)/playground` stays in the repository because it is useful for:
 
 - quickly checking how an existing shared component behaves
 - finding props and visual behavior examples

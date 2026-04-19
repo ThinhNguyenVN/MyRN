@@ -1,6 +1,6 @@
-# Data and state standard for `my-rn`
+# Data and state standard
 
-This file defines how apps generated from `create-myrn-app` should handle API calls, server cache, app state, and auth state.
+This file defines how this codebase should handle API calls, server cache, app state, and auth state.
 
 ## Core rules
 
@@ -13,7 +13,7 @@ This file defines how apps generated from `create-myrn-app` should handle API ca
 
 ## Shared API layer
 
-Use the shared stack that already exists in `my-rn`:
+Use the shared stack that already exists in this repository:
 
 - `src/constants/api.ts`
 - `src/api/axios-instance.ts`
@@ -133,7 +133,7 @@ Canonical example:
 
 ## Auth and persistence standard
 
-The auth flow in `my-rn` is the canonical source of truth.
+The auth flow in this repository is the canonical source of truth.
 
 Reference files:
 

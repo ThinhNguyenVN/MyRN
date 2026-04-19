@@ -1,8 +1,8 @@
-# `my-rn`
+# Project overview
 
-Expo SDK 55 React Native starter kit for iOS, Android, and Web.
+Expo SDK 55 React Native app for iOS, Android, and Web.
 
-`my-rn` is the reference implementation behind `create-myrn-app`. It is designed to be copied and followed closely by future projects, especially for:
+This repository is structured to support:
 
 - Expo Router shell structure
 - feature-first module organization
@@ -11,11 +11,11 @@ Expo SDK 55 React Native starter kit for iOS, Android, and Web.
 - API integration with Axios + RTK Query
 - app state with Redux Toolkit
 
-## Starter-kit documentation
+## Project documentation
 
-The conventions for future projects live in `.docs/`:
+The working conventions for this codebase live in `.docs/`:
 
-- `.docs/README.md`: map of all starter-kit docs
+- `.docs/README.md`: map of all project docs
 - `.docs/folder-structure.md`: route shell and feature folder rules
 - `.docs/screen-standard.md`: standard screen structure
 - `.docs/ui-theme-standard.md`: UI kit, theme, token, and styling rules

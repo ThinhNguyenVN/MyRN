@@ -1,6 +1,6 @@
-# `my-rn` starter-kit docs
+# Project conventions
 
-This directory defines the working conventions that future apps generated from `create-myrn-app` should follow.
+This directory defines the working conventions for this app.
 
 The goal is not to document every file in the repo. The goal is to give humans and AI agents a small set of strict references that are easy to apply in concrete tasks.
 
@@ -9,6 +9,7 @@ The goal is not to document every file in the repo. The goal is to give humans a
 - `src/app` is route shell only.
 - Production screen implementation lives in `src/features`.
 - `src/features/auth` and `src/features/todo` are the canonical reference features.
+- `auth` and `todo` are reference implementations for architecture and code shape, not mandatory product features for every app.
 - `src/app/(public)/(tabs)/playground` stays in the app as a component usage catalog.
 - `playground` is not a structure reference for production code.
 - Branch names must use `feat/`, `fix/`, `issue/`, or `release/`.
@@ -46,7 +47,25 @@ Read:
 1. `data-state-standard.md`
 2. `canonical-references.md`
 
-### Review whether code follows starter-kit rules
+### Build a whole app or a large new domain
+
+Read:
+
+1. `folder-structure.md`
+2. `data-state-standard.md`
+3. `screen-standard.md`
+4. `ui-theme-standard.md`
+5. `canonical-references.md`
+
+Build in this order:
+
+1. app shell, providers, and store integration
+2. shared theme, UI, and API boundaries
+3. feature modules under `src/features`
+4. thin route files under `src/app`
+5. final cleanup against canonical references
+
+### Review whether code follows project rules
 
 Read all files in this directory, then compare the change against `src/features/auth` and `src/features/todo`.
 
