@@ -63,6 +63,8 @@ If any of the above is unspecified in design, follow `.docs/default-behavior-rul
 - Use Redux Toolkit slice/thunk only when they fit the documented boundaries.
 - Use `src/features/auth` and `src/features/todo` only as reference implementations for structure and code shape.
 - Do not treat `playground` as a structure reference.
+- If the new design is visually very different from the current UI and the change repeats across multiple screens, refactor the shared visual layer instead of patching each screen with one-off overrides.
+- If the redesign is feature-local and not expected to spread, keep the change local to the feature instead of forcing it into shared UI too early.
 
 ## Definition of done
 - correct structure and file placement

@@ -20,6 +20,7 @@ The goal is not to document every file in the repo. The goal is to give humans a
 - `folder-structure.md`: where code belongs.
 - `screen-standard.md`: how one production screen should be built.
 - `ui-theme-standard.md`: how to use shared components, tokens, and styles.
+  Includes rules for large visual redesigns and when to refactor shared UI/theme layers.
 - `data-state-standard.md`: how to call APIs and structure RTK Query, Redux Toolkit, hooks, and auth.
 - `default-behavior-rules.md`: fallback product and UX behavior when the design or prompt does not specify enough detail.
 - `canonical-references.md`: which existing files are the source of truth when there is ambiguity.

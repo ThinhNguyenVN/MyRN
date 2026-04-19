@@ -68,6 +68,8 @@ If behavior is not specified in design, follow `.docs/default-behavior-rules.md`
 - `src/app` must stay a thin route shell.
 - Production implementation must live in `src/features`.
 - Reuse existing shared UI, theme, token, API, and store layers before adding new abstractions.
+- If the new design is a large visual redesign, keep the architecture and data boundaries, but allow refactoring shared theme and shared UI layers to match the new system.
+- If visual changes repeat across many screens, prefer shared-layer refactors over one-off screen overrides.
 - Use RTK Query by default for server data.
 - Use Redux Toolkit slice or thunk only when appropriate for client-owned state or orchestration.
 - Prefer route constants when paths are reused.
@@ -106,3 +108,4 @@ If a detail is missing:
 - If Figma and Stitch differ, declare one final source of truth.
 - If links may be inaccessible, attach screenshots and written notes.
 - If behavior is not fully designed, say "use project defaults" so the agent follows the shared default rules instead of improvising.
+- If the design is a major visual departure from the current app, say so explicitly and ask for a scope-lock pass first.

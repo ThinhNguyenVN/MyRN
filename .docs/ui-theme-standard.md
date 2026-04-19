@@ -174,6 +174,37 @@ Rules:
 - Repeated style objects should move to `styles.ts`.
 - Theme-derived styles should not be scattered across the screen body.
 
+## Large visual redesign rule
+
+When a new design is visually very different from the current app, keep the architecture stable but allow the visual system to change.
+
+Core principle:
+
+- architecture is stable
+- the visual system is replaceable
+
+Rules:
+
+- Do not force a radically new design into old shared UI shapes if that would produce obviously incorrect UI.
+- Do not solve a broad redesign by stacking screen-local overrides on top of outdated shared components.
+- If the same visual change appears across multiple screens, prefer updating shared tokens, shared elements, or shared composite UI instead of patching each screen separately.
+- If the difference is isolated to one screen or one domain-specific block, a local override is acceptable.
+- If the redesign affects app shell patterns such as headers, tabs, filters, sheets, or common cards/inputs/buttons, treat it as a shared-layer change first.
+- For a large redesign, start with a scope-lock pass before implementation so the work is split into shell changes, shared UI/theme changes, and feature-specific changes.
+
+Practical decision rule:
+
+- repeated change across many screens -> refactor shared layer
+- isolated change in one flow -> keep it local unless reuse becomes clear
+- shell-level visual change -> update shell/shared UI, not just feature styles
+
+During redesign work:
+
+- preserve project architecture first
+- preserve required behavior second
+- create a new consistent shared visual language third
+- match final visual fidelity fourth
+
 ## `playground` policy
 
 `playground` remains part of this codebase because it helps developers and AI discover how shared components behave.

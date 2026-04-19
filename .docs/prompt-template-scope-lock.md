@@ -33,11 +33,14 @@ I want you to review the design sources and lock scope before coding.
 4. Propose the implementation order.
 5. List any assumptions you would use if I do not clarify them.
 6. Call out anything that should follow the default behavior rules.
+7. If the design represents a large visual redesign, identify which parts should change at the token layer, shared UI layer, shell layer, and feature-only layer.
 
 ### Constraints
 - Use `src/features/auth` and `src/features/todo` only as structural references.
 - Do not invent a new architecture pattern if the current conventions already cover the case.
 - Treat `playground` as a component catalog only.
+- If the redesign changes repeated visual patterns across many screens, prefer refactoring shared tokens or shared UI instead of patching each screen locally.
+- Keep architecture stable even if the visual system changes heavily.
 
 ## Expected output
 
