@@ -8,6 +8,7 @@ This file defines how production features should compose UI in this codebase.
 - Use `auth` and `todo` as the production-quality references.
 - Use `playground` to learn component behavior, not feature structure.
 - Do not hardcode design values in feature code when a theme token already exists.
+- If the design does not specify a behavior detail, follow `.docs/default-behavior-rules.md` before inventing a new UI behavior.
 
 ## Shared component layers
 

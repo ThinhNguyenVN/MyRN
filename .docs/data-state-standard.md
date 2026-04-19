@@ -205,3 +205,8 @@ If a feature is simple, invalidation is acceptable. If a feature is list-heavy a
 - Are thunks reserved for orchestration and persistence flows?
 - Is the shared API client reused instead of duplicated?
 - Are screens accessing server state only through containers or screen hooks?
+
+## Related references
+
+- Read `.docs/default-behavior-rules.md` for fallback behavior when API/loading/error/success details are not fully specified in the prompt or design.
+- Read `.docs/prompt-template-feature.md` or `.docs/prompt-template-full-app.md` when preparing implementation prompts for new work.

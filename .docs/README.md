@@ -21,7 +21,11 @@ The goal is not to document every file in the repo. The goal is to give humans a
 - `screen-standard.md`: how one production screen should be built.
 - `ui-theme-standard.md`: how to use shared components, tokens, and styles.
 - `data-state-standard.md`: how to call APIs and structure RTK Query, Redux Toolkit, hooks, and auth.
+- `default-behavior-rules.md`: fallback product and UX behavior when the design or prompt does not specify enough detail.
 - `canonical-references.md`: which existing files are the source of truth when there is ambiguity.
+- `prompt-template-full-app.md`: reusable prompt template for generating a whole app or a large domain.
+- `prompt-template-feature.md`: reusable prompt template for implementing one feature or a small set of screens.
+- `prompt-template-scope-lock.md`: reusable prompt template for a planning or scope-confirmation pass before coding.
 
 ## Suggested AI reading order by task
 
@@ -31,21 +35,24 @@ Read:
 
 1. `folder-structure.md`
 2. `screen-standard.md`
-3. `canonical-references.md`
+3. `default-behavior-rules.md`
+4. `canonical-references.md`
 
 ### Add or update shared UI
 
 Read:
 
 1. `ui-theme-standard.md`
-2. `canonical-references.md`
+2. `default-behavior-rules.md`
+3. `canonical-references.md`
 
 ### Add or update API, RTK Query, Redux Toolkit, or auth state
 
 Read:
 
 1. `data-state-standard.md`
-2. `canonical-references.md`
+2. `default-behavior-rules.md`
+3. `canonical-references.md`
 
 ### Build a whole app or a large new domain
 
@@ -55,7 +62,8 @@ Read:
 2. `data-state-standard.md`
 3. `screen-standard.md`
 4. `ui-theme-standard.md`
-5. `canonical-references.md`
+5. `default-behavior-rules.md`
+6. `canonical-references.md`
 
 Build in this order:
 
@@ -68,6 +76,14 @@ Build in this order:
 ### Review whether code follows project rules
 
 Read all files in this directory, then compare the change against `src/features/auth` and `src/features/todo`.
+
+### Ask AI to build a new app or feature from designs
+
+Use one of these templates as the starting prompt:
+
+1. `prompt-template-scope-lock.md` for planning and ambiguity reduction before coding
+2. `prompt-template-feature.md` for one feature or a few screens
+3. `prompt-template-full-app.md` for a whole app or a large domain
 
 ## What this docs set intentionally does not do
 

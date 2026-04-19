@@ -173,3 +173,7 @@ Avoid these in new production screens:
 - Does the form use `MyForm` and `MyForm*` adapters?
 - Does the list use `MyList` instead of raw list primitives?
 - Does the screen look closer to `auth` or `todo` than to `playground`?
+
+## Default behavior fallback
+
+If a design or prompt does not define screen behavior clearly enough, follow `.docs/default-behavior-rules.md` instead of inventing one-off behavior per screen.
