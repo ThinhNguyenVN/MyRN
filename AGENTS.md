@@ -10,6 +10,17 @@ This is an **Expo SDK 55 React Native** app (`myrn`) targeting iOS, Android, and
 - Do not create or use `cursor/` branches for normal development work.
 - If you need a helper, run `yarn branch:create <feat|fix|issue|release> <description words>` and use the printed branch name with `git checkout -b`.
 
+### Required docs discovery
+
+- Treat `.docs/README.md` as the entry point for project conventions.
+- When the user asks how to prompt the agent for app or feature generation, read `.docs/prompt-template-full-app.md`, `.docs/prompt-template-feature.md`, and `.docs/prompt-template-scope-lock.md`.
+- Before adding or changing production screens, read `.docs/folder-structure.md`, `.docs/screen-standard.md`, and `.docs/canonical-references.md`.
+- Before adding or changing shared UI, theme, or tokens, read `.docs/ui-theme-standard.md` and `.docs/canonical-references.md`.
+- Before adding or changing API, RTK Query, Redux Toolkit, hooks, or auth state, read `.docs/data-state-standard.md` and `.docs/canonical-references.md`.
+- If design or product notes are incomplete, read `.docs/default-behavior-rules.md` and use those defaults instead of inventing ad hoc behavior.
+- Before generating a whole app or a large new domain, read all files under `.docs/` and follow the build order documented in `.docs/README.md`.
+- When conventions conflict, follow `.docs/canonical-references.md`, then match the patterns used in `src/features/auth` and `src/features/todo`.
+
 ### Key commands
 
 | Action | Command |

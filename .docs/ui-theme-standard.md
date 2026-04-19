@@ -1,0 +1,225 @@
+# UI, component, and theme standard
+
+This file defines how production features should compose UI in this codebase.
+
+## Core rules
+
+- Prefer shared components before creating new ones.
+- Use `auth` and `todo` as the production-quality references.
+- Use `playground` to learn component behavior, not feature structure.
+- Do not hardcode design values in feature code when a theme token already exists.
+- If the design does not specify a behavior detail, follow `.docs/default-behavior-rules.md` before inventing a new UI behavior.
+
+## Shared component layers
+
+### `src/components/elements`
+
+Use `elements` for reusable primitives and controls.
+
+Typical examples:
+
+- `MyText`
+- `MyView`
+- `MyButton`
+- `MyIcon`
+- `MyTextInput`
+- `MySwitch`
+
+Use an existing element before creating a local wrapper in a feature.
+
+### `src/components/form`
+
+Use `form` for `react-hook-form` integration.
+
+Examples:
+
+- `MyForm`
+- `MyFormTextInput`
+- `MyFormSwitch`
+- other `MyForm*` adapters
+
+For production forms, prefer `MyForm*` adapters over wiring low-level fields manually.
+
+### `src/components/ui`
+
+Use `ui` for shared composite behavior and cross-feature patterns.
+
+Examples:
+
+- `MyList`
+- `NavigationBarHeader`
+- `Confirmation`
+- `Toast`
+- `SwipeableItem`
+- `ScrollToHide`
+
+If a behavior is likely to be reused across screens or features, it belongs here instead of inside a single feature.
+
+## What to use by default
+
+### Text
+
+- Use `MyText` for app text.
+- Choose typography from the shared scale.
+- Choose text color from semantic tokens.
+
+Do not use raw `Text` directly in normal feature code unless there is a very specific technical reason.
+
+### Container and layout
+
+- Use `MyView` when the container needs theme-aware background, radius, elevation, or container props.
+- Raw `View` is allowed for very simple local wrappers.
+
+Allowed `View` examples:
+
+- a thin grouping wrapper inside one screen
+- a simple row or column with one local style
+- layout glue that does not need theme behavior
+
+Prefer `MyView` when any of these are true:
+
+- background color comes from theme
+- radius or elevation is needed
+- shared spacing or container props make the code clearer
+
+### Buttons and pressables
+
+- Use `MyButton` and `MyButton.Icon` for actions.
+- Use `MyPressable` only when you need a custom pressable surface pattern that `MyButton` does not cover.
+
+Do not create ad-hoc button styles in production screens when a shared button variant is already sufficient.
+
+### Lists
+
+- Prefer `MyList` for scrollable production lists.
+- Do not use raw `FlatList` or `FlashList` directly in feature screens unless the shared list cannot support the use case.
+
+### Header and global feedback
+
+- Use `NavigationBarHeader` for stack headers.
+- Use `Confirmation` and `Toast` for shared feedback flows.
+
+Do not create feature-local confirm modals or duplicate toast systems.
+
+## Theme and token rules
+
+### Color
+
+Use semantic tokens through theme helpers and shared components.
+
+Examples:
+
+- `text/active/primary`
+- `text/active/secondary`
+- `fill/background/primary`
+- `fill/background/secondary`
+
+Rules:
+
+- Do not hardcode colors in production features.
+- Brand and semantic meaning should come from theme tokens, not raw hex values.
+- If a needed semantic token does not exist, add it in the theme layer instead of hardcoding in a screen.
+
+### Spacing
+
+Use the spacing scale:
+
+- `x1`
+- `x2`
+- `x3`
+- `x4`
+- `x6`
+- `x8`
+- `x10`
+
+Rules:
+
+- Prefer `getSpacing(...)` inside `generateStyles(theme)`.
+- Do not invent arbitrary spacing values in feature styles unless the use case is exceptional.
+
+### Typography
+
+Use the shared typography presets:
+
+- `h1` to `h6`
+- `subtitle`
+- `body`
+- `label`
+- `caption`
+- `button`
+
+Rules:
+
+- Prefer typography presets over custom font size and line height in screen code.
+- If a new text style is needed broadly, add it to the shared typography scale instead of redefining it per screen.
+
+### Radius and elevation
+
+- Use shared radius tokens.
+- Use shared elevation tokens when a surface needs shadow treatment.
+
+Do not create one-off shadow recipes in feature code when the theme already has elevation support.
+
+## Styling pattern
+
+Production screens should follow this pattern:
+
+- create `generateStyles(theme)`
+- consume with `useThemedStyles(generateStyles)`
+- keep most styling in `styles.ts`
+
+Rules:
+
+- Inline style is allowed only for tiny, non-reused adjustments.
+- Repeated style objects should move to `styles.ts`.
+- Theme-derived styles should not be scattered across the screen body.
+
+## Large visual redesign rule
+
+When a new design is visually very different from the current app, keep the architecture stable but allow the visual system to change.
+
+Core principle:
+
+- architecture is stable
+- the visual system is replaceable
+
+Rules:
+
+- Do not force a radically new design into old shared UI shapes if that would produce obviously incorrect UI.
+- Do not solve a broad redesign by stacking screen-local overrides on top of outdated shared components.
+- If the same visual change appears across multiple screens, prefer updating shared tokens, shared elements, or shared composite UI instead of patching each screen separately.
+- If the difference is isolated to one screen or one domain-specific block, a local override is acceptable.
+- If the redesign affects app shell patterns such as headers, tabs, filters, sheets, or common cards/inputs/buttons, treat it as a shared-layer change first.
+- For a large redesign, start with a scope-lock pass before implementation so the work is split into shell changes, shared UI/theme changes, and feature-specific changes.
+
+Practical decision rule:
+
+- repeated change across many screens -> refactor shared layer
+- isolated change in one flow -> keep it local unless reuse becomes clear
+- shell-level visual change -> update shell/shared UI, not just feature styles
+
+During redesign work:
+
+- preserve project architecture first
+- preserve required behavior second
+- create a new consistent shared visual language third
+- match final visual fidelity fourth
+
+## `playground` policy
+
+`playground` remains part of this codebase because it helps developers and AI discover how shared components behave.
+
+However:
+
+- do not treat `playground` folder structure as a production reference
+- do not copy its use of extra wrappers or loose style patterns into new features
+- use it only to learn available props, behaviors, and visual patterns
+
+## Review checklist
+
+- Did the screen use shared components before adding new wrappers?
+- Is `MyText` used for app text?
+- Is raw `View` only used for simple local layout?
+- Are lists built with `MyList` by default?
+- Are colors, spacing, typography, radius, and elevation coming from shared theme/tokens?
+- Is `playground` treated only as a component catalog, not as a production structure reference?
