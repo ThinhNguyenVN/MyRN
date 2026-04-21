@@ -14,7 +14,7 @@
     "playground": "Playground"
   },
   "home": {
-    "welcome": "Chào mừng đến MyRN",
+    "welcome": "Chào mừng đến {{appName}}",
     "envLabel": "Môi trường",
     "goTodo": "Vào Todo",
     "logout": "Đăng xuất",
