@@ -2,6 +2,7 @@ import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import templateConfig from '@root/template.config.json'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
@@ -65,7 +66,7 @@ export default function HomeScreen() {
     >
       <MyView style={styles.titleContainer}>
         <MyText typography="subtitle" style={styles.sectionTitle}>
-          {t('home.welcome')}
+          {t('home.welcome', { appName: templateConfig.appName })}
         </MyText>
 
         <MyText typography="body">{authSummary}</MyText>

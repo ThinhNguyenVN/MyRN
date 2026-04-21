@@ -14,7 +14,7 @@
     "playground": "Playground"
   },
   "home": {
-    "welcome": "Welcome to MyRN",
+    "welcome": "Welcome to {{appName}}",
     "envLabel": "Env",
     "goTodo": "Go to Todo",
     "logout": "Logout",

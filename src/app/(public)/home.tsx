@@ -1,6 +1,7 @@
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import templateConfig from '@root/template.config.json'
 
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
@@ -33,7 +34,7 @@ const Home: React.FC = () => {
         }}
       />
       <MyView style={styles.container}>
-        <MyText typography="h5">{t('home.welcome')}</MyText>
+        <MyText typography="h5">{t('home.welcome', { appName: templateConfig.appName })}</MyText>
       </MyView>
     </>
   )
