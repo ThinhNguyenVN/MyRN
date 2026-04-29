@@ -7,6 +7,8 @@ Use this template when asking an AI agent to build one feature, one flow, or a s
 ```md
 Implement a feature in this repository by following `AGENTS.md` and the relevant files in `.docs/` before coding.
 
+Before implementation, create or update a spec artifact at `specs/<feature-name>.spec.md` using `specs/_template.spec.md`, and keep the spec link in your implementation summary.
+
 ## Goal
 - Feature name: [feature name]
 - Business goal: [what the feature does]
@@ -79,3 +81,4 @@ If any of the above is unspecified in design, follow `.docs/default-behavior-rul
 
 - Use this template when design is already fairly clear and you want implementation to begin immediately.
 - If the design is still ambiguous, start with `prompt-template-scope-lock.md` first.
+- Even when implementation starts immediately, keep `specs/<feature-name>.spec.md` updated as the durable source for scope, assumptions, and AC/test traceability.

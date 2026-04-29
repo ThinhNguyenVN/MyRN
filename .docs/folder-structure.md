@@ -117,6 +117,7 @@ src/features/
 
 Notes:
 
+- Use kebab-case for file and folder names (for example `todo-form.container.tsx`, `auth-api.ts`, `my-list.tsx`).
 - Keep the current naming convention such as `auth-api.ts`, `auth-slice.ts`, `auth-thunks.ts`.
 - A feature may omit files it does not need.
 - Avoid creating `components/` and `hooks/` folders inside a feature until the feature is large enough to justify them.

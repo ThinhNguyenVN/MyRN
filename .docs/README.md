@@ -27,6 +27,7 @@ The goal is not to document every file in the repo. The goal is to give humans a
 - `prompt-template-full-app.md`: reusable prompt template for generating a whole app or a large domain.
 - `prompt-template-feature.md`: reusable prompt template for implementing one feature or a small set of screens.
 - `prompt-template-scope-lock.md`: reusable prompt template for a planning or scope-confirmation pass before coding.
+- `../specs/_template.spec.md`: reusable spec artifact template for durable scope, assumptions, and traceability.
 
 ## Suggested AI reading order by task
 
@@ -85,6 +86,31 @@ Use one of these templates as the starting prompt:
 1. `prompt-template-scope-lock.md` for planning and ambiguity reduction before coding
 2. `prompt-template-feature.md` for one feature or a few screens
 3. `prompt-template-full-app.md` for a whole app or a large domain
+
+### Scope-lock policy (mandatory triggers)
+
+Run a scope-lock pass before coding when any of these is true:
+
+1. Multi-screen flow (2 or more production screens)
+2. Multiple design sources (for example Figma plus Stitch plus notes/screenshots)
+3. API/auth/state changes that affect more than one layer
+4. Acceptance criteria are not explicit
+5. Shared UI/theme refactor is expected
+
+Scope-lock may be skipped only for tiny changes:
+
+- copy-only updates
+- visual tweaks on one screen with no flow/data impact
+- refactors with no behavior change
+
+Scope-lock output must include:
+
+- in-scope items
+- out-of-scope items
+- assumptions
+- open questions
+- implementation order
+- architecture mapping (`src/app` vs `src/features` vs shared layers)
 
 ## What this docs set intentionally does not do
 

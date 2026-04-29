@@ -22,7 +22,8 @@ The working conventions for this codebase live in `.docs/`:
 - `.docs/data-state-standard.md`: Axios, RTK Query, Redux Toolkit, and hook rules
 - `.docs/canonical-references.md`: which parts of the repo are the source of truth
 
-When there is ambiguity, follow `src/features/auth` and `src/features/todo` first.
+When there is ambiguity, follow the precedence in `.docs/default-behavior-rules.md`.
+Use `src/features/auth` and `src/features/todo` as canonical references only after explicit product requirements, design notes, and same-feature patterns.
 
 ## Branch naming
 
