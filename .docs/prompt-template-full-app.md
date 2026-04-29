@@ -67,6 +67,7 @@ If behavior is not specified in design, follow `.docs/default-behavior-rules.md`
 ## Technical constraints
 - `src/app` must stay a thin route shell.
 - Production implementation must live in `src/features`.
+- Starter routes such as `src/app/(public)/home.tsx` and `src/app/(public)/(tabs)/index.tsx` are replaceable samples, not fixed product requirements.
 - Reuse existing shared UI, theme, token, API, and store layers before adding new abstractions.
 - If the new design is a large visual redesign, keep the architecture and data boundaries, but allow refactoring shared theme and shared UI layers to match the new system.
 - If visual changes repeat across many screens, prefer shared-layer refactors over one-off screen overrides.

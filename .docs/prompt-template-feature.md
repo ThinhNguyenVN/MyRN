@@ -59,6 +59,7 @@ If any of the above is unspecified in design, follow `.docs/default-behavior-rul
 ## Technical constraints
 - Keep `src/app` as route shell only.
 - Put production implementation in `src/features`.
+- Treat starter routes such as `src/app/(public)/home.tsx` and `src/app/(public)/(tabs)/index.tsx` as replaceable samples when a new home flow is requested.
 - Follow the `container + view + styles + optional hook/types` pattern.
 - Prefer existing shared UI, tokens, and theme helpers.
 - Use RTK Query by default for server data.

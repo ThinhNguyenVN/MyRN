@@ -10,6 +10,7 @@ The goal is not to document every file in the repo. The goal is to give humans a
 - Production screen implementation lives in `src/features`.
 - `src/features/auth` and `src/features/todo` are the canonical reference features.
 - `auth` and `todo` are reference implementations for architecture and code shape, not mandatory product features for every app.
+- Starter routes under `src/app/(public)` such as `home.tsx` and `(tabs)/index.tsx` are sample placeholders and must be replaced when product scope requires a new home flow.
 - `src/app/(public)/(tabs)/playground` stays in the app as a component usage catalog.
 - `playground` is not a structure reference for production code.
 - Branch names must use `feat/`, `fix/`, `issue/`, or `release/`.
