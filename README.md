@@ -22,38 +22,12 @@ The working conventions for this codebase live in `.docs/`:
 - `.docs/data-state-standard.md`: Axios, RTK Query, Redux Toolkit, and hook rules
 - `.docs/canonical-references.md`: which parts of the repo are the source of truth
 
-When there is ambiguity, follow the precedence in `.docs/default-behavior-rules.md`.
-Use `src/features/auth` and `src/features/todo` as canonical references only after explicit product requirements, design notes, and same-feature patterns.
+When there is ambiguity, follow the unified precedence in `.docs/README.md` first.
+Use `.docs/default-behavior-rules.md` as the fallback layer in that precedence.
 
 ## Branch naming
 
-Use branch names in this format:
-
-- `feat/<description>`
-- `fix/<description>`
-- `issue/<description>`
-- `release/<description>`
-
-Rules:
-
-- Do not create or use `cursor/` branches for normal development work.
-- Prefer the existing helper script to generate a valid branch name.
-
-Examples:
-
-- `feat/auth-login`
-- `fix/token-refresh`
-- `issue/123-login-error`
-- `release/1-2-0`
-
-Generate a valid branch name from the CLI if needed:
-
-```bash
-yarn branch:create feat auth login
-yarn branch:create fix token refresh
-yarn branch:create issue 123 login error
-yarn branch:create release 1 2 0
-```
+Follow `AGENTS.md` as the canonical source for branch naming rules and examples.
 
 ## Install
 

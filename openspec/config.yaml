@@ -1,0 +1,8 @@
+schema: spec-driven
+context: |
+  Language: Vietnamese (vi-VN)
+  Tất cả artifacts phải được viết bằng tiếng Việt.
+  Giữ nguyên các thuật ngữ kỹ thuật và tên file/path bằng tiếng Anh khi cần.
+
+  Luôn tuân thủ các quy ước dự án trong `AGENTS.md` và các tiêu chuẩn trong `.docs/`.
+  Không tạo bộ quy tắc kiến trúc riêng cho OpenSpec nếu quy tắc dự án hiện tại đã định nghĩa rõ.

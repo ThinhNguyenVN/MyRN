@@ -16,6 +16,26 @@ The goal is not to document every file in the repo. The goal is to give humans a
 - Branch names must use `feat/`, `fix/`, `issue/`, or `release/`.
 - Do not create or use `cursor/` branches for normal development work.
 
+## Unified precedence (single source of truth)
+
+Use this precedence when requirements seem ambiguous or conflicting:
+
+1. explicit product requirements and accepted scope
+2. design source of truth (Figma/Stitch/annotated notes)
+3. existing pattern in the same feature
+4. canonical references in `src/features/auth` and `src/features/todo`
+5. fallback defaults in `default-behavior-rules.md`
+
+If other docs summarize precedence in shorter form, this section wins.
+
+## OpenSpec integration
+
+- OpenSpec is the process layer for planning and execution.
+- `specs/<feature-or-domain>.spec.md` is the required durable artifact output.
+- Use `specs/_template.spec.md` as the default structure unless scope explicitly requires a narrower format.
+- Use `prompt-template-scope-lock.md` before implementation when mandatory scope-lock triggers apply.
+- Do not run a parallel spec workflow outside `specs/`; keep one source of truth per change.
+
 ## Read this file first, then pick the matching spec
 
 - `folder-structure.md`: where code belongs.

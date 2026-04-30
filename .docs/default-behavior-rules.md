@@ -6,15 +6,8 @@ These defaults are intended to reduce random AI guesswork. They apply only when 
 
 ## Precedence
 
-Use this order:
-
-1. explicit product requirement
-2. Figma or Stitch behavior notes
-3. existing app pattern in the same feature
-4. canonical references from `auth` and `todo`
-5. the defaults in this file
-
-If a source above conflicts with this file, the source above wins.
+Follow the unified precedence in `.docs/README.md`.
+This file is the fallback layer when behavior details are still missing after applying that precedence.
 
 ## Core principle
 

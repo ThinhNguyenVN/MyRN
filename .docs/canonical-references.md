@@ -4,14 +4,15 @@ Use this file when a contributor or AI needs to know which parts of the repo are
 
 These are reference implementations, not mandatory business features for every app. A new app may have different domains and route names, but it should still copy the same structural boundaries and coding patterns.
 
-## Source of truth order
+## Scope of this file
 
-When conventions conflict, use this order:
+For global precedence (product/design/feature/default fallback), follow `.docs/README.md`.
+This file defines canonical code pattern references only:
 
 1. `src/features/auth`
 2. `src/features/todo`
-3. Shared layers under `src/components`, `src/api`, `src/store`, and `src/theme`
-4. `playground` only for isolated component usage examples
+3. shared layers under `src/components`, `src/api`, `src/store`, and `src/theme`
+4. `playground` for isolated component usage only
 
 ## Canonical feature: `auth`
 

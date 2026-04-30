@@ -19,8 +19,8 @@ This is an **Expo SDK 55 React Native** app (`myrn`) targeting iOS, Android, and
 - Before adding or changing API, RTK Query, Redux Toolkit, hooks, or auth state, read `.docs/data-state-standard.md` and `.docs/canonical-references.md`.
 - If design or product notes are incomplete, read `.docs/default-behavior-rules.md` and use those defaults instead of inventing ad hoc behavior.
 - Before generating a whole app or a large new domain, read all files under `.docs/` and follow the build order documented in `.docs/README.md`.
-- When behavior is ambiguous, follow the precedence in `.docs/default-behavior-rules.md`.
-- Use `.docs/canonical-references.md` and patterns in `src/features/auth` and `src/features/todo` only after explicit product requirements, design notes, and same-feature patterns.
+- When behavior is ambiguous, follow the unified precedence in `.docs/README.md`.
+- Use `.docs/default-behavior-rules.md` as the fallback layer in that precedence.
 
 ### Key commands
 
