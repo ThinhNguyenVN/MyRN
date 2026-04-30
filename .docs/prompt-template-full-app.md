@@ -11,6 +11,7 @@ Before coding:
 - follow `AGENTS.md`
 - read the relevant files in `.docs/`
 - use `src/features/auth` and `src/features/todo` only as reference implementations for structure and code shape
+- create or update a spec artifact at `specs/<app-or-domain-name>.spec.md` using `specs/_template.spec.md`, and keep the spec link in your implementation summary
 
 ## Goal
 - Build: [whole app / MVP / app shell + core flows]
@@ -67,6 +68,7 @@ If behavior is not specified in design, follow `.docs/default-behavior-rules.md`
 ## Technical constraints
 - `src/app` must stay a thin route shell.
 - Production implementation must live in `src/features`.
+- Starter routes such as `src/app/(public)/home.tsx` and `src/app/(public)/(tabs)/index.tsx` are replaceable samples, not fixed product requirements.
 - Reuse existing shared UI, theme, token, API, and store layers before adding new abstractions.
 - If the new design is a large visual redesign, keep the architecture and data boundaries, but allow refactoring shared theme and shared UI layers to match the new system.
 - If visual changes repeat across many screens, prefer shared-layer refactors over one-off screen overrides.
@@ -109,3 +111,4 @@ If a detail is missing:
 - If links may be inaccessible, attach screenshots and written notes.
 - If behavior is not fully designed, say "use project defaults" so the agent follows the shared default rules instead of improvising.
 - If the design is a major visual departure from the current app, say so explicitly and ask for a scope-lock pass first.
+- Keep `specs/<app-or-domain-name>.spec.md` updated as the durable source for scope, assumptions, and AC/test traceability.

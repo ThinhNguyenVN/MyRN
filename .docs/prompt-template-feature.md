@@ -7,6 +7,8 @@ Use this template when asking an AI agent to build one feature, one flow, or a s
 ```md
 Implement a feature in this repository by following `AGENTS.md` and the relevant files in `.docs/` before coding.
 
+Before implementation, create or update a spec artifact at `specs/<feature-name>.spec.md` using `specs/_template.spec.md`, and keep the spec link in your implementation summary.
+
 ## Goal
 - Feature name: [feature name]
 - Business goal: [what the feature does]
@@ -57,6 +59,7 @@ If any of the above is unspecified in design, follow `.docs/default-behavior-rul
 ## Technical constraints
 - Keep `src/app` as route shell only.
 - Put production implementation in `src/features`.
+- Treat starter routes such as `src/app/(public)/home.tsx` and `src/app/(public)/(tabs)/index.tsx` as replaceable samples when a new home flow is requested.
 - Follow the `container + view + styles + optional hook/types` pattern.
 - Prefer existing shared UI, tokens, and theme helpers.
 - Use RTK Query by default for server data.
@@ -79,3 +82,4 @@ If any of the above is unspecified in design, follow `.docs/default-behavior-rul
 
 - Use this template when design is already fairly clear and you want implementation to begin immediately.
 - If the design is still ambiguous, start with `prompt-template-scope-lock.md` first.
+- Even when implementation starts immediately, keep `specs/<feature-name>.spec.md` updated as the durable source for scope, assumptions, and AC/test traceability.

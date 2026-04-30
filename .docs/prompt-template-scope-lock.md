@@ -53,3 +53,4 @@ The scope-lock response should include:
 - shared UI reuse plan
 - open questions
 - explicit assumptions if coding were to start immediately
+- proposed spec artifact path (`specs/<feature-or-domain-name>.spec.md`) and what sections must be filled first

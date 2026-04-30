@@ -44,6 +44,13 @@ Keep using the current pattern:
 - Use helper functions for parameterized paths.
 - Keep timeouts and base config centralized.
 
+### API base URL env rule
+
+- `API_BASE_URL` must come from `EXPO_PUBLIC_API_BASE_URL` via `getEnv` in `src/constants/api.ts`. Do not hardcode domains or base URLs in features, screens, or API clients.
+- When backend domain/source changes (new project, new environment, or migration), update `EXPO_PUBLIC_API_BASE_URL` in all relevant env files (`.env.test`, `.env.staging`, `.env.production`, and local `.env` variants if used).
+- API integration changes are not complete until env values are updated and verified by running app/tests with the target env file.
+- Keep endpoint paths in `Endpoints`; only the host/base URL belongs in env.
+
 ## RTK Query is the default for server data
 
 Every server-backed feature should start with a `<feature>-api.ts` file.
