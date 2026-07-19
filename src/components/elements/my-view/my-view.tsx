@@ -41,6 +41,7 @@ const MyView: React.FC<MyViewProps> = ({
   if (useSurface) {
     return (
       <MySurface
+        {...viewProps}
         elevation={elevation}
         radius={radius ?? 'none'}
         fillParent={fillParent}

@@ -32,6 +32,7 @@ export type SurfaceStyle = Pick<
   | 'minHeight'
   | 'maxWidth'
   | 'maxHeight'
+  | 'aspectRatio'
 
   // --- Flex (basic) ---
   | 'flex'
@@ -86,6 +87,7 @@ export const CONTAINER_STYLE_KEYS: (keyof SurfaceStyle)[] = [
   'minHeight',
   'maxWidth',
   'maxHeight',
+  'aspectRatio',
 
   // flex (outer)
   'flex',

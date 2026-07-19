@@ -1,5 +1,11 @@
 import type { StyleProp, ViewStyle } from 'react-native'
-import type { ImageErrorEventData, ImageProps, ImageSource, ImageStyle } from 'expo-image'
+import type {
+  ImageErrorEventData,
+  ImageLoadEventData,
+  ImageProps,
+  ImageSource,
+  ImageStyle,
+} from 'expo-image'
 
 import type { ElevationToken } from '@/theme/elevation'
 import type { ContainerStyleProps } from '@/types/styles'
@@ -15,6 +21,7 @@ export interface MyImageProps extends ContainerStyleProps {
   source?: MyImageSource
   onPress?: () => void
   onLoadStart?: () => void
+  onLoad?: (event: ImageLoadEventData) => void
   onLoadEnd?: () => void
   onError?: (event?: ImageErrorEventData) => void
   showMessage?: boolean

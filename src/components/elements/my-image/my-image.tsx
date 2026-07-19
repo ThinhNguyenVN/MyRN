@@ -26,6 +26,7 @@ const MyImage: React.FC<MyImageProps> = ({
   source,
   onPress,
   onLoadStart,
+  onLoad,
   onLoadEnd,
   onError,
   showMessage = false,
@@ -154,6 +155,7 @@ const MyImage: React.FC<MyImageProps> = ({
           placeholder={imagePlaceholder}
           priority={priority}
           onLoadStart={handleLoadStart}
+          onLoad={onLoad}
           onLoadEnd={handleLoadEnd}
           onError={handleError}
         />
