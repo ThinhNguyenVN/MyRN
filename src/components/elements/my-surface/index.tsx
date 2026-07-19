@@ -120,12 +120,21 @@ const MySurface: React.FC<MySurfaceProps> = ({
 
   const finalContainerStyle = useMemo(() => {
     const base: Record<string, unknown> = { ...containerStyle }
-    // Bắt buộc overflow visible khi có elevation để shadow SVG không bị cắt
+    // Outer container owns the shadow; inner content can safely clip children.
     if (elevation && elevation !== 'none') {
       base.overflow = 'visible'
+
+      if (isIos) {
+        base.backgroundColor = resolvedBackgroundColor
+        base.borderRadius = r
+        base.shadowColor = '#000'
+        base.shadowOffset = { width: dx, height: dy }
+        base.shadowOpacity = opacity
+        base.shadowRadius = blur
+      }
     }
     return base as ViewStyle
-  }, [containerStyle, elevation])
+  }, [containerStyle, elevation, resolvedBackgroundColor, r, dx, dy, opacity, blur])
 
   // Inner content: clip, border, background. iOS/Web: native shadow; Android: SVG
   const finalContentStyle = useMemo(() => {
@@ -140,13 +149,6 @@ const MySurface: React.FC<MySurfaceProps> = ({
     }
     if (hasUserOverflowHidden) base.overflow = 'hidden'
 
-    // iOS: native shadow — nhanh, không cần SVG
-    if (isIos) {
-      base.shadowColor = '#000'
-      base.shadowOffset = { width: dx, height: dy }
-      base.shadowOpacity = opacity
-      base.shadowRadius = blur
-    }
     // Web: CSS boxShadow — nhanh, không cần SVG
     if (isWeb) {
       ;(base as Record<string, unknown>).boxShadow =

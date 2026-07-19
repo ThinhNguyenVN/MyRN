@@ -1,12 +1,18 @@
 import type { ReactNode } from 'react'
-import type { StyleProp, ViewStyle } from 'react-native'
+import type { PressableProps, StyleProp, ViewStyle } from 'react-native'
 
 import type { ContainerStyleProps } from '@/types/styles'
 import type { MyViewProps } from '../my-view'
 
 export type AnimatedType = 'opacity' | 'scale'
 
-export interface MyPressableProps extends ContainerStyleProps {
+export interface MyPressableProps
+  extends
+    ContainerStyleProps,
+    Omit<
+      PressableProps,
+      'children' | 'style' | 'onPress' | 'onPressIn' | 'onPressOut' | 'disabled'
+    > {
   children: ReactNode
   onPress?: () => void
   onPressIn?: () => void

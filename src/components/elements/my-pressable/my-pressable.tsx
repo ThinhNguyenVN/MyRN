@@ -14,7 +14,7 @@ import MyView from '@/components/elements/my-view'
 
 import type { AnimatedType, MyPressableProps } from './type'
 
-import { getContainerStyle, pickContainerProps } from '@/utils/styles'
+import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
 
 export const SCALE_LARGE = 0.985
 export const SCALE_SMALL = 0.95
@@ -50,6 +50,7 @@ const MyPressable: React.FC<MyPressableProps> = ({
     [rest],
   )
   const hasContainerStyle = Object.keys(containerStyle).length > 0
+  const pressableProps = omitContainerProps(rest as Record<string, unknown>)
   const scale = useSharedValue(1)
   const opacity = useSharedValue(1)
   const sizeRef = useRef({ w: 0, h: 0 })
@@ -149,6 +150,7 @@ const MyPressable: React.FC<MyPressableProps> = ({
 
   return (
     <Pressable
+      {...pressableProps}
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
