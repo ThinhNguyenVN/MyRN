@@ -28,3 +28,9 @@
 - [x] 5.2 Chạy `yarn lint` và sửa lỗi liên quan upgrade
 - [x] 5.3 Chạy `npx dotenv -e .env.test -- yarn test` và sửa lỗi liên quan upgrade
 - [x] 5.4 Smoke thủ công (khi có thể): tab bar + scroll-to-hide, custom header/back, bottom sheet, Skia spinner, keyboard avoiding
+
+## 6. Fix crash Expo Go (Worklets / Hermes)
+
+- [x] 6.1 Bật `inlineRequires: true` trong `metro.config.js` (fix SIGSEGV `JSIWorkletsModuleProxy::toOptimizedObject`)
+- [x] 6.2 Thêm `react-native-worklets/plugin` tường minh trong `babel.config.js`
+- [ ] 6.3 Verify trên iOS Simulator Expo Go: `npx expo start -c` rồi mở lại app

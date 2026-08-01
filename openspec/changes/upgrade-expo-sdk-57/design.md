@@ -114,3 +114,10 @@ Nếu `expo install --fix` resolve patch khác trong cùng dòng tương thích,
 - Khi migrate sheet: rewrite `MyBottomSheet` (bỏ custom `BottomSheetBackdrop` / `BottomSheetFooter` / handle), regression form trong sheet (`BottomSheetTextInput`, dropdown list, date/wheel picker), và chấp nhận UX native modal vs gorhom hiện tại.
 - Siết lại React Compiler ESLint rules (`react-hooks/immutability`, `refs`, `set-state-in-effect`, `static-components`) đã tạm `off` vì xung đột SharedValue Reanimated — cleanup trong change lint riêng.
 - Cảnh báo expo-doctor về `app.json` + `app.config.ts` (false positive / pattern sẵn có: `app.config.ts` vẫn `require('./app.json')`) — xử lý khi refactor config nếu cần.
+
+## Hotfix đã áp dụng trong change này
+
+- **Expo Go iOS crash (SIGSEGV)**: faulting thread `com.facebook.react.runtime.JavaScript`, stack Hermes `cloneString` ← `worklets::JSIWorkletsModuleProxy::toOptimizedObject`.
+- **Nguyên nhân**: Expo tắt `inlineRequires` mặc định → Worklets JSI init sai thứ tự.
+- **Fix**: `metro.config.js` bật `inlineRequires: true`; `babel.config.js` khai báo tường minh `react-native-worklets/plugin`.
+- **Verify**: `npx expo start -c` rồi mở lại Expo Go trên Simulator.
