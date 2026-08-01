@@ -14,7 +14,7 @@
     "fix": "eslint src --fix",
     "check:commit": "yarn lint && npx dotenv -e .env.test -- yarn test",
     "prepare": "husky",
-    "postinstall": "mkdir public; cp $(node -p \"require.resolve('canvaskit-wasm/bin/full/canvaskit.wasm', { paths: [require.resolve('@shopify/react-native-skia')] })\") public/canvaskit.wasm"
+    "postinstall": "patch-package && mkdir public; cp $(node -p \"require.resolve('canvaskit-wasm/bin/full/canvaskit.wasm', { paths: [require.resolve('@shopify/react-native-skia')] })\") public/canvaskit.wasm"
   },
   "dependencies": {
     "@expo/vector-icons": "15.1.1",
@@ -80,6 +80,7 @@
     "husky": "9.1.7",
     "jest": "30.3.0",
     "msw": "2.12.14",
+    "patch-package": "^8.0.1",
     "prettier": "3.7.4",
     "react-test-renderer": "19.2.3",
     "typescript": "6.0.3"

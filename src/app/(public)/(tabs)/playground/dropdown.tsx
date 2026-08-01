@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import MyDropdownInput from '@/components/elements/my-dropdown-input'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 const dropdownOptions = [
   { labelKey: 'playground.dropdownOptionA', value: 'a' },

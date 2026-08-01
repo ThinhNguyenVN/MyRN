@@ -4,7 +4,11 @@ import Skeleton from 'react-native-reanimated-skeleton'
 
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles, skeletonTextLayout, skeletonThumbLayout } from './styles'
+import {
+  generateStyles,
+  skeletonTextLayout,
+  skeletonThumbLayout,
+} from '@/features/playground/my-list/styles'
 
 export const SkeletonRow = memo(function SkeletonRow() {
   const styles = useThemedStyles(generateStyles)

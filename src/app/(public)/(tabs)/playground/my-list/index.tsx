@@ -8,10 +8,10 @@ import type { ListRenderItemInfo } from '@/components/ui/my-list'
 import { ScrollToHideContent } from '@/components/ui/scroll-to-hide'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { useMyListData, type Post } from './hooks'
-import { PostRow } from './post-row'
-import { SkeletonRow } from './skeleton-row'
-import { generateStyles } from './styles'
+import { useMyListData, type Post } from '@/features/playground/my-list/hooks'
+import { PostRow } from '@/features/playground/my-list/post-row'
+import { SkeletonRow } from '@/features/playground/my-list/skeleton-row'
+import { generateStyles } from '@/features/playground/my-list/styles'
 
 const SKELETON_ROW_COUNT = 8
 const SKELETON_LOAD_MORE_COUNT = 3

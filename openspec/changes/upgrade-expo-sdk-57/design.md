@@ -120,6 +120,9 @@ Nếu `expo install --fix` resolve patch khác trong cùng dòng tương thích,
 - **Expo Go iOS crash (SIGSEGV)**: faulting thread `com.facebook.react.runtime.JavaScript`, stack Hermes ← `worklets::JSIWorkletsModuleProxy::toOptimizedObject`.
 - **Nguyên nhân 1**: Expo tắt `inlineRequires` mặc định → Worklets JSI init sai thứ tự.
 - **Fix 1**: `metro.config.js` bật `inlineRequires: true`; `babel.config.js` khai báo tường minh `react-native-worklets/plugin`.
-- **Nguyên nhân 2 (sau khi Fix 1 vẫn crash)**: Expo Go **57.0.5** ship native Worklets **0.10.0** / Reanimated **4.5.0**, trong khi `expo@57.0.9` bundled JS là **0.10.1** / **4.5.1** → mismatch JS/native.
-- **Fix 2**: pin `react-native-worklets@0.10.0` và `react-native-reanimated@4.5.0`; thêm vào `expo.install.exclude` để doctor không ép lại bản 57.0.9.
+- **Nguyên nhân 2**: Expo Go **57.0.5** ship native Worklets **0.10.0** / Reanimated **4.5.0**, trong khi `expo@57.0.9` bundled JS là **0.10.1** / **4.5.1** → mismatch JS/native (API `createSerializableNonWorkletFunction` đổi arity 3→2 giữa hai bản).
+- **Fix 2**: pin `react-native-worklets@0.10.0` và `react-native-reanimated@4.5.0`; thêm vào `expo.install.exclude`.
+- **Nguyên nhân 3 (IPS 12:40)**: vẫn SIGSEGV trong `createSerializableNonWorkletFunction` khi native đọc `fun.name` (`Hermes utf8FromStringView`, pointer auth failure) — bug/path lỗi trên Worklets **0.10.0** (đã rewrite ở 0.10.1 nhưng Expo Go chưa ship).
+- **Fix 3**: `patch-package` bỏ truyền `fun.name` (luôn `undefined`) trong `cloneNonWorkletFunction`.
+- **Fallback**: nếu vẫn crash trên Expo Go → dùng development build (`npx expo run:ios`) với Worklets **0.10.1** / Reanimated **4.5.1**.
 - **Verify**: `npx expo start -c` rồi mở lại Expo Go trên Simulator.

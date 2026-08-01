@@ -8,8 +8,8 @@ import { IconSymbol } from '@/components/ui/icon-symbol'
 import { useThemedStyles } from '@/theme/theme-context'
 import { useTranslation } from 'react-i18next'
 
-import { PLAYGROUND_LINKS } from './constants'
-import { generateStyles } from '../styles'
+import { PLAYGROUND_LINKS } from '@/features/playground/constants'
+import { generateStyles } from '@/features/home/styles'
 
 export default function PlaygroundScreen() {
   const styles = useThemedStyles(generateStyles)

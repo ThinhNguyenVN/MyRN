@@ -5,7 +5,7 @@ import MyAlert from '@/components/elements/my-alert'
 import MyText from '@/components/elements/my-text'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 export default function AlertScreen() {
   const styles = useThemedStyles(generateStyles)

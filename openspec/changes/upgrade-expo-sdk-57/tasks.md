@@ -34,4 +34,5 @@
 - [x] 6.1 Bật `inlineRequires: true` trong `metro.config.js` (fix SIGSEGV `JSIWorkletsModuleProxy::toOptimizedObject`)
 - [x] 6.2 Thêm `react-native-worklets/plugin` tường minh trong `babel.config.js`
 - [x] 6.3 Pin `react-native-worklets@0.10.0` + `react-native-reanimated@4.5.0` khớp Expo Go 57.0.5 (tránh mismatch với bundled 0.10.1/4.5.1 của expo@57.0.9)
-- [ ] 6.4 Verify trên iOS Simulator Expo Go: `npx expo start -c` rồi mở lại app
+- [x] 6.4 Patch `react-native-worklets@0.10.0` (`cloneNonWorkletFunction` không truyền `fun.name`) + `patch-package` trong postinstall
+- [x] 6.5 Verify trên iOS Simulator Expo Go: `npx expo start -c` rồi mở lại app (Expo Go sống sau bundle, không có `.ips` mới)

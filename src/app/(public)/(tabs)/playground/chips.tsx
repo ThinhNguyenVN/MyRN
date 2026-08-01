@@ -8,7 +8,7 @@ import MyView from '@/components/elements/my-view'
 import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 export default function ChipsScreen() {
   const styles = useThemedStyles(generateStyles)

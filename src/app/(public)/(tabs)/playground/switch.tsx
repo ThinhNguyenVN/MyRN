@@ -6,7 +6,7 @@ import MySwitch from '@/components/elements/my-switch'
 import MyText from '@/components/elements/my-text'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 export default function SwitchScreen() {
   const styles = useThemedStyles(generateStyles)

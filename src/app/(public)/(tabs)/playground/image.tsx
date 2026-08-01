@@ -7,7 +7,7 @@ import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 export default function ImageScreen() {
   const styles = useThemedStyles(generateStyles)

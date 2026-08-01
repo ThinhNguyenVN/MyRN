@@ -6,8 +6,8 @@ import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import type { Post } from './hooks'
-import { generateStyles } from './styles'
+import type { Post } from '@/features/playground/my-list/hooks'
+import { generateStyles } from '@/features/playground/my-list/styles'
 
 export const PostRow = memo(function PostRow({ item }: { item: Post }) {
   const styles = useThemedStyles(generateStyles)

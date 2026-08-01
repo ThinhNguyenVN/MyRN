@@ -5,7 +5,7 @@ import MyCounter from '@/components/elements/my-counter'
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 export default function CounterScreen() {
   const styles = useThemedStyles(generateStyles)

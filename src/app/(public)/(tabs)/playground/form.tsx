@@ -23,7 +23,7 @@ import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
 import type { MyKeyboardAvoidingScrollViewRef } from '@/components/ui/my-keyboard-avoiding'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
-import { formScreenStyles } from './styles'
+import { formScreenStyles } from '@/features/playground/styles'
 
 const DROPDOWN_OPTIONS = [
   { label: 'playground.formRoleAdmin', value: 'admin' },

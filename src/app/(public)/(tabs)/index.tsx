@@ -15,7 +15,7 @@ import { useGetMeQuery } from '@/features/auth/auth-api'
 import { selectIsAuthenticated } from '@/features/auth/auth-slice'
 import { logoutThunk } from '@/features/auth/auth-thunks'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/home/styles'
 import { useThemedStyles } from '@/theme/theme-context'
 
 export default function HomeScreen() {
