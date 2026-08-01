@@ -11,6 +11,11 @@ const SEGMENT_TITLE_KEY: Record<string, string> = {
   explore: 'explore',
 }
 
+const normalizeTitle = (value: unknown): string => {
+  if (Array.isArray(value)) return value.join(' ')
+  return typeof value === 'string' ? value : ''
+}
+
 export interface NavigationBarHeaderExtraProps {
   hideBackButton?: boolean
 }
@@ -23,8 +28,11 @@ const NavigationBarHeader: React.FC<NativeStackHeaderProps & NavigationBarHeader
   const { t } = useTranslation()
   const segments = useSegments()
   const nav = navigation ?? { canGoBack: () => router.canGoBack(), goBack: () => router.back() }
-  const defaultTitleKey = segments.length >= 2 ? SEGMENT_TITLE_KEY[segments[1] as string] : ''
-  const title = options?.title ?? (defaultTitleKey ? t(defaultTitleKey) : '')
+  const currentSegment = segments[1]
+  const defaultTitleKey =
+    typeof currentSegment === 'string' ? (SEGMENT_TITLE_KEY[currentSegment] ?? '') : ''
+  const translatedTitle = defaultTitleKey ? normalizeTitle(t(defaultTitleKey)) : ''
+  const title = options?.title ?? translatedTitle
   const right = options?.headerRight?.({ canGoBack: nav.canGoBack() })
   const showBack = !hideBackButton && nav.canGoBack()
 
