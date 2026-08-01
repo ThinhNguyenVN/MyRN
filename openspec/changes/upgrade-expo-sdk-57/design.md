@@ -117,7 +117,9 @@ Nếu `expo install --fix` resolve patch khác trong cùng dòng tương thích,
 
 ## Hotfix đã áp dụng trong change này
 
-- **Expo Go iOS crash (SIGSEGV)**: faulting thread `com.facebook.react.runtime.JavaScript`, stack Hermes `cloneString` ← `worklets::JSIWorkletsModuleProxy::toOptimizedObject`.
-- **Nguyên nhân**: Expo tắt `inlineRequires` mặc định → Worklets JSI init sai thứ tự.
-- **Fix**: `metro.config.js` bật `inlineRequires: true`; `babel.config.js` khai báo tường minh `react-native-worklets/plugin`.
+- **Expo Go iOS crash (SIGSEGV)**: faulting thread `com.facebook.react.runtime.JavaScript`, stack Hermes ← `worklets::JSIWorkletsModuleProxy::toOptimizedObject`.
+- **Nguyên nhân 1**: Expo tắt `inlineRequires` mặc định → Worklets JSI init sai thứ tự.
+- **Fix 1**: `metro.config.js` bật `inlineRequires: true`; `babel.config.js` khai báo tường minh `react-native-worklets/plugin`.
+- **Nguyên nhân 2 (sau khi Fix 1 vẫn crash)**: Expo Go **57.0.5** ship native Worklets **0.10.0** / Reanimated **4.5.0**, trong khi `expo@57.0.9` bundled JS là **0.10.1** / **4.5.1** → mismatch JS/native.
+- **Fix 2**: pin `react-native-worklets@0.10.0` và `react-native-reanimated@4.5.0`; thêm vào `expo.install.exclude` để doctor không ép lại bản 57.0.9.
 - **Verify**: `npx expo start -c` rồi mở lại Expo Go trên Simulator.
