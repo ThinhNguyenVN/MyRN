@@ -126,3 +126,4 @@ Nếu `expo install --fix` resolve patch khác trong cùng dòng tương thích,
 - **Fix 3**: `patch-package` bỏ truyền `fun.name` (luôn `undefined`) trong `cloneNonWorkletFunction`.
 - **Fallback**: nếu vẫn crash trên Expo Go → dùng development build (`npx expo run:ios`) với Worklets **0.10.1** / Reanimated **4.5.1**.
 - **Verify**: `npx expo start -c` rồi mở lại Expo Go trên Simulator.
+- **KNOWN ISSUE — Bottom sheet native (deferred)**: Sau SDK 57, `@gorhom/bottom-sheet@5.2.8` + Reanimated 4.5 trên iOS/Android: `present()` không hiện sheet (web Modal vẫn OK). Đã thử snapPoints / tắt dynamic sizing / patch [PR #2720](https://github.com/gorhom/react-native-bottom-sheet/pull/2720) — **không đủ**. **Quyết định**: không chặn upgrade; rollback các thử fix trong app; track bằng GitHub issue; migrate sang **Expo UI BottomSheet** trong change follow-up (đã out-of-scope từ đầu).

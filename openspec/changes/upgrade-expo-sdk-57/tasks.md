@@ -36,3 +36,9 @@
 - [x] 6.3 Pin `react-native-worklets@0.10.0` + `react-native-reanimated@4.5.0` khớp Expo Go 57.0.5 (tránh mismatch với bundled 0.10.1/4.5.1 của expo@57.0.9)
 - [x] 6.4 Patch `react-native-worklets@0.10.0` (`cloneNonWorkletFunction` không truyền `fun.name`) + `patch-package` trong postinstall
 - [x] 6.5 Verify trên iOS Simulator Expo Go: `npx expo start -c` rồi mở lại app (Expo Go sống sau bundle, không có `.ips` mới)
+
+## 7. Known issue — Bottom sheet (deferred)
+
+- [x] 7.1 Đánh giá: fix gorhom + Reanimated 4 trên Expo Go quá phức tạp / không ổn định trong scope upgrade
+- [x] 7.2 Rollback thử nghiệm fix trong `MyBottomSheet` + gỡ patch `@gorhom/bottom-sheet`
+- [x] 7.3 Mở GitHub issue track regression native ([#16](https://github.com/ThinhNguyenVN/MyRN/issues/16)); migrate `@expo/ui` BottomSheet ở change riêng
