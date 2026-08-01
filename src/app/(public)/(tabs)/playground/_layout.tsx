@@ -7,10 +7,10 @@ import { ScrollToHideHeader } from '@/components/ui/scroll-to-hide'
 import { NavigationBarHeader } from '@/components/ui/navigation-bar'
 import SideBar, { SideBarItem } from '@/components/ui/side-bar'
 import { useShowSidebar } from '@/hooks/dimenstions-hooks'
-import { PLAYGROUND_LINKS } from './constants'
-import { titleFromRoute } from './title-from-route'
+import { PLAYGROUND_LINKS } from '@/features/playground/constants'
+import { titleFromRoute } from '@/features/playground/title-from-route'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 const screenOptions = {
   header: (props: any) => <NavigationBarHeader {...props} />,

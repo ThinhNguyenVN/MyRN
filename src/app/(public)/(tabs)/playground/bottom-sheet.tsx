@@ -11,7 +11,7 @@ import MyTextInput from '@/components/elements/my-text-input'
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 const LIST_ITEMS = [
   'playground.dropdownOptionA',

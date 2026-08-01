@@ -1,4 +1,3 @@
-import type { NativeStackHeaderProps } from '@react-navigation/native-stack'
 import type { ReactNode } from 'react'
 
 export interface NavigationBarProps {
@@ -9,5 +8,23 @@ export interface NavigationBarProps {
   showBack?: boolean
 }
 
-/** Extends NativeStackHeaderProps for use as Stack header component */
-export type NavigationBarHeaderProps = NativeStackHeaderProps
+/** Minimal stack-header navigation helpers used by NavigationBarHeader */
+export type NavigationBarHeaderNavigation = {
+  canGoBack: () => boolean
+  goBack: () => void
+}
+
+/** Minimal stack header options used by NavigationBarHeader */
+export type NavigationBarHeaderOptions = {
+  title?: string
+  headerRight?: (props: { canGoBack: boolean }) => ReactNode
+}
+
+/**
+ * Local stand-in for former NativeStackHeaderProps.
+ * Expo Router SDK 56+ no longer exposes @react-navigation/native-stack for app code.
+ */
+export type NavigationBarHeaderProps = {
+  navigation?: NavigationBarHeaderNavigation
+  options?: NavigationBarHeaderOptions
+}

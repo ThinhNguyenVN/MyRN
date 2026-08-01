@@ -12,7 +12,7 @@ import {
 } from '@/components/elements/my-wheel-picker'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 const SCREEN_KEY = 'wheel-picker-screen'
 

@@ -13,7 +13,7 @@ import {
 import type { ThemeType } from '@/theme/theme-context'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 import { ListRenderItemInfo, MyList } from '@/components/ui/my-list'
 import MyView from '@/components/elements/my-view'
 

@@ -3,7 +3,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ScrollToHideFooter } from '@/components/ui/scroll-to-hide'
-import { BottomTabBar } from '@react-navigation/bottom-tabs'
+import { BottomTabBar } from 'expo-router/js-tabs'
 import { useTheme } from '@/theme/theme-context'
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable, { SCALE_SMALL } from '@/components/elements/my-pressable'

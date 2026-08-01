@@ -1,0 +1,31 @@
+diff --git a/node_modules/react-native-worklets/lib/module/memory/serializable.native.js b/node_modules/react-native-worklets/lib/module/memory/serializable.native.js
+index 8629093..dea0975 100644
+--- a/node_modules/react-native-worklets/lib/module/memory/serializable.native.js
++++ b/node_modules/react-native-worklets/lib/module/memory/serializable.native.js
+@@ -269,7 +269,7 @@ function cloneArray(value, shouldPersistRemote, depth) {
+ }
+ function cloneNonWorkletFunction(fun) {
+   const functionId = nextRemoteFunctionId;
+-  const clone = WorkletsModule.createSerializableNonWorkletFunction(fun, functionId, __DEV__ ? fun.name : undefined);
++  const clone = WorkletsModule.createSerializableNonWorkletFunction(fun, functionId, undefined);
+   if (clone.__keepAlive) {
+     registerRemoteFunction(fun);
+   }
+diff --git a/node_modules/react-native-worklets/src/memory/serializable.native.ts b/node_modules/react-native-worklets/src/memory/serializable.native.ts
+index ecc57cf..0e20d72 100644
+--- a/node_modules/react-native-worklets/src/memory/serializable.native.ts
++++ b/node_modules/react-native-worklets/src/memory/serializable.native.ts
+@@ -401,10 +401,12 @@ function cloneNonWorkletFunction<TArgs extends unknown[], TReturn>(
+   fun: (...args: TArgs) => TReturn
+ ): SerializableRef<(...args: TArgs) => TReturn> {
+   const functionId = nextRemoteFunctionId;
++  // Expo Go 57.0.5 (Worklets 0.10.0 native): passing fun.name can SIGSEGV in
++  // createSerializableNonWorkletFunction → Hermes utf8FromStringView.
+   const clone = WorkletsModule.createSerializableNonWorkletFunction(
+     fun,
+     functionId,
+-    __DEV__ ? fun.name : undefined
++    undefined
+   ) as SerializableRef<(...args: TArgs) => TReturn>;
+   if ((clone as RegisteredRemoteFunction).__keepAlive) {
+     registerRemoteFunction(fun);

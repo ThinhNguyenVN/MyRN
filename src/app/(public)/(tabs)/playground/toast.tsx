@@ -7,7 +7,7 @@ import { Confirmation } from '@/components/ui/confirmation'
 import { Toast } from '@/components/ui/toast'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 export default function ToastAndConfirmationScreen() {
   const styles = useThemedStyles(generateStyles)

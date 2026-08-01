@@ -9,7 +9,7 @@ import MyDatePicker, {
 } from '@/components/elements/my-date-picker'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { generateStyles } from './styles'
+import { generateStyles } from '@/features/playground/styles'
 
 export default function DatePickerScreen() {
   const styles = useThemedStyles(generateStyles)

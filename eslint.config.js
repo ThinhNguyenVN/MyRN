@@ -46,6 +46,13 @@ module.exports = defineConfig([
         },
       ],
 
+      // React Compiler rules from eslint-config-expo 57 conflict with Reanimated
+      // SharedValue mutations and common RN patterns; tighten in a follow-up cleanup.
+      'react-hooks/immutability': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/static-components': 'off',
+
       semi: ['error', 'never'],
       quotes: ['warn', 'single', { avoidEscape: true }],
       'no-multiple-empty-lines': ['warn', { max: 1, maxEOF: 1 }],
