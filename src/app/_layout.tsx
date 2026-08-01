@@ -7,7 +7,7 @@ import '@/i18n'
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { PortalHost, PortalProvider } from '@gorhom/portal'
-import { StyleSheet, useColorScheme, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ConfirmationRoot, setConfirmationRef } from '@/components/ui/confirmation'
 import type { ConfirmationRef } from '@/components/ui/confirmation'
@@ -18,12 +18,13 @@ import { ScrollToHideProvider } from '@/components/ui/scroll-to-hide'
 import { Provider } from 'react-redux'
 
 import { useAppInit } from '@/hooks/app-init-hooks'
+import { useHydratedColorScheme } from '@/hooks/color-scheme-hooks'
 import { store } from '@/store/store'
 
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme()
+  const colorScheme = useHydratedColorScheme()
   const confirmationRef = useRef<ConfirmationRef | null>(null)
   const toastRef = useRef<ToastRef | null>(null)
 
@@ -36,12 +37,10 @@ export default function RootLayout() {
     }
   }, [])
 
-  const themeName = colorScheme === 'dark' ? 'dark' : 'light'
-
   return (
     <GestureHandlerRootView style={styles.root}>
       <PortalProvider shouldAddRootHost={false}>
-        <MyThemeProvider value={themeName}>
+        <MyThemeProvider value={colorScheme}>
           <Provider store={store}>
             <AppInitGate>
               <ScrollToHideProvider>
