@@ -1,10 +1,10 @@
 import React, { memo } from 'react'
 
-import type { NativeStackHeaderProps } from '@react-navigation/native-stack'
 import { router, useSegments } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 
 import NavigationBar from './navigation-bar'
+import type { NavigationBarHeaderProps } from './type'
 
 const SEGMENT_TITLE_KEY: Record<string, string> = {
   index: 'tabs.home',
@@ -20,7 +20,7 @@ export interface NavigationBarHeaderExtraProps {
   hideBackButton?: boolean
 }
 
-const NavigationBarHeader: React.FC<NativeStackHeaderProps & NavigationBarHeaderExtraProps> = ({
+const NavigationBarHeader: React.FC<NavigationBarHeaderProps & NavigationBarHeaderExtraProps> = ({
   navigation,
   options,
   hideBackButton = false,

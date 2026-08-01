@@ -2,7 +2,7 @@
 
 ## Cursor Cloud specific instructions
 
-This is an **Expo SDK 55 React Native** app (`myrn`) targeting iOS, Android, and Web. It uses the **DummyJSON** public API (`https://dummyjson.com`) as its backend — there is no self-hosted backend or database.
+This is an **Expo SDK 57 React Native** app (`myrn`) targeting iOS, Android, and Web. It uses the **DummyJSON** public API (`https://dummyjson.com`) as its backend — there is no self-hosted backend or database.
 
 ### Git branch naming
 
