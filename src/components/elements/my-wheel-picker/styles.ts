@@ -21,6 +21,7 @@ export function generateStyles(theme: ThemeType) {
     wrap: {
       height: ITEM_HEIGHT * VISIBLE_COUNT,
       overflow: 'hidden' as const,
+      backgroundColor: getColor('fill/background/tertiary'),
     },
     item: {
       justifyContent: 'center' as const,
@@ -40,12 +41,12 @@ export function generateStyles(theme: ThemeType) {
     overlayTop: {
       top: 0,
       backgroundColor: getColor('fill/background/tertiary'),
-      opacity: 0.85,
+      opacity: 0.72,
     },
     overlayBottom: {
       bottom: 0,
       backgroundColor: getColor('fill/background/tertiary'),
-      opacity: 0.85,
+      opacity: 0.72,
     },
     highlight: {
       position: 'absolute' as const,
@@ -55,7 +56,7 @@ export function generateStyles(theme: ThemeType) {
       height: ITEM_HEIGHT,
       borderRadius: Radius.small,
       borderWidth: 1,
-      borderColor: getColor('border/inactive/tertiary'),
+      borderColor: getColor('border/inactive/secondary'),
       backgroundColor: getColor('fill/background/secondary'),
       pointerEvents: 'none' as const,
     },

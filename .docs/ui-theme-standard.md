@@ -62,14 +62,15 @@ This project uses a **hybrid** UI strategy:
 | Bucket | Examples | Approach |
 |--------|----------|----------|
 | Brand primitives | `MyButton`, `MyText`, `MyChip`, `MyPressable`, text-input skin | Keep token-driven `My*` — do **not** replace with Expo UI / SwiftUI / Compose by default |
-| System presentation | Bottom sheet (`MyBottomSheet`) | Expo UI as the **engine** behind the facade (`@expo/ui/community/bottom-sheet`); features never import `@expo/ui` directly |
+| System presentation | Bottom sheet (`MyBottomSheet`); wheel (`MyWheelPicker` on iOS) | Expo UI as the **engine** behind the facade; features never import `@expo/ui` directly. Date pickers stay branded custom calendar. |
 
 Rules:
 
 - Do **not** use Expo UI to replace `MyButton` / `MyText` / other brand primitives in production features.
 - Bottom sheet call sites go through `MyBottomSheet` (and re-exported helpers like `BottomSheetView` / `BottomSheetTextInput` from `@/components/elements/my-bottom-sheet`).
 - Mobile width uses the Expo UI sheet engine; desktop / wide layout may still use branded RN `Modal` / `TriggerModal` where that is the existing pattern.
-- Date / wheel / picker may keep custom facades for now; promoting their engine to Expo UI is a separate follow-up.
+- **Date:** branded custom calendar for single + range (shared month/year header + dual-wheel).
+- **Wheel:** Expo UI Picker wheel on iOS; Android/web keep `WheelPickerView`.
 
 ## What to use by default
 

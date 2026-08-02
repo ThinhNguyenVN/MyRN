@@ -40,6 +40,8 @@ If other docs summarize precedence in shorter form, this section wins.
 
 - `folder-structure.md`: where code belongs.
 - `screen-standard.md`: how one production screen should be built.
+- `coding-conventions.md`: general coding conventions (component files, handlers, My* elements, theme tokens, layout breakpoints).
+- `component-code-standard.md`: redirect stub → `coding-conventions.md`.
 - `ui-theme-standard.md`: how to use shared components, tokens, and styles.
   Includes rules for large visual redesigns and when to refactor shared UI/theme layers.
 - `data-state-standard.md`: how to call APIs and structure RTK Query, Redux Toolkit, hooks, and auth.
@@ -58,16 +60,18 @@ Read:
 
 1. `folder-structure.md`
 2. `screen-standard.md`
-3. `default-behavior-rules.md`
-4. `canonical-references.md`
+3. `coding-conventions.md`
+4. `default-behavior-rules.md`
+5. `canonical-references.md`
 
 ### Add or update shared UI
 
 Read:
 
-1. `ui-theme-standard.md`
-2. `default-behavior-rules.md`
-3. `canonical-references.md`
+1. `coding-conventions.md`
+2. `ui-theme-standard.md`
+3. `default-behavior-rules.md`
+4. `canonical-references.md`
 
 ### Add or update API, RTK Query, Redux Toolkit, or auth state
 

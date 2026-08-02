@@ -1,5 +1,11 @@
 import type { ReactNode } from 'react'
-import type { StyleProp, ViewStyle } from 'react-native'
+import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native'
+
+export type DayCell = {
+  date: Date
+  isCurrentMonth: boolean
+  disabled: boolean
+}
 
 export interface MyDatePickerProps {
   value?: Date | null
@@ -72,7 +78,7 @@ export interface YearMonthPickerViewProps {
   maxDate?: Date
 }
 
-export interface DateRangePickerTriggerProps {
+export interface DatePickerTriggerProps {
   open: boolean
   openPicker: () => void
   disabled: boolean
@@ -83,4 +89,67 @@ export interface DateRangePickerTriggerProps {
   errorMessage?: string
   required?: boolean
   triggerInputStyle: StyleProp<ViewStyle>
+}
+
+export interface DatePickerTriggerRenderProps {
+  openPicker: () => void
+  disabled: boolean
+  open: boolean
+}
+
+export interface DatePickerContentOpts {
+  setYearMonthMode: (isOpen: boolean) => void
+  yearMonthMode: boolean
+}
+
+export interface DatePickerShellProps {
+  title: string
+  disabled?: boolean
+  footer?: ReactNode
+  renderFooter?: (closePicker: () => void) => ReactNode
+  renderTrigger: (props: DatePickerTriggerRenderProps) => ReactNode
+  renderContent: (closePicker: () => void, contentOpts: DatePickerContentOpts) => ReactNode
+  panelMinWidth?: number
+  estimatedPanelHeight?: number
+  contentContainerStyle?: StyleProp<ViewStyle>
+  footerContainerStyle?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>
+}
+
+export interface CalendarBaseProps {
+  currentView: Date
+  goPrev: () => void
+  goNext: () => void
+  cells: DayCell[]
+  cellStyle?: StyleProp<ViewStyle>
+  renderCell: (cell: DayCell, idx: number) => React.ReactNode
+  onGridLayout: (event: LayoutChangeEvent) => void
+  /** Khi có, vùng tháng/năm (giữa header) có thể bấm để mở year-month picker. */
+  onHeaderPress?: () => void
+}
+
+export interface CalendarContentProps {
+  value?: Date | null
+  minDate?: Date
+  maxDate?: Date
+  closePicker: () => void
+  setYearMonthMode: (isOpen: boolean) => void
+  onSelectDay: (date: Date, closePicker: () => void) => void
+}
+
+export interface RangeCalendarContentProps {
+  startDate: Date | null
+  endDate: Date | null
+  minDate?: Date
+  maxDate?: Date
+  onSelectDay: (date: Date) => void
+  setYearMonthMode: (isOpen: boolean) => void
+}
+
+export interface RangeFooterProps {
+  onClear: () => void
+  onConfirm: () => void
+  clearLabel: string
+  confirmLabel: string
+  rowStyle: StyleProp<ViewStyle>
 }

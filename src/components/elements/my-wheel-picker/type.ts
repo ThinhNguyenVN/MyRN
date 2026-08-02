@@ -38,3 +38,10 @@ export interface WheelPickerRowProps {
   opacityOutputRange: number[]
   itemStyle?: StyleProp<ViewStyle>
 }
+
+export interface ExpoWheelPickerFieldProps {
+  items: WheelPickerItem[]
+  selectedIndex: number
+  onSelectIndex: (index: number) => void
+  enabled?: boolean
+}

@@ -1,6 +1,10 @@
 import { DEFAULT_DATE_LOCALE } from '@/configs/themes'
 import type { WheelPickerItem } from '@/components/elements/my-wheel-picker'
 
+import type { DayCell } from './type'
+
+export type { DayCell } from './type'
+
 export const COLS = 7
 export const FALLBACK_CELL_WIDTH = 36
 
@@ -24,8 +28,6 @@ export function getMonthYearLabel(date: Date): string {
     year: 'numeric',
   }).format(date)
 }
-
-export type DayCell = { date: Date; isCurrentMonth: boolean; disabled: boolean }
 
 export function getDaysForMonth(viewMonth: Date, minDate?: Date, maxDate?: Date): DayCell[] {
   const year = viewMonth.getFullYear()

@@ -4,34 +4,20 @@ import { useTranslation } from 'react-i18next'
 
 import Calendar from '@/components/elements/my-date-picker/calendar'
 import DatePickerShell from '@/components/elements/my-date-picker/date-picker-shell'
+import { formatDate } from '@/components/elements/my-date-picker/calendar-utils'
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
 import MyTextInput from '@/components/elements/my-text-input'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import type { MyDatePickerProps } from './type'
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date)
-}
-
-interface DatePickerTriggerProps {
-  open: boolean
-  openPicker: () => void
-  disabled: boolean
-  displayText: string
-  placeholder: string
-  title?: string
-  error?: boolean
-  errorMessage?: string
-  required?: boolean
-  triggerInputStyle: ReturnType<typeof generateStyles>['triggerInput']
-}
+import type {
+  CalendarContentProps,
+  DatePickerContentOpts,
+  DatePickerTriggerProps,
+  DatePickerTriggerRenderProps,
+  MyDatePickerProps,
+} from './type'
 
 const DatePickerTrigger = memo(function DatePickerTrigger({
   open,
@@ -76,6 +62,32 @@ const DatePickerTrigger = memo(function DatePickerTrigger({
   )
 })
 
+const CalendarContent = memo(function CalendarContent({
+  value,
+  minDate,
+  maxDate,
+  closePicker,
+  setYearMonthMode,
+  onSelectDay,
+}: CalendarContentProps) {
+  const handleSelectDay = useCallback(
+    (date: Date) => {
+      onSelectDay(date, closePicker)
+    },
+    [onSelectDay, closePicker],
+  )
+
+  return (
+    <Calendar
+      value={value}
+      minDate={minDate}
+      maxDate={maxDate}
+      onSelectDay={handleSelectDay}
+      onYearMonthModeChange={setYearMonthMode}
+    />
+  )
+})
+
 const MyDatePicker = memo(function MyDatePicker({
   value,
   onValueChange,
@@ -96,16 +108,54 @@ const MyDatePicker = memo(function MyDatePicker({
   const handleSelectDay = useCallback(
     (date: Date, closePicker: () => void) => {
       onValueChange?.(date)
-      const timer = setTimeout(closePicker, 300)
-      return () => clearTimeout(timer)
+      setTimeout(closePicker, 300)
     },
     [onValueChange],
   )
 
   const displayText = value ? formatDate(value) : ''
-
   const resolvedPlaceholder = placeholder ?? t('components.datePickOne')
   const resolvedTitle = title ?? t('components.datePickOne')
+
+  const renderTrigger = useCallback(
+    ({ openPicker, disabled: triggerDisabled, open }: DatePickerTriggerRenderProps) => (
+      <DatePickerTrigger
+        open={open}
+        openPicker={openPicker}
+        disabled={triggerDisabled}
+        displayText={displayText}
+        placeholder={resolvedPlaceholder}
+        title={resolvedTitle}
+        error={error}
+        errorMessage={errorMessage}
+        required={required}
+        triggerInputStyle={styles.triggerInput}
+      />
+    ),
+    [
+      displayText,
+      resolvedPlaceholder,
+      resolvedTitle,
+      error,
+      errorMessage,
+      required,
+      styles.triggerInput,
+    ],
+  )
+
+  const renderContent = useCallback(
+    (closePicker: () => void, contentOpts: DatePickerContentOpts) => (
+      <CalendarContent
+        value={value}
+        minDate={minDate}
+        maxDate={maxDate}
+        closePicker={closePicker}
+        setYearMonthMode={contentOpts.setYearMonthMode}
+        onSelectDay={handleSelectDay}
+      />
+    ),
+    [value, minDate, maxDate, handleSelectDay],
+  )
 
   return (
     <DatePickerShell
@@ -115,29 +165,8 @@ const MyDatePicker = memo(function MyDatePicker({
       panelMinWidth={280}
       estimatedPanelHeight={380}
       style={style}
-      renderTrigger={({ openPicker, disabled: d, open }) => (
-        <DatePickerTrigger
-          open={open}
-          openPicker={openPicker}
-          disabled={d}
-          displayText={displayText}
-          placeholder={resolvedPlaceholder}
-          title={resolvedTitle}
-          error={error}
-          errorMessage={errorMessage}
-          required={required}
-          triggerInputStyle={styles.triggerInput}
-        />
-      )}
-      renderContent={(closePicker, contentOpts) => (
-        <Calendar
-          value={value}
-          minDate={minDate}
-          maxDate={maxDate}
-          onSelectDay={(date) => handleSelectDay(date, closePicker)}
-          onYearMonthModeChange={contentOpts.setYearMonthMode}
-        />
-      )}
+      renderTrigger={renderTrigger}
+      renderContent={renderContent}
     />
   )
 })

@@ -61,7 +61,7 @@ export default function PlaygroundLayout() {
           return {
             ...screenOptions,
             title: t(titleFromRoute(route.name ?? '')),
-            contentStyle: { backgroundColor: getColor('brand/white') },
+            contentStyle: { backgroundColor: getColor('fill/background/primary') },
             header: (props) =>
               isMyListRoute ? (
                 <ScrollToHideHeader>
@@ -89,7 +89,7 @@ export default function PlaygroundLayout() {
             return {
               ...screenOptions,
               title: t(titleFromRoute(route.name ?? '')),
-              contentStyle: { backgroundColor: getColor('brand/white') },
+              contentStyle: { backgroundColor: getColor('fill/background/primary') },
               header: (props) =>
                 isMyListRoute ? (
                   <ScrollToHideHeader>

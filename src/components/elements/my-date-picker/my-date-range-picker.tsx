@@ -12,7 +12,14 @@ import MyTextInput from '@/components/elements/my-text-input'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import type { MyDateRangePickerProps, DateRangePickerTriggerProps } from './type'
+import type {
+  DatePickerContentOpts,
+  DatePickerTriggerProps,
+  DatePickerTriggerRenderProps,
+  MyDateRangePickerProps,
+  RangeCalendarContentProps,
+  RangeFooterProps,
+} from './type'
 import { toDateOnly, formatDate } from './calendar-utils'
 
 const DateRangePickerTrigger = memo(function DateRangePickerTrigger({
@@ -26,7 +33,7 @@ const DateRangePickerTrigger = memo(function DateRangePickerTrigger({
   errorMessage,
   required,
   triggerInputStyle,
-}: DateRangePickerTriggerProps) {
+}: DatePickerTriggerProps) {
   const chevronRotation = useSharedValue(0)
   useEffect(() => {
     chevronRotation.value = withTiming(open ? -90 : 0)
@@ -55,6 +62,47 @@ const DateRangePickerTrigger = memo(function DateRangePickerTrigger({
         pointerEvents="box-none"
       />
     </MyPressable>
+  )
+})
+
+const RangeCalendarContent = memo(function RangeCalendarContent({
+  startDate,
+  endDate,
+  minDate,
+  maxDate,
+  onSelectDay,
+  setYearMonthMode,
+}: RangeCalendarContentProps) {
+  return (
+    <CalendarRange
+      startDate={startDate}
+      endDate={endDate}
+      minDate={minDate}
+      maxDate={maxDate}
+      onSelectDay={onSelectDay}
+      onYearMonthModeChange={setYearMonthMode}
+    />
+  )
+})
+
+const RangeFooter = memo(function RangeFooter({
+  onClear,
+  onConfirm,
+  clearLabel,
+  confirmLabel,
+  rowStyle,
+}: RangeFooterProps) {
+  return (
+    <View style={rowStyle}>
+      <MyButton type="tertiary" text={clearLabel} width="full" onPress={onClear} elevation="none" />
+      <MyButton
+        type="primary"
+        text={confirmLabel}
+        width="full"
+        onPress={onConfirm}
+        elevation="none"
+      />
+    </View>
   )
 })
 
@@ -106,6 +154,61 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
 
   const resolvedPlaceholder = placeholder ?? t('components.datePickRange')
   const resolvedTitle = title ?? t('components.datePickRange')
+  const clearLabel = t('common.clear')
+  const confirmLabel = t('common.confirm')
+
+  const renderTrigger = useCallback(
+    ({ openPicker, disabled: triggerDisabled, open }: DatePickerTriggerRenderProps) => (
+      <DateRangePickerTrigger
+        open={open}
+        openPicker={openPicker}
+        disabled={triggerDisabled}
+        displayText={displayText}
+        placeholder={resolvedPlaceholder}
+        title={resolvedTitle}
+        error={error}
+        errorMessage={errorMessage}
+        required={required}
+        triggerInputStyle={styles.triggerInput}
+      />
+    ),
+    [
+      displayText,
+      resolvedPlaceholder,
+      resolvedTitle,
+      error,
+      errorMessage,
+      required,
+      styles.triggerInput,
+    ],
+  )
+
+  const renderContent = useCallback(
+    (_closePicker: () => void, contentOpts: DatePickerContentOpts) => (
+      <RangeCalendarContent
+        startDate={startDate}
+        endDate={endDate}
+        minDate={minDate}
+        maxDate={maxDate}
+        onSelectDay={handleSelectDay}
+        setYearMonthMode={contentOpts.setYearMonthMode}
+      />
+    ),
+    [startDate, endDate, minDate, maxDate, handleSelectDay],
+  )
+
+  const renderFooter = useCallback(
+    (closePicker: () => void) => (
+      <RangeFooter
+        onClear={handleClear}
+        onConfirm={closePicker}
+        clearLabel={clearLabel}
+        confirmLabel={confirmLabel}
+        rowStyle={styles.footerButtonRow}
+      />
+    ),
+    [handleClear, clearLabel, confirmLabel, styles.footerButtonRow],
+  )
 
   return (
     <DatePickerShell
@@ -114,50 +217,9 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
       panelMinWidth={280}
       estimatedPanelHeight={380}
       style={style}
-      renderTrigger={({ openPicker, disabled: d, open }) => (
-        <DateRangePickerTrigger
-          open={open}
-          openPicker={openPicker}
-          disabled={d}
-          displayText={displayText}
-          placeholder={resolvedPlaceholder}
-          title={resolvedTitle}
-          error={error}
-          errorMessage={errorMessage}
-          required={required}
-          triggerInputStyle={styles.triggerInput}
-        />
-      )}
-      renderContent={(closePicker, contentOpts) => (
-        <>
-          <CalendarRange
-            startDate={startDate}
-            endDate={endDate}
-            minDate={minDate}
-            maxDate={maxDate}
-            onSelectDay={handleSelectDay}
-            onYearMonthModeChange={contentOpts.setYearMonthMode}
-          />
-          {!contentOpts.yearMonthMode ? (
-            <View style={styles.footerButtonRow}>
-              <MyButton
-                type="tertiary"
-                text={t('common.clear')}
-                width="full"
-                onPress={handleClear}
-                elevation="none"
-              />
-              <MyButton
-                type="primary"
-                text={t('common.confirm')}
-                width="full"
-                onPress={closePicker}
-                elevation="none"
-              />
-            </View>
-          ) : null}
-        </>
-      )}
+      renderTrigger={renderTrigger}
+      renderContent={renderContent}
+      renderFooter={renderFooter}
     />
   )
 })
