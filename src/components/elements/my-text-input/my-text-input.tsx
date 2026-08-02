@@ -10,7 +10,7 @@ import {
 
 import { isNil } from 'lodash'
 
-import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
+import { BottomSheetTextInput } from '@/components/elements/my-bottom-sheet'
 
 import MyText from '../my-text'
 import MyView from '../my-view'

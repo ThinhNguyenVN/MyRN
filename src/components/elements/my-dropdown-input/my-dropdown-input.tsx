@@ -1,10 +1,12 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, View, Keyboard } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
-import { BottomSheetFlatList, BottomSheetFlatListMethods } from '@gorhom/bottom-sheet'
 import { useTranslation } from 'react-i18next'
 
-import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
+import MyBottomSheet, {
+  BottomSheetFlatList,
+  type MyBottomSheetRef,
+} from '@/components/elements/my-bottom-sheet'
 import { TriggerModal } from '@/components/ui/trigger-modal'
 import MyCheckbox from '@/components/elements/my-checkbox'
 import MyIcon from '@/components/elements/my-icon'
@@ -228,7 +230,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
 
   const optionsList = (
     <ListComponent
-      ref={listRef as React.Ref<BottomSheetFlatListMethods>}
+      ref={listRef as React.Ref<FlatList<DropdownOption>>}
       data={options}
       keyExtractor={(item, index) => `dropdown-option-${item.value}-${index}`}
       renderItem={renderOption}

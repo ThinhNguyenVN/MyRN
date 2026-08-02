@@ -1,9 +1,11 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Keyboard, View } from 'react-native'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useTranslation } from 'react-i18next'
 
-import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
+import MyBottomSheet, {
+  BottomSheetView,
+  type MyBottomSheetRef,
+} from '@/components/elements/my-bottom-sheet'
 import MyButton from '@/components/elements/my-button'
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
@@ -33,7 +35,6 @@ const MyWheelPicker = memo(function MyWheelPicker({
   const useSheet = useIsMobile()
   const sheetRef = useRef<MyBottomSheetRef>(null)
   const triggerRef = useRef<View>(null)
-  const isMobile = useIsMobile()
   const confirmHandlerRef = useRef<() => void>(() => {})
   const [open, setOpen] = useState(false)
   const [triggerLayout, setTriggerLayout] = useState<{
@@ -104,8 +105,6 @@ const MyWheelPicker = memo(function MyWheelPicker({
     />
   )
 
-  const paddingBottom = isMobile ? 140 : 0
-
   const footerContent = useMemo(
     () => (
       <MyButton
@@ -151,9 +150,7 @@ const MyWheelPicker = memo(function MyWheelPicker({
           useScrollView={false}
           footer={footerContent}
         >
-          <BottomSheetView style={[styles.pickerContent, { paddingBottom }]}>
-            {wheelPicker}
-          </BottomSheetView>
+          <BottomSheetView style={styles.pickerContent}>{wheelPicker}</BottomSheetView>
         </MyBottomSheet>
       ) : (
         <TriggerModal
