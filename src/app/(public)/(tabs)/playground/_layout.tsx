@@ -12,6 +12,11 @@ import { titleFromRoute } from '@/features/playground/title-from-route'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from '@/features/playground/styles'
 
+/** Deep links (e.g. /playground/bottom-sheet) get `index` under them so Back returns to the menu. */
+export const unstable_settings = {
+  initialRouteName: 'index',
+}
+
 const screenOptions = {
   header: (props: any) => <NavigationBarHeader {...props} />,
   headerShown: true,
@@ -50,6 +55,7 @@ export default function PlaygroundLayout() {
   if (!showSidebar) {
     return (
       <Stack
+        initialRouteName="index"
         screenOptions={({ route }) => {
           const isMyListRoute = route.name === 'my-list/index'
           return {
