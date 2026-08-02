@@ -1,4 +1,5 @@
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react'
+import type { LayoutChangeEvent, StyleProp, TextStyle, ViewStyle } from 'react-native'
 import { View } from 'react-native'
 
 import MyPressable from '@/components/elements/my-pressable'
@@ -31,6 +32,135 @@ function getInitialViewMonth(props: CalendarPropsUnion): Date {
   return new Date(initial.getFullYear(), initial.getMonth(), 1)
 }
 
+type CalendarStyles = ReturnType<typeof generateStyles>
+
+interface SingleDayCellProps {
+  cell: DayCell
+  idx: number
+  selected: boolean
+  isToday: boolean
+  cellStyle?: StyleProp<ViewStyle>
+  styles: CalendarStyles
+  onSelectDay: (date: Date) => void
+}
+
+const SingleDayCell = memo(function SingleDayCell({
+  cell,
+  idx,
+  selected,
+  isToday,
+  cellStyle,
+  styles,
+  onSelectDay,
+}: SingleDayCellProps) {
+  const handlePress = useCallback(() => {
+    if (!cell.disabled) onSelectDay(cell.date)
+  }, [cell.disabled, cell.date, onSelectDay])
+
+  return (
+    <MyPressable
+      key={`${idx}-day-cell`}
+      onPress={handlePress}
+      disabled={cell.disabled}
+      style={[
+        styles.dayCell,
+        cellStyle,
+        isToday && styles.dayCellToday,
+        selected && styles.dayCellSelected,
+        cell.disabled && styles.dayCellDisabled,
+      ]}
+      haptic={false}
+      animatedType="opacity"
+    >
+      <View style={styles.dayCellContent}>
+        <MyText
+          typography="label"
+          style={[styles.dayCellText, selected && styles.dayCellSelectedText]}
+        >
+          {cell.date.getDate()}
+        </MyText>
+        {isToday ? (
+          <View style={[styles.dayCellTodayDot, selected && styles.dayCellTodayDotSelected]} />
+        ) : null}
+      </View>
+    </MyPressable>
+  )
+})
+
+interface RangeDayCellProps {
+  cell: DayCell
+  idx: number
+  isStart: boolean
+  isEnd: boolean
+  inRange: boolean
+  isToday: boolean
+  cellStyle?: StyleProp<ViewStyle>
+  styles: CalendarStyles
+  onSelectDay: (date: Date) => void
+}
+
+const RangeDayCell = memo(function RangeDayCell({
+  cell,
+  idx,
+  isStart,
+  isEnd,
+  inRange,
+  isToday,
+  cellStyle,
+  styles,
+  onSelectDay,
+}: RangeDayCellProps) {
+  const handlePress = useCallback(() => {
+    if (!cell.disabled) onSelectDay(cell.date)
+  }, [cell.disabled, cell.date, onSelectDay])
+
+  const isRangeStartOrEnd = isStart || isEnd
+  const isSingleDayRange = isStart && isEnd
+
+  let rangeStyle = null
+  let textStyle: StyleProp<TextStyle> = styles.dayCellText
+  if (isSingleDayRange) {
+    rangeStyle = styles.dayCellRangeStartEnd
+    textStyle = [styles.dayCellText, styles.dayCellRangeText]
+  } else if (isStart) {
+    rangeStyle = styles.dayCellRangeStart
+    textStyle = [styles.dayCellText, styles.dayCellRangeText]
+  } else if (isEnd) {
+    rangeStyle = styles.dayCellRangeEnd
+    textStyle = [styles.dayCellText, styles.dayCellRangeText]
+  } else if (inRange) {
+    rangeStyle = styles.dayCellInRange
+  }
+
+  return (
+    <MyPressable
+      key={`${idx}-day-cell`}
+      onPress={handlePress}
+      disabled={cell.disabled}
+      style={[
+        styles.dayCell,
+        cellStyle,
+        isToday && styles.dayCellToday,
+        rangeStyle,
+        cell.disabled && styles.dayCellDisabled,
+      ]}
+      haptic={false}
+      animatedType="opacity"
+    >
+      <View style={styles.dayCellContent}>
+        <MyText typography="label" style={textStyle}>
+          {cell.date.getDate()}
+        </MyText>
+        {isToday ? (
+          <View
+            style={[styles.dayCellTodayDot, isRangeStartOrEnd && styles.dayCellTodayDotSelected]}
+          />
+        ) : null}
+      </View>
+    </MyPressable>
+  )
+})
+
 const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnion) {
   const { mode, minDate, maxDate, onSelectDay, onYearMonthModeChange } = props
   const styles = useThemedStyles(generateStyles)
@@ -56,12 +186,15 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
     [viewMonth],
   )
 
+  const goPrevMonth = useCallback((d: Date) => new Date(d.getFullYear(), d.getMonth() - 1, 1), [])
+  const goNextMonth = useCallback((d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 1), [])
+
   const goPrev = useCallback(() => {
-    setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))
-  }, [])
+    setViewMonth(goPrevMonth)
+  }, [goPrevMonth])
   const goNext = useCallback(() => {
-    setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))
-  }, [])
+    setViewMonth(goNextMonth)
+  }, [goNextMonth])
 
   const cells = useMemo(
     () => getDaysForMonth(currentView, minDate, maxDate),
@@ -75,12 +208,11 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
 
   const renderCell = useCallback(
     (cell: DayCell, idx: number) => {
-      const baseCellStyle = [styles.dayCell, cellStyle]
       if (!cell.isCurrentMonth) {
         return (
           <View
             key={`${idx}-other-month`}
-            style={[baseCellStyle, styles.dayCellOtherMonth, styles.dayCellEmpty]}
+            style={[styles.dayCell, cellStyle, styles.dayCellOtherMonth, styles.dayCellEmpty]}
           />
         )
       }
@@ -89,33 +221,15 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
         const selected = !isNil(valueOnly) && isSameDay(cell.date, valueOnly)
         const isToday = isSameDay(cell.date, todayOnly)
         return (
-          <MyPressable
-            key={`${idx}-day-cell`}
-            onPress={() => !cell.disabled && onSelectDay(cell.date)}
-            disabled={cell.disabled}
-            style={[
-              baseCellStyle,
-              isToday && styles.dayCellToday,
-              selected && styles.dayCellSelected,
-              cell.disabled && styles.dayCellDisabled,
-            ]}
-            haptic={false}
-            animatedType="opacity"
-          >
-            <View style={styles.dayCellContent}>
-              <MyText
-                typography="label"
-                style={[styles.dayCellText, selected && styles.dayCellSelectedText]}
-              >
-                {cell.date.getDate()}
-              </MyText>
-              {isToday ? (
-                <View
-                  style={[styles.dayCellTodayDot, selected && styles.dayCellTodayDotSelected]}
-                />
-              ) : null}
-            </View>
-          </MyPressable>
+          <SingleDayCell
+            cell={cell}
+            idx={idx}
+            selected={selected}
+            isToday={isToday}
+            cellStyle={cellStyle}
+            styles={styles}
+            onSelectDay={onSelectDay}
+          />
         )
       }
 
@@ -127,62 +241,20 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
         !isNil(endOnly) &&
         cellDate.getTime() > startOnly.getTime() &&
         cellDate.getTime() < endOnly.getTime()
-      const isRangeStartOrEnd = isStart || isEnd
-      const isSingleDayRange = isStart && isEnd
       const isToday = isSameDay(cell.date, todayOnly)
 
-      let rangeStyle = null
-      let textStyle: typeof styles.dayCellText = styles.dayCellText
-      if (isSingleDayRange) {
-        rangeStyle = styles.dayCellRangeStartEnd
-        textStyle = [
-          styles.dayCellText,
-          styles.dayCellRangeText,
-        ] as unknown as typeof styles.dayCellText
-      } else if (isStart) {
-        rangeStyle = styles.dayCellRangeStart
-        textStyle = [
-          styles.dayCellText,
-          styles.dayCellRangeText,
-        ] as unknown as typeof styles.dayCellText
-      } else if (isEnd) {
-        rangeStyle = styles.dayCellRangeEnd
-        textStyle = [
-          styles.dayCellText,
-          styles.dayCellRangeText,
-        ] as unknown as typeof styles.dayCellText
-      } else if (inRange) {
-        rangeStyle = styles.dayCellInRange
-      }
-
       return (
-        <MyPressable
-          key={`${idx}-day-cell`}
-          onPress={() => !cell.disabled && onSelectDay(cell.date)}
-          disabled={cell.disabled}
-          style={[
-            baseCellStyle,
-            isToday && styles.dayCellToday,
-            rangeStyle,
-            cell.disabled && styles.dayCellDisabled,
-          ]}
-          haptic={false}
-          animatedType="opacity"
-        >
-          <View style={styles.dayCellContent}>
-            <MyText typography="label" style={textStyle}>
-              {cell.date.getDate()}
-            </MyText>
-            {isToday ? (
-              <View
-                style={[
-                  styles.dayCellTodayDot,
-                  isRangeStartOrEnd && styles.dayCellTodayDotSelected,
-                ]}
-              />
-            ) : null}
-          </View>
-        </MyPressable>
+        <RangeDayCell
+          cell={cell}
+          idx={idx}
+          isStart={isStart}
+          isEnd={isEnd}
+          inRange={inRange}
+          isToday={isToday}
+          cellStyle={cellStyle}
+          styles={styles}
+          onSelectDay={onSelectDay}
+        />
       )
     },
     [mode, styles, cellStyle, valueOnly, startOnly, endOnly, todayOnly, onSelectDay],
@@ -210,10 +282,19 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
     [onYearMonthModeChange],
   )
 
+  const handleGridLayout = useCallback((e: LayoutChangeEvent) => {
+    setGridWidth(e.nativeEvent.layout.width)
+  }, [])
+
+  const yearMonthValue = useMemo(
+    () => ({ year: pendingYear, month: pendingMonth }),
+    [pendingYear, pendingMonth],
+  )
+
   if (showYearMonthPicker) {
     return (
       <YearMonthPickerView
-        value={{ year: pendingYear, month: pendingMonth }}
+        value={yearMonthValue}
         onValueChange={handleYearMonthValueChange}
         minDate={minDate}
         maxDate={maxDate}
@@ -229,7 +310,7 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
       cells={cells}
       cellStyle={cellStyle}
       renderCell={renderCell}
-      onGridLayout={setGridWidth}
+      onGridLayout={handleGridLayout}
       onHeaderPress={openYearMonthPicker}
     />
   )

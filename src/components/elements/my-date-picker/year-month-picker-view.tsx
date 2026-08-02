@@ -104,4 +104,3 @@ const YearMonthPickerView = memo(function YearMonthPickerView({
 YearMonthPickerView.displayName = 'YearMonthPickerView'
 
 export default YearMonthPickerView
-export type { YearMonthValue }

@@ -1,6 +1,4 @@
-import type { ReactNode } from 'react'
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react'
-import type { StyleProp, ViewStyle } from 'react-native'
 import { Keyboard, View } from 'react-native'
 
 import MyBottomSheet, {
@@ -12,25 +10,7 @@ import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-
-export interface DatePickerContentOpts {
-  setYearMonthMode: (isOpen: boolean) => void
-  yearMonthMode: boolean
-}
-
-export interface DatePickerShellProps {
-  title: string
-  disabled?: boolean
-  footer?: ReactNode
-  renderFooter?: (closePicker: () => void) => ReactNode
-  renderTrigger: (props: { openPicker: () => void; disabled: boolean; open: boolean }) => ReactNode
-  renderContent: (closePicker: () => void, contentOpts: DatePickerContentOpts) => ReactNode
-  panelMinWidth?: number
-  estimatedPanelHeight?: number
-  contentContainerStyle?: StyleProp<ViewStyle>
-  footerContainerStyle?: StyleProp<ViewStyle>
-  style?: StyleProp<ViewStyle>
-}
+import type { DatePickerShellProps } from './type'
 
 const DatePickerShell = memo(function DatePickerShell({
   title,
@@ -58,6 +38,14 @@ const DatePickerShell = memo(function DatePickerShell({
   } | null>(null)
   const [yearMonthMode, setYearMonthMode] = useState(false)
 
+  const handleMeasureInWindow = useCallback(
+    (x: number, y: number, width: number, height: number) => {
+      setTriggerLayout({ x, y, width, height })
+      setOpen(true)
+    },
+    [],
+  )
+
   const openPicker = useCallback(() => {
     if (disabled) return
     Keyboard.dismiss()
@@ -65,12 +53,9 @@ const DatePickerShell = memo(function DatePickerShell({
       setOpen(true)
       sheetRef.current?.open()
     } else {
-      triggerRef.current?.measureInWindow((x, y, width, height) => {
-        setTriggerLayout({ x, y, width, height })
-        setOpen(true)
-      })
+      triggerRef.current?.measureInWindow(handleMeasureInWindow)
     }
-  }, [disabled, isMobile])
+  }, [disabled, isMobile, handleMeasureInWindow])
 
   const closePicker = useCallback(() => {
     if (isMobile) {
@@ -131,3 +116,4 @@ const DatePickerShell = memo(function DatePickerShell({
 DatePickerShell.displayName = 'DatePickerShell'
 
 export default DatePickerShell
+export type { DatePickerContentOpts, DatePickerShellProps } from './type'

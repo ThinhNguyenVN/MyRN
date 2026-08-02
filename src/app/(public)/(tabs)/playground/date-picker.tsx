@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { ScrollView } from 'react-native'
 import { useTranslation } from 'react-i18next'
 
@@ -7,6 +7,7 @@ import MyDatePicker, {
   MyDateRangePicker,
   type DateRange,
 } from '@/components/elements/my-date-picker'
+import MyText from '@/components/elements/my-text'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from '@/features/playground/styles'
@@ -18,11 +19,36 @@ export default function DatePickerScreen() {
   const [date2, setDate2] = useState<Date | null>(new Date())
   const [dateWithFooter, setDateWithFooter] = useState<Date | null>(new Date(2026, 2, 7))
   const [range, setRange] = useState<DateRange | null>(null)
-  const minDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-  const maxDate = new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0)
+  const minDate = useMemo(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1), [])
+  const maxDate = useMemo(
+    () => new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0),
+    [],
+  )
+
+  const handleClearFooterDate = useCallback(() => {
+    setDateWithFooter(null)
+  }, [])
+
+  const clearFooter = useMemo(
+    () => (
+      <MyButton
+        type="tertiary"
+        text={t('common.clear')}
+        width="full"
+        onPress={handleClearFooterDate}
+        elevation="none"
+      />
+    ),
+    [t, handleClearFooterDate],
+  )
 
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
+      <MyText typography="body" color="text/active/secondary">
+        Engine: branded calendar (single + range cùng month/year header; tap tháng/năm mở
+        dual-wheel).
+      </MyText>
+
       <MyDatePicker
         value={date1}
         onValueChange={setDate1}
@@ -56,15 +82,7 @@ export default function DatePickerScreen() {
         value={dateWithFooter}
         onValueChange={setDateWithFooter}
         title={t('playground.datePickerSelectedDate')}
-        footer={
-          <MyButton
-            type="tertiary"
-            text={t('common.clear')}
-            width="full"
-            onPress={() => setDateWithFooter(null)}
-            elevation={'none'}
-          />
-        }
+        footer={clearFooter}
       />
 
       <MyDateRangePicker
@@ -72,14 +90,6 @@ export default function DatePickerScreen() {
         onValueChange={setRange}
         placeholder={t('playground.datePickerRange')}
         title={t('playground.datePickerRange')}
-        footer={
-          <MyButton
-            type="tertiary"
-            text={t('common.clear')}
-            width="full"
-            onPress={() => setRange(null)}
-          />
-        }
       />
     </ScrollView>
   )

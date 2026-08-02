@@ -24,7 +24,7 @@ export default function ButtonsLayout() {
           route.name === 'detail'
             ? t('playground.buttonsDetailTitle')
             : t('playground.linksButtons'),
-        contentStyle: { backgroundColor: getColor('brand/white') },
+        contentStyle: { backgroundColor: getColor('fill/background/primary') },
         header: (props: any) => (
           <NavigationBarHeader {...props} hideBackButton={!isMobile && route.name === 'index'} />
         ),

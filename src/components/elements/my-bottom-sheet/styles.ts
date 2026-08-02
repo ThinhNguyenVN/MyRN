@@ -3,7 +3,7 @@ import { Radius } from '@/theme/radius'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
-const HEADER_HEIGHT = 50
+const HEADER_HEIGHT = 44
 
 export const generateStyles = (theme: ThemeType) => {
   const { getColor, getSpacing, insets } = theme
@@ -31,7 +31,7 @@ export const generateStyles = (theme: ThemeType) => {
       flexDirection: 'row',
       alignItems: 'center',
       paddingHorizontal: getSpacing('x4'),
-      borderBottomWidth: 1,
+      borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: getColor('border/inactive/tertiary'),
     },
     headerTitleWrap: {
@@ -40,26 +40,30 @@ export const generateStyles = (theme: ThemeType) => {
       alignItems: 'center',
     },
     headerTitle: {
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: '600',
       color: getColor('text/active/primary'),
     },
     headerClose: {
-      width: 20,
-      height: 20,
+      width: 24,
+      height: 24,
       justifyContent: 'center',
       alignItems: 'center',
     },
     content: {
-      padding: getSpacing('x4'),
+      paddingHorizontal: getSpacing('x4'),
+      paddingTop: getSpacing('x2'),
+      paddingBottom: getSpacing('x4'),
     },
     footer: {
-      paddingTop: getSpacing('x2'),
-      paddingBottom: insets.bottom || getSpacing('x4'),
+      paddingHorizontal: getSpacing('x4'),
+      paddingTop: getSpacing('x4'),
+      paddingBottom: getSpacing('x2'),
     },
     modalFooter: {
       paddingHorizontal: getSpacing('x4'),
-      paddingBottom: insets.bottom || getSpacing('x4'),
+      paddingTop: getSpacing('x4'),
+      paddingBottom: insets.bottom || getSpacing('x2'),
     },
   })
 }

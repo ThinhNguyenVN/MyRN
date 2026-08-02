@@ -77,7 +77,7 @@ export function generateStyles(theme: ThemeType) {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: getSpacing('x3'),
+        marginBottom: getSpacing('x4'),
       },
       calendarMonthYear: {
         color: getColor('text/active/primary'),
@@ -86,7 +86,7 @@ export function generateStyles(theme: ThemeType) {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: getSpacing('x2'),
+        paddingVertical: getSpacing('x1'),
       },
       calendarPrevNext: {
         padding: getSpacing('x2'),
@@ -106,7 +106,6 @@ export function generateStyles(theme: ThemeType) {
         ...(isWeb ? { minWidth: 0 } : { flex: 1, flexShrink: 0 }),
       },
       weekDayText: {
-        color: getColor('text/inactive/primary'),
         textAlign: 'center',
       },
       daysGrid: {
@@ -182,14 +181,13 @@ export function generateStyles(theme: ThemeType) {
 
       footerButtonRow: {
         flexDirection: 'row',
-        gap: getSpacing('x2'),
-        marginTop: getSpacing('x6'),
+        gap: getSpacing('x4'),
       },
 
       yearMonthPickerRow: {
         flexDirection: 'row',
         gap: getSpacing('x2'),
-        marginBottom: getSpacing('x3'),
+        marginBottom: getSpacing('x2'),
       },
       yearMonthWheel: {
         flex: 1,
@@ -197,12 +195,11 @@ export function generateStyles(theme: ThemeType) {
       },
       yearMonthPickerFooter: {
         flexDirection: 'row',
-        gap: getSpacing('x2'),
+        gap: getSpacing('x4'),
         marginTop: getSpacing('x4'),
       },
       mobileContentContainer: {
-        padding: getSpacing('x4'),
-        paddingBottom: 100,
+        padding: 0,
       },
     }),
   }
