@@ -5,7 +5,6 @@ import 'react-native-reanimated'
 import * as SplashScreen from 'expo-splash-screen'
 import '@/i18n'
 
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { PortalHost, PortalProvider } from '@gorhom/portal'
 import { StyleSheet, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -44,18 +43,16 @@ export default function RootLayout() {
           <Provider store={store}>
             <AppInitGate>
               <ScrollToHideProvider>
-                <BottomSheetModalProvider>
-                  <ConfirmationRoot ref={confirmationRef} />
-                  <ToastRoot ref={toastRef} />
-                  <Stack>
-                    <Stack.Screen name="(public)" options={{ headerShown: false }} />
-                    <Stack.Screen name="(private)" options={{ headerShown: false }} />
-                  </Stack>
-                  <View style={styles.portalHostOverlay} pointerEvents="box-none">
-                    <PortalHost name="root" />
-                  </View>
-                  <StatusBar style="auto" />
-                </BottomSheetModalProvider>
+                <ConfirmationRoot ref={confirmationRef} />
+                <ToastRoot ref={toastRef} />
+                <Stack>
+                  <Stack.Screen name="(public)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(private)" options={{ headerShown: false }} />
+                </Stack>
+                <View style={styles.portalHostOverlay} pointerEvents="box-none">
+                  <PortalHost name="root" />
+                </View>
+                <StatusBar style="auto" />
               </ScrollToHideProvider>
             </AppInitGate>
           </Provider>

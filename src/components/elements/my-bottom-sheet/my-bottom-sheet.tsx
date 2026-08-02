@@ -12,46 +12,18 @@ import { Dimensions, Modal, Pressable, ScrollView, View } from 'react-native'
 import {
   BottomSheetModal,
   BottomSheetScrollView,
-  BottomSheetFooter,
-  BottomSheetBackdrop,
-  type BottomSheetFooterProps,
-  type BottomSheetBackdropProps,
-} from '@gorhom/bottom-sheet'
+  type BottomSheetMethods,
+} from '@expo/ui/community/bottom-sheet'
 
 import MyIcon from '@/components/elements/my-icon'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
+import MyPressable from '@/components/elements/my-pressable'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 
 import type { MyBottomSheetProps, MyBottomSheetRef } from './type'
 import { generateStyles } from './styles'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import MyPressable from '../my-pressable'
-
-function SheetHandle() {
-  const styles = useThemedStyles(generateStyles)
-  return (
-    <View style={styles.handleContainer}>
-      <View style={styles.handleIndicator} />
-    </View>
-  )
-}
-
-function createBackdropComponent(pressBackdropToClose: boolean) {
-  function SheetBackdrop(props: BottomSheetBackdropProps) {
-    return (
-      <BottomSheetBackdrop
-        {...props}
-        pressBehavior={pressBackdropToClose ? 'close' : 'none'}
-        appearsOnIndex={0}
-        disappearsOnIndex={-1}
-      />
-    )
-  }
-  SheetBackdrop.displayName = 'SheetBackdrop'
-  return SheetBackdrop
-}
 
 const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
   (
@@ -69,18 +41,20 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       style,
       backgroundStyle,
       useScrollView = true,
-      ...rest
+      enableDynamicSizing,
+      snapPoints,
+      index,
+      onChange,
     },
     ref,
   ) => {
-    const { getSpacing } = useTheme()
-    const bottomSheetRef = useRef<BottomSheetModal>(null)
+    const { getColor } = useTheme()
+    const bottomSheetRef = useRef<BottomSheetMethods>(null)
     const styles = useThemedStyles(generateStyles)
-    const insets = useSafeAreaInsets()
-    const isMobileSize = useIsMobileSize()
-
-    const isMobile = isMobileSize
+    const isMobile = useIsMobileSize()
     const [modalVisible, setModalVisible] = useState(false)
+
+    const panDownEnabled = enablePanDownToClose && pressBackdropToClose
 
     const close = useCallback(() => {
       if (isMobile) {
@@ -109,6 +83,11 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       setModalVisible(false)
       handleDismiss()
     }, [handleDismiss])
+
+    const resolvedBackgroundStyle = useMemo(
+      () => [{ backgroundColor: getColor('fill/background/tertiary') }, backgroundStyle],
+      [getColor, backgroundStyle],
+    )
 
     const headerContent = useMemo(() => {
       if (header) return null
@@ -141,27 +120,9 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       styles.headerTitle,
     ])
 
-    const footerComponent = useCallback(
-      (footerProps: BottomSheetFooterProps) => {
-        if (!footer) return undefined
-
-        return (
-          <BottomSheetFooter {...footerProps}>
-            <MyView style={styles.footer}>{footer}</MyView>
-          </BottomSheetFooter>
-        )
-      },
-      [footer, styles.footer],
-    )
-
-    const backdropComponent = useMemo(
-      () => createBackdropComponent(pressBackdropToClose),
-      [pressBackdropToClose],
-    )
+    const footerNode = footer ? <MyView style={styles.footer}>{footer}</MyView> : null
 
     const windowHeight = Dimensions.get('window').height
-
-    const withFooterStyle = !!footerComponent ? { paddingBottom: 130 } : { paddingBottom: 100 }
     const modalPanelStyle = useMemo(
       () => [styles.modalPanel, { maxHeight: windowHeight * 0.8 }],
       [styles.modalPanel, windowHeight],
@@ -194,33 +155,35 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       )
     }
 
+    const sheetBody = useScrollView ? (
+      <BottomSheetScrollView
+        contentContainerStyle={[styles.content, contentContainerStyle]}
+        keyboardShouldPersistTaps="handled"
+      >
+        {children}
+        {footerNode}
+      </BottomSheetScrollView>
+    ) : (
+      <View style={[styles.content, contentContainerStyle]}>
+        {children}
+        {footerNode}
+      </View>
+    )
+
     return (
       <BottomSheetModal
         ref={bottomSheetRef}
         onDismiss={handleDismiss}
-        enablePanDownToClose={enablePanDownToClose}
+        enablePanDownToClose={panDownEnabled}
         style={[style, styles.sheet]}
-        backgroundStyle={backgroundStyle}
-        handleComponent={SheetHandle}
-        backdropComponent={backdropComponent}
-        footerComponent={footerComponent}
-        enableDynamicSizing
-        keyboardBehavior={'fillParent'}
-        enableBlurKeyboardOnGesture={false}
-        maxDynamicContentSize={Dimensions.get('window').height - (insets.top || getSpacing('x6'))}
-        {...rest}
+        backgroundStyle={resolvedBackgroundStyle}
+        enableDynamicSizing={enableDynamicSizing ?? !snapPoints}
+        snapPoints={snapPoints}
+        index={index}
+        onChange={onChange}
       >
         {header ?? headerContent}
-        {useScrollView ? (
-          <BottomSheetScrollView
-            contentContainerStyle={[styles.content, withFooterStyle, contentContainerStyle]}
-            keyboardShouldPersistTaps="handled"
-          >
-            {children}
-          </BottomSheetScrollView>
-        ) : (
-          <View style={[styles.content, contentContainerStyle]}>{children}</View>
-        )}
+        {sheetBody}
       </BottomSheetModal>
     )
   },

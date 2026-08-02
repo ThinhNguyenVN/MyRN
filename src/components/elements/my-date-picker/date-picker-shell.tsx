@@ -3,13 +3,15 @@ import React, { memo, useCallback, useMemo, useRef, useState } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 import { Keyboard, View } from 'react-native'
 
-import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
+import MyBottomSheet, {
+  BottomSheetView,
+  type MyBottomSheetRef,
+} from '@/components/elements/my-bottom-sheet'
 import { TriggerModal } from '@/components/ui/trigger-modal'
 import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
 
 export interface DatePickerContentOpts {
   setYearMonthMode: (isOpen: boolean) => void
@@ -90,9 +92,6 @@ const DatePickerShell = memo(function DatePickerShell({
 
   const footerContent = yearMonthMode ? null : renderFooter ? renderFooter(closePicker) : footer
 
-  const hasFooter = !!(footer ?? renderFooter)
-  const paddingBottom = hasFooter && !yearMonthMode ? 140 : 80
-
   return (
     <View style={style}>
       {trigger}
@@ -107,9 +106,7 @@ const DatePickerShell = memo(function DatePickerShell({
           footer={footerContent}
           useScrollView={false}
         >
-          <BottomSheetView
-            style={[styles.mobileContentContainer, { paddingBottom }, contentContainerStyle]}
-          >
+          <BottomSheetView style={[styles.mobileContentContainer, contentContainerStyle]}>
             {content}
           </BottomSheetView>
         </MyBottomSheet>

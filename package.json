@@ -17,8 +17,8 @@
     "postinstall": "patch-package && mkdir public; cp $(node -p \"require.resolve('canvaskit-wasm/bin/full/canvaskit.wasm', { paths: [require.resolve('@shopify/react-native-skia')] })\") public/canvaskit.wasm"
   },
   "dependencies": {
+    "@expo/ui": "57.0.8",
     "@expo/vector-icons": "15.1.1",
-    "@gorhom/bottom-sheet": "5.2.8",
     "@gorhom/portal": "1.0.14",
     "@hookform/resolvers": "3.9.1",
     "@reduxjs/toolkit": "2.11.2",

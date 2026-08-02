@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { ScrollView, View } from 'react-native'
+import { useLocalSearchParams } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
@@ -23,6 +24,7 @@ const LIST_ITEMS = [
 export default function BottomSheetScreen() {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
+  const { autoOpen } = useLocalSearchParams<{ autoOpen?: string }>()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showError, setShowError] = useState(false)
@@ -37,6 +39,23 @@ export default function BottomSheetScreen() {
   const longRef = useRef<MyBottomSheetRef>(null)
   const customHeaderRef = useRef<MyBottomSheetRef>(null)
   const noCloseRef = useRef<MyBottomSheetRef>(null)
+
+  // Smoke-test helper: deep-link ?autoOpen=simple|form|list|long|custom|noclose
+  useEffect(() => {
+    if (!autoOpen) return
+    const map: Record<string, RefObject<MyBottomSheetRef | null>> = {
+      simple: simpleRef,
+      form: formRef,
+      list: listRef,
+      long: longRef,
+      custom: customHeaderRef,
+      noclose: noCloseRef,
+    }
+    const target = map[autoOpen]
+    if (!target) return
+    const timer = setTimeout(() => target.current?.open(), 900)
+    return () => clearTimeout(timer)
+  }, [autoOpen])
 
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
