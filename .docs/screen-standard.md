@@ -120,7 +120,11 @@ List screens should follow this flow:
 1. `container.tsx` owns query, refresh state, mutations, and navigation
 2. `view.tsx` owns rendering
 3. shared list behavior should go through `MyList`
-4. row interactions should prefer shared UI patterns such as `SwipeableItem`
+4. async UI should use the product kit: `MySkeleton` / `MyErrorState` / `MyEmptyState` (see `shared-ui-catalog.md`)
+5. row surfaces should prefer `MyCard`; separators `MyDivider`; search `MySearchInput`
+6. row interactions should prefer shared UI patterns such as `SwipeableItem`
+
+Canonical wiring: `src/features/todo/screens/todo-list.view.tsx`.
 
 ## `styles.ts` standard
 
@@ -170,8 +174,9 @@ Avoid these in new production screens:
 
 - Does the screen have a clear `container` and `view` split?
 - Is navigation/data orchestration kept out of the `view`?
-- Does the form use `MyForm` and `MyForm*` adapters?
+- Does the form use `MyForm` and `MyForm*` adapters (including `MyFormCheckbox` when needed)?
 - Does the list use `MyList` instead of raw list primitives?
+- Does the list use `MySkeleton` / `MyEmptyState` / `MyErrorState` for async states?
 - Does the screen look closer to `auth` or `todo` than to `playground`?
 
 ## Default behavior fallback

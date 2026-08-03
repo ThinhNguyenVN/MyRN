@@ -62,6 +62,7 @@ If any of the above is unspecified in design, follow `.docs/default-behavior-rul
 - Treat starter routes such as `src/app/(public)/home.tsx` and `src/app/(public)/(tabs)/index.tsx` as replaceable samples when a new home flow is requested.
 - Follow the `container + view + styles + optional hook/types` pattern.
 - Prefer existing shared UI, tokens, and theme helpers.
+- For list/settings/async UI, prefer the product kit in `.docs/shared-ui-catalog.md` (`MyCard`, `MyDivider`, `MySearchInput`, `MySkeleton`, `MyEmptyState`, `MyErrorState`, `MyFormCheckbox`).
 - Use RTK Query by default for server data.
 - Use Redux Toolkit slice/thunk only when they fit the documented boundaries.
 - Use `src/features/auth` and `src/features/todo` only as reference implementations for structure and code shape.
@@ -72,8 +73,8 @@ If any of the above is unspecified in design, follow `.docs/default-behavior-rul
 ## Definition of done
 - correct structure and file placement
 - correct flow and user behavior in scope
-- correct loading/empty/error/success handling
-- correct use of shared UI/theme/data-state boundaries
+- correct loading/empty/error/success handling (`MySkeleton` / `MyEmptyState` / `MyErrorState` when applicable)
+- correct use of shared UI/theme/data-state boundaries (see `.docs/shared-ui-catalog.md`)
 - appropriate validation/testing evidence
 - walkthrough evidence for the implemented scope
 ```

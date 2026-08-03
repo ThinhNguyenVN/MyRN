@@ -50,7 +50,7 @@ The scope-lock response should include:
 - flow summary
 - implementation order
 - data/state approach
-- shared UI reuse plan
+- shared UI reuse plan (map screens to `.docs/shared-ui-catalog.md` kit pieces where applicable)
 - open questions
 - explicit assumptions if coding were to start immediately
 - proposed spec artifact path (`specs/<feature-or-domain-name>.spec.md`) and what sections must be filled first

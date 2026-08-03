@@ -49,6 +49,7 @@ Use `src/features/todo` as the reference for:
 - container and view split
 - route re-export pattern
 - optimistic cache updates
+- list async UI with the product kit (`MySkeleton`, `MyEmptyState`, `MyErrorState`) and row surface via `MyCard`
 
 Important files:
 
@@ -67,6 +68,17 @@ What to copy from `todo`:
 - server state handled with RTK Query
 - view file as presentational UI only
 - optimistic updates inside the API layer instead of ad hoc local state patches in screens
+- initial loading / empty / fetch-error wiring with shared empty/error/skeleton facades
+
+## Shared UI kit (product components)
+
+When a screen needs card / divider / search / async empty-error-skeleton / form checkbox / image gallery, use:
+
+- Decision table + props: `.docs/shared-ui-catalog.md`
+- Theme composition rules: `.docs/ui-theme-standard.md`
+- Behavior when design is silent: `.docs/default-behavior-rules.md`
+
+Canonical production call site for list async + card rows: `todo-list.view.tsx`.
 
 ## `playground`: allowed use and forbidden use
 
@@ -75,6 +87,13 @@ What to copy from `todo`:
 - quickly checking how an existing shared component behaves
 - finding props and visual behavior examples
 - manual experimentation by developers and AI
+
+Product-kit playground entries (usage catalog only):
+
+- `divider.tsx`, `card.tsx`
+- `empty-state.tsx`, `error-state.tsx`, `skeleton.tsx`
+- `search-input.tsx`, `form.tsx` (includes `MyFormCheckbox`), `checkbox.tsx`
+- `image-slider.tsx` (slider + fullscreen `ImagePreview`)
 
 Do not use `playground` as the reference for:
 
@@ -87,9 +106,11 @@ Rule:
 
 - Learn component behavior from `playground`.
 - Learn production structure from `auth` and `todo`.
+- Learn which kit component to pick from `shared-ui-catalog.md`.
 
 ## Review questions
 
 - Did the new code follow `auth` or `todo` when a matching example existed?
 - Was `playground` used only as a usage catalog?
+- Did list/async screens reuse `MySkeleton` / `MyEmptyState` / `MyErrorState` / `MyCard` instead of inventing local equivalents?
 - Did the contributor avoid copying extra `View` wrappers and loose styling from demo code?

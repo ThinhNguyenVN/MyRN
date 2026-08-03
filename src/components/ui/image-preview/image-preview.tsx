@@ -1,24 +1,24 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { Modal, Pressable, useWindowDimensions } from 'react-native'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  FlatList,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  Modal,
+  useWindowDimensions,
+} from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import type { ImageLoadEventData } from 'expo-image'
 
 import MyIcon from '@/components/elements/my-icon'
-import MyImage from '@/components/elements/my-image'
 import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
+import { PreviewZoomableImage } from './preview-zoomable-image'
 import { generateStyles } from './styles'
 import type { ImagePreviewProps } from './type'
 
-type ImageSize = {
-  width: number
-  height: number
-}
-
-const preventBackdropClose = () => undefined
+const keyExtractor = (item: string, index: number) => `${item}-${index}`
 
 export const ImagePreview = memo(function ImagePreview({
   images,
@@ -31,27 +31,11 @@ export const ImagePreview = memo(function ImagePreview({
   const styles = useThemedStyles(generateStyles)
   const insets = useSafeAreaInsets()
   const { width, height } = useWindowDimensions()
-  const [sourceSize, setSourceSize] = useState<ImageSize | null>(null)
+  const listRef = useRef<FlatList<string>>(null)
+  const [isZoomed, setIsZoomed] = useState(false)
   const lastIndex = Math.max(images.length - 1, 0)
-  const activeImage = images[activeIndex]
-  const renderedImageSize = useMemo(() => {
-    if (!sourceSize || sourceSize.width <= 0 || sourceSize.height <= 0) {
-      return { width, height }
-    }
+  const hasImages = images.length > 0
 
-    const sourceAspectRatio = sourceSize.width / sourceSize.height
-    const viewportAspectRatio = width / height
-
-    if (viewportAspectRatio > sourceAspectRatio) {
-      return { width: height * sourceAspectRatio, height }
-    }
-
-    return { width, height: width / sourceAspectRatio }
-  }, [height, sourceSize, width])
-  const imageFrameStyle = useMemo(
-    () => [styles.imageFrame, renderedImageSize],
-    [renderedImageSize, styles.imageFrame],
-  )
   const closeButtonStyle = useMemo(
     () => [styles.closeButton, { top: insets.top + 16 }],
     [insets.top, styles.closeButton],
@@ -60,27 +44,91 @@ export const ImagePreview = memo(function ImagePreview({
     () => [styles.counter, { bottom: insets.bottom + 16 }],
     [insets.bottom, styles.counter],
   )
+  const listStyle = useMemo(() => ({ width, height }), [height, width])
+
+  const scrollToIndex = useCallback(
+    (index: number, animated: boolean) => {
+      if (width <= 0) return
+      listRef.current?.scrollToOffset({
+        offset: index * width,
+        animated,
+      })
+    },
+    [width],
+  )
 
   useEffect(() => {
-    setSourceSize(null)
-  }, [activeImage])
-
-  const handleImageLoad = useCallback((event: ImageLoadEventData) => {
-    setSourceSize({
-      width: event.source.width,
-      height: event.source.height,
+    if (!visible || width <= 0) return
+    setIsZoomed(false)
+    const frame = requestAnimationFrame(() => {
+      scrollToIndex(activeIndex, false)
     })
-  }, [])
+    return () => cancelAnimationFrame(frame)
+    // Only sync when opening / viewport changes — index changes from buttons call scrollToIndex directly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, width, scrollToIndex])
+
+  const goToIndex = useCallback(
+    (index: number, animated: boolean) => {
+      const nextIndex = Math.min(Math.max(index, 0), lastIndex)
+      setIsZoomed(false)
+      onIndexChange(nextIndex)
+      scrollToIndex(nextIndex, animated)
+    },
+    [lastIndex, onIndexChange, scrollToIndex],
+  )
+
   const handlePreviousPress = useCallback(
-    () => onIndexChange(Math.max(activeIndex - 1, 0)),
-    [activeIndex, onIndexChange],
+    () => goToIndex(activeIndex - 1, true),
+    [activeIndex, goToIndex],
   )
   const handleNextPress = useCallback(
-    () => onIndexChange(Math.min(activeIndex + 1, lastIndex)),
-    [activeIndex, lastIndex, onIndexChange],
+    () => goToIndex(activeIndex + 1, true),
+    [activeIndex, goToIndex],
   )
 
-  if (!activeImage) return null
+  const handleMomentumScrollEnd = useCallback(
+    ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (width <= 0) return
+      const nextIndex = Math.round(nativeEvent.contentOffset.x / width)
+      const clamped = Math.min(Math.max(nextIndex, 0), lastIndex)
+      if (clamped !== activeIndex) {
+        setIsZoomed(false)
+        onIndexChange(clamped)
+      }
+    },
+    [activeIndex, lastIndex, onIndexChange, width],
+  )
+
+  const handleZoomChange = useCallback((zoomed: boolean) => {
+    setIsZoomed(zoomed)
+  }, [])
+
+  const getItemLayout = useCallback(
+    (_: ArrayLike<string> | null | undefined, index: number) => ({
+      length: width,
+      offset: width * index,
+      index,
+    }),
+    [width],
+  )
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: string; index: number }) => (
+      <PreviewZoomableImage
+        uri={item}
+        label={label}
+        index={index}
+        width={width}
+        height={height}
+        isActive={visible && index === activeIndex}
+        onZoomChange={handleZoomChange}
+      />
+    ),
+    [activeIndex, handleZoomChange, height, label, visible, width],
+  )
+
+  if (!hasImages) return null
 
   return (
     <Modal
@@ -92,28 +140,26 @@ export const ImagePreview = memo(function ImagePreview({
       onRequestClose={onClose}
     >
       <MyView style={styles.container}>
-        <Pressable
-          style={styles.backdrop}
-          accessibilityRole="button"
-          accessibilityLabel={`Close ${label} image preview`}
-          onPress={onClose}
-        />
-
-        <Pressable
-          style={imageFrameStyle}
-          accessibilityRole="image"
-          accessibilityLabel={`${label} image ${activeIndex + 1}`}
-          onPress={preventBackdropClose}
-        >
-          <MyImage
-            url={activeImage}
-            style={styles.image}
-            imageStyle={styles.image}
-            contentFit="contain"
-            cachePolicy="memory-disk"
-            onLoad={handleImageLoad}
+        {width > 0 && height > 0 ? (
+          <FlatList
+            key={`image-preview-${width}-${height}`}
+            ref={listRef}
+            horizontal
+            pagingEnabled
+            data={images}
+            extraData={`${activeIndex}-${isZoomed}`}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+            getItemLayout={getItemLayout}
+            style={listStyle}
+            showsHorizontalScrollIndicator={false}
+            bounces={false}
+            scrollEnabled={images.length > 1 && !isZoomed}
+            onMomentumScrollEnd={handleMomentumScrollEnd}
+            initialScrollIndex={Math.min(activeIndex, lastIndex)}
+            removeClippedSubviews={false}
           />
-        </Pressable>
+        ) : null}
 
         <MyPressable
           animatedType="opacity"
@@ -129,12 +175,12 @@ export const ImagePreview = memo(function ImagePreview({
           <>
             <PreviewNavigationButton
               direction="previous"
-              disabled={activeIndex === 0}
+              disabled={activeIndex === 0 || isZoomed}
               onPress={handlePreviousPress}
             />
             <PreviewNavigationButton
               direction="next"
-              disabled={activeIndex === lastIndex}
+              disabled={activeIndex === lastIndex || isZoomed}
               onPress={handleNextPress}
             />
           </>

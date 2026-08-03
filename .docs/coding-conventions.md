@@ -55,8 +55,13 @@ Trong feature / screen / hầu hết UI:
 |---------|------|
 | `View` | `MyView` (trừ glue layout rất mỏng hoặc đang implement MyView) |
 | `Text` | `MyText` |
-| `Image` (URL) | `MyImage` |
+| `Image` (URL) | `MyImage` (fullscreen gallery: `ImagePreview`, không `MyImage`) |
 | Button / press / icon / input / sheet / spinner | `MyButton`, `MyPressable`, `MyIcon`, `MyTextInput`, `MyBottomSheet`, `MySpinner`, `MySurface` |
+| Card / divider / search | `MyCard`, `MyDivider`, `MySearchInput` |
+| Empty / error / skeleton loading | `MyEmptyState`, `MyErrorState`, `MySkeleton` |
+| Checkbox/radio trong form | `MyFormCheckbox` |
+
+Catalog quyết định + props: `.docs/shared-ui-catalog.md`.
 
 Ưu tiên **ContainerStyleProps** (`margin`, `padding`, `gap`, …) trên My* thay vì nhồi vào `style`.
 

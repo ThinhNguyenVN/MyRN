@@ -50,7 +50,7 @@ For each screen or flow, define:
 - validation behavior: [describe or say "use project defaults"]
 - destructive action behavior: [describe or say "use project defaults"]
 
-If behavior is not specified in design, follow `.docs/default-behavior-rules.md`.
+If behavior is not specified in design, follow `.docs/default-behavior-rules.md` and prefer kit components from `.docs/shared-ui-catalog.md`.
 
 ## Data and backend
 - Data source: [real API / mock / mixed]
@@ -70,6 +70,7 @@ If behavior is not specified in design, follow `.docs/default-behavior-rules.md`
 - Production implementation must live in `src/features`.
 - Starter routes such as `src/app/(public)/home.tsx` and `src/app/(public)/(tabs)/index.tsx` are replaceable samples, not fixed product requirements.
 - Reuse existing shared UI, theme, token, API, and store layers before adding new abstractions.
+- Prefer the product kit in `.docs/shared-ui-catalog.md` for list/settings/async/search/form-checkbox/media surfaces.
 - If the new design is a large visual redesign, keep the architecture and data boundaries, but allow refactoring shared theme and shared UI layers to match the new system.
 - If visual changes repeat across many screens, prefer shared-layer refactors over one-off screen overrides.
 - Use RTK Query by default for server data.
@@ -86,7 +87,7 @@ The task is done when:
 - app shell, providers, and routes are correct
 - features are placed under `src/features`
 - UI matches the design within scope
-- required states are implemented
+- required states are implemented (`MySkeleton` / `MyEmptyState` / `MyErrorState` for list/async when applicable)
 - data/auth boundaries follow project conventions
 - checks/tests appropriate to the changes are run
 - working walkthrough evidence is produced
@@ -101,6 +102,7 @@ If design and implementation constraints conflict:
 If a detail is missing:
 - do not invent a new architecture pattern
 - use `.docs/default-behavior-rules.md`
+- prefer kit pieces from `.docs/shared-ui-catalog.md` before creating feature-local empty/error/card/search UI
 - stay consistent with `auth` and `todo`
 ```
 

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   MyForm,
+  MyFormCheckbox,
   MyFormChips,
   MyFormCounter,
   MyFormDatePicker,
@@ -53,6 +54,7 @@ const formSchema = z.object({
     .refine((v) => !isNil(v) && v !== '', 'playground.formErrRole'),
   count: z.number().min(3, 'playground.formErrCountMin').max(99, 'playground.formErrCountMax'),
   enabled: z.boolean().refine((v) => v === true, 'playground.formErrEnable'),
+  agreed: z.boolean().refine((v) => v === true, 'playground.formErrAgree'),
   level: z
     .number()
     .nullable()
@@ -78,6 +80,7 @@ const defaultValues: FormValues = {
   role: null,
   count: 1,
   enabled: false,
+  agreed: false,
   level: null,
   newsletter: false,
   marketing: false,
@@ -144,6 +147,13 @@ function FormBody({ scrollToField }: { scrollToField: (name: string) => void }) 
         name="enabled"
         title={t('playground.formFeature')}
         subTitle={t('playground.formOnOff')}
+      />
+
+      <MyFormCheckbox<FormValues>
+        name="agreed"
+        label={t('playground.formAgreeTerms')}
+        title={t('playground.formAgreeTerms')}
+        required
       />
 
       <MyFormWheelPicker<FormValues>
