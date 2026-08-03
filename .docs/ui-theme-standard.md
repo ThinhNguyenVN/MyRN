@@ -24,8 +24,11 @@ Typical examples:
 - `MyIcon`
 - `MyTextInput`
 - `MySwitch`
+- `MyCard`, `MyDivider`, `MySearchInput`
+- `MyEmptyState`, `MyErrorState`, `MySkeleton`
 
 Use an existing element before creating a local wrapper in a feature.
+For product wiring (when to use which kit piece), see `shared-ui-catalog.md`.
 
 ### `src/components/form`
 
@@ -36,6 +39,7 @@ Examples:
 - `MyForm`
 - `MyFormTextInput`
 - `MyFormSwitch`
+- `MyFormCheckbox`
 - other `MyForm*` adapters
 
 For production forms, prefer `MyForm*` adapters over wiring low-level fields manually.
@@ -52,6 +56,7 @@ Examples:
 - `Toast`
 - `SwipeableItem`
 - `ScrollToHide`
+- `ImageSlider`, `ImagePreview`
 
 If a behavior is likely to be reused across screens or features, it belongs here instead of inside a single feature.
 
@@ -61,7 +66,7 @@ This project uses a **hybrid** UI strategy:
 
 | Bucket | Examples | Approach |
 |--------|----------|----------|
-| Brand primitives | `MyButton`, `MyText`, `MyChip`, `MyPressable`, text-input skin | Keep token-driven `My*` — do **not** replace with Expo UI / SwiftUI / Compose by default |
+| Brand primitives | `MyButton`, `MyText`, `MyChip`, `MyPressable`, text-input skin, `MyCard`, `MyDivider`, `MySearchInput`, `MyEmptyState`, `MyErrorState`, `MySkeleton` | Keep token-driven `My*` — do **not** replace with Expo UI / SwiftUI / Compose by default |
 | System presentation | Bottom sheet (`MyBottomSheet`); wheel (`MyWheelPicker` on iOS) | Expo UI as the **engine** behind the facade; features never import `@expo/ui` directly. Date pickers stay branded custom calendar. |
 
 Rules:
@@ -110,6 +115,20 @@ Do not create ad-hoc button styles in production screens when a shared button va
 
 - Prefer `MyList` for scrollable production lists.
 - Do not use raw `FlatList` or `FlashList` directly in feature screens unless the shared list cannot support the use case.
+- List async UI (required defaults when design is silent):
+  1. initial load → `MySkeleton` (`preset="listRow"` + `count` as needed)
+  2. fetch error without usable stale data → `MyErrorState` + `onRetry`
+  3. empty success → `MyEmptyState`
+- Prefer `MyCard` for list/settings row surfaces instead of one-off card StyleSheets.
+- Use `MyDivider` for section separators and `MySearchInput` for search fields.
+- Forms: use `MyFormCheckbox` for checkbox/radio fields bound to `MyForm` (alongside other `MyForm*` adapters).
+- Full props, playground routes, and import paths: `shared-ui-catalog.md`.
+- Canonical list wiring: `src/features/todo/screens/todo-list.view.tsx`.
+
+### Media
+
+- Carousel: `ImageSlider`.
+- Fullscreen gallery: `ImagePreview` (pager slide + zoom). Do not use `MyImage` inside fullscreen preview — it forces square aspect; preview uses `expo-image` contain.
 
 ### Header and global feedback
 
@@ -238,5 +257,8 @@ However:
 - Is `MyText` used for app text?
 - Is raw `View` only used for simple local layout?
 - Are lists built with `MyList` by default?
+- Did list/async screens use `MySkeleton` / `MyEmptyState` / `MyErrorState` instead of ad-hoc blanks?
+- Did row/settings surfaces prefer `MyCard` / `MyDivider` / `MySearchInput` where they fit?
 - Are colors, spacing, typography, radius, and elevation coming from shared theme/tokens?
 - Is `playground` treated only as a component catalog, not as a production structure reference?
+- Was `shared-ui-catalog.md` consulted before inventing a new empty/error/card/search pattern?

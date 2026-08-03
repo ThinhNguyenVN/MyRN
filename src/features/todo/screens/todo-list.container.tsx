@@ -8,12 +8,19 @@ import type { TodoItem } from '@/features/todo/types'
 import { TodoListView } from './todo-list.view'
 
 export default function TodoListScreenContainer() {
-  const { data, isLoading, isFetching, refetch } = useGetTodosQuery({ limit: 30, skip: 0 })
+  const { data, isLoading, isFetching, isError, refetch } = useGetTodosQuery({
+    limit: 30,
+    skip: 0,
+  })
   const [deleteTodo] = useDeleteTodoMutation()
   const [isPullRefreshing, setIsPullRefreshing] = useState(false)
 
   const handleRefresh = useCallback(() => {
     setIsPullRefreshing(true)
+    void refetch()
+  }, [refetch])
+
+  const handleRetry = useCallback(() => {
     void refetch()
   }, [refetch])
 
@@ -41,8 +48,10 @@ export default function TodoListScreenContainer() {
     <TodoListView
       todos={data?.todos ?? []}
       isLoading={isLoading}
+      isError={isError}
       isRefreshing={isPullRefreshing}
       onRefresh={handleRefresh}
+      onRetry={handleRetry}
       onEdit={handleEdit}
       onDelete={handleDelete}
     />

@@ -119,6 +119,35 @@ export const generateStyles = (theme: ThemeType) => {
       marginBottom: getSpacing('x4'),
     },
 
+    imageSliderWrap: {
+      width: '100%',
+      maxWidth: 420,
+      alignSelf: 'center',
+    },
+    dividerVerticalRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      minHeight: 48,
+    },
+    surfaceDemoBox: {
+      width: 160,
+      height: 96,
+      marginBottom: getSpacing('x6'),
+      alignSelf: 'center',
+    },
+    surfaceDemoInner: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: getSpacing('x3'),
+    },
+    spinnerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: getSpacing('x4'),
+      marginBottom: getSpacing('x4'),
+    },
+
     // ─── Misc ───────────────────────────────────────────────────────────────
     errorContent: {
       padding: getSpacing('x4'),

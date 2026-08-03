@@ -28,7 +28,6 @@ module.exports = defineConfig([
       'react-native/no-inline-styles': 'warn',
       // Không cho phép import và code không sử dụng
       'no-unused-vars': 'error',
-      '@typescript-eslint/no-unused-vars': 'error',
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'error',

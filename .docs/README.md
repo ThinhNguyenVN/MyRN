@@ -44,6 +44,7 @@ If other docs summarize precedence in shorter form, this section wins.
 - `component-code-standard.md`: redirect stub → `coding-conventions.md`.
 - `ui-theme-standard.md`: how to use shared components, tokens, and styles.
   Includes rules for large visual redesigns and when to refactor shared UI/theme layers.
+- `shared-ui-catalog.md`: product UI kit decision table — which `My*` / shared UI to use (card, divider, skeleton, empty/error, search, form checkbox, image preview).
 - `data-state-standard.md`: how to call APIs and structure RTK Query, Redux Toolkit, hooks, and auth.
 - `default-behavior-rules.md`: fallback product and UX behavior when the design or prompt does not specify enough detail.
 - `canonical-references.md`: which existing files are the source of truth when there is ambiguity.
@@ -61,8 +62,9 @@ Read:
 1. `folder-structure.md`
 2. `screen-standard.md`
 3. `coding-conventions.md`
-4. `default-behavior-rules.md`
-5. `canonical-references.md`
+4. `shared-ui-catalog.md`
+5. `default-behavior-rules.md`
+6. `canonical-references.md`
 
 ### Add or update shared UI
 
@@ -70,8 +72,9 @@ Read:
 
 1. `coding-conventions.md`
 2. `ui-theme-standard.md`
-3. `default-behavior-rules.md`
-4. `canonical-references.md`
+3. `shared-ui-catalog.md`
+4. `default-behavior-rules.md`
+5. `canonical-references.md`
 
 ### Add or update API, RTK Query, Redux Toolkit, or auth state
 
@@ -89,8 +92,9 @@ Read:
 2. `data-state-standard.md`
 3. `screen-standard.md`
 4. `ui-theme-standard.md`
-5. `default-behavior-rules.md`
-6. `canonical-references.md`
+5. `shared-ui-catalog.md`
+6. `default-behavior-rules.md`
+7. `canonical-references.md`
 
 Build in this order:
 

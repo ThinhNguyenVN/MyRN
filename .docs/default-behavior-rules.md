@@ -49,7 +49,8 @@ When behavior is unspecified, prefer the safest and most conservative UX that:
 ### Initial loading
 
 - If the primary screen content depends on the first fetch, show a clear loading state instead of a blank screen.
-- Prefer the shared loading treatment already used by nearby canonical screens.
+- Prefer `MySkeleton` with an appropriate preset (`listRow` / `textBlock` / `card`) when the content shape is list- or card-like.
+- Prefer the shared loading treatment already used by nearby canonical screens (`todo` list).
 
 ### Refetching
 
@@ -59,8 +60,9 @@ When behavior is unspecified, prefer the safest and most conservative UX that:
 ## Empty state defaults
 
 - Never leave an empty list or blank container without explanation.
+- Use `MyEmptyState` (`title` required; `subtitle` / CTA optional).
 - Show a concise empty title and, when useful, one supporting line.
-- If there is an obvious next action, expose it from the empty state.
+- If there is an obvious next action, expose it from the empty state (`actionLabel` + `onActionPress`).
 
 Examples:
 
@@ -78,7 +80,7 @@ Examples:
 
 ### Data fetch errors
 
-- Show a recoverable error state with a retry path.
+- Show a recoverable error state with a retry path via `MyErrorState` (`message` + `onRetry`).
 - If stale data exists, prefer keeping the stale data visible and surface the error non-destructively.
 
 ### Destructive mutation errors
@@ -108,6 +110,7 @@ Do not add confirmation for harmless or easily reversible actions unless the pro
 ## Form defaults
 
 - Use `MyForm` and `MyForm*` adapters.
+- Prefer `MyFormCheckbox` for checkbox/radio fields (not ad-hoc `MyCheckbox` + `Controller`).
 - Validate with `zod`.
 - Trim text input on submit unless whitespace is product-significant.
 - Keep entered values when validation or submit fails.
@@ -118,6 +121,8 @@ Do not add confirmation for harmless or easily reversible actions unless the pro
 ## List defaults
 
 - Prefer `MyList` for production lists.
+- Prefer `MyCard` for list/settings row surfaces; `MyDivider` for section separators; `MySearchInput` for search.
+- Async UI order: `MySkeleton` → `MyErrorState` (+ retry) → `MyEmptyState` → content. See `shared-ui-catalog.md`.
 - If the screen is list-first, support refresh when the app pattern already supports it.
 - If an item action is destructive, use confirmation or a clearly intentional affordance.
 - If optimistic updates improve responsiveness and the feature is list-heavy, prefer optimistic behavior in the API layer.
@@ -130,7 +135,7 @@ Do not add confirmation for harmless or easily reversible actions unless the pro
 
 ## Visual defaults
 
-- Prefer shared components before new wrappers.
+- Prefer shared components before new wrappers — start from `shared-ui-catalog.md`.
 - Prefer token-based colors, spacing, typography, radius, and elevation.
 - Use raw `View` only for simple local wrappers.
 - Do not copy extra wrapper noise from `playground`.

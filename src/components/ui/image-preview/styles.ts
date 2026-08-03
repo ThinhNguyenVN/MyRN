@@ -6,20 +6,17 @@ export const generateStyles = (theme: ThemeType) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
       backgroundColor: '#0A0A0A',
     },
-    backdrop: {
-      ...StyleSheet.absoluteFillObject,
-    },
-    imageFrame: {
+    page: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
       backgroundColor: '#0A0A0A',
     },
     image: {
       width: '100%',
       height: '100%',
-      backgroundColor: '#0A0A0A',
     },
     closeButton: {
       position: 'absolute',
@@ -55,6 +52,7 @@ export const generateStyles = (theme: ThemeType) =>
     },
     counter: {
       position: 'absolute',
+      alignSelf: 'center',
       zIndex: 2,
       paddingHorizontal: theme.getSpacing('x3'),
       paddingVertical: theme.getSpacing('x2'),
