@@ -1,28 +1,30 @@
 # AGENTS.md
 
-## Cursor Cloud specific instructions
+## Agent instructions
 
-This is an **Expo SDK 57 React Native** app (`myrn`) targeting iOS, Android, and Web. It uses the **DummyJSON** public API (`https://dummyjson.com`) as its backend — there is no self-hosted backend or database.
+This is an **Expo SDK 57 React Native** template app (`myrn`) for iOS, Android, and Web. Default demo backend is **DummyJSON** (`https://dummyjson.com`) — no self-hosted DB in-repo. Treat the repo as a **ready platform** for product work; see `.docs/product-kickoff.md`.
 
 ### Git branch naming
 
-- Use branch names in the format `feat/<description>`, `fix/<description>`, `issue/<description>`, or `release/<description>`.
-- Do not create or use `cursor/` branches for normal development work.
-- If you need a helper, run `yarn branch:create <feat|fix|issue|release> <description words>` and use the printed branch name with `git checkout -b`.
+- Use `feat/`, `fix/`, `issue/`, or `release/` prefixes.
+- Do not use `cursor/` branches for normal work.
+- Helper: `yarn branch:create <feat|fix|issue|release> <description words>` then `git checkout -b` with the printed name.
 
 ### Required docs discovery
 
-- Treat `.docs/README.md` as the entry point for project conventions.
-- Before any UI/component work, read `.docs/coding-conventions.md` (general conventions: `type.ts`, no inline JSX handlers, My* elements, theme tokens, breakpoints).
-- When choosing which shared UI to use on production screens (card, divider, skeleton, empty/error, search, form checkbox, image preview), read `.docs/shared-ui-catalog.md`.
-- When the user asks how to prompt the agent for app or feature generation, read `.docs/prompt-template-full-app.md`, `.docs/prompt-template-feature.md`, and `.docs/prompt-template-scope-lock.md`.
-- Before adding or changing shared UI, theme, or tokens, read `.docs/coding-conventions.md`, `.docs/ui-theme-standard.md`, `.docs/shared-ui-catalog.md`, and `.docs/canonical-references.md`.
-- Before adding or changing production screens, read `.docs/folder-structure.md`, `.docs/screen-standard.md`, `.docs/coding-conventions.md`, `.docs/shared-ui-catalog.md`, and `.docs/canonical-references.md`.
-- Before adding or changing API, RTK Query, Redux Toolkit, hooks, or auth state, read `.docs/data-state-standard.md` and `.docs/canonical-references.md`.
-- If design or product notes are incomplete, read `.docs/default-behavior-rules.md` and use those defaults instead of inventing ad hoc behavior.
-- Before generating a whole app or a large new domain, read all files under `.docs/` and follow the build order documented in `.docs/README.md`.
-- When behavior is ambiguous, follow the unified precedence in `.docs/README.md`.
-- Use `.docs/default-behavior-rules.md` as the fallback layer in that precedence.
+1. Entry: `.docs/README.md` (precedence + reading orders).
+2. **New product / fresh session / clone:** `.docs/product-kickoff.md` first.
+3. Then open only the docs for the task (do not read everything by default):
+   - UI conventions → `.docs/coding-conventions.md`
+   - Which kit component → `.docs/shared-ui-catalog.md`
+   - Screens → `.docs/folder-structure.md`, `.docs/screen-standard.md`
+   - Shared UI/theme changes → `.docs/ui-theme-standard.md`
+   - API / RTK / auth → `.docs/data-state-standard.md`
+   - Missing UX detail → `.docs/default-behavior-rules.md`
+   - Ambiguity → precedence in `.docs/README.md`
+   - Prompt templates → `.docs/prompt-template-scope-lock.md`, `prompt-template-feature.md`, `prompt-template-full-app.md`
+4. Platform OpenSpec capabilities under `openspec/specs/` are **baseline already shipped** — read `openspec/specs/README.md` before treating them as work to redo.
+5. Large / multi-screen / unclear AC → scope-lock before coding.
 
 ### Key commands
 
@@ -31,12 +33,12 @@ This is an **Expo SDK 57 React Native** app (`myrn`) targeting iOS, Android, and
 | Install deps | `yarn install` |
 | Lint | `yarn lint` |
 | Tests | `npx dotenv -e .env.test -- yarn test` |
-| Start (web) | `yarn start` then press `w`, or `npx dotenv -e .env.test -- npx expo start --web --port 8081` |
+| Start (web) | `yarn start` then `w`, or `npx dotenv -e .env.test -- npx expo start --web --port 8081` |
 
 ### Non-obvious caveats
 
-- **Tests require env vars:** Running `yarn test` without env vars will fail the `axios-instance.test.ts` suite because `EXPO_PUBLIC_API_BASE_URL` is unset. Use `npx dotenv -e .env.test -- yarn test` to load `.env.test` before running Jest.
-- **`--non-interactive` flag is not supported** by the current Expo CLI. Use `CI=1` environment variable instead if you need non-interactive mode.
-- **postinstall script:** `yarn install` runs a postinstall step that copies `canvaskit.wasm` into `public/`. The `mkdir public` may warn if the directory already exists — this is harmless.
-- **DummyJSON test credentials:** `emilys` / `emilyspass` (user Emily Johnson). These are public demo credentials from dummyjson.com.
-- **Expo Router warnings:** Several files under `playground/` emit "missing default export" warnings during web bundling. These are utility/style files co-located with route files and do not affect functionality.
+- **Tests need env:** `yarn test` without env fails `axios-instance` tests — use `npx dotenv -e .env.test -- yarn test`.
+- **Expo CLI:** no `--non-interactive`; use `CI=1` if needed.
+- **postinstall:** copies `canvaskit.wasm` into `public/` (`mkdir public` warning is harmless).
+- **DummyJSON demo login:** `emilys` / `emilyspass`.
+- **Playground bundler warnings:** some co-located non-route files under `playground/` warn “missing default export” — ignore for demos.
