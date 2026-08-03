@@ -93,9 +93,9 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 ### `ImagePreview`
 
 - Path: `@/components/ui/image-preview`
-- Fullscreen modal over `images[]`: horizontal pager (slide between images), double-tap/pinch zoom, pan when zoomed
-- Uses `expo-image` for contain (not `MyImage` — `MyImage` forces square aspect)
-- While zoomed, pager swipe is disabled; zoom reset re-enables paging
+- Fullscreen gallery over `images[]`: pager slide, double-tap/pinch zoom, pan when zoomed
+- Do not use `MyImage` inside fullscreen preview (square aspect) — preview path is built for contain
+- While zoomed, pager swipe is disabled
 - Key props: `images`, `activeIndex`, `visible`, `label`, `onClose`, `onIndexChange`
 
 ## Import cheat sheet

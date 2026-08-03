@@ -89,11 +89,9 @@ src/app/
 
 ### Current repo note
 
-- `src/app/(private)/todo/index.tsx` and `src/app/(private)/todo/form.tsx` already follow the target rule.
-- `src/app/(public)/login.tsx` is also acceptable because it only does a redirect check and mounts the feature screen.
-- `src/app/(public)/home.tsx` and `src/app/(public)/(tabs)/index.tsx` are starter sample routes in this template project. Treat them as replacement targets when a new product home screen is requested.
-- `src/app/(public)/(tabs)/index.tsx` and files under `src/app/(public)/(tabs)/playground` are useful references today, but new production features should not copy that structure.
-- `playground` route files are exempt as component demos, but production features must not copy their structure.
+- Good thin routes: `src/app/(private)/todo/*`, `src/app/(public)/login.tsx`.
+- Starter placeholders to replace for product home/tabs: `src/app/(public)/home.tsx`, `src/app/(public)/(tabs)/index.tsx`.
+- `playground` stays as component demos only — never copy its structure into production features.
 
 ### Home and tabs replacement rule
 
@@ -102,7 +100,6 @@ When implementing a new home experience:
 - replace starter implementation in `src/app/(public)/home.tsx` and/or `src/app/(public)/(tabs)/index.tsx` based on the requested navigation model
 - keep route files thin and move real screen implementation to `src/features/<feature>/screens/*`
 - do not preserve starter home/tabs behavior unless explicitly required by product scope
-- do not use `playground` structure as a production baseline
 
 ## `src/features`: the real app surface
 

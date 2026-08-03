@@ -1,6 +1,8 @@
 # Coding conventions
 
-Quy ước chung khi code trong MyRN. Đây là **convention source** cho human + agent.
+Quy ước chung khi code trong MyRN. Đây là **convention source** cho human + agent (có thể tiếng Việt).
+
+Product kickoff / architecture reading order: `.docs/product-kickoff.md` + `.docs/README.md` (English). File này chỉ quy ước viết code.
 
 Cursor rules (always injected):
 

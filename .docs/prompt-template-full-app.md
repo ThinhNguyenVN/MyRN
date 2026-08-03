@@ -1,6 +1,8 @@
 # Prompt template: full app build
 
-Use this template when asking an AI agent to build a whole app or a large app surface from Figma, Stitch, screenshots, notes, or mixed inputs.
+Use this template when asking an AI agent to build a product (or large domain) **on this template repo** from Figma, Stitch, screenshots, notes, or mixed inputs.
+
+Do **not** use this to rewrite the platform from scratch. Kickoff: `.docs/product-kickoff.md`.
 
 ## Copy-paste template
 
@@ -9,9 +11,11 @@ Implement this app in the current repository.
 
 Before coding:
 - follow `AGENTS.md`
-- read the relevant files in `.docs/`
+- read `.docs/product-kickoff.md` then the relevant files in `.docs/`
+- treat this repo as a ready platform — do **not** rebuild Expo/SDK, UI kit, or invent a second architecture
 - use `src/features/auth` and `src/features/todo` only as reference implementations for structure and code shape
-- create or update a spec artifact at `specs/<app-or-domain-name>.spec.md` using `specs/_template.spec.md`, and keep the spec link in your implementation summary
+- create or update a product spec at `specs/<app-or-domain-name>.spec.md` using `specs/_template.spec.md`
+- replace starter home/tabs when the product defines them; keep `playground` as catalog only
 
 ## Goal
 - Build: [whole app / MVP / app shell + core flows]
@@ -84,12 +88,13 @@ If behavior is not specified in design, follow `.docs/default-behavior-rules.md`
 
 ## Definition of done
 The task is done when:
-- app shell, providers, and routes are correct
-- features are placed under `src/features`
+- product flows in scope are implemented under `src/features` with thin `src/app` routes
+- starter home/tabs replaced when that was in scope
 - UI matches the design within scope
-- required states are implemented (`MySkeleton` / `MyEmptyState` / `MyErrorState` for list/async when applicable)
-- data/auth boundaries follow project conventions
+- required states use kit facades (`MySkeleton` / `MyEmptyState` / `MyErrorState`) when applicable
+- data/auth follow `data-state-standard.md` (env base URL updated if API changed)
 - checks/tests appropriate to the changes are run
+- `specs/<name>.spec.md` is updated
 - working walkthrough evidence is produced
 
 ## Decision policy

@@ -1,5 +1,8 @@
 # Spec: <feature-or-domain-name>
 
+> Product scope artifact for this template repo. Kickoff rules: `.docs/product-kickoff.md`.
+> Do not re-list shipped platform work from `openspec/specs/` here unless this change modifies that capability.
+
 ## Metadata
 - Spec ID: SPEC-<yyyy>-<nn>
 - Owner: <name>

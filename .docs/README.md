@@ -6,15 +6,12 @@ The goal is not to document every file in the repo. The goal is to give humans a
 
 ## Core rules
 
-- `src/app` is route shell only.
-- Production screen implementation lives in `src/features`.
-- `src/features/auth` and `src/features/todo` are the canonical reference features.
-- `auth` and `todo` are reference implementations for architecture and code shape, not mandatory product features for every app.
-- Starter routes under `src/app/(public)` such as `home.tsx` and `(tabs)/index.tsx` are sample placeholders and must be replaced when product scope requires a new home flow.
-- `src/app/(public)/(tabs)/playground` stays in the app as a component usage catalog.
-- `playground` is not a structure reference for production code.
-- Branch names must use `feat/`, `fix/`, `issue/`, or `release/`.
-- Do not create or use `cursor/` branches for normal development work.
+- `src/app` = route shell only; production UI in `src/features`.
+- `auth` / `todo` = canonical **structure** references, not mandatory product features.
+- Starter `home` / tabs `index` = placeholders to replace when product defines home/tabs.
+- `playground` = component catalog only, not production structure.
+- Branches: `feat|fix|issue|release/` — never `cursor/`.
+- **New product / fresh AI:** read `product-kickoff.md` before coding.
 
 ## Unified precedence (single source of truth)
 
@@ -28,16 +25,28 @@ Use this precedence when requirements seem ambiguous or conflicting:
 
 If other docs summarize precedence in shorter form, this section wins.
 
-## OpenSpec integration
+## OpenSpec and product specs (two layers)
 
-- OpenSpec is the process layer for planning and execution.
-- `specs/<feature-or-domain>.spec.md` is the required durable artifact output.
-- Use `specs/_template.spec.md` as the default structure unless scope explicitly requires a narrower format.
-- Use `prompt-template-scope-lock.md` before implementation when mandatory scope-lock triggers apply.
-- Do not run a parallel spec workflow outside `specs/`; keep one source of truth per change.
+Do not confuse these:
+
+| Layer | Path | Purpose |
+|-------|------|---------|
+| Conventions | `.docs/` | How to implement in this repo |
+| Product scope | `specs/<feature-or-domain>.spec.md` | Durable product AC / assumptions (`specs/_template.spec.md`) |
+| Change process | `openspec/changes/<change>/` | Propose → design → tasks → delta specs for one change |
+| Platform baseline | `openspec/specs/` | Already-shipped capabilities — **not** a rebuild backlog (`openspec/specs/README.md`) |
+
+Rules:
+
+- For product features, always keep `specs/<name>.spec.md` updated.
+- Use OpenSpec changes when the team wants propose/apply workflow; delta specs sync into `openspec/specs/` on archive.
+- Do not invent a third parallel spec system.
+- OpenSpec **change artifacts** are Vietnamese (`openspec/config.yaml`). `.docs/` and product `specs/*.spec.md` stay English unless the user asks otherwise.
+- Before large/ambiguous product work, use `prompt-template-scope-lock.md` when mandatory triggers apply.
 
 ## Read this file first, then pick the matching spec
 
+- `product-kickoff.md`: start here when turning this template into a real product (scope, replace starters, features vs references, API boundary).
 - `folder-structure.md`: where code belongs.
 - `screen-standard.md`: how one production screen should be built.
 - `coding-conventions.md`: general coding conventions (component files, handlers, My* elements, theme tokens, layout breakpoints).
@@ -54,6 +63,17 @@ If other docs summarize precedence in shorter form, this section wins.
 - `../specs/_template.spec.md`: reusable spec artifact template for durable scope, assumptions, and traceability.
 
 ## Suggested AI reading order by task
+
+### Start a real product on this template
+
+Read:
+
+1. `product-kickoff.md`
+2. `folder-structure.md`
+3. `shared-ui-catalog.md`
+4. `default-behavior-rules.md`
+5. `canonical-references.md`
+6. Then `prompt-template-scope-lock.md` (or feature/full-app template once scope is clear)
 
 ### Add a new screen
 
@@ -84,25 +104,28 @@ Read:
 2. `default-behavior-rules.md`
 3. `canonical-references.md`
 
-### Build a whole app or a large new domain
+### Build a whole app or a large new domain **on this template**
+
+This is product work on an existing platform — **not** a greenfield rewrite.
 
 Read:
 
-1. `folder-structure.md`
-2. `data-state-standard.md`
-3. `screen-standard.md`
-4. `ui-theme-standard.md`
-5. `shared-ui-catalog.md`
+1. `product-kickoff.md`
+2. `folder-structure.md`
+3. `data-state-standard.md`
+4. `screen-standard.md`
+5. `shared-ui-catalog.md` (+ `ui-theme-standard.md` if changing shared visuals)
 6. `default-behavior-rules.md`
 7. `canonical-references.md`
 
 Build in this order:
 
-1. app shell, providers, and store integration
-2. shared theme, UI, and API boundaries
-3. feature modules under `src/features`
-4. thin route files under `src/app`
-5. final cleanup against canonical references
+1. Confirm inputs + scope-lock / `specs/<name>.spec.md`
+2. Keep shell/providers; only adjust routes/groups the product needs
+3. First vertical slice under `src/features`
+4. Thin routes under `src/app`; replace starter home/tabs when in scope
+5. Point API env at real backend when required; keep RTK Query boundaries
+6. Cleanup against canonical references + kit catalog
 
 ### Review whether code follows project rules
 
@@ -149,4 +172,5 @@ Scope-lock output must include:
 
 ## Golden path
 
+When starting a real product on this template, follow `product-kickoff.md`.
 When adding a feature, copy the shape and boundaries from `auth` and `todo` first. Only create a new pattern if both canonical features fail to cover the use case.

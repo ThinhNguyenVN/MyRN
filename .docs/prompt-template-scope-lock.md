@@ -8,7 +8,7 @@ I want you to review the design sources and lock scope before coding.
 
 ### Goal
 - Do not implement yet.
-- First produce a scoped implementation plan for this app/feature using the project conventions in `AGENTS.md` and `.docs/`.
+- First produce a scoped implementation plan for this app/feature using the project conventions in `AGENTS.md`, `.docs/product-kickoff.md`, and `.docs/`.
 
 ### Design sources
 - Figma: [link]

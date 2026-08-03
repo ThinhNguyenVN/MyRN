@@ -7,7 +7,10 @@ These are reference implementations, not mandatory business features for every a
 ## Scope of this file
 
 For global precedence (product/design/feature/default fallback), follow `.docs/README.md`.
-This file defines canonical code pattern references only:
+For template → product kickoff, follow `.docs/product-kickoff.md`.
+Platform capability specs under `openspec/specs/` are shipped baseline — see `openspec/specs/README.md`.
+
+This file defines canonical **code pattern** references only:
 
 1. `src/features/auth`
 2. `src/features/todo`
