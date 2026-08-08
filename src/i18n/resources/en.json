@@ -31,6 +31,7 @@
     "signInHint": "DummyJSON demo - e.g. emilys / emilyspass",
     "usernameLabel": "Username",
     "passwordLabel": "Password",
+    "rememberMe": "Remember me",
     "signInButton": "Sign in",
     "signInFailed": "Sign in failed",
     "usernameMin": "Enter username",

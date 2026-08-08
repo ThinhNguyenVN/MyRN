@@ -31,6 +31,7 @@
     "signInHint": "Demo DummyJSON - ví dụ: emilys / emilyspass",
     "usernameLabel": "Tên đăng nhập",
     "passwordLabel": "Mật khẩu",
+    "rememberMe": "Ghi nhớ đăng nhập",
     "signInButton": "Đăng nhập",
     "signInFailed": "Đăng nhập thất bại",
     "usernameMin": "Vui lòng nhập tên đăng nhập",

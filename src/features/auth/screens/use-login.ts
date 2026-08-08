@@ -4,6 +4,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { isNormalizedApiError } from '@/api/errors'
+import { isWeb } from '@/constants/dimensions'
 import { Routes } from '@/constants/routes'
 import { loginThunk } from '@/features/auth/auth-thunks'
 import { useAppDispatch } from '@/store/hooks'
@@ -33,6 +34,8 @@ export function useLogin(scrollToField: (name: string) => void) {
           loginThunk({
             username: values.username.trim(),
             password: values.password,
+            // Native: always persist until logout. Web: honor remember-me checkbox.
+            remember: isWeb ? values.remember : true,
           }),
         ).unwrap()
         router.replace(Routes.defaultRoute)

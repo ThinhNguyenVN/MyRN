@@ -40,6 +40,9 @@ export const generateStyles = (theme: ThemeType) => {
       width: '100%',
       alignSelf: 'stretch',
     },
+    rememberRow: {
+      alignSelf: 'flex-start',
+    },
     rootError: {
       marginTop: -getSpacing('x2'),
     },
