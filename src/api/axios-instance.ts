@@ -4,6 +4,11 @@ import { refreshAuthToken } from '@/api/auth-client'
 import { normalizeAxiosError } from '@/api/errors'
 import { API_AXIOS_CONFIG, AUTH_SKIP_REFRESH_PATHS } from '@/constants/api'
 import { logout, selectRefreshToken, updateTokens } from '@/features/auth/auth-slice'
+import {
+  getStoredRefreshToken,
+  removeStoredRefreshToken,
+  setStoredRefreshToken,
+} from '@/features/auth/token-storage'
 import { getStore, tryGetStore } from '@/store/store-ref'
 import type { RootStateWithAuth } from '@/store/types'
 
@@ -16,6 +21,11 @@ function getRootState(): RootStateWithAuth {
   return getStore().getState() as RootStateWithAuth
 }
 
+async function clearSessionLocally(): Promise<void> {
+  tryGetStore()?.dispatch(logout())
+  await removeStoredRefreshToken()
+}
+
 let refreshInFlight: Promise<string> | null = null
 
 function performRefresh(refreshToken: string): Promise<string> {
@@ -23,13 +33,20 @@ function performRefresh(refreshToken: string): Promise<string> {
     refreshInFlight = (async () => {
       try {
         const { accessToken, refreshToken: newRefresh } = await refreshAuthToken(refreshToken)
-        tryGetStore()?.dispatch(updateTokens({ accessToken, refreshToken: newRefresh }))
+        const nextRefresh = newRefresh || refreshToken
+        tryGetStore()?.dispatch(updateTokens({ accessToken, refreshToken: nextRefresh }))
+
+        // Only touch storage when a refresh was already persisted (remember-me on / native).
+        const stored = await getStoredRefreshToken()
+        if (stored) {
+          await setStoredRefreshToken(nextRefresh)
+        }
 
         return accessToken
       } catch (err) {
         const normalized = normalizeAxiosError(err)
         if (normalized.status === 401) {
-          tryGetStore()?.dispatch(logout())
+          await clearSessionLocally()
         }
         throw normalized
       } finally {
@@ -78,7 +95,7 @@ apiClient.interceptors.response.use(
     }
 
     if (!refreshToken) {
-      tryGetStore()?.dispatch(logout())
+      await clearSessionLocally()
       return Promise.reject(normalizeAxiosError(error))
     }
 

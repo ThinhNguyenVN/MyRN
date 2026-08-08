@@ -2,14 +2,14 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 
 import { normalizeAxiosError, type NormalizedApiError } from '@/api/errors'
 import { authApi } from '@/features/auth/auth-api'
-import { logout, setCredentials, updateTokens } from '@/features/auth/auth-slice'
+import { logout, setCredentials, setUser, updateTokens } from '@/features/auth/auth-slice'
 import {
   getStoredRefreshToken,
   removeStoredRefreshToken,
   setStoredRefreshToken,
 } from '@/features/auth/token-storage'
 
-type LoginPayload = { username: string; password: string }
+type LoginPayload = { username: string; password: string; remember?: boolean }
 
 export const initAuthThunk = createAsyncThunk<
   { accessToken: string; refreshToken: string } | null,
@@ -26,6 +26,16 @@ export const initAuthThunk = createAsyncThunk<
     const { accessToken, refreshToken: nextRefreshToken } = data
     dispatch(updateTokens({ accessToken, refreshToken: nextRefreshToken }))
     await setStoredRefreshToken(nextRefreshToken)
+
+    try {
+      const user = await dispatch(
+        authApi.endpoints.getMe.initiate(undefined, { forceRefetch: true }),
+      ).unwrap()
+      dispatch(setUser(user))
+    } catch {
+      // Keep session even if /me fails — shell can retry later.
+    }
+
     return { accessToken, refreshToken: nextRefreshToken }
   } catch (error) {
     const normalized = normalizeAxiosError(error)
@@ -41,7 +51,12 @@ export const loginThunk = createAsyncThunk<void, LoginPayload, { rejectValue: No
   'auth/login',
   async (input, { dispatch, rejectWithValue }) => {
     try {
-      const data = await dispatch(authApi.endpoints.login.initiate(input)).unwrap()
+      const data = await dispatch(
+        authApi.endpoints.login.initiate({
+          username: input.username,
+          password: input.password,
+        }),
+      ).unwrap()
 
       dispatch(
         setCredentials({
@@ -57,7 +72,12 @@ export const loginThunk = createAsyncThunk<void, LoginPayload, { rejectValue: No
           },
         }),
       )
-      await setStoredRefreshToken(data.refreshToken)
+
+      if (input.remember === false) {
+        await removeStoredRefreshToken()
+      } else {
+        await setStoredRefreshToken(data.refreshToken)
+      }
     } catch (error) {
       return rejectWithValue(normalizeAxiosError(error))
     }
