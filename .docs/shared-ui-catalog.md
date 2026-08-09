@@ -18,6 +18,8 @@ For architecture/theme rules, still follow `ui-theme-standard.md` and `coding-co
 | Fetch failure + retry | `MyErrorState` | Inline error text without retry affordance |
 | Boolean / checkbox / radio in `MyForm` | `MyFormCheckbox` | `MyCheckbox` + `Controller` ad-hoc in new screens |
 | Image carousel + fullscreen preview | `ImageSlider` + `ImagePreview` | Custom pager/zoom unless kit cannot support the case |
+| Edge nav drawer (hamburger menu) | `DrawerMenu` | Ad-hoc `Modal` + absolute panel |
+| App rail (web) | `SideBar` (`card` \| `flush`, icons, header/footer) | One-off left nav View |
 
 ## Layout surfaces
 
@@ -36,6 +38,20 @@ For architecture/theme rules, still follow `ui-theme-standard.md` and `coding-co
 - Prefer for list/settings rows; use `MySurface` directly when you only need elevation without card padding/press API
 - Playground: `…/playground/card.tsx` (includes elevation cases: `none`, soft/hard)
 - Canonical: `src/features/todo/screens/todo-list.view.tsx` (row surface)
+
+## Navigation chrome
+
+### `DrawerMenu`
+
+- Path: `@/components/ui/drawer-menu`
+- Edge panel with backdrop fade + slide; props: `visible`, `onClose`, `title`, `subtitle?`, `meta?`, `data`, `onSelected?`, `side?: 'left' \| 'right'` (default `left`), `width?`, `headerContent?`, `footer?`
+- Playground: `src/app/(public)/(tabs)/playground/drawer-menu.tsx`
+
+### `SideBar`
+
+- Path: `@/components/ui/side-bar`
+- Sliding highlight nav list; `variant?: 'card' \| 'flush'`; optional `icon` / `iconFocused`, `header`, `footer`, `highlightColor`
+- Used by playground layout rail; product flush rail for authenticated chrome
 
 ## List / async UI states
 
@@ -110,6 +126,8 @@ import MySkeleton from '@/components/elements/my-skeleton'
 import { MyFormCheckbox } from '@/components/form'
 import { ImagePreview } from '@/components/ui/image-preview'
 import { ImageSlider } from '@/components/ui/image-slider'
+import DrawerMenu from '@/components/ui/drawer-menu'
+import SideBar from '@/components/ui/side-bar'
 ```
 
 ## Anti-patterns

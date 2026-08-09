@@ -1,10 +1,23 @@
 import type { ReactNode } from 'react'
-import type { PressableProps, StyleProp, ViewStyle } from 'react-native'
+import type { GestureResponderEvent, PressableProps, StyleProp, ViewStyle } from 'react-native'
 
 import type { ContainerStyleProps } from '@/types/styles'
 import type { MyViewProps } from '../my-view'
 
 export type AnimatedType = 'opacity' | 'scale'
+
+/** RN web passes MouseEvent when Pressable renders as an anchor (`href`). */
+export type MyPressableEvent =
+  | GestureResponderEvent
+  | (GestureResponderEvent & {
+      button?: number
+      metaKey?: boolean
+      altKey?: boolean
+      ctrlKey?: boolean
+      shiftKey?: boolean
+      preventDefault?: () => void
+      currentTarget?: { target?: string }
+    })
 
 export interface MyPressableProps
   extends
@@ -14,7 +27,7 @@ export interface MyPressableProps
       'children' | 'style' | 'onPress' | 'onPressIn' | 'onPressOut' | 'disabled'
     > {
   children: ReactNode
-  onPress?: () => void
+  onPress?: (event?: MyPressableEvent) => void
   onPressIn?: () => void
   onPressOut?: () => void
   disabled?: boolean
@@ -24,4 +37,6 @@ export interface MyPressableProps
   haptic?: boolean
   style?: StyleProp<ViewStyle>
   surfaceProps?: Partial<MyViewProps>
+  /** When set (e.g. tab bar), RN web renders an `<a>`; must preventDefault for SPA nav. */
+  href?: string
 }

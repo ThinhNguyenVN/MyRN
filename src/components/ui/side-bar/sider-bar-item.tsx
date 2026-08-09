@@ -14,7 +14,12 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { Typography } from '@/theme/typography'
 import { ANIMATION_DURATION, generateStyles } from './styles'
 
-function SideBarItem({
+function shouldShowChevron(item: SideBarRowProps['item']): boolean {
+  if (item.showChevron !== undefined) return item.showChevron
+  return !!item.href && !item.icon
+}
+
+function SideBarItemRow({
   item,
   index,
   isActive,
@@ -60,14 +65,35 @@ function SideBarItem({
     opacity: progress.value,
   }))
 
+  const showChevron = shouldShowChevron(item)
+  const leadingIcon = item.icon
+  const leadingIconFocused = item.iconFocused ?? item.icon
+
   const content = (
-    <MyPressable onPress={onSelected} style={styles.itemRow} haptic={false}>
+    <MyPressable
+      onPress={onSelected}
+      style={styles.itemRow}
+      haptic={false}
+      accessibilityRole="button"
+      accessibilityState={{ selected: isActive }}
+      accessibilityLabel={item.label}
+    >
+      {leadingIcon ? (
+        <MyView style={styles.itemRowLeading}>
+          <Animated.View style={iconInactiveStyle}>
+            <MyIcon name={leadingIcon} size={22} color={iconColorInactive} />
+          </Animated.View>
+          <Animated.View style={[styles.iconLayer, iconActiveStyle]}>
+            <MyIcon name={leadingIconFocused!} size={22} color={iconColorActive} />
+          </Animated.View>
+        </MyView>
+      ) : null}
       <MyView style={styles.itemRowLabel}>
         <Animated.Text style={[Typography.body as TextStyle, textAnimatedStyle]}>
           {item.label}
         </Animated.Text>
       </MyView>
-      {!!item.href ? (
+      {showChevron ? (
         <MyView style={styles.itemRowIcon}>
           <Animated.View style={iconInactiveStyle}>
             <MyIcon name="chevron-forward" size={20} color={iconColorInactive} />
@@ -90,4 +116,4 @@ function SideBarItem({
   return content
 }
 
-export default memo(SideBarItem)
+export default memo(SideBarItemRow)

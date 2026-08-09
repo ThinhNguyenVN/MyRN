@@ -12,6 +12,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 const NavigationBar: React.FC<NavigationBarProps> = ({
   title,
   onBackPress,
+  left,
   right,
   showBack = false,
 }) => {
@@ -27,15 +28,16 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
     setRightWidth(e.nativeEvent.layout.width)
   }, [])
 
-  const shouldShowBack = showBack && onBackPress
+  const shouldShowBack = !left && showBack && onBackPress
 
   const padding = Math.max(leftWidth, rightWidth)
   return (
     <MyView style={styles.bar} fillParent={false}>
       <MyView style={styles.left} onLayout={onLeftLayout}>
-        {shouldShowBack ? (
-          <MyButton.Icon icon="arrow-back" type="light" size="small" onPress={onBackPress} />
-        ) : null}
+        {left ??
+          (shouldShowBack ? (
+            <MyButton.Icon icon="arrow-back" type="light" size="small" onPress={onBackPress} />
+          ) : null)}
       </MyView>
       <View style={styles.contentHeight}>
         <MyButton.Icon icon="arrow-back" type="light" size="small" onPress={onBackPress} />

@@ -24,6 +24,7 @@ Only open a capability here when you are **changing that capability** (e.g. edit
 | `list-async-ui-states` | `MySkeleton` / `MyEmptyState` / `MyErrorState` — see catalog + todo list |
 | `my-search-input` | `MySearchInput` preset |
 | `my-form-checkbox` | `MyFormCheckbox` adapter |
+| `drawer-menu` | Edge drawer (`side: left\|right`) — see `.docs/shared-ui-catalog.md` + playground |
 | `product-ui-kit-test-coverage` | Kit QA expectations (tests/smoke) — process, not a product screen |
 | `picker-facade-test-coverage` | Picker helper test/smoke expectations — process, not a product screen |
 

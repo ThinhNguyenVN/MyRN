@@ -20,10 +20,14 @@ function SideBarInner({
   elevation: elevationProp,
   style,
   onSelected: onSelectedProp,
+  header,
+  footer,
+  variant = 'card',
+  highlightColor,
 }: SideBarProps) {
   const pathname = usePathname()
   const { defaultElevation } = useTheme()
-  const elevation = elevationProp ?? defaultElevation
+  const elevation = elevationProp ?? (variant === 'flush' ? 'none' : defaultElevation)
   const styles = useThemedStyles(generateStyles)
   const listContentRef = useRef<View>(null)
   const layoutsRef = useRef<Record<number, { y: number; height: number }>>({})
@@ -68,6 +72,12 @@ function SideBarInner({
   useEffect(() => {
     syncHighlightFromLayouts()
   }, [activeIndex, syncHighlightFromLayouts])
+
+  useEffect(() => {
+    return () => {
+      if (navigateTimeoutRef.current) clearTimeout(navigateTimeoutRef.current)
+    }
+  }, [])
 
   const handleMeasureLayout = useCallback(
     (index: number, y: number, height: number) => {
@@ -131,16 +141,24 @@ function SideBarInner({
   )
 
   const keyExtractor = useCallback(
-    (item: SideBarItem, index: number) => `${item.label}-${index}`,
+    (item: SideBarItem, index: number) => `${item.label}-${item.href ?? index}`,
     [],
   )
 
   const showHighlight = activeIndex >= 0
+  const isFlush = variant === 'flush'
 
   const listContent = (
     <View ref={listContentRef} style={styles.listContent} collapsable={false}>
       {showHighlight && (
-        <Animated.View style={[styles.highlight, highlightStyle]} pointerEvents="none" />
+        <Animated.View
+          style={[
+            styles.highlight,
+            highlightColor ? { backgroundColor: highlightColor } : null,
+            highlightStyle,
+          ]}
+          pointerEvents="none"
+        />
       )}
       <FlatList
         data={data}
@@ -153,9 +171,15 @@ function SideBarInner({
   )
 
   return (
-    <View style={[styles.sidebarOuter, style]}>
-      <MyView elevation={elevation} style={styles.sidebar} radius="medium">
+    <View style={[isFlush ? styles.sidebarOuterFlush : styles.sidebarOuter, style]}>
+      <MyView
+        elevation={elevation === 'none' ? undefined : elevation}
+        style={isFlush ? styles.sidebarFlush : styles.sidebar}
+        radius={isFlush ? 'none' : 'medium'}
+      >
+        {header ? <View style={styles.header}>{header}</View> : null}
         {listContent}
+        {footer ? <View style={styles.footer}>{footer}</View> : null}
       </MyView>
     </View>
   )

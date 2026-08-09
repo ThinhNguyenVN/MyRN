@@ -12,6 +12,7 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string }[] = [
   { labelKey: 'playground.linksCounter', href: '/playground/counter' },
   { labelKey: 'playground.linksToast', href: '/playground/toast' },
   { labelKey: 'playground.linksBottomSheet', href: '/playground/bottom-sheet' },
+  { labelKey: 'playground.linksDrawerMenu', href: '/playground/drawer-menu' },
   { labelKey: 'playground.linksTextInput', href: '/playground/text-input' },
   { labelKey: 'playground.linksSearchInput', href: '/playground/search-input' },
   { labelKey: 'playground.linksAlert', href: '/playground/alert' },

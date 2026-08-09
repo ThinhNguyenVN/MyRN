@@ -3,8 +3,10 @@ import type { ReactNode } from 'react'
 export interface NavigationBarProps {
   title?: string
   onBackPress?: () => void
+  /** Custom left slot (e.g. menu). When set, hides the default back button. */
+  left?: ReactNode
   right?: ReactNode
-  /** Show back button. When true and onBackPress provided, back is visible. */
+  /** Show back button. When true and onBackPress provided, back is visible (unless `left` is set). */
   showBack?: boolean
 }
 

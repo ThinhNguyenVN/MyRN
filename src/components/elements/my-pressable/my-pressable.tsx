@@ -7,12 +7,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
+import { isWeb } from '@/constants/dimensions'
 import { useTheme } from '@/theme/theme-context'
 import { triggerHaptic } from '@/utils/haptic'
 
 import MyView from '@/components/elements/my-view'
 
-import type { AnimatedType, MyPressableProps } from './type'
+import type { AnimatedType, MyPressableEvent, MyPressableProps } from './type'
 
 import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
 
@@ -51,6 +52,7 @@ const MyPressable: React.FC<MyPressableProps> = ({
   )
   const hasContainerStyle = Object.keys(containerStyle).length > 0
   const pressableProps = omitContainerProps(rest as Record<string, unknown>)
+  const href = (pressableProps as { href?: string | null }).href
   const scale = useSharedValue(1)
   const opacity = useSharedValue(1)
   const sizeRef = useRef({ w: 0, h: 0 })
@@ -121,9 +123,36 @@ const MyPressable: React.FC<MyPressableProps> = ({
     handlers[animatedType]()
   }, [disabled, animatedType, handlePressOutOpacity, handlePressOutScale, onPressOutProp])
 
+  // Match React Navigation PlatformPressable: href → <a> on web; preventDefault for SPA nav.
+  const handlePress = useCallback(
+    (e: MyPressableEvent) => {
+      if (disabled) return
+      if (isWeb && typeof href === 'string') {
+        const hasModifierKey =
+          ('metaKey' in e && e.metaKey) ||
+          ('altKey' in e && e.altKey) ||
+          ('ctrlKey' in e && e.ctrlKey) ||
+          ('shiftKey' in e && e.shiftKey)
+        const isLeftClick = !('button' in e) || e.button === undefined || e.button === 0
+        const target =
+          e.currentTarget && 'target' in e.currentTarget ? e.currentTarget.target : undefined
+        const isSelfTarget = [undefined, null, '', 'self'].includes(target as string | null)
+        if (!hasModifierKey && isLeftClick && isSelfTarget) {
+          e.preventDefault?.()
+          onPress?.(e)
+        }
+        return
+      }
+      onPress?.(e)
+    },
+    [disabled, href, onPress],
+  )
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
     opacity: opacity.value,
+    // Scale creates a containing block that otherwise clips tab labels on web.
+    overflow: 'visible' as const,
   }))
 
   const innerLayoutStyle = useMemo(() => {
@@ -151,14 +180,16 @@ const MyPressable: React.FC<MyPressableProps> = ({
   return (
     <Pressable
       {...pressableProps}
-      onPress={onPress}
+      onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onLayout={scaleBySize ? onLayout : undefined}
       disabled={disabled}
-      style={[...(hasContainerStyle ? [containerStyle] : []), style]}
+      style={[...(hasContainerStyle ? [containerStyle] : []), style, { overflow: 'visible' }]}
     >
-      <Animated.View style={[innerLayoutStyle, animatedStyle]}>{content}</Animated.View>
+      <Animated.View style={[innerLayoutStyle, { overflow: 'visible' }, animatedStyle]}>
+        {content}
+      </Animated.View>
     </Pressable>
   )
 }

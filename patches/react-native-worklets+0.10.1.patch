@@ -1,31 +1,26 @@
 diff --git a/node_modules/react-native-worklets/lib/module/memory/serializable.native.js b/node_modules/react-native-worklets/lib/module/memory/serializable.native.js
-index 8629093..dea0975 100644
+index d82f096..9270421 100644
 --- a/node_modules/react-native-worklets/lib/module/memory/serializable.native.js
 +++ b/node_modules/react-native-worklets/lib/module/memory/serializable.native.js
-@@ -269,7 +269,7 @@ function cloneArray(value, shouldPersistRemote, depth) {
+@@ -275,7 +275,7 @@ function cloneArray(value, shouldPersistRemote, depth) {
+   return clone;
  }
  function cloneNonWorkletFunction(fun) {
-   const functionId = nextRemoteFunctionId;
--  const clone = WorkletsModule.createSerializableNonWorkletFunction(fun, functionId, __DEV__ ? fun.name : undefined);
-+  const clone = WorkletsModule.createSerializableNonWorkletFunction(fun, functionId, undefined);
-   if (clone.__keepAlive) {
-     registerRemoteFunction(fun);
-   }
+-  const clone = WorkletsModule.createSerializableNonWorkletFunction(fun, __DEV__ ? fun.name : undefined);
++  const clone = WorkletsModule.createSerializableNonWorkletFunction(fun, undefined);
+   if (globalThis.WeakRef) {
+     // WeakRef is installed on runtimes only with Hermes microtaskQueue enabled.
+     serializableMappingCache.set(fun, new WeakRef(clone));
 diff --git a/node_modules/react-native-worklets/src/memory/serializable.native.ts b/node_modules/react-native-worklets/src/memory/serializable.native.ts
-index ecc57cf..0e20d72 100644
+index 5417b6e..abce467 100644
 --- a/node_modules/react-native-worklets/src/memory/serializable.native.ts
 +++ b/node_modules/react-native-worklets/src/memory/serializable.native.ts
-@@ -401,10 +401,12 @@ function cloneNonWorkletFunction<TArgs extends unknown[], TReturn>(
-   fun: (...args: TArgs) => TReturn
+@@ -405,7 +405,7 @@ function cloneNonWorkletFunction<TArgs extends unknown[], TReturn>(
  ): SerializableRef<(...args: TArgs) => TReturn> {
-   const functionId = nextRemoteFunctionId;
-+  // Expo Go 57.0.5 (Worklets 0.10.0 native): passing fun.name can SIGSEGV in
-+  // createSerializableNonWorkletFunction → Hermes utf8FromStringView.
    const clone = WorkletsModule.createSerializableNonWorkletFunction(
      fun,
-     functionId,
 -    __DEV__ ? fun.name : undefined
 +    undefined
    ) as SerializableRef<(...args: TArgs) => TReturn>;
-   if ((clone as RegisteredRemoteFunction).__keepAlive) {
-     registerRemoteFunction(fun);
+ 
+   if (globalThis.WeakRef) {
