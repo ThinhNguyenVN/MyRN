@@ -17,6 +17,7 @@ This is an **Expo SDK 57 React Native** template app (`myrn`) for iOS, Android, 
 3. Then open only the docs for the task (do not read everything by default):
    - UI conventions → `.docs/coding-conventions.md`
    - Which kit component → `.docs/shared-ui-catalog.md`
+   - Kit sync with products → `.docs/platform-kit-sync.md`
    - Screens → `.docs/folder-structure.md`, `.docs/screen-standard.md`
    - Shared UI/theme changes → `.docs/ui-theme-standard.md`
    - API / RTK / auth → `.docs/data-state-standard.md`

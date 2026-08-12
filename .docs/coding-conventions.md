@@ -20,6 +20,10 @@ Bản liệt kê dài hơn (cùng nội dung): `.cursor/rules.md`.
 
 ## 1. Cấu trúc component
 
+**Hai layout — chọn theo phạm vi reuse.**
+
+### A) Shared kit — `src/components/{elements,form,ui}/`
+
 - Folder + file chính: **kebab-case** (`my-date-picker/my-date-picker.tsx`).
 - **`index.tsx` chỉ re-export** — không implement component trong `index.tsx`.
 - Cùng folder bắt buộc:
@@ -34,6 +38,22 @@ my-foo/
   type.ts
   styles.ts
   hooks.ts       # optional
+```
+
+### B) Feature-only UI — `src/features/<feature>/components/`
+
+Chỉ dùng trong feature đó → **không** đưa vào `src/components/ui`.
+
+- **Flat**: `1 file = 1 component` (kebab-case `.tsx`).
+- **Không** tạo folder con per component (`index` / `styles` / `type` riêng).
+- Styles/props dùng chung: `components/styles.ts` + `components/type.ts` (hoặc `screens/styles.ts`).
+
+```
+src/features/<feature>/components/
+  styles.ts
+  type.ts
+  order-summary-card.tsx
+  status-badge.tsx
 ```
 
 Import dùng alias `@/*`.

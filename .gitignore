@@ -41,8 +41,15 @@ app-example
 # generated native folders
 /ios
 /android
-/.cursor
-/.vscode
+
+# Cursor: track shared rules/commands/skills; ignore local-only cursor state
+.cursor/*
+!.cursor/commands/
+!.cursor/commands/**
+!.cursor/skills/
+!.cursor/skills/**
+!.cursor/rules/
+!.cursor/rules/**
 
 # vscode
 .vscode/

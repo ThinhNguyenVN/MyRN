@@ -80,6 +80,8 @@ Not allowed:
 - RTK Query hooks
 - direct store reads unless there is a very strong reason and the screen is still clearly presentational
 
+When the view becomes large, extract feature-only presentational pieces into `features/<feature>/components/` as **flat** `.tsx` files with shared `components/styles.ts` + `components/type.ts`. Do not use the shared-kit folder layout (`index` + per-component `styles`/`type`) for those, and do not move them into `src/components/ui`. See `.docs/folder-structure.md` and `.docs/coding-conventions.md` §1.
+
 ### Raw `View` usage
 
 Raw `View` is allowed for simple wrappers and very local layout.

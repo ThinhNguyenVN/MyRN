@@ -1,0 +1,17 @@
+---
+description: RTK Query createApi first; thunks for orchestration; pure slice reducers
+globs: src/features/**/*.{ts,tsx},src/api/**/*.{ts,tsx},src/store/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Thunk / feature data flow
+
+Source: `.docs/data-state-standard.md`.
+
+1. **Server data** → RTK Query `createApi` in `features/<feature>/<feature>-api.ts`. Do not invent a new Axios client inside a feature.
+2. **Endpoints** → `src/constants/api.ts` (`Endpoints`) — no hardcoded path strings in screens.
+3. **Base URL** → `EXPO_PUBLIC_API_BASE_URL` via `getEnv` — never hardcode domains.
+4. **Thunks** → multi-step orchestration / bootstrapping only; keep slice reducers pure and sync.
+5. **Screens** → typed hooks from `src/store/hooks.ts`; do not bypass `axiosBaseQuery` for normal APIs.
+6. Normalize network errors via shared `src/api/errors.ts`; one runtime source of truth in Redux.
+7. **Before new endpoints:** probe live success + failed/empty; write `openspec/changes/<change>/contracts/*.md` with runtime types. Do not guess `string` vs `number`. See `.docs/data-state-standard.md` § Live API contract verification.

@@ -6,6 +6,8 @@ Learn props and visuals from `playground`. Learn production wiring from `src/fea
 
 For architecture/theme rules, still follow `ui-theme-standard.md` and `coding-conventions.md`.
 
+Reusable kit invented in a product must be backported here — see `platform-kit-sync.md`.
+
 ## Decision table (prefer these first)
 
 | Need | Use | Do not invent |
@@ -20,6 +22,7 @@ For architecture/theme rules, still follow `ui-theme-standard.md` and `coding-co
 | Image carousel + fullscreen preview | `ImageSlider` + `ImagePreview` | Custom pager/zoom unless kit cannot support the case |
 | Edge nav drawer (hamburger menu) | `DrawerMenu` | Ad-hoc `Modal` + absolute panel |
 | App rail (web) | `SideBar` (`card` \| `flush`, icons, header/footer) | One-off left nav View |
+| Bottom tabs (pill active) | `useTabBar` / `TabBarButton` | Raw `tabBarButton` + default RN border/elevation |
 
 ## Layout surfaces
 
@@ -52,6 +55,16 @@ For architecture/theme rules, still follow `ui-theme-standard.md` and `coding-co
 - Path: `@/components/ui/side-bar`
 - Sliding highlight nav list; `variant?: 'card' \| 'flush'`; optional `icon` / `iconFocused`, `header`, `footer`, `highlightColor`
 - Used by playground layout rail; product flush rail for authenticated chrome
+
+### `Tab bar` (`useTabBar` / `TabBarButton`)
+
+- Path: `@/components/ui/tabbar`
+- Pill active state, theme tokens, dark-mode border/elevation overrides for RN `BottomTabBar`
+- `useTabBar({ items, openDrawer?, mobileOnly? })` → `renderTabBar`, `screenOptions`, `tabScreens`
+- Pass `items: TabBarNavItem[]` (`id`, `labelKey`, `icon`, `iconFocused?`)
+- `mobileOnly: true` when desktop uses a sidebar instead of tabs
+- `openDrawer` enables mobile header menu button
+- Sample wiring: `src/app/(public)/(tabs)/_layout.tsx`
 
 ## List / async UI states
 

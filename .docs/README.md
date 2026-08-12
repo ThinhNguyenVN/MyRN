@@ -47,6 +47,7 @@ Rules:
 ## Read this file first, then pick the matching spec
 
 - `product-kickoff.md`: start here when turning this template into a real product (scope, replace starters, features vs references, API boundary).
+- `platform-kit-sync.md`: accept kit backports from products; pull platform upgrades into products.
 - `folder-structure.md`: where code belongs.
 - `screen-standard.md`: how one production screen should be built.
 - `coding-conventions.md`: general coding conventions (component files, handlers, My* elements, theme tokens, layout breakpoints).
@@ -93,8 +94,9 @@ Read:
 1. `coding-conventions.md`
 2. `ui-theme-standard.md`
 3. `shared-ui-catalog.md`
-4. `default-behavior-rules.md`
-5. `canonical-references.md`
+4. `platform-kit-sync.md` (backports from products / platform SoT)
+5. `default-behavior-rules.md`
+6. `canonical-references.md`
 
 ### Add or update API, RTK Query, Redux Toolkit, or auth state
 
