@@ -1,0 +1,28 @@
+---
+description: Ban inline arrow handlers in JSX (onPress, renderItem, etc.)
+globs: src/**/*.{tsx,jsx}
+alwaysApply: false
+---
+
+# No inline render handlers
+
+Do **not** create new functions inside JSX:
+
+```tsx
+// bad
+<MyButton onPress={() => doThing(id)} />
+<FlatList renderItem={({ item }) => <Row item={item} />} />
+
+// good
+const handlePress = useCallback(() => doThing(id), [id])
+const renderItem = useCallback(({ item }) => <Row item={item} />, [])
+<MyButton onPress={handlePress} />
+<FlatList renderItem={renderItem} />
+```
+
+Allowed:
+
+- Passing a stable reference: `onPress={handlePress}`
+- Passing a `useState` setter: `onChangeText={setValue}`
+- Reanimated worklet bodies
+- `setState(prev => …)` **inside** an already-defined callback (not as a JSX prop expression)

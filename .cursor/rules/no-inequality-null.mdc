@@ -1,0 +1,13 @@
+---
+description: Use lodash isNil instead of != null / == null
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Null / undefined checks
+
+- Forbidden: `x != null`, `x == null`.
+- Prefer: `isNil(x)` / `!isNil(x)` from `lodash`.
+- When null and undefined must differ: use `=== null` or `=== undefined` explicitly.
+- Prefer optional chaining (`x?.y`) when the left side may be nullish.
+- ESLint `eqeqeq` is on — always `===` / `!==` for value comparisons.

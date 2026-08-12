@@ -55,6 +55,7 @@ OpenSpec change artifacts in this repo are written in **Vietnamese** (`openspec/
 - Screens: `container + view + styles` (`screen-standard.md`).
 - Routes in `src/app` stay thin.
 - Prefer kit from `shared-ui-catalog.md` before one-off empty/error/card/search UI.
+- Reusable kit added while shipping a product must be backported here per `platform-kit-sync.md`.
 - Product may omit todo/auth as business features.
 
 ### 4. Swap API via env + same data-state pattern
@@ -87,6 +88,7 @@ OpenSpec change artifacts in this repo are written in **Vietnamese** (`openspec/
 | Folders / starters | `folder-structure.md` |
 | Screen split | `screen-standard.md` |
 | Which `My*` | `shared-ui-catalog.md` |
+| Sync kit ↔ products | `platform-kit-sync.md` |
 | API / Redux | `data-state-standard.md` |
 | UX fallbacks | `default-behavior-rules.md` |
 | Canonical code | `canonical-references.md` |

@@ -1,47 +1,41 @@
 import { Tabs } from 'expo-router'
-import React from 'react'
-import { useTranslation } from 'react-i18next'
+import React, { useMemo } from 'react'
 
-import { ScrollToHideFooter } from '@/components/ui/scroll-to-hide'
-import { BottomTabBar } from 'expo-router/js-tabs'
-import { useTheme } from '@/theme/theme-context'
-import MyIcon from '@/components/elements/my-icon'
-import MyPressable, { SCALE_SMALL } from '@/components/elements/my-pressable'
 import MyView from '@/components/elements/my-view'
+import { useTabBar, type TabBarNavItem } from '@/components/ui/tabbar'
+
+const PUBLIC_TAB_NAV: TabBarNavItem[] = [
+  {
+    id: 'index',
+    labelKey: 'tabs.home',
+    icon: 'home-outline',
+    iconFocused: 'home',
+  },
+  {
+    id: 'playground',
+    labelKey: 'tabs.playground',
+    icon: 'grid-outline',
+    iconFocused: 'grid',
+  },
+]
 
 export default function TabLayout() {
-  const { getColor } = useTheme()
-  const { t } = useTranslation()
+  const items = useMemo(() => PUBLIC_TAB_NAV, [])
+  const { renderTabBar, screenOptions, tabScreens } = useTabBar({ items })
+
   return (
     <MyView flex={1}>
-      <Tabs
-        tabBar={(props) => (
-          <ScrollToHideFooter>
-            <BottomTabBar {...props} />
-          </ScrollToHideFooter>
-        )}
-        screenOptions={{
-          tabBarActiveTintColor: getColor('fill/active/primary'),
-          headerShown: false,
-          tabBarButton(props) {
-            return <MyPressable {...(props as any)} scaleBySize={false} scaleValue={SCALE_SMALL} />
-          },
-        }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: t('tabs.home'),
-            tabBarIcon: ({ color }) => <MyIcon name="home" size={28} color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="playground"
-          options={{
-            title: t('tabs.playground'),
-            tabBarIcon: ({ color }) => <MyIcon name="grid-outline" size={28} color={color} />,
-          }}
-        />
+      <Tabs tabBar={renderTabBar} screenOptions={screenOptions}>
+        {tabScreens.map((item) => (
+          <Tabs.Screen
+            key={item.id}
+            name={item.id}
+            options={{
+              title: item.title,
+              tabBarIcon: item.renderIcon,
+            }}
+          />
+        ))}
       </Tabs>
     </MyView>
   )

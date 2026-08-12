@@ -115,6 +115,10 @@ src/features/
   │ ├ <screen>.view.tsx
   │ ├ <screen>.types.ts
   │ └ styles.ts
+  ├ components/                 # feature-only UI (optional; when view gets large)
+  │ ├ styles.ts                 # shared styles for these components
+  │ ├ type.ts                   # shared props types
+  │ └ <name>.tsx                # flat: 1 file = 1 component (no nested folders)
   ├ <feature>-api.ts
   ├ <feature>-slice.ts
   ├ <feature>-thunks.ts
@@ -127,7 +131,8 @@ Notes:
 - Use kebab-case for file and folder names (for example `todo-form.container.tsx`, `auth-api.ts`, `my-list.tsx`).
 - Keep the current naming convention such as `auth-api.ts`, `auth-slice.ts`, `auth-thunks.ts`.
 - A feature may omit files it does not need.
-- Avoid creating `components/` and `hooks/` folders inside a feature until the feature is large enough to justify them.
+- **Feature-only presentational UI** → `features/<feature>/components/` (flat files + shared `styles.ts` / `type.ts`). Do **not** use the shared-kit layout (folder + `index` + per-component `styles`/`type`) here.
+- **Cross-feature / reusable kit** → `src/components/{elements,form,ui}/` only. Do **not** put single-feature cards into `src/components/ui`.
 
 ## Shared layers
 

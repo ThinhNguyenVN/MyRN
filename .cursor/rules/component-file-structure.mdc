@@ -1,0 +1,48 @@
+---
+description: Component layout — shared kit folders vs flat feature components
+globs: src/components/**/*.{ts,tsx},src/features/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Component file structure
+
+Two layouts. **Do not mix them up.**
+
+## A) Shared kit — `src/components/{elements,form,ui}/`
+
+Reuse across features. **One folder per component** (kebab-case):
+
+```
+my-foo/
+  my-foo.tsx
+  index.ts       # re-export only — never implement here
+  type.ts        # all props / exported types
+  styles.ts      # generateStyles(theme)
+  hooks.ts       # optional
+```
+
+Product-only wrappers next to a kit (e.g. `private-sidebar.tsx`) may use `private-sidebar.styles.ts` instead of bloating the shared kit `styles.ts`.
+
+## B) Feature-only UI — `src/features/<feature>/components/`
+
+Presentational pieces used **only** by that feature.
+
+**Flat folder — no per-component subfolders:**
+
+```
+src/features/<feature>/components/
+  styles.ts              # shared generateStyles for all feature components
+  type.ts                # shared props / component types
+  order-summary-card.tsx # 1 file = 1 component
+  status-badge.tsx
+  …
+```
+
+Rules:
+
+- **Do not** put feature-only UI under `src/components/ui`.
+- **Do not** create `order-summary-card/index.ts` + `styles.ts` + `type.ts` trees inside the feature.
+- Prefer shared `components/styles.ts` (or screen `styles.ts`) over one styles file per component.
+- Keep production screens thin: `screens/` = container + view + screen styles; extract large JSX into `components/*.tsx`.
+
+Screen standard: `container.tsx` + `view.tsx` + `styles.ts` under `features/<feature>/screens/` — see `.docs/screen-standard.md`.

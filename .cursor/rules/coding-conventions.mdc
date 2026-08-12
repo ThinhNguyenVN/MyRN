@@ -1,0 +1,156 @@
+---
+description: Always-on coding conventions for MyRN (structure, styles, lint, React Native)
+alwaysApply: true
+---
+
+# Coding conventions (enforce on every change)
+
+**Sources:** `.docs/coding-conventions.md`, `.docs/folder-structure.md`, `.docs/screen-standard.md`, `eslint.config.js`.  
+Treat these as hard requirements — PR review and ESLint will catch slips.
+
+---
+
+## 1. Component / file structure
+
+**Two layouts — pick by reuse scope:**
+
+### Shared kit (`src/components/{elements,form,ui}/`)
+
+- Folder + primary file: **kebab-case** (`my-date-picker/my-date-picker.tsx`).
+- **`index.ts(x)` = re-export only** — no component implementation in `index`.
+- Co-locate per component folder:
+  - **`type.ts`** — all `interface` / `type` / props (never export types from `.tsx`)
+  - **`styles.ts`** — `generateStyles(theme)` + `useThemedStyles` (never `StyleSheet.create` / `generateStyles` inside `.tsx`)
+  - **`hooks.ts`** — optional
+- Product variants in the same kit folder may use `*.styles.ts` (e.g. `private-sidebar.styles.ts`).
+
+```
+my-foo/
+  my-foo.tsx
+  index.ts       # re-export only
+  type.ts
+  styles.ts
+  hooks.ts       # optional
+```
+
+### Feature-only UI (`src/features/<feature>/components/`)
+
+UI used **only** by that feature (do **not** put these in `src/components/ui`).
+
+- **Flat**: one `.tsx` file per component — **no** nested folder + `index` / `styles` / `type` per component.
+- Shared **`styles.ts`** + **`type.ts`** in that `components/` folder (or reuse screen `styles.ts`).
+- Screens stay thin; large presentational blocks live here.
+
+```
+src/features/<feature>/components/
+  styles.ts
+  type.ts
+  order-summary-card.tsx
+  status-badge.tsx
+```
+
+- Imports: alias `@/*` only.
+
+---
+
+## 2. Styles & theme
+
+- **No inline styles** (`style={{ … }}`) — ESLint `react-native/no-inline-styles`. Exception: values that must be computed from props/state/layout (e.g. measured width). Prefer named styles in `styles.ts`.
+- Colors / spacing / radius / typography: theme tokens (`getColor`, `getSpacing`, `getRadius`, …).
+- Borders: `border/…` tokens — no hardcoded hex / `brand/black` as border.
+- Shadows: `MySurface` + `elevation="soft/…"` — no raw `shadowColor` / numeric `elevation` in StyleSheet.
+- Screen background: `fill/background/primary` (not `brand/white` — breaks dark mode).
+
+---
+
+## 3. My* kit before RN primitives
+
+| Avoid | Prefer |
+|-------|--------|
+| `View` | `MyView` (except thin glue / implementing MyView) |
+| `Text` | `MyText` |
+| URL `Image` | `MyImage` (fullscreen gallery → `ImagePreview`) |
+| Press / button / icon / input / sheet / spinner | `MyPressable`, `MyButton`, `MyIcon`, `MyTextInput`, `MyBottomSheet`, `MySpinner`, `MySurface` |
+| Card / divider / search | `MyCard`, `MyDivider`, `MySearchInput` |
+| Empty / error / skeleton | `MyEmptyState`, `MyErrorState`, `MySkeleton` |
+
+- Prefer **ContainerStyleProps** (`margin`, `padding`, `gap`, …) on My* over stuffing layout into `style`.
+- Do not wrap a single child in an extra `View`/`MyView` with no layout purpose.
+- Catalog: `.docs/shared-ui-catalog.md`.
+
+---
+
+## 4. Handlers & lists
+
+- **No new arrow functions in JSX:** `onPress={() => …}`, `renderItem={({ item }) => …}`.
+- Use `useCallback` / named functions; OK to pass `setState` setters directly.
+- Exceptions: Reanimated worklets; `setState(prev => …)` inside a callback (not inline in JSX).
+- **List `key`:** do not use bare `key={item.id}`. Use a stable prefixed key, e.g. `` key={`drawer-item-${item.id}`} ``, `` key={`sidebar-footer-${item.id}`} ``.
+
+---
+
+## 5. Null / equality / platform
+
+- No `!= null` / `== null`. Use `isNil` / `!isNil` from `lodash`.
+- ESLint `eqeqeq: always` — use `===` / `!==`.
+- Distinguish null vs undefined only when needed: `=== null` / `=== undefined`.
+- Platform flags: `isWeb` / `isIos` / `isAndroid` from `@/constants/dimensions` — avoid `Platform.OS === 'web'` in UI when helpers exist.
+- **Layout breakpoints:** `useIsMobileSize()` / `isMobileSize` — never use `Platform.OS` to decide mobile vs desktop layout.
+- `Platform.OS` only for true platform APIs (native modules, permissions, picker engines).
+
+---
+
+## 6. App / feature / screen placement
+
+- `src/app` = **thin route shell** only (layouts, redirects, `export { default } from '@/features/…'`).
+- No API calls, business logic, or large screen UI inside `src/app` route files.
+- Authenticated chrome lives in **`(private)/_layout`** — do **not** invent `(shell)` or `features/shell`.
+- Production screens: `features/<feature>/screens/` with **container + view + styles** (+ optional `use-*.ts` / types). See `.docs/screen-standard.md`.
+- Do not copy playground screen structure into production features.
+
+---
+
+## 7. Conditional UI & sheets
+
+- Prefer `ConditionRenderer` when there is a clear `when` + `fallback`.
+- `MyTextInput` inside `MyBottomSheet` → must use `useBottomSheetTextInput`.
+
+---
+
+## 8. Align with ESLint / Prettier (do not fight the linter)
+
+From `eslint.config.js`:
+
+- Prettier: no semicolons, single quotes, trailing commas, printWidth 100.
+- `unused-imports`: remove unused imports/vars (prefix intentional unused with `_`).
+- `prefer-const`, `curly: all`, `eqeqeq`.
+- `no-console` except `console.warn` / `console.error`.
+- `no-debugger`: error.
+- Run / respect `yarn lint` — fix errors before considering the task done.
+
+---
+
+## 9. Data / async (short)
+
+- API contracts via RTK `createApi`; thunks for multi-step orchestration; slice reducers stay pure sync.
+- Details: `.docs/data-state-standard.md`.
+
+---
+
+## 10. Scope & git
+
+- DRY: shared logic/UI in 2+ places → extract.
+- Do not edit outside the task; no unsolicited markdown/docs.
+- Branch names: `feat/` | `fix/` | `issue/` | `release/` — not `cursor/`.
+
+---
+
+## Pre-merge checklist (UI)
+
+- [ ] Shared kit: types in `type.ts`; `index` re-export only; styles in `styles.ts`
+- [ ] Feature-only: flat `components/*.tsx` + shared `components/styles.ts` / `type.ts`
+- [ ] No inline style / inline JSX handlers
+- [ ] Prefixed list keys
+- [ ] My* + theme tokens; `isWeb`/`isNil`/`useIsMobileSize` as applicable
+- [ ] Thin `app/` routes; screens under `features/…/screens`
+- [ ] Lint clean (errors fixed)
