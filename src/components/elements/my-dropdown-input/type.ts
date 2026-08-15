@@ -5,6 +5,13 @@ export interface DropdownOption {
   value: string
 }
 
+export interface DropdownOptionRowProps {
+  option: DropdownOption
+  selected: boolean
+  multiSelect: boolean
+  onSelect: (value: string) => void
+}
+
 export interface MyDropdownInputProps {
   options: DropdownOption[]
   /** Single: string | null. Multi: string[]. */
@@ -12,8 +19,14 @@ export interface MyDropdownInputProps {
   onValueChange?: (value: string | string[]) => void
   placeholder?: string
   disabled?: boolean
+  /** First fetch in progress — trigger stays locked with a loading placeholder. */
+  loading?: boolean
   multiSelect?: boolean
+  /** When omitted, optional fields (`required` false) can clear the value. */
+  allowClear?: boolean
   title?: string
+  /** Sheet / fullscreen picker heading. Falls back to `title`. */
+  pickerTitle?: string
   subTitle?: string
   error?: boolean
   errorMessage?: string

@@ -36,7 +36,6 @@ type CalendarStyles = ReturnType<typeof generateStyles>
 
 interface SingleDayCellProps {
   cell: DayCell
-  idx: number
   selected: boolean
   isToday: boolean
   cellStyle?: StyleProp<ViewStyle>
@@ -46,7 +45,6 @@ interface SingleDayCellProps {
 
 const SingleDayCell = memo(function SingleDayCell({
   cell,
-  idx,
   selected,
   isToday,
   cellStyle,
@@ -59,7 +57,6 @@ const SingleDayCell = memo(function SingleDayCell({
 
   return (
     <MyPressable
-      key={`${idx}-day-cell`}
       onPress={handlePress}
       disabled={cell.disabled}
       style={[
@@ -89,7 +86,6 @@ const SingleDayCell = memo(function SingleDayCell({
 
 interface RangeDayCellProps {
   cell: DayCell
-  idx: number
   isStart: boolean
   isEnd: boolean
   inRange: boolean
@@ -101,7 +97,6 @@ interface RangeDayCellProps {
 
 const RangeDayCell = memo(function RangeDayCell({
   cell,
-  idx,
   isStart,
   isEnd,
   inRange,
@@ -134,7 +129,6 @@ const RangeDayCell = memo(function RangeDayCell({
 
   return (
     <MyPressable
-      key={`${idx}-day-cell`}
       onPress={handlePress}
       disabled={cell.disabled}
       style={[
@@ -211,7 +205,7 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
       if (!cell.isCurrentMonth) {
         return (
           <View
-            key={`${idx}-other-month`}
+            key={`calendar-day-empty-${idx}`}
             style={[styles.dayCell, cellStyle, styles.dayCellOtherMonth, styles.dayCellEmpty]}
           />
         )
@@ -222,8 +216,8 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
         const isToday = isSameDay(cell.date, todayOnly)
         return (
           <SingleDayCell
+            key={`calendar-day-${idx}`}
             cell={cell}
-            idx={idx}
             selected={selected}
             isToday={isToday}
             cellStyle={cellStyle}
@@ -245,8 +239,8 @@ const CalendarInternal = memo(function CalendarInternal(props: CalendarPropsUnio
 
       return (
         <RangeDayCell
+          key={`calendar-day-${idx}`}
           cell={cell}
-          idx={idx}
           isStart={isStart}
           isEnd={isEnd}
           inRange={inRange}

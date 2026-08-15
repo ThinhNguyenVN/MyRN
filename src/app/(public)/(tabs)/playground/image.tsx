@@ -106,6 +106,15 @@ export default function ImageScreen() {
         }
         style={styles.image200x100}
       />
+      <MyText typography="label" style={styles.labelMargin}>
+        {t('playground.imageLockAspectOff')}
+      </MyText>
+      <MyImage
+        url="https://picsum.photos/320/180"
+        lockAspectRatio={false}
+        contentFit="cover"
+        style={styles.image200x100}
+      />
     </ScrollView>
   )
 }

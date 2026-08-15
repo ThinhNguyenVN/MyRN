@@ -1,4 +1,9 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig, isAxiosError } from 'axios'
+import axios, {
+  AxiosHeaders,
+  type AxiosError,
+  type InternalAxiosRequestConfig,
+  isAxiosError,
+} from 'axios'
 
 import { refreshAuthToken } from '@/api/auth-client'
 import { normalizeAxiosError } from '@/api/errors'
@@ -33,8 +38,14 @@ function performRefresh(refreshToken: string): Promise<string> {
     refreshInFlight = (async () => {
       try {
         const { accessToken, refreshToken: newRefresh } = await refreshAuthToken(refreshToken)
+        // Some refresh endpoints omit refresh_token — keep previous when unchanged
         const nextRefresh = newRefresh || refreshToken
-        tryGetStore()?.dispatch(updateTokens({ accessToken, refreshToken: nextRefresh }))
+        tryGetStore()?.dispatch(
+          updateTokens({
+            accessToken,
+            refreshToken: nextRefresh,
+          }),
+        )
 
         // Only touch storage when a refresh was already persisted (remember-me on / native).
         const stored = await getStoredRefreshToken()
@@ -69,6 +80,26 @@ apiClient.interceptors.request.use((config) => {
   } catch {
     /* store not ready — omit bearer */
   }
+
+  // Multipart: never keep instance default `application/json` Content-Type.
+  const data = config.data
+  const isFormData =
+    typeof FormData !== 'undefined' &&
+    data !== null &&
+    typeof data === 'object' &&
+    (data instanceof FormData ||
+      (typeof (data as FormData).append === 'function' &&
+        ((data as { constructor?: { name?: string } }).constructor?.name === 'FormData' ||
+          Object.prototype.toString.call(data) === '[object FormData]')))
+
+  if (isFormData && config.headers) {
+    const headers = AxiosHeaders.from(config.headers)
+    headers.delete('Content-Type')
+    headers.delete('content-type')
+    headers.set('Content-Type', false)
+    config.headers = headers
+  }
+
   return config
 })
 

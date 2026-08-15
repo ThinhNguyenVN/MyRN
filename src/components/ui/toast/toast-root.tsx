@@ -46,8 +46,7 @@ const ANIMATION_DURATION_WEB = 400
 
 const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
   const styles = useThemedStyles(generateStyles)
-  const { getSpacing, defaultElevation } = useTheme()
-  const gap = getSpacing('x3')
+  const { defaultElevation } = useTheme()
   const [options, setOptions] = useState<ToastOptions | null>(null)
   const [visible, setVisible] = useState(false)
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -129,11 +128,15 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
 
   const body = (
     <>
-      <MyIcon name={iconName} size={22} color={iconColor as never} />
-      <MyView flex={1} justifyContent="center">
-        <MyText numberOfLines={2}>{options.text}</MyText>
+      <MyView style={styles.toastIcon}>
+        <MyIcon name={iconName} size={22} color={iconColor as never} />
+      </MyView>
+      <MyView style={styles.toastBody}>
+        <MyText style={styles.toastText} numberOfLines={4}>
+          {options.text}
+        </MyText>
         {options.description ? (
-          <MyText style={styles.description} numberOfLines={2}>
+          <MyText style={[styles.description, styles.toastText]} numberOfLines={4}>
             {options.description}
           </MyText>
         ) : null}
@@ -152,9 +155,7 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
       fillParent={false}
       style={[styles.container, containerStyle]}
     >
-      <MyView flexDirection="row" alignItems="center" style={{ gap }}>
-        {body}
-      </MyView>
+      <MyView style={styles.toastRow}>{body}</MyView>
     </MyView>
   )
 

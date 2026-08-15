@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react'
+import React, { forwardRef, memo, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   TouchableOpacity,
   Platform,
@@ -7,24 +7,46 @@ import {
   type ViewStyle,
   type TextStyle,
 } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 import { isNil } from 'lodash'
 
 import { BottomSheetTextInput } from '@/components/elements/my-bottom-sheet'
+import FormFieldError from '@/components/form/form-field-error'
+import FormFieldLabel from '@/components/form/form-field-label'
+import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
+import { useThemedStyles } from '@/theme/theme-context'
+import {
+  formatDisplayNumber,
+  sanitizeDisplayNumberInput,
+  type FormatDisplayNumberOptions,
+} from '@/utils/format-display-number'
+import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
 
 import MyText from '../my-text'
 import MyView from '../my-view'
 
 import { generateStyles } from './styles'
 import type { MyTextInputProps, MyTextInputRef } from './type'
-import { useThemedStyles } from '@/theme/theme-context'
-import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
-import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
-import FormFieldLabel from '@/components/form/form-field-label'
-import FormFieldError from '@/components/form/form-field-error'
 
 const INPUT_FONT_SIZE = 16
 const INPUT_HEIGHT = 40
+
+function resolveNumberFormatOptions(
+  numberFormat: MyTextInputProps['numberFormat'],
+  appLanguage: string,
+): FormatDisplayNumberOptions | null {
+  if (!numberFormat) {
+    return null
+  }
+  if (numberFormat === true) {
+    return { locale: appLanguage, maxFractionDigits: 2 }
+  }
+  return {
+    locale: numberFormat.locale ?? appLanguage,
+    maxFractionDigits: numberFormat.maxFractionDigits ?? 2,
+  }
+}
 
 const MyTextInput = memo(
   forwardRef<MyTextInputRef, MyTextInputProps>(function MyTextInput(
@@ -46,11 +68,15 @@ const MyTextInput = memo(
       onEndIconPress,
       width = 'auto',
       height = INPUT_HEIGHT,
+      borderless = false,
       onFocus: onFocusProp,
       onBlur: onBlurProp,
+      onChangeText: onChangeTextProp,
       inputStyle,
+      inputRowStyle: inputRowStyleProp,
       ignoreValue,
       required = false,
+      numberFormat = false,
       value,
       style: styleProp,
       ...rest
@@ -58,6 +84,7 @@ const MyTextInput = memo(
     ref,
   ) {
     const styles = useThemedStyles(generateStyles)
+    const { i18n } = useTranslation()
     const isMobileSize = useIsMobileSize()
     const TextInputComponent =
       Platform.OS === 'web' || !isMobileSize
@@ -77,6 +104,30 @@ const MyTextInput = memo(
     const hasContainerStyle = Object.keys(containerStyle).length > 0
     const viewProps = omitContainerProps(rest as Record<string, unknown>)
     const [isFocused, setIsFocused] = useState(false)
+    const numberFormatOptions = useMemo(
+      () => resolveNumberFormatOptions(numberFormat, i18n.language),
+      [i18n.language, numberFormat],
+    )
+
+    const [displayValue, setDisplayValue] = useState(() => {
+      if (!numberFormatOptions || typeof value !== 'string') {
+        return undefined as string | undefined
+      }
+      return formatDisplayNumber(value, numberFormatOptions)
+    })
+
+    useEffect(() => {
+      if (!numberFormatOptions) {
+        setDisplayValue(undefined)
+        return
+      }
+      if (isFocused) {
+        return
+      }
+      setDisplayValue(
+        formatDisplayNumber(typeof value === 'string' ? value : '', numberFormatOptions),
+      )
+    }, [isFocused, numberFormatOptions, value])
 
     const handleFocus = useCallback(
       (e: unknown) => {
@@ -88,9 +139,25 @@ const MyTextInput = memo(
     const handleBlur = useCallback(
       (e: unknown) => {
         setIsFocused(false)
+        if (numberFormatOptions && typeof value === 'string') {
+          setDisplayValue(formatDisplayNumber(value, numberFormatOptions))
+        }
         onBlurProp?.(e as Parameters<NonNullable<typeof onBlurProp>>[0])
       },
-      [onBlurProp],
+      [numberFormatOptions, onBlurProp, value],
+    )
+
+    const handleChangeText = useCallback(
+      (text: string) => {
+        if (!numberFormatOptions) {
+          onChangeTextProp?.(text)
+          return
+        }
+        const next = sanitizeDisplayNumberInput(text, numberFormatOptions)
+        setDisplayValue(next.display)
+        onChangeTextProp?.(next.value)
+      },
+      [numberFormatOptions, onChangeTextProp],
     )
 
     const state: 'default' | 'disabled' | 'error' | 'focus' = error
@@ -111,9 +178,13 @@ const MyTextInput = memo(
       }
     }, [width])
 
-    const inputRowStyle = useMemo(
-      () => ({ borderColor: stateColors.border, height }),
-      [stateColors.border, height],
+    const inputRowStateStyle = useMemo(
+      () => ({
+        borderColor: stateColors.border,
+        height,
+        ...(borderless ? { borderWidth: 0, backgroundColor: 'transparent' } : null),
+      }),
+      [borderless, stateColors.border, height],
     )
     const inputDynamicStyle = useMemo(
       () => ({
@@ -137,6 +208,11 @@ const MyTextInput = memo(
       ? [styles.container, widthStyle, containerStyle, styleProp]
       : [styles.container, widthStyle, styleProp]
 
+    const resolvedValue = numberFormatOptions
+      ? (displayValue ??
+        formatDisplayNumber(typeof value === 'string' ? value : '', numberFormatOptions))
+      : value
+
     return (
       <View style={rootStyle} pointerEvents={editable && !disabled ? 'auto' : 'box-none'}>
         <FormFieldLabel
@@ -146,7 +222,7 @@ const MyTextInput = memo(
           error={!!error}
           style={styles.title}
         />
-        <MyView style={[styles.inputRow, inputRowStyle]}>
+        <MyView style={[styles.inputRow, inputRowStateStyle, inputRowStyleProp]}>
           {!!startText && (
             <MyText typography="body" color="text/active/secondary">
               {startText}
@@ -165,10 +241,11 @@ const MyTextInput = memo(
           <TextInputComponent
             ref={ref as any}
             {...viewProps}
-            value={ignoreValue ? undefined : value}
+            value={ignoreValue ? undefined : resolvedValue}
             editable={!disabled && editable}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            onChangeText={handleChangeText}
             textAlignVertical="top"
             style={[
               styles.inputBase,

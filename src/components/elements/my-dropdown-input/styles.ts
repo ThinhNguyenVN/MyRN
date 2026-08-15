@@ -6,6 +6,8 @@ export type DropdownInputState = 'default' | 'disabled' | 'error' | 'focus'
 export const DROPDOWN_MIN_HEIGHT = 240
 export const DROPDOWN_MAX_HEIGHT = 400
 export const DROPDOWN_MIN_ITEMS = 5
+export const DROPDOWN_ITEM_SIZE = 52
+export const DROPDOWN_LIST_DRAW_DISTANCE = 400
 
 function getStateColors(theme: ThemeType) {
   const { getColor } = theme
@@ -42,7 +44,7 @@ function getStateColors(theme: ThemeType) {
 }
 
 export function generateStyles(theme: ThemeType) {
-  const { getColor, getSpacing, insets } = theme
+  const { getColor, getSpacing, getRadius, insets } = theme
   const stateColors = getStateColors(theme)
   return {
     stateColors,
@@ -52,12 +54,62 @@ export function generateStyles(theme: ThemeType) {
       },
       triggerWrap: {
         width: '100%',
+        position: 'relative',
       },
       triggerInput: {
         marginBottom: 0,
       },
+      triggerClearHit: {
+        position: 'absolute',
+        right: 0,
+        bottom: 0,
+        width: 44,
+        height: 44,
+        zIndex: 2,
+      },
+      optionRowInner: {
+        width: '100%',
+      },
       optionRowMobile: {
-        marginBottom: getSpacing('x2'),
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: getSpacing('x4'),
+        minHeight: DROPDOWN_ITEM_SIZE,
+        gap: getSpacing('x3'),
+      },
+      optionMark: {
+        width: 22,
+        height: 22,
+        borderWidth: 1,
+        borderColor: getColor('border/inactive/primary'),
+        backgroundColor: getColor('fill/background/tertiary'),
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      optionMarkRadio: {
+        borderRadius: 11,
+      },
+      optionMarkCheckbox: {
+        borderRadius: getRadius('small'),
+      },
+      optionMarkSelected: {
+        borderColor: getColor('border/active/primary'),
+        backgroundColor: getColor('fill/active/primary'),
+      },
+      optionMarkDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: getColor('fill/background/tertiary'),
+      },
+      clearRow: {
+        paddingHorizontal: getSpacing('x4'),
+        paddingVertical: getSpacing('x3'),
+        minHeight: 44,
+        justifyContent: 'center',
+      },
+      clearRowText: {
+        color: getColor('text/active/tertiary'),
       },
       optionLabelMobile: {
         flex: 1,
@@ -96,6 +148,53 @@ export function generateStyles(theme: ThemeType) {
       },
       sheetListContent: {
         paddingBottom: getSpacing('x6'),
+      },
+      sheetListContentMobile: {
+        paddingHorizontal: 0,
+        paddingBottom: (insets.bottom || 0) + getSpacing('x6'),
+      },
+      pickerRoot: {
+        flex: 1,
+        backgroundColor: getColor('fill/background/primary'),
+      },
+      pickerRootAndroid: {
+        paddingTop: insets.top,
+      },
+      pickerHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: getSpacing('x2'),
+        paddingLeft: getSpacing('x4'),
+        paddingRight: getSpacing('x2'),
+        paddingVertical: getSpacing('x4'),
+      },
+      pickerTitle: {
+        flex: 1,
+        color: getColor('text/active/primary'),
+      },
+      pickerCloseHit: {
+        width: 44,
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      searchWrap: {
+        paddingHorizontal: getSpacing('x4'),
+        paddingBottom: getSpacing('x3'),
+      },
+      searchWrapWeb: {
+        paddingTop: getSpacing('x4'),
+      },
+      emptyWrap: {
+        paddingHorizontal: getSpacing('x4'),
+        paddingTop: getSpacing('x8'),
+      },
+      pickerList: {
+        flex: 1,
+      },
+      pickerKeyboardAvoid: {
+        flex: 1,
       },
     }),
   }

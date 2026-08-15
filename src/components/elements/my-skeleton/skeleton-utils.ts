@@ -12,9 +12,7 @@ const TEXT_BLOCK_LAYOUT: SkeletonLayoutItem[] = [
 ]
 
 const CARD_LAYOUT: SkeletonLayoutItem[] = [
-  { key: 'media', width: '100%', height: 120, marginBottom: 12, borderRadius: 8 },
-  { key: 'title', width: '70%', height: 16, marginBottom: 8 },
-  { key: 'body', width: '92%', height: 12 },
+  { key: 'media', width: '100%', height: 96, borderRadius: 8 },
 ]
 
 export function getSkeletonLayout(preset: MySkeletonPreset): SkeletonLayoutItem[] {

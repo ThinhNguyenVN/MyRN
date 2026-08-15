@@ -8,6 +8,7 @@ import '@/i18n'
 import { PortalHost, PortalProvider } from '@gorhom/portal'
 import { StyleSheet, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 import { ConfirmationRoot, setConfirmationRef } from '@/components/ui/confirmation'
 import type { ConfirmationRef } from '@/components/ui/confirmation'
 import { ToastRoot, setToastRef } from '@/components/ui/toast'
@@ -38,26 +39,28 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={styles.root}>
-      <PortalProvider shouldAddRootHost={false}>
-        <MyThemeProvider value={colorScheme}>
-          <Provider store={store}>
-            <AppInitGate>
-              <ScrollToHideProvider>
-                <ConfirmationRoot ref={confirmationRef} />
-                <ToastRoot ref={toastRef} />
-                <Stack>
-                  <Stack.Screen name="(public)" options={{ headerShown: false }} />
-                  <Stack.Screen name="(private)" options={{ headerShown: false }} />
-                </Stack>
-                <View style={styles.portalHostOverlay} pointerEvents="box-none">
-                  <PortalHost name="root" />
-                </View>
-                <StatusBar style="auto" />
-              </ScrollToHideProvider>
-            </AppInitGate>
-          </Provider>
-        </MyThemeProvider>
-      </PortalProvider>
+      <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
+        <PortalProvider shouldAddRootHost={false}>
+          <MyThemeProvider value={colorScheme}>
+            <Provider store={store}>
+              <AppInitGate>
+                <ScrollToHideProvider>
+                  <ConfirmationRoot ref={confirmationRef} />
+                  <ToastRoot ref={toastRef} />
+                  <Stack>
+                    <Stack.Screen name="(public)" options={{ headerShown: false }} />
+                    <Stack.Screen name="(private)" options={{ headerShown: false }} />
+                  </Stack>
+                  <View style={styles.portalHostOverlay} pointerEvents="box-none">
+                    <PortalHost name="root" />
+                  </View>
+                  <StatusBar style="auto" />
+                </ScrollToHideProvider>
+              </AppInitGate>
+            </Provider>
+          </MyThemeProvider>
+        </PortalProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   )
 }

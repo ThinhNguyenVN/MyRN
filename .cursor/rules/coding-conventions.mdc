@@ -22,6 +22,7 @@ Treat these as hard requirements — PR review and ESLint will catch slips.
   - **`type.ts`** — all `interface` / `type` / props (never export types from `.tsx`)
   - **`styles.ts`** — `generateStyles(theme)` + `useThemedStyles` (never `StyleSheet.create` / `generateStyles` inside `.tsx`)
   - **`hooks.ts`** — optional
+  - **`utils.ts`** — pure helpers for that kit (or put shared helpers in `src/utils/`). Do **not** invent one-off files like `get-foo.ts` / `foo-helper.ts` beside the component.
 - Product variants in the same kit folder may use `*.styles.ts` (e.g. `private-sidebar.styles.ts`).
 
 ```
@@ -31,6 +32,7 @@ my-foo/
   type.ts
   styles.ts
   hooks.ts       # optional
+  utils.ts       # optional pure helpers
 ```
 
 ### Feature-only UI (`src/features/<feature>/components/`)
@@ -74,6 +76,7 @@ src/features/<feature>/components/
 | Card / divider / search | `MyCard`, `MyDivider`, `MySearchInput` |
 | Empty / error / skeleton | `MyEmptyState`, `MyErrorState`, `MySkeleton` |
 
+- Form screens with `MyTextInput` / `MyFormTextInput` that the software keyboard can cover: wrap the **field scroll** in `MyKeyboardAvoiding.ScrollView` (not a raw `ScrollView`). Sticky footer forms: `MyKeyboardAvoiding.Toolbar` as last child of the **full-screen root** (not inside the scroll, not portaled). Do **not** wrap header / list-toolbar search (`ExpandableSearch`, top `MySearchInput`). Sheet inputs: `useBottomSheetTextInput`.
 - Prefer **ContainerStyleProps** (`margin`, `padding`, `gap`, …) on My* over stuffing layout into `style`.
 - Do not wrap a single child in an extra `View`/`MyView` with no layout purpose.
 - Catalog: `.docs/shared-ui-catalog.md`.
@@ -152,5 +155,6 @@ From `eslint.config.js`:
 - [ ] No inline style / inline JSX handlers
 - [ ] Prefixed list keys
 - [ ] My* + theme tokens; `isWeb`/`isNil`/`useIsMobileSize` as applicable
+- [ ] Form body with text inputs: `MyKeyboardAvoiding.ScrollView` (not header search; sheet → `useBottomSheetTextInput`)
 - [ ] Thin `app/` routes; screens under `features/…/screens`
 - [ ] Lint clean (errors fixed)

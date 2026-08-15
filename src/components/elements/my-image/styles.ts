@@ -7,8 +7,11 @@ export function generateStyles(theme: ThemeType) {
     container: {
       backgroundColor: getColor('fill/inactive/primary'),
       justifyContent: 'center',
-      alignItems: 'center',
+      alignItems: 'stretch',
       overflow: 'hidden',
+    },
+    /** Default when caller does not set both width + height. */
+    square: {
       aspectRatio: 1,
     },
     image: {
@@ -55,6 +58,7 @@ export function generateStyles(theme: ThemeType) {
     },
     touchable: {
       flex: 1,
+      alignSelf: 'stretch',
     },
   })
 }

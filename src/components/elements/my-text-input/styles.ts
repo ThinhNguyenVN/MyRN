@@ -39,7 +39,7 @@ export function getStateColors(theme: ThemeType) {
 }
 
 export function generateStyles(theme: ThemeType) {
-  const { getSpacing } = theme
+  const { getSpacing, getColor } = theme
   const stateColors = getStateColors(theme)
   return {
     stateColors,
@@ -50,10 +50,12 @@ export function generateStyles(theme: ThemeType) {
       flexDirection: 'row' as const,
       justifyContent: 'center' as const,
       borderWidth: 1,
-      borderRadius: Radius.medium,
-      paddingHorizontal: getSpacing('x2'),
+      borderRadius: Radius.large,
+      paddingHorizontal: getSpacing('x3'),
       gap: getSpacing('x1'),
       alignItems: 'center' as const,
+      minHeight: 44,
+      backgroundColor: getColor('fill/background/tertiary'),
     },
     inputBase: {
       fontSize: 16,

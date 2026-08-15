@@ -7,7 +7,14 @@
     "done": "Xong",
     "clear": "Xóa",
     "loading": "Đang tải",
-    "disabled": "Vô hiệu hóa"
+    "disabled": "Vô hiệu hóa",
+    "back": "Quay lại",
+    "comingSoon": "Tính năng sắp có"
+  },
+  "pagination": {
+    "summary": "Hiển thị {{from}} đến {{to}} trong tổng số {{total}}",
+    "prev": "Trang trước",
+    "next": "Trang sau"
   },
   "tabs": {
     "home": "Trang chủ",
@@ -405,15 +412,56 @@
     "swipeActionFlag": "Đánh dấu",
     "swipeActionReply": "Trả lời",
     "swipeActionMove": "Di chuyển",
-    "swipeActionStar": "Gắn sao"
+    "swipeActionStar": "Gắn sao",
+    "linksStepper": "Stepper",
+    "linksPagination": "Pagination",
+    "linksImagePicker": "Image Picker",
+    "linksWebsiteHeader": "Website Header",
+    "linksExpandableSearch": "Expandable Search",
+    "linksFab": "Floating Action Button",
+    "linksMediaListRow": "Media List Row",
+    "stepperIntro": "Chạm step (allowJump) hoặc dùng Next/Back.",
+    "stepperStepInfo": "Thông tin",
+    "stepperStepPrice": "Giá",
+    "stepperStepImage": "Hình ảnh",
+    "stepperNext": "Tiếp theo",
+    "stepperBack": "Quay lại",
+    "stepperActive": "Step hiện tại: {{step}}",
+    "paginationIntro": "Điều khiển phân trang dùng chung cho list dài.",
+    "imagePickerIntro": "Chọn ảnh từ thư viện (web + native).",
+    "imagePickerClear": "Xóa",
+    "websiteHeaderIntro": "Header trang desktop với back + actions tùy chọn.",
+    "websiteHeaderTitle": "Trang demo",
+    "expandableSearchIntro": "Search trên header mở rộng khi bấm.",
+    "expandableSearchPlaceholder": "Tìm kiếm…",
+    "fabIntro": "Nút hành động nổi — bấm để toast.",
+    "fabPressed": "Đã bấm FAB",
+    "mediaListRowIntro": "Hàng thumb + title + meta cho list.",
+    "mediaListRowTitle": "Sản phẩm mẫu",
+    "mediaListRowMeta": "SKU-001 · Còn hàng",
+    "textInputNumberFormat": "Định dạng số (locale)",
+    "textInputNumberFormatHint": "Lưu số canonical; hiển thị có dấu phân nhóm.",
+    "imageLockAspectOff": "lockAspectRatio=false (fill khung)",
+    "imagePickerEmptyTitle": "Chạm để chọn ảnh",
+    "imagePickerEmptyHint": "JPEG, PNG, GIF, WebP · tối đa 5MB. Web: kéo thả cũng được."
   },
   "components": {
     "datePickOne": "Chọn ngày",
     "datePickRange": "Chọn khoảng ngày",
     "dropdownSelect": "Chọn...",
+    "dropdownSearch": "Tìm lựa chọn",
+    "dropdownSearchEmpty": "Không tìm thấy lựa chọn",
+    "dropdownEmpty": "Chưa có lựa chọn",
+    "dropdownLoading": "Đang tải...",
+    "dropdownClear": "Bỏ chọn",
+    "drawerOpen": "Mở menu",
     "wheelSelect": "Chọn",
     "imageEmpty": "Không có ảnh",
     "imageError": "Không thể tải ảnh",
-    "chipsAdd": "Thêm..."
+    "chipsAdd": "Thêm...",
+    "websiteHeader": {
+      "notifications": "Thông báo",
+      "profile": "Hồ sơ"
+    }
   }
 }

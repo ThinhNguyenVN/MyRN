@@ -10,7 +10,7 @@ const subscribeToWindowDimensions = (onStoreChange: () => void) => {
 const getWindowWidth = () => Dimensions.get('window').width
 const getServerWindowWidth = () => 0
 
-function useWindowWidth(): number {
+export function useWindowWidth(): number {
   return useSyncExternalStore(subscribeToWindowDimensions, getWindowWidth, getServerWindowWidth)
 }
 

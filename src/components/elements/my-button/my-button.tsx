@@ -8,6 +8,12 @@ import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { generateStyles } from './styles'
 
+import {
+  getButtonWidthStyle,
+  isButtonInteractionLocked,
+  shouldRenderButtonLabel,
+  usesOnPrimaryButtonText,
+} from './button-utils'
 import type { MyButtonProps } from './type'
 import MySpinner from '../my-spinner'
 import MyPressable from '../my-pressable'
@@ -28,6 +34,7 @@ const MyButton: React.FC<MyButtonProps> = ({
   left,
   right,
   containerStyle,
+  textColor: textColorProp,
   ...rest
 }) => {
   const { getColor, defaultElevation } = useTheme()
@@ -46,25 +53,23 @@ const MyButton: React.FC<MyButtonProps> = ({
   const hasContainerPropsStyle = Object.keys(containerPropsStyle).length > 0
   const pressableProps = omitContainerProps(rest as Record<string, unknown>)
 
-  const widthStyle: ViewStyle | null = useMemo(() => {
-    switch (width) {
-      case 'full':
-        return { width: '100%', alignSelf: 'stretch', flexShrink: 1 }
-      case 'auto':
-        return { width: 'auto' }
-      default:
-        return { width }
-    }
-  }, [width])
+  const widthStyle: ViewStyle | null = useMemo(() => getButtonWidthStyle(width), [width])
 
   const buttonStyle: ViewStyle[] = [
     styles?.[type],
     size === 'small' ? styles.sizeSmall : styles.sizeLarge,
     ...(widthStyle ? [widthStyle] : []),
   ]
-  const useWhiteText = type === 'primary' || type === 'dark' || type === 'tertiary' || disabled
-  const textColor = useWhiteText ? TEXT_ON_PRIMARY : getColor('text/active/primary')
-  const textStyle = useMemo(() => ({ color: textColor }), [textColor])
+  const useWhiteText = usesOnPrimaryButtonText(type, disabled)
+  const textColor = disabled
+    ? TEXT_ON_PRIMARY
+    : (textColorProp ??
+      (useWhiteText
+        ? TEXT_ON_PRIMARY
+        : type === 'secondary'
+          ? getColor('brand/secondary')
+          : getColor('text/active/primary')))
+  const textStyle = useMemo(() => ({ color: textColor, flexShrink: 0 }), [textColor])
 
   const content = (
     <>
@@ -73,9 +78,11 @@ const MyButton: React.FC<MyButtonProps> = ({
       ) : (
         <>
           {left ?? null}
-          <MyText typography="button" style={textStyle}>
-            {text}
-          </MyText>
+          {shouldRenderButtonLabel(text, loading) ? (
+            <MyText typography="button" style={textStyle}>
+              {text}
+            </MyText>
+          ) : null}
           {right ?? null}
         </>
       )}
@@ -84,14 +91,18 @@ const MyButton: React.FC<MyButtonProps> = ({
 
   const surfaceStyle = [buttonStyle, disabled && styles.disabled, style]
   const touchableStyle = [
-    styles.touchable,
-    ...(width === 'full' && widthStyle ? [widthStyle] : []),
+    width === 'full' ? styles.touchable : null,
+    ...(widthStyle ? [widthStyle] : []),
     ...(hasContainerPropsStyle ? [containerPropsStyle] : []),
     containerStyle,
   ]
 
   return (
-    <MyPressable disabled={disabled || loading} {...pressableProps} style={touchableStyle}>
+    <MyPressable
+      disabled={isButtonInteractionLocked(disabled, loading)}
+      {...pressableProps}
+      style={touchableStyle}
+    >
       <MyView radius="large" elevation={elevation} style={surfaceStyle}>
         {content}
       </MyView>

@@ -7,7 +7,14 @@
     "done": "Done",
     "clear": "Clear",
     "loading": "Loading",
-    "disabled": "Disabled"
+    "disabled": "Disabled",
+    "back": "Back",
+    "comingSoon": "Coming soon"
+  },
+  "pagination": {
+    "summary": "Showing {{from}} to {{to}} of {{total}}",
+    "prev": "Previous page",
+    "next": "Next page"
   },
   "tabs": {
     "home": "Home",
@@ -405,15 +412,56 @@
     "swipeActionFlag": "Flag",
     "swipeActionReply": "Reply",
     "swipeActionMove": "Move",
-    "swipeActionStar": "Star"
+    "swipeActionStar": "Star",
+    "linksStepper": "Stepper",
+    "linksPagination": "Pagination",
+    "linksImagePicker": "Image Picker",
+    "linksWebsiteHeader": "Website Header",
+    "linksExpandableSearch": "Expandable Search",
+    "linksFab": "Floating Action Button",
+    "linksMediaListRow": "Media List Row",
+    "stepperIntro": "Tap steps (allowJump) or use Next/Back.",
+    "stepperStepInfo": "Info",
+    "stepperStepPrice": "Price",
+    "stepperStepImage": "Image",
+    "stepperNext": "Next",
+    "stepperBack": "Back",
+    "stepperActive": "Active step: {{step}}",
+    "paginationIntro": "Shared pagination control for long lists.",
+    "imagePickerIntro": "Pick an image from gallery (web + native).",
+    "imagePickerClear": "Clear",
+    "websiteHeaderIntro": "Desktop page header with optional back + actions.",
+    "websiteHeaderTitle": "Demo page",
+    "expandableSearchIntro": "Header search that expands on press.",
+    "expandableSearchPlaceholder": "Search…",
+    "fabIntro": "Floating action button — tap to toast.",
+    "fabPressed": "FAB pressed",
+    "mediaListRowIntro": "Thumb + title + meta row for lists.",
+    "mediaListRowTitle": "Sample product",
+    "mediaListRowMeta": "SKU-001 · In stock",
+    "textInputNumberFormat": "Number format (locale)",
+    "textInputNumberFormatHint": "Stores canonical digits; displays with grouping.",
+    "imageLockAspectOff": "lockAspectRatio=false (fill box)",
+    "imagePickerEmptyTitle": "Tap to pick an image",
+    "imagePickerEmptyHint": "JPEG, PNG, GIF, WebP · max 5MB. Web: drag & drop works too."
   },
   "components": {
     "datePickOne": "Pick a date",
     "datePickRange": "Pick a date range",
     "dropdownSelect": "Select...",
+    "dropdownSearch": "Search options",
+    "dropdownSearchEmpty": "No matching options",
+    "dropdownEmpty": "No options yet",
+    "dropdownLoading": "Loading...",
+    "dropdownClear": "Clear selection",
+    "drawerOpen": "Open menu",
     "wheelSelect": "Select",
     "imageEmpty": "No image",
     "imageError": "Failed to load image",
-    "chipsAdd": "Add..."
+    "chipsAdd": "Add...",
+    "websiteHeader": {
+      "notifications": "Notifications",
+      "profile": "Profile"
+    }
   }
 }

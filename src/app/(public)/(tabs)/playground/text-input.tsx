@@ -14,6 +14,7 @@ export default function TextInputScreen() {
   const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [amount, setAmount] = useState('1234567.89')
   const [showError, setShowError] = useState(false)
   return (
     <MyKeyboardAvoiding.ScrollView showToolbar contentContainerStyle={styles.screenContent}>
@@ -98,6 +99,15 @@ export default function TextInputScreen() {
           placeholder="editable={false}"
           editable={false}
           value={t('playground.textInputReadOnlyValue')}
+        />
+        <MyTextInput
+          title={t('playground.textInputNumberFormat')}
+          subTitle={t('playground.textInputNumberFormatHint')}
+          placeholder="0"
+          value={amount}
+          onChangeText={setAmount}
+          numberFormat
+          keyboardType="decimal-pad"
         />
       </MyView>
     </MyKeyboardAvoiding.ScrollView>

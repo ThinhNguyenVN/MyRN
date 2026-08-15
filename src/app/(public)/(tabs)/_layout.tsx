@@ -28,7 +28,7 @@ export default function TabLayout() {
       <Tabs tabBar={renderTabBar} screenOptions={screenOptions}>
         {tabScreens.map((item) => (
           <Tabs.Screen
-            key={item.id}
+            key={`public-tab-${item.id}`}
             name={item.id}
             options={{
               title: item.title,
