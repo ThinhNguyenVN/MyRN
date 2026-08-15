@@ -62,6 +62,16 @@ module.exports = defineConfig([
       curly: ['warn', 'all'],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-debugger': 'error',
+      // Prefer stable prefixed list keys — bare key={item.id} is easy to collide across lists.
+      'no-restricted-syntax': [
+        'warn',
+        {
+          selector:
+            "JSXAttribute[name.name='key'] > JSXExpressionContainer > MemberExpression[property.name='id']",
+          message:
+            'Use a stable prefixed list key (e.g. key={`private-tab-${item.id}`}), not bare key={item.id}.',
+        },
+      ],
     },
   },
 

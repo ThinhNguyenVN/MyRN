@@ -40,7 +40,13 @@
       "expo-web-browser",
       "expo-secure-store",
       "expo-localization",
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

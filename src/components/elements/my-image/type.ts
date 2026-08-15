@@ -30,6 +30,11 @@ export interface MyImageProps extends ContainerStyleProps {
   elevation?: MyImageElevation
   cachePolicy?: ImageProps['cachePolicy']
   contentFit?: ImageProps['contentFit']
+  /**
+   * When false, never apply the default 1:1 aspect ratio (e.g. full-bleed previews).
+   * Default: auto — square only when both width and height are unset.
+   */
+  lockAspectRatio?: boolean
   emptyContent?: React.ReactNode
   errorContent?: React.ReactNode
   headers?: Record<string, string>

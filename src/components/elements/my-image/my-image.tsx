@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image, type ImageErrorEventData, type ImageSource } from 'expo-image'
-import { TouchableOpacity, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, type ViewStyle } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import Skeleton from 'react-native-reanimated-skeleton'
 import { useTranslation } from 'react-i18next'
@@ -19,6 +19,13 @@ import { getContainerStyle, pickContainerProps } from '@/utils/styles'
 const FADE_MS = 200
 const CACHE_POLICY = 'memory-disk'
 
+function hasExplicitBox(style: ViewStyle | undefined): boolean {
+  if (!style) {
+    return false
+  }
+  return !isNil(style.width) && !isNil(style.height)
+}
+
 const MyImage: React.FC<MyImageProps> = ({
   style,
   imageStyle,
@@ -35,6 +42,7 @@ const MyImage: React.FC<MyImageProps> = ({
   elevation = 'none',
   cachePolicy = CACHE_POLICY,
   contentFit = 'cover',
+  lockAspectRatio,
   emptyContent,
   errorContent,
   headers,
@@ -178,6 +186,13 @@ const MyImage: React.FC<MyImageProps> = ({
     </>
   )
 
+  const flattenedStyle = StyleSheet.flatten([
+    hasContainerPropsStyle ? containerPropsStyle : null,
+    style,
+  ]) as ViewStyle | undefined
+  const useSquareFallback =
+    lockAspectRatio !== false && (lockAspectRatio === true || !hasExplicitBox(flattenedStyle))
+
   const needsDimensionFallback = useMemo(() => {
     const hasAlignSelf = !isNil(containerPropsStyle.alignSelf)
     const hasWidth = !isNil(containerPropsStyle.width)
@@ -187,6 +202,7 @@ const MyImage: React.FC<MyImageProps> = ({
 
   const containerStyle = [
     styles.container,
+    useSquareFallback ? styles.square : null,
     ...(hasContainerPropsStyle ? [containerPropsStyle] : []),
     needsDimensionFallback && { width: '100%' as const },
     style,

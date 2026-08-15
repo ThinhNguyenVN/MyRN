@@ -30,6 +30,7 @@ Bản liệt kê dài hơn (cùng nội dung): `.cursor/rules.md`.
   - **`type.ts`**: mọi `interface` / `type` / props. Không `export interface` trong `.tsx`.
   - **`styles.ts`**: `generateStyles(theme)` + `useThemedStyles`. Không style inline.
   - **`hooks.ts`**: (nếu có) logic hooks.
+  - **`utils.ts`**: (nếu có) pure helper của kit đó. Helper dùng chung app → `src/utils/`. **Không** tạo file one-off kiểu `get-foo.ts` / `foo-helper.ts` cạnh component.
 
 ```
 my-foo/
@@ -38,6 +39,7 @@ my-foo/
   type.ts
   styles.ts
   hooks.ts       # optional
+  utils.ts       # optional
 ```
 
 ### B) Feature-only UI — `src/features/<feature>/components/`

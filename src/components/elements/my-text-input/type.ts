@@ -3,6 +3,7 @@ import type { TextInput, TextInputProps, StyleProp, TextStyle, ViewStyle } from 
 
 import type { IconColorType } from '@/theme/colors'
 import type { ContainerStyleProps } from '@/types/styles'
+import type { FormatDisplayNumberOptions } from '@/utils/format-display-number'
 
 /** Ref type: exposes all RN TextInput methods (focus, blur, clear, setNativeProps, measure, measureInWindow, measureLayout). */
 export type MyTextInputRef = ComponentRef<typeof TextInput>
@@ -37,7 +38,15 @@ export interface MyTextInputProps
   width?: TextInputWidth
   /** Override height of input row. Khi không truyền: small = auto, large = 100 */
   height?: number
+  /** Hide the input field border (e.g. expandable header search). */
+  borderless?: boolean
   inputStyle?: StyleProp<TextStyle>
   ignoreValue?: boolean
   required?: boolean
+  /**
+   * Format large numbers for display with locale thousands separators
+   * (`1.000.000` vi / `1,000,000` en) and drop trailing fraction zeros.
+   * Form value stays canonical (`1000000` / `1000000.5`, ASCII `.` decimal).
+   */
+  numberFormat?: boolean | FormatDisplayNumberOptions
 }

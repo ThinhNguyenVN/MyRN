@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { Platform, type ColorValue } from 'react-native'
+import { Platform, StyleSheet, type ColorValue } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { BottomTabBar } from 'expo-router/js-tabs'
 
@@ -31,6 +31,28 @@ type UseTabBarArgs = {
   mobileOnly?: boolean
 }
 
+type TabRouteState = {
+  index: number
+  routes: { key: string; name: string; state?: { index?: number; routes?: { name: string }[] } }[]
+}
+
+/** Hide chrome when a tab hosts a nested stack focused on a child (not `index`). */
+function shouldHideTabBar(state: TabRouteState, tabBarStyle: unknown): boolean {
+  const focused = state.routes[state.index]
+  const nested = focused?.state
+  if (nested?.routes && nested.index !== undefined) {
+    const nestedRoute = nested.routes[nested.index]
+    if (nestedRoute && nestedRoute.name !== 'index') {
+      return true
+    }
+  }
+
+  const flat = StyleSheet.flatten(tabBarStyle as object) as
+    | { display?: string; height?: number }
+    | undefined
+  return flat?.display === 'none' || flat?.height === 0
+}
+
 /** Tabs `screenOptions` + custom tab bar. */
 export function useTabBar({ items, openDrawer, mobileOnly = false }: UseTabBarArgs) {
   const { t } = useTranslation()
@@ -44,7 +66,14 @@ export function useTabBar({ items, openDrawer, mobileOnly = false }: UseTabBarAr
 
   const renderTabBar = useCallback(
     (props: React.ComponentProps<typeof BottomTabBar>) => {
-      if (!showChrome) return null
+      if (!showChrome) {
+        return null
+      }
+      const focusedRoute = props.state.routes[props.state.index]
+      const focusedOptions = props.descriptors[focusedRoute.key]?.options
+      if (shouldHideTabBar(props.state as TabRouteState, focusedOptions?.tabBarStyle)) {
+        return null
+      }
       return (
         <ScrollToHideFooter style={styles.tabBarFooter}>
           <BottomTabBar {...props} insets={{ ...props.insets, bottom: 0, top: 0 }} />
@@ -90,7 +119,7 @@ export function useTabBar({ items, openDrawer, mobileOnly = false }: UseTabBarAr
                 type="light"
                 size="small"
                 onPress={openDrawer}
-                accessibilityLabel={t('shell.drawer.open', { defaultValue: 'Open menu' })}
+                accessibilityLabel={t('shell.drawer.open')}
               />
             ) : undefined
           }

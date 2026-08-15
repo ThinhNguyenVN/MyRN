@@ -22,6 +22,7 @@ Treat these as hard requirements — PR review and ESLint will catch slips.
   - **`type.ts`** — all `interface` / `type` / props (never export types from `.tsx`)
   - **`styles.ts`** — `generateStyles(theme)` + `useThemedStyles` (never `StyleSheet.create` / `generateStyles` inside `.tsx`)
   - **`hooks.ts`** — optional
+  - **`utils.ts`** — pure helpers for that kit (or put shared helpers in `src/utils/`). Do **not** invent one-off files like `get-foo.ts` / `foo-helper.ts` beside the component.
 - Product variants in the same kit folder may use `*.styles.ts` (e.g. `private-sidebar.styles.ts`).
 
 ```
@@ -31,6 +32,7 @@ my-foo/
   type.ts
   styles.ts
   hooks.ts       # optional
+  utils.ts       # optional pure helpers
 ```
 
 ### Feature-only UI (`src/features/<feature>/components/`)
