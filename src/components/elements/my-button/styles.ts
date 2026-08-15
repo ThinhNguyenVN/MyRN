@@ -4,18 +4,17 @@ import { StyleSheet } from 'react-native'
 import { ThemeType } from '@/theme/theme-context'
 
 export const BUTTON_SMALL_HEIGHT = 40
-export const BUTTON_LARGE_HEIGHT = 48
+export const BUTTON_LARGE_HEIGHT = 44
 
 export const generateStyles = (theme: ThemeType) => {
   const { getColor, getSpacing, getRadius } = theme
 
   const base: ViewStyle = {
-    borderRadius: Radius.large,
+    borderRadius: Radius.medium,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: getSpacing('x2'),
-    width: '100%',
   }
   const withBorder: ViewStyle = { borderWidth: 1 }
   return StyleSheet.create({
@@ -27,8 +26,8 @@ export const generateStyles = (theme: ThemeType) => {
     secondary: {
       ...base,
       ...withBorder,
-      backgroundColor: '#FFFFFF',
-      borderColor: getColor('fill/active/primary'),
+      backgroundColor: getColor('fill/background/tertiary'),
+      borderColor: getColor('border/inactive/secondary'),
     },
     tertiary: {
       ...base,

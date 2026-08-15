@@ -41,6 +41,8 @@ export interface MyTextInputProps
   /** Hide the input field border (e.g. expandable header search). */
   borderless?: boolean
   inputStyle?: StyleProp<TextStyle>
+  /** Extra styles for the bordered input row (fill, alignment). */
+  inputRowStyle?: StyleProp<ViewStyle>
   ignoreValue?: boolean
   required?: boolean
   /**

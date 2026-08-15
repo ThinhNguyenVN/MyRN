@@ -15,6 +15,8 @@ export interface MyDatePickerProps {
   minDate?: Date
   maxDate?: Date
   title?: string
+  /** Hide the trigger field label when the parent (e.g. MyFormField) already shows it. */
+  hideTitle?: boolean
   error?: boolean
   errorMessage?: string
   required?: boolean

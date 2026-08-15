@@ -84,12 +84,15 @@ Trong feature / screen / hầu hết UI:
 | Card / divider / search | `MyCard`, `MyDivider`, `MySearchInput` |
 | Empty / error / skeleton loading | `MyEmptyState`, `MyErrorState`, `MySkeleton` |
 | Checkbox/radio trong form | `MyFormCheckbox` |
+| Form body scroll (native, field có thể bị bàn phím che) | `MyKeyboardAvoiding.ScrollView` |
 
 Catalog quyết định + props: `.docs/shared-ui-catalog.md`.
 
 Ưu tiên **ContainerStyleProps** (`margin`, `padding`, `gap`, …) trên My* thay vì nhồi vào `style`.
 
 Không bọc `View`/`MyView` chỉ để wrap **một** child không cần thiết.
+
+Form production: wrap **scroll chứa field** bằng `MyKeyboardAvoiding.ScrollView`. **Không** wrap search trên header / toolbar đỉnh list (`ExpandableSearch`, `MySearchInput` trên chrome). Input trong `MyBottomSheet` → `useBottomSheetTextInput`.
 
 ---
 
@@ -158,9 +161,12 @@ Chi tiết: `.docs/data-state-standard.md` + `.cursor/rules/thunk-feature-flow.m
 
 ## Checklist trước khi coi xong task UI
 
-- [ ] Types trong `type.ts`; `index` chỉ re-export
+- [ ] Types trong `type.ts`; `index` chỉ re-export; styles trong `styles.ts` (không `generateStyles` trong `.tsx`)
 - [ ] Không inline style / inline handler trong JSX
+- [ ] List `key` có prefix ổn định (không bare `item.id`)
 - [ ] Dùng My* + token theme; nền `fill/background/…` đúng light/dark
-- [ ] Layout size qua `useIsMobileSize`, không `Platform.OS` cho breakpoint
+- [ ] `isWeb` / `isNil` / `useIsMobileSize` đúng chỗ (không `Platform.OS` cho breakpoint / web flag UI)
 - [ ] Sheet + input: `useBottomSheetTextInput` nếu cần
-- [ ] Không wrapper View thừa; DRY
+- [ ] Form có text input (không phải header search): `MyKeyboardAvoiding.ScrollView` cho body scroll
+- [ ] `app/` mỏng; screen production dưới `features/…/screens`
+- [ ] Không wrapper View thừa; DRY; `yarn lint` sạch lỗi

@@ -5,8 +5,9 @@ import React, {
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from 'react'
-import { LayoutChangeEvent, StyleSheet, useWindowDimensions, View } from 'react-native'
+import { LayoutChangeEvent, useWindowDimensions, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
   Easing,
@@ -17,6 +18,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
+import { isWeb } from '@/constants/dimensions'
 import { useThemedStyles } from '@/theme/theme-context'
 import { triggerHaptic } from '@/utils/haptic'
 import { isNil } from 'lodash'
@@ -35,9 +37,15 @@ import {
   VEL_DELETE,
 } from './constants'
 import { useSwipeableItemOptional } from './swipe-item-context'
+import { SwipeableRowPressProvider } from './swipe-row-press'
 import { SwipeableActionStrip } from './swipeable-action-strip'
 import { generateStyles, stripWidthPx } from './styles'
 import type { SwipeableItemProps, SwipeableItemRef } from './types'
+
+/** Block the synthetic click / Pressable onPress that follows a pan on web. */
+const SUPPRESS_PRESS_AFTER_PAN_MS = 450
+/** Treat row as “open” — tap content closes instead of navigating. */
+const OPEN_PRESS_IGNORE_PX = 8
 
 const hapticDelete = () => {
   triggerHaptic('Medium')
@@ -51,6 +59,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
     const styles = useThemedStyles(generateStyles)
     const { width: windowWidth } = useWindowDimensions()
     const swipeableItem = useSwipeableItemOptional()
+    const [clipWidth, setClipWidth] = useState(0)
 
     const translateX = useSharedValue(0)
     const underlayOpacity = useSharedValue(1)
@@ -121,12 +130,46 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
       notifyPanBeginRef.current()
     }, [])
 
-    const foregroundStyle = useAnimatedStyle(() => ({
-      transform: [{ translateX: translateX.value }],
-    }))
+    const suppressPressUntilRef = useRef(0)
 
-    const underlayWrapStyle = useAnimatedStyle(() => ({
+    const markPressSuppressed = useCallback(() => {
+      suppressPressUntilRef.current = Date.now() + SUPPRESS_PRESS_AFTER_PAN_MS
+    }, [])
+
+    const shouldIgnorePress = useCallback(() => {
+      if (Date.now() < suppressPressUntilRef.current) {
+        return true
+      }
+      // Tap while menu open → close, do not navigate.
+      if (Math.abs(translateX.value) > OPEN_PRESS_IGNORE_PX) {
+        close()
+        markPressSuppressed()
+        return true
+      }
+      return false
+    }, [close, markPressSuppressed, translateX])
+
+    const rowPressValue = useMemo(() => ({ shouldIgnorePress }), [shouldIgnorePress])
+
+    /** Content-only: do not attach to action strips (delete/edit must stay clickable). */
+    const onContentClickCapture = useCallback(
+      (event: { stopPropagation?: () => void; preventDefault?: () => void }) => {
+        if (Date.now() >= suppressPressUntilRef.current) {
+          return
+        }
+        event.preventDefault?.()
+        event.stopPropagation?.()
+      },
+      [],
+    )
+
+    /**
+     * Row is [leftStrip][content][rightStrip]. Rest keeps content flush left by offsetting
+     * -leftStrip; gesture translateX is relative to that rest (0 = closed).
+     */
+    const rowStyle = useAnimatedStyle(() => ({
       opacity: underlayOpacity.value,
+      transform: [{ translateX: translateX.value - leftStripSV.value }],
     }))
 
     const pan = useMemo(() => {
@@ -158,7 +201,9 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
             targetX,
             { duration: DELETE_SLIDE_MS, easing: Easing.out(Easing.cubic) },
             (finished) => {
-              if (finished) runOnJS(runDelete)()
+              if (finished) {
+                runOnJS(runDelete)()
+              }
             },
           )
         }
@@ -205,6 +250,11 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
           rightDelHapticDone.value = 0
           runOnJS(invokeNotifyPanBeginOnJS)()
         })
+        .onStart(() => {
+          'worklet'
+          // Pan activated (past activeOffset) — block the trailing click/press on web.
+          runOnJS(markPressSuppressed)()
+        })
         .onUpdate((e) => {
           'worklet'
           const rw = rowWidth.value
@@ -214,8 +264,12 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
           let next = dragStartX.value + e.translationX
           const maxX = lw > 0 ? lw + COMMIT_EXTRA + preview : 0
           const minX = rsw > 0 ? -(rsw + COMMIT_EXTRA + preview) : 0
-          if (next > maxX) next = maxX
-          if (next < minX) next = minX
+          if (next > maxX) {
+            next = maxX
+          }
+          if (next < minX) {
+            next = minX
+          }
           translateX.value = next
 
           const commitL = lw > 0 ? lw + COMMIT_EXTRA : COMMIT_EXTRA
@@ -247,6 +301,8 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
         .onEnd((e) => {
           'worklet'
           gestureNeedsFinalize.value = 0
+          // Suppress only after an activated pan (onStart already marked). Avoid
+          // blocking taps when the gesture ends without becoming a swipe.
           settle(e.velocityX)
         })
         .onFinalize(() => {
@@ -258,13 +314,13 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
         })
       // SharedValue refs ổn định theo lifetime row; chỉ rebuild gesture khi callback JS đổi identity.
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [invokeNotifyPanBeginOnJS, runDelete])
-
-    const onLayoutForeground = useCallback(
+    }, [invokeNotifyPanBeginOnJS, markPressSuppressed, runDelete])
+    const onLayoutClip = useCallback(
       (ev: LayoutChangeEvent) => {
         const w = ev.nativeEvent.layout.width
         if (w > 0) {
           rowWidth.value = w
+          setClipWidth((prev) => (prev === w ? prev : w))
         }
       },
       [rowWidth],
@@ -278,48 +334,54 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
       [close],
     )
 
+    const contentStyle = useMemo(
+      () => [styles.content, clipWidth > 0 ? { width: clipWidth } : styles.contentFill],
+      [clipWidth, styles.content, styles.contentFill],
+    )
+
+    const measured = clipWidth > 0
+
     return (
       <Animated.View
         entering={SWIPEABLE_ITEM_ROW_ENTERING}
         exiting={SWIPEABLE_ITEM_ROW_EXITING}
         collapsable={false}
       >
-        <View style={styles.root} testID={testID}>
-          <Animated.View
-            style={[StyleSheet.absoluteFillObject, styles.underlayClip, underlayWrapStyle]}
-            pointerEvents="box-none"
-          >
-            <View style={styles.underlayBg} pointerEvents="box-none" />
-            <SwipeableActionStrip
-              actions={leftActions}
-              side="left"
-              rowKey={rowKey}
-              stripPx={leftStripPx}
-              stripStyle={styles.leftStripAbs}
-              translateX={translateX}
-              wrapAction={wrapAction}
-            />
-            <SwipeableActionStrip
-              actions={rightActions}
-              side="right"
-              rowKey={rowKey}
-              stripPx={rightStripPx}
-              stripStyle={styles.rightStripAbs}
-              translateX={translateX}
-              wrapAction={wrapAction}
-            />
-          </Animated.View>
-
-          <GestureDetector gesture={pan}>
-            <Animated.View
-              style={[styles.foreground, foregroundStyle]}
-              onLayout={onLayoutForeground}
-              collapsable={false}
-            >
-              {children}
-            </Animated.View>
-          </GestureDetector>
-        </View>
+        <SwipeableRowPressProvider value={rowPressValue}>
+          <View style={styles.clip} testID={testID} collapsable={false} onLayout={onLayoutClip}>
+            <GestureDetector gesture={pan}>
+              <Animated.View style={[styles.row, rowStyle]} collapsable={false}>
+                {measured ? (
+                  <SwipeableActionStrip
+                    actions={leftActions}
+                    side="left"
+                    rowKey={rowKey}
+                    stripPx={leftStripPx}
+                    stripStyle={[styles.strip, styles.stripLeft]}
+                    wrapAction={wrapAction}
+                  />
+                ) : null}
+                <View
+                  style={contentStyle}
+                  collapsable={false}
+                  {...(isWeb ? { onClickCapture: onContentClickCapture } : null)}
+                >
+                  {children}
+                </View>
+                {measured ? (
+                  <SwipeableActionStrip
+                    actions={rightActions}
+                    side="right"
+                    rowKey={rowKey}
+                    stripPx={rightStripPx}
+                    stripStyle={[styles.strip, styles.stripRight]}
+                    wrapAction={wrapAction}
+                  />
+                ) : null}
+              </Animated.View>
+            </GestureDetector>
+          </View>
+        </SwipeableRowPressProvider>
       </Animated.View>
     )
   },

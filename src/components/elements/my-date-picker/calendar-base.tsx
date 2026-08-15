@@ -48,7 +48,7 @@ export const CalendarBase = memo(function CalendarBase({
       <View style={styles.calendarTableWrap} onLayout={onGridLayout}>
         <View style={styles.weekDayRow}>
           {WEEKDAYS.map((wd) => (
-            <View key={`${wd}-week-day-cell`} style={[styles.weekDayCell, cellStyle]}>
+            <View key={`calendar-weekday-${wd}`} style={[styles.weekDayCell, cellStyle]}>
               <MyText typography="label" color="text/active/primary" style={styles.weekDayText}>
                 {wd}
               </MyText>
@@ -57,7 +57,7 @@ export const CalendarBase = memo(function CalendarBase({
         </View>
         <View style={styles.daysGrid}>
           {rows.map((row, rowIdx) => (
-            <View key={`${rowIdx}-days-row`} style={styles.daysRow}>
+            <View key={`calendar-days-row-${rowIdx}`} style={styles.daysRow}>
               {row.map((cell, cellIdx) => renderCell(cell, rowIdx * COLS + cellIdx))}
             </View>
           ))}

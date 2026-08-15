@@ -76,6 +76,7 @@ src/features/<feature>/components/
 | Card / divider / search | `MyCard`, `MyDivider`, `MySearchInput` |
 | Empty / error / skeleton | `MyEmptyState`, `MyErrorState`, `MySkeleton` |
 
+- Form screens with `MyTextInput` / `MyFormTextInput` that the software keyboard can cover: wrap the **field scroll** in `MyKeyboardAvoiding.ScrollView` (not a raw `ScrollView`). Sticky footer forms: `MyKeyboardAvoiding.Toolbar` as last child of the **full-screen root** (not inside the scroll, not portaled). Do **not** wrap header / list-toolbar search (`ExpandableSearch`, top `MySearchInput`). Sheet inputs: `useBottomSheetTextInput`.
 - Prefer **ContainerStyleProps** (`margin`, `padding`, `gap`, …) on My* over stuffing layout into `style`.
 - Do not wrap a single child in an extra `View`/`MyView` with no layout purpose.
 - Catalog: `.docs/shared-ui-catalog.md`.
@@ -154,5 +155,6 @@ From `eslint.config.js`:
 - [ ] No inline style / inline JSX handlers
 - [ ] Prefixed list keys
 - [ ] My* + theme tokens; `isWeb`/`isNil`/`useIsMobileSize` as applicable
+- [ ] Form body with text inputs: `MyKeyboardAvoiding.ScrollView` (not header search; sheet → `useBottomSheetTextInput`)
 - [ ] Thin `app/` routes; screens under `features/…/screens`
 - [ ] Lint clean (errors fixed)

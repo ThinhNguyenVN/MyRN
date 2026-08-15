@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated'
+import { isNil } from 'lodash'
 import MyPressable from '@/components/elements/my-pressable'
 import MyView from '@/components/elements/my-view'
 import MyIcon from '@/components/elements/my-icon'
@@ -15,8 +16,8 @@ import { Typography } from '@/theme/typography'
 import { ANIMATION_DURATION, generateStyles } from './styles'
 
 function shouldShowChevron(item: SideBarRowProps['item']): boolean {
-  if (item.showChevron !== undefined) return item.showChevron
-  return !!item.href && !item.icon
+  if (!isNil(item.showChevron)) return item.showChevron
+  return Boolean(item.href) && !item.icon
 }
 
 function SideBarItemRow({

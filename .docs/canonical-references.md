@@ -41,6 +41,7 @@ What to copy from `auth`:
 
 - a thin route that redirects and mounts a feature screen
 - a form screen built with `MyForm` and `MyForm*` adapters
+- native form field scroll via `MyKeyboardAvoiding.ScrollView` (`login-screen.container.tsx`; also `todo-form.view.tsx`)
 - thunk-based orchestration when the flow spans API, Redux state, and persistence
 
 ## Canonical feature: `todo`
@@ -95,7 +96,7 @@ Product-kit playground entries (usage catalog only):
 
 - `divider.tsx`, `card.tsx`
 - `empty-state.tsx`, `error-state.tsx`, `skeleton.tsx`
-- `search-input.tsx`, `form.tsx` (includes `MyFormCheckbox`), `checkbox.tsx`
+- `search-input.tsx`, `form.tsx` (includes `MyFormCheckbox` + `MyKeyboardAvoiding.ScrollView`), `checkbox.tsx`, `text-input.tsx`
 - `image-slider.tsx` (slider + fullscreen `ImagePreview`)
 
 Do not use `playground` as the reference for:
@@ -116,4 +117,5 @@ Rule:
 - Did the new code follow `auth` or `todo` when a matching example existed?
 - Was `playground` used only as a usage catalog?
 - Did list/async screens reuse `MySkeleton` / `MyEmptyState` / `MyErrorState` / `MyCard` instead of inventing local equivalents?
+- Did form screens wrap field scroll with `MyKeyboardAvoiding.ScrollView` (and leave header search unwrapped)?
 - Did the contributor avoid copying extra `View` wrappers and loose styling from demo code?

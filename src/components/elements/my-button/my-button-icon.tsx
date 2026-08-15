@@ -8,6 +8,7 @@ import MyIcon from '../my-icon'
 import MySpinner from '../my-spinner'
 import MyPressable from '../my-pressable'
 
+import { isButtonInteractionLocked, usesOnPrimaryButtonText } from './button-utils'
 import { generateStyles } from './styles'
 import type { MyButtonIconProps } from './type'
 
@@ -42,7 +43,7 @@ const MyButtonIcon: React.FC<MyButtonIconProps> = ({
   const hasContainerPropsStyle = Object.keys(containerPropsStyle).length > 0
   const pressableProps = omitContainerProps(rest as Record<string, unknown>)
 
-  const useWhiteIcon = type === 'primary' || type === 'dark' || type === 'tertiary' || disabled
+  const useWhiteIcon = usesOnPrimaryButtonText(type, disabled)
   const iconColor = useWhiteIcon ? TEXT_ON_PRIMARY : getColor('icon/active/primary')
   const iconSize = size === 'small' ? ICON_SIZE_SMALL : ICON_SIZE_LARGE
 
@@ -58,7 +59,11 @@ const MyButtonIcon: React.FC<MyButtonIconProps> = ({
   const touchableStyle = [...(hasContainerPropsStyle ? [containerPropsStyle] : []), containerStyle]
 
   return (
-    <MyPressable disabled={disabled || loading} {...pressableProps} style={touchableStyle}>
+    <MyPressable
+      disabled={isButtonInteractionLocked(disabled, loading)}
+      {...pressableProps}
+      style={touchableStyle}
+    >
       <MyView elevation={elevation} style={surfaceStyle} radius="full">
         {content}
       </MyView>

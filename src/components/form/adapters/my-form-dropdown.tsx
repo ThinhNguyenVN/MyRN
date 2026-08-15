@@ -13,6 +13,7 @@ export type MyFormDropdownProps<TFieldValues extends FieldValues> = Omit<
 > & {
   name: FieldPath<TFieldValues>
   title?: string
+  pickerTitle?: string
   subTitle?: string
   required?: boolean
 }
@@ -20,6 +21,7 @@ export type MyFormDropdownProps<TFieldValues extends FieldValues> = Omit<
 function MyFormDropdownInner<TFieldValues extends FieldValues>({
   name,
   title,
+  pickerTitle,
   subTitle,
   required,
   ...rest
@@ -32,6 +34,8 @@ function MyFormDropdownInner<TFieldValues extends FieldValues>({
     <MyFormField<TFieldValues> name={name} title={title} subTitle={subTitle} required={required}>
       <MyDropdownInput
         {...rest}
+        pickerTitle={pickerTitle ?? title}
+        required={required}
         value={(value as string | string[] | null) ?? null}
         onValueChange={(v) => {
           if (error) clearError?.()

@@ -96,6 +96,7 @@ const MyDatePicker = memo(function MyDatePicker({
   minDate,
   maxDate,
   title,
+  hideTitle = false,
   error = false,
   errorMessage,
   required = false,
@@ -116,6 +117,7 @@ const MyDatePicker = memo(function MyDatePicker({
   const displayText = value ? formatDate(value) : ''
   const resolvedPlaceholder = placeholder ?? t('components.datePickOne')
   const resolvedTitle = title ?? t('components.datePickOne')
+  const triggerTitle = hideTitle ? undefined : resolvedTitle
 
   const renderTrigger = useCallback(
     ({ openPicker, disabled: triggerDisabled, open }: DatePickerTriggerRenderProps) => (
@@ -125,7 +127,7 @@ const MyDatePicker = memo(function MyDatePicker({
         disabled={triggerDisabled}
         displayText={displayText}
         placeholder={resolvedPlaceholder}
-        title={resolvedTitle}
+        title={triggerTitle}
         error={error}
         errorMessage={errorMessage}
         required={required}
@@ -135,7 +137,7 @@ const MyDatePicker = memo(function MyDatePicker({
     [
       displayText,
       resolvedPlaceholder,
-      resolvedTitle,
+      triggerTitle,
       error,
       errorMessage,
       required,

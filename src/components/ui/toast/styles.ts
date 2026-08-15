@@ -42,12 +42,30 @@ export function generateStyles(theme: ThemeType) {
     container: {
       maxWidth: MAX_WIDTH,
       width: '100%',
+      overflow: 'hidden',
       flexDirection: 'row',
       alignItems: 'center',
       padding: getSpacing('x4'),
       borderRadius: Radius.medium,
       backgroundColor: getColor('fill/background/tertiary'),
       gap: getSpacing('x3'),
+    },
+    toastRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '100%',
+      gap: getSpacing('x3'),
+    },
+    toastIcon: {
+      flexShrink: 0,
+    },
+    toastBody: {
+      flex: 1,
+      minWidth: 0,
+      justifyContent: 'center',
+    },
+    toastText: {
+      flexShrink: 1,
     },
     containerInfo: {},
     containerSuccess: {},

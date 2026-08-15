@@ -73,6 +73,7 @@ const MyTextInput = memo(
       onBlur: onBlurProp,
       onChangeText: onChangeTextProp,
       inputStyle,
+      inputRowStyle: inputRowStyleProp,
       ignoreValue,
       required = false,
       numberFormat = false,
@@ -177,11 +178,11 @@ const MyTextInput = memo(
       }
     }, [width])
 
-    const inputRowStyle = useMemo(
+    const inputRowStateStyle = useMemo(
       () => ({
         borderColor: stateColors.border,
         height,
-        ...(borderless ? { borderWidth: 0 } : null),
+        ...(borderless ? { borderWidth: 0, backgroundColor: 'transparent' } : null),
       }),
       [borderless, stateColors.border, height],
     )
@@ -221,7 +222,7 @@ const MyTextInput = memo(
           error={!!error}
           style={styles.title}
         />
-        <MyView style={[styles.inputRow, inputRowStyle]}>
+        <MyView style={[styles.inputRow, inputRowStateStyle, inputRowStyleProp]}>
           {!!startText && (
             <MyText typography="body" color="text/active/secondary">
               {startText}

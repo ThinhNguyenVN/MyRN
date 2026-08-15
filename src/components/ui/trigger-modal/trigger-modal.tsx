@@ -96,6 +96,10 @@ const TriggerModal = memo(function TriggerModal({
 
   const animatedBackdropStyle = useAnimatedStyle(() => ({ opacity: opacity.value }))
 
+  const handleContentLayout = useCallback(() => {
+    setContentReady(true)
+  }, [])
+
   if (!triggerLayout) return null
   if (!visible && !isExiting && !wasVisibleRef.current) return null
 
@@ -108,30 +112,32 @@ const TriggerModal = memo(function TriggerModal({
         style={[StyleSheet.absoluteFillObject, animatedBackdropStyle]}
         pointerEvents={allowPointerEvents ? 'auto' : 'none'}
       >
-        <Pressable style={[StyleSheet.absoluteFillObject, styles.backdrop]} onPress={onClose}>
+        <Pressable style={[StyleSheet.absoluteFillObject, styles.backdrop]} onPress={onClose} />
+        <MyView
+          elevation={'soft/down/small'}
+          radius="medium"
+          style={[
+            styles.panel,
+            panelLayout && {
+              left: panelLayout.left,
+              width: panelLayout.width,
+              top: panelLayout.top,
+              bottom: panelLayout.bottom,
+              maxHeight: Math.max(200, panelLayout.maxHeight),
+            },
+            panelStyle,
+          ]}
+        >
           <MyView
-            elevation={'soft/down/small'}
-            radius="medium"
-            style={[
-              styles.panel,
-              panelLayout && {
-                left: panelLayout.left,
-                width: panelLayout.width,
-                top: panelLayout.top,
-                bottom: panelLayout.bottom,
-                maxHeight: Math.max(200, panelLayout.maxHeight),
-              },
-              panelStyle,
-            ]}
+            style={[styles.contentWrap, contentContainerStyle]}
+            onLayout={handleContentLayout}
           >
-            <MyView style={contentContainerStyle} onLayout={() => setContentReady(true)}>
-              {children}
-            </MyView>
-            {!!footer ? (
-              <View style={[styles.footerWrap, footerContainerStyle]}>{footer}</View>
-            ) : null}
+            {children}
           </MyView>
-        </Pressable>
+          {!!footer ? (
+            <View style={[styles.footerWrap, footerContainerStyle]}>{footer}</View>
+          ) : null}
+        </MyView>
       </Animated.View>
     </Portal>
   )

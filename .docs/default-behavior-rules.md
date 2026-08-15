@@ -111,6 +111,7 @@ Do not add confirmation for harmless or easily reversible actions unless the pro
 
 - Use `MyForm` and `MyForm*` adapters.
 - Prefer `MyFormCheckbox` for checkbox/radio fields (not ad-hoc `MyCheckbox` + `Controller`).
+- Native form body: wrap field scroll with `MyKeyboardAvoiding.ScrollView` so focused inputs stay above the keyboard. Do not wrap header / list-toolbar search. Sheet inputs use `useBottomSheetTextInput`.
 - Validate with `zod`.
 - Trim text input on submit unless whitespace is product-significant.
 - Keep entered values when validation or submit fails.

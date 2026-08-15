@@ -5,6 +5,7 @@ describe('skeleton-utils', () => {
     expect(getSkeletonLayout('listRow')[0]?.key).toBe('title')
     expect(getSkeletonLayout('textBlock').length).toBeGreaterThan(1)
     expect(getSkeletonLayout('card')[0]?.key).toBe('media')
+    expect(getSkeletonLayout('card')).toHaveLength(1)
   })
 
   it('resolves count safely', () => {

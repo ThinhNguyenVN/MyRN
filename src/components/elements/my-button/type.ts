@@ -17,7 +17,7 @@ export interface MyButtonProps extends Omit<
   MyPressableProps,
   'style' | 'children' | 'width' | 'left' | 'right'
 > {
-  text: string
+  text?: string
   style?: StyleProp<ViewStyle>
   disabled?: boolean
   loading?: boolean
@@ -28,6 +28,8 @@ export interface MyButtonProps extends Omit<
   left?: ReactNode
   right?: ReactNode
   containerStyle?: StyleProp<ViewStyle>
+  /** Override label color. Ignored when the button is disabled. */
+  textColor?: string
 }
 
 export interface MyButtonIconProps extends Omit<

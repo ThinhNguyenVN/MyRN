@@ -25,6 +25,8 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Empty list / empty filter | `MyEmptyState` | Blank `View` or title-only without shared empty |
 | Fetch failure + retry | `MyErrorState` | Inline error text without retry affordance |
 | Boolean / checkbox / radio in `MyForm` | `MyFormCheckbox` | `MyCheckbox` + `Controller` ad-hoc in new screens |
+| Form body scroll (native keyboard) | `MyKeyboardAvoiding.ScrollView` | Raw `ScrollView` / `KeyboardAvoidingView` around form fields |
+| Initial list loading (page-level) | `LoadingPlaceholder` (`components/ui/loading-placeholder`) | Ad-hoc `MySkeleton` wrappers per screen |
 | Image carousel + fullscreen preview | `ImageSlider` + `ImagePreview` | Custom pager/zoom unless kit cannot support the case |
 | Pick image from library (web/iOS/Android) | `pickImage` / `buildImageFormData` (`components/ui/image-picker`) | Ad-hoc `<input type="file">` / Files document picker for photos |
 | Image dropzone + preview + clear | `ImagePickerField` (`components/ui/image-picker`) | Feature-only upload boxes that reimplement dashed dropzone UI |
@@ -56,6 +58,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 
 - Path: `@/components/ui/drawer-menu`
 - Edge panel with backdrop fade + slide; props: `visible`, `onClose`, `title`, `subtitle?`, `meta?`, `data`, `onSelected?`, `side?: 'left' \| 'right'` (default `left`), `width?`, `headerContent?`, `footer?`
+- `DrawerProvider` / `useOpenDrawer` for hamburger → open drawer without product chrome
 - Playground: `src/app/(public)/(tabs)/playground/drawer-menu.tsx`
 
 ### `SideBar`
@@ -82,6 +85,13 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 - Pair with `WebsiteHeaderNav` for stack header options; `useComingSoon` backs unwired actions
 - Playground: `…/playground/website-header.tsx`
 
+### `PrivateStackHeader`
+
+- Path: `@/components/ui/private-stack-header`
+- Stack header that switches mobile `NavigationBarHeader` vs desktop `WebsiteHeaderNav`
+- `usePrivateStackHeaders({ fallbackBackHref })` for list vs child screens + optional hamburger via `useOpenDrawer`
+- Product wrappers (`PrivateDrawer` / `PrivateSidebar` with logo + nav) stay in the product
+
 ## List / async UI states
 
 Wire in this order for list-first screens:
@@ -99,6 +109,12 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Props: `preset?: 'listRow' \| 'textBlock' \| 'card'` (default `listRow`), `count?` (default `1`), `isLoading?` (default `true`)
 - Example: `<MySkeleton preset="listRow" count={6} />`
 - Playground: `…/playground/skeleton.tsx`
+
+### `LoadingPlaceholder`
+
+- Path: `@/components/ui/loading-placeholder`
+- Thin page/list loading wrap around `MySkeleton` (`preset`, `count`)
+- Prefer over repeating skeleton layout in each feature screen
 
 ### `MyEmptyState`
 
@@ -120,6 +136,19 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Thin preset on `MyTextInput`: search icon, clear when non-empty, `returnKeyType="search"`; remaining props forward
 - Playground: `…/playground/search-input.tsx`
 
+### `MyDropdownInput`
+
+- Path: `@/components/elements/my-dropdown-input`
+- Single/multi select; searchable list when options are long enough to scroll; Vietnamese-insensitive filter
+- Form adapter: `MyFormDropdown` (`pickerTitle` for sheet heading)
+- Playground: `…/playground/dropdown.tsx`
+
+### `MyButton`
+
+- Path: `@/components/elements/my-button`
+- `width?: number | 'auto' | 'full'`; `text` optional (icon/content-only); `textColor?` when enabled
+- Alert/dialog footers: prefer `width="auto"` so two actions share content width (avoid `width="full"` / `flex:1` in auto-height columns)
+
 ### `ExpandableSearch`
 
 - Path: `@/components/ui/expandable-search`
@@ -132,6 +161,19 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Bind via `name` like other `MyForm*` adapters; supports `MyCheckbox` `type` (`checkbox` / `radio`)
 - Prefer over wiring `MyCheckbox` + RHF manually in new form screens
 - Playground: form demo includes checkbox field (`…/playground/form.tsx`); element-only: `…/playground/checkbox.tsx`
+
+## Keyboard avoiding (form scroll)
+
+### `MyKeyboardAvoiding.ScrollView`
+
+- Path: `@/components/ui/my-keyboard-avoiding`
+- Wrap the **form field scroll** on native so the focused `MyTextInput` / `MyFormTextInput` stays above the software keyboard. Kit falls back to `ScrollView` on web.
+- Canonical: login (`login-screen.container.tsx`), todo form. Playground: `…/playground/form.tsx`, `…/playground/text-input.tsx`.
+- `KeyboardProvider` lives once in `src/app/_layout.tsx` — do not nest another provider in the screen.
+- **Do not wrap:** header / chrome search (`ExpandableSearch`), list-toolbar `MySearchInput` at the top of a list (not covered by the keyboard).
+- **Bottom sheet:** keep `useBottomSheetTextInput` on `MyTextInput`; do not replace the sheet scroller with `MyKeyboardAvoiding.ScrollView`.
+- Sticky form footers stay **outside** the avoiding scroll. Horizontal table scrolls stay RN `ScrollView`.
+- `KeyboardToolbar` (prev/next/done) MUST sit flush on the software keyboard. If the screen has a sticky footer, render `MyKeyboardAvoiding.Toolbar` as the **last child of the full-screen root** (sibling of footer) — not inside the field `ScrollView` (`showToolbar` only when that scroll already fills the window, e.g. login). Do **not** portal the toolbar.
 
 ### `Stepper`
 
@@ -189,6 +231,7 @@ import MyErrorState from '@/components/elements/my-error-state'
 import MySearchInput from '@/components/elements/my-search-input'
 import MySkeleton from '@/components/elements/my-skeleton'
 import { MyFormCheckbox } from '@/components/form'
+import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
 import { ExpandableSearch } from '@/components/ui/expandable-search'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { ImagePickerField, pickImage, buildImageFormData } from '@/components/ui/image-picker'

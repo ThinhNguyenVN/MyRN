@@ -55,6 +55,7 @@ Examples:
 - `Confirmation`
 - `Toast`
 - `SwipeableItem`
+- `MyKeyboardAvoiding`
 - `ScrollToHide`
 - `ImageSlider`, `ImagePreview`
 
@@ -122,6 +123,7 @@ Do not create ad-hoc button styles in production screens when a shared button va
 - Prefer `MyCard` for list/settings row surfaces instead of one-off card StyleSheets.
 - Use `MyDivider` for section separators and `MySearchInput` for search fields.
 - Forms: use `MyFormCheckbox` for checkbox/radio fields bound to `MyForm` (alongside other `MyForm*` adapters).
+- Form field scroll on native: `MyKeyboardAvoiding.ScrollView`. Do not wrap header search. Sheet inputs: `useBottomSheetTextInput`.
 - Full props, playground routes, and import paths: `shared-ui-catalog.md`.
 - Canonical list wiring: `src/features/todo/screens/todo-list.view.tsx`.
 

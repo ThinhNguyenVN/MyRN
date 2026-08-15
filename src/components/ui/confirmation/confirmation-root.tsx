@@ -1,17 +1,19 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Modal, View } from 'react-native'
 
 import MyAlert from '@/components/elements/my-alert'
+import type { MyAlertButtonProp } from '@/components/elements/my-alert'
+import { useThemedStyles } from '@/theme/theme-context'
 
 import type { ConfirmationOptions, ConfirmationRef } from './type'
-
 import { generateStyles } from './styles'
-import { useThemedStyles } from '@/theme/theme-context'
 
 type Resolver = (value: boolean) => void
 
 const ConfirmationRoot = forwardRef<ConfirmationRef, object>(function ConfirmationRoot(_, ref) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const [visible, setVisible] = useState(false)
   const [options, setOptions] = useState<ConfirmationOptions | null>(null)
   const resolverRef = useRef<Resolver | null>(null)
@@ -54,35 +56,40 @@ const ConfirmationRoot = forwardRef<ConfirmationRef, object>(function Confirmati
     resolveOnce(false)
   }, [resolveOnce])
 
-  const handleClose = useCallback(() => {
-    setVisible(false)
-    resolveOnce(false)
-  }, [resolveOnce])
+  if (!options) {
+    return null
+  }
 
-  if (!options) return null
+  const {
+    confirmText,
+    cancelText,
+    buttons: customButtons,
+    hideClose = true,
+    type = 'info',
+    ...alertProps
+  } = options
 
-  const { confirmText, cancelText, buttons: customButtons, hideClose, ...alertProps } = options
-
-  const buttons = customButtons ?? [
-    ...(confirmText
-      ? [{ text: confirmText, type: 'primary' as const, onPress: handleConfirm }]
-      : []),
-    ...(cancelText ? [{ text: cancelText, type: 'tertiary' as const, onPress: handleCancel }] : []),
+  const resolvedCancelText = cancelText ?? t('common.cancel')
+  const confirmType = type === 'error' ? 'tertiary' : 'primary'
+  const buttons: MyAlertButtonProp[] = customButtons ?? [
+    { text: resolvedCancelText, type: 'light', onPress: handleCancel },
+    ...(confirmText ? [{ text: confirmText, type: confirmType, onPress: handleConfirm }] : []),
   ]
 
   return (
     <Modal
       visible={visible}
       transparent
-      animationType={'fade'}
+      animationType="fade"
       statusBarTranslucent
-      onRequestClose={handleClose}
+      onRequestClose={handleCancel}
     >
       <View style={styles.overlay}>
         <MyAlert
           {...alertProps}
+          type={type}
           buttons={buttons}
-          onClose={hideClose ? undefined : handleClose}
+          onClose={hideClose ? undefined : handleCancel}
           style={styles.centered}
         />
       </View>

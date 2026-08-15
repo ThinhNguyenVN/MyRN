@@ -9,8 +9,11 @@ export function generateStyles(theme: ThemeType) {
       flex: 1,
       backgroundColor: getColor('fill/background/secondary'),
     },
-    contentContainer: {
+    scroll: {
       flex: 1,
+    },
+    contentContainer: {
+      flexGrow: 1,
       paddingHorizontal: getSpacing('x4'),
       paddingTop: getSpacing('x4'),
       paddingBottom: (insets.bottom ?? 0) + 100,

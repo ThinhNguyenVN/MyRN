@@ -20,7 +20,13 @@ export function generateStyles(theme: ThemeType) {
     },
 
     footerWrap: {
+      flexShrink: 0,
       paddingTop: getSpacing('x4'),
+    },
+    contentWrap: {
+      width: '100%',
+      minHeight: 0,
+      flexShrink: 1,
     },
   })
 }

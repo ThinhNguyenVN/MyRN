@@ -14,45 +14,42 @@ export function stripWidthPx(actionCount: number) {
   )
 }
 
-export function generateStyles(_: ThemeType) {
+export function generateStyles(theme: ThemeType) {
+  const { getColor, getRadius } = theme
   return StyleSheet.create({
-    root: {
-      overflow: 'visible',
-      position: 'relative',
-    },
-    underlayClip: {
+    /** Clips the trailing/leading action strips until the row is swiped open. */
+    clip: {
       overflow: 'hidden',
-    },
-    underlayBg: {
-      ...StyleSheet.absoluteFillObject,
-    },
-    leftStripAbs: {
-      position: 'absolute',
-      left: 0,
-      top: 0,
-      bottom: 0,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'flex-end',
-      gap: ACTION_GAP,
-      paddingLeft: 0,
-      paddingRight: UNDERLAY_PADDING_X,
-    },
-    rightStripAbs: {
-      position: 'absolute',
-      right: 0,
-      top: 0,
-      bottom: 0,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'flex-end',
-      gap: ACTION_GAP,
-      paddingLeft: UNDERLAY_PADDING_X,
-      paddingRight: 0,
-    },
-    foreground: {
-      zIndex: 2,
       width: '100%',
+      borderRadius: getRadius('large'),
+      backgroundColor: getColor('fill/background/tertiary'),
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'stretch',
+    },
+    content: {
+      flexGrow: 0,
+      flexShrink: 0,
+      backgroundColor: getColor('fill/background/tertiary'),
+    },
+    /** First layout pass before clip width is measured. */
+    contentFill: {
+      width: '100%',
+    },
+    strip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: ACTION_GAP,
+      paddingHorizontal: UNDERLAY_PADDING_X,
+      backgroundColor: getColor('fill/background/tertiary'),
+    },
+    stripLeft: {
+      justifyContent: 'flex-end',
+    },
+    stripRight: {
+      justifyContent: 'flex-start',
     },
   })
 }

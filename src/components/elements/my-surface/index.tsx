@@ -174,7 +174,7 @@ const MySurface: React.FC<MySurfaceProps> = ({
   return (
     <View style={finalContainerStyle} onLayout={onLayout}>
       {needsSvgShadow && (
-        <Svg width={svgWidth} height={svgHeight} style={svgStyle}>
+        <Svg width={svgWidth} height={svgHeight} style={svgStyle} pointerEvents="none">
           <Defs>
             <Filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
               <FeGaussianBlur in="SourceGraphic" stdDeviation={shadowBlur} />

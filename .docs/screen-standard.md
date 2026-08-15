@@ -104,6 +104,9 @@ Form screens should follow this flow:
 3. default values are defined in `types.ts`
 4. view uses `MyForm*` adapters
 5. submit handler is owned by container or a dedicated screen hook
+6. native form body scroll uses `MyKeyboardAvoiding.ScrollView` (not RN `ScrollView`) whenever `MyTextInput` / `MyFormTextInput` can be covered by the keyboard
+
+Do **not** wrap header / list-toolbar search. `MyTextInput` inside `MyBottomSheet` uses `useBottomSheetTextInput`. Sticky footers stay outside the avoiding scroll. Web may keep a plain `ScrollView` (the kit already falls back). Canonical wrap: `login-screen.container.tsx`, `todo-form.view.tsx`.
 
 Expected shape:
 
@@ -177,6 +180,7 @@ Avoid these in new production screens:
 - Does the screen have a clear `container` and `view` split?
 - Is navigation/data orchestration kept out of the `view`?
 - Does the form use `MyForm` and `MyForm*` adapters (including `MyFormCheckbox` when needed)?
+- Does the form body use `MyKeyboardAvoiding.ScrollView` for native text inputs (excluding header search)?
 - Does the list use `MyList` instead of raw list primitives?
 - Does the list use `MySkeleton` / `MyEmptyState` / `MyErrorState` for async states?
 - Does the screen look closer to `auth` or `todo` than to `playground`?
