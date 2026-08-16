@@ -33,6 +33,9 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Edge nav drawer (hamburger menu) | `DrawerMenu` | Ad-hoc `Modal` + absolute panel |
 | App rail (web) | `SideBar` (`card` \| `flush`, icons, header/footer) | One-off left nav View |
 | Bottom tabs (pill active) | `useTabBar` / `TabBarButton` | Raw `tabBarButton` + default RN border/elevation |
+| Form sticky footer (save + extras + amount) | `FormFooterBar` | One-off absolute footer rows |
+| Order line (product / unit / qty / price) | `OrderFormLineEditor` | Feature-only line cards |
+| Desktop table row overflow | `TableRowMoreMenu` | Ad-hoc `TriggerModal` per table |
 
 ## Layout surfaces
 
@@ -140,6 +143,8 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 
 - Path: `@/components/elements/my-dropdown-input`
 - Single/multi select; searchable list when options are long enough to scroll; Vietnamese-insensitive filter
+- `searchable={false}` skips search; `preferSheet` forces a native bottom sheet (~50%) instead of a full-screen picker
+- Optional `imageUrl` on options shows a thumb in the list (`undefined` hides the column; `null` uses placeholder)
 - Form adapter: `MyFormDropdown` (`pickerTitle` for sheet heading)
 - Playground: `…/playground/dropdown.tsx`
 
@@ -221,6 +226,33 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Docked bottom-right `MyButton.Icon`; optional `bottomOffset` above tab bar
 - Playground: `…/playground/floating-action-button.tsx`
 
+### `FormFooterBar`
+
+- Path: `@/components/ui/form-footer-bar`
+- Sticky footer: actions left, optional amount (`FormFooterAmountBar`) right; mobile overflow via More sheet
+- Wizard mode when `onNext` is passed (stacked amount + back/next)
+- Playground: `…/playground/form-footer-bar.tsx`
+
+### `OrderFormLineEditor`
+
+- Path: `@/components/ui/order-form-line`
+- Shared order line: product dropdown (+ thumb), unit (`searchable={false}` + `preferSheet`), qty, unit price, note, remove
+- Bind `items.${index}.*` in `MyForm`; pass generic `products: { id, unit_id? }[]`
+- Playground: `…/playground/order-form-line.tsx`
+
+### `TableRowMoreMenu`
+
+- Path: `@/components/ui/table-row-more-menu`
+- Ellipsis trigger + `TriggerModal` panel of full-width `MyButton` actions
+- Playground: `…/playground/table-row-more-menu.tsx`
+
+### Shared form hooks
+
+- `useFormWizardSteps` (`src/hooks/use-form-wizard-steps.ts`) — create/edit step index + `trigger` per step
+- `useFormEntityImage` (`src/hooks/use-form-entity-image.ts`) — pick / pending / upload / cache-bust display URL
+- `useOrderListExport` (`src/hooks/use-order-list-export.ts`) — filtered PDF/Excel export with cap confirm
+- `useDebouncedValue` (`src/hooks/commons-hooks.ts`)
+
 ## Import cheat sheet
 
 ```ts
@@ -241,6 +273,9 @@ import { MediaListRow } from '@/components/ui/media-list-row'
 import { Pagination } from '@/components/ui/pagination'
 import { Stepper } from '@/components/ui/stepper'
 import { WebsiteHeader } from '@/components/ui/website-header'
+import { FormFooterBar } from '@/components/ui/form-footer-bar'
+import { OrderFormLineEditor } from '@/components/ui/order-form-line'
+import { TableRowMoreMenu } from '@/components/ui/table-row-more-menu'
 import DrawerMenu from '@/components/ui/drawer-menu'
 import SideBar from '@/components/ui/side-bar'
 ```

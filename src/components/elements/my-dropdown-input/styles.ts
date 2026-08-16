@@ -77,6 +77,21 @@ export function generateStyles(theme: ThemeType) {
         minHeight: DROPDOWN_ITEM_SIZE,
         gap: getSpacing('x3'),
       },
+      optionThumb: {
+        width: 36,
+        height: 36,
+        borderRadius: getRadius('small'),
+        overflow: 'hidden',
+        backgroundColor: getColor('fill/background/secondary'),
+      },
+      optionThumbPlaceholder: {
+        width: 36,
+        height: 36,
+        borderRadius: getRadius('small'),
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: getColor('fill/background/secondary'),
+      },
       optionMark: {
         width: 22,
         height: 22,
@@ -195,6 +210,11 @@ export function generateStyles(theme: ThemeType) {
       },
       pickerKeyboardAvoid: {
         flex: 1,
+      },
+      sheetPickerContent: {
+        paddingHorizontal: 0,
+        paddingTop: 0,
+        paddingBottom: (insets.bottom || 0) + getSpacing('x4'),
       },
     }),
   }
