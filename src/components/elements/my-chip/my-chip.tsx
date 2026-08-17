@@ -10,7 +10,45 @@ import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 
 import { generateStyles } from './styles'
-import type { ChipType, MyChipProps } from './type'
+import type { ChipSize, ChipTone, ChipType, MyChipProps } from './type'
+
+function chipSizeStyle(
+  size: ChipSize,
+  styles: ReturnType<typeof generateStyles>,
+): (typeof styles)['sizeMedium'] {
+  if (size === 'xs') {
+    return styles.sizeXs
+  }
+  if (size === 'tag') {
+    return styles.sizeTag
+  }
+  if (size === 'small') {
+    return styles.sizeSmall
+  }
+  return styles.sizeMedium
+}
+
+const TONE_TEXT: Record<
+  ChipTone,
+  'text/active/secondary' | `text/${Exclude<ChipTone, 'neutral'>}/primary`
+> = {
+  neutral: 'text/active/secondary',
+  success: 'text/success/primary',
+  alert: 'text/alert/primary',
+  warning: 'text/warning/primary',
+  info: 'text/info/primary',
+}
+
+const TONE_STYLE: Record<
+  ChipTone,
+  'toneNeutral' | 'toneSuccess' | 'toneAlert' | 'toneWarning' | 'toneInfo'
+> = {
+  neutral: 'toneNeutral',
+  success: 'toneSuccess',
+  alert: 'toneAlert',
+  warning: 'toneWarning',
+  info: 'toneInfo',
+}
 
 const TEXT_ON_PRIMARY = '#ffffff'
 
@@ -22,6 +60,7 @@ function getStyleKey(type: ChipType, selected: boolean): string {
 const MyChip: React.FC<MyChipProps> = ({
   label,
   type = 'filled',
+  tone,
   size = 'medium',
   selected = false,
   disabled = false,
@@ -53,23 +92,28 @@ const MyChip: React.FC<MyChipProps> = ({
 
   const styleKey = getStyleKey(type, selected)
   const surfaceStyle: StyleProp<ViewStyle> = [
-    styles[styleKey as keyof typeof styles] ?? styles.filled,
-    size === 'small' ? styles.sizeSmall : styles.sizeMedium,
+    tone ? styles[TONE_STYLE[tone]] : (styles[styleKey as keyof typeof styles] ?? styles.filled),
+    chipSizeStyle(size, styles),
     disabled ? styles.disabled : undefined,
     style,
   ]
 
   const useWhiteText =
-    (type === 'primary' && !selected) || (selected && (type === 'secondary' || type === 'filled'))
-  const textColor = useWhiteText ? TEXT_ON_PRIMARY : getColor('text/active/primary')
+    !tone &&
+    ((type === 'primary' && !selected) || (selected && (type === 'secondary' || type === 'filled')))
+  const textColor = useWhiteText
+    ? TEXT_ON_PRIMARY
+    : tone
+      ? getColor(TONE_TEXT[tone])
+      : getColor('text/active/primary')
   const textStyle = useMemo(() => ({ color: textColor }), [textColor])
-  const typography = size === 'small' ? 'caption' : 'label'
+  const typography = size === 'medium' ? 'label' : 'caption'
 
   const rightContent = showClose ? (
     <Pressable style={styles.closeTouchable} onPress={onClose} disabled={disabled}>
       <MyIcon
         name="close"
-        size={size === 'small' ? 14 : 18}
+        size={size === 'medium' ? 18 : 14}
         color={useWhiteText ? ('#ffffff' as const) : 'icon/active/primary'}
       />
     </Pressable>

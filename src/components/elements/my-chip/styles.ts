@@ -65,6 +65,48 @@ export function generateStyles(theme: ThemeType) {
       backgroundColor: getColor('fill/active/primary'),
       borderWidth: 0,
     },
+    toneNeutral: {
+      ...base,
+      ...withBorder,
+      backgroundColor: getColor('fill/background/secondary'),
+      borderColor: getColor('border/inactive/tertiary'),
+    },
+    toneSuccess: {
+      ...base,
+      ...withBorder,
+      backgroundColor: getColor('border/success/secondary'),
+      borderColor: getColor('border/success/primary'),
+    },
+    toneAlert: {
+      ...base,
+      ...withBorder,
+      backgroundColor: getColor('border/alert/secondary'),
+      borderColor: getColor('border/alert/primary'),
+    },
+    toneWarning: {
+      ...base,
+      ...withBorder,
+      backgroundColor: getColor('border/warning/secondary'),
+      borderColor: getColor('border/warning/primary'),
+    },
+    toneInfo: {
+      ...base,
+      ...withBorder,
+      backgroundColor: getColor('border/info/secondary'),
+      borderColor: getColor('border/info/primary'),
+    },
+    sizeXs: {
+      minHeight: 18,
+      paddingHorizontal: getSpacing('x1'),
+      paddingVertical: 1,
+      gap: 0,
+    },
+    sizeTag: {
+      minHeight: 22,
+      paddingHorizontal: getSpacing('x2'),
+      paddingVertical: 2,
+      gap: getSpacing('x1'),
+    },
     sizeSmall: {
       height: CHIP_SMALL_HEIGHT,
       paddingHorizontal: getSpacing('x3'),

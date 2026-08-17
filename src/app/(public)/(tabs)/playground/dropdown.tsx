@@ -29,6 +29,7 @@ export default function DropdownScreen() {
   const [dropdownValue, setDropdownValue] = useState<string | null>(null)
   const [dropdownMultiValue, setDropdownMultiValue] = useState<string[]>([])
   const [unitValue, setUnitValue] = useState<string | null>(null)
+  const [fullscreenValue, setFullscreenValue] = useState<string | null>(null)
   const options = dropdownOptions.map((option) => ({
     label: t(option.labelKey),
     value: option.value,
@@ -46,6 +47,9 @@ export default function DropdownScreen() {
   }, [])
   const handleUnitChange = useCallback((v: string | string[]) => {
     setUnitValue(Array.isArray(v) ? (v[0] ?? null) : v)
+  }, [])
+  const handleFullscreenChange = useCallback((v: string | string[]) => {
+    setFullscreenValue(Array.isArray(v) ? (v[0] ?? null) : v)
   }, [])
   const handleDisabledChange = useCallback(() => {}, [])
 
@@ -68,6 +72,15 @@ export default function DropdownScreen() {
         title={t('playground.dropdownSheetTitle')}
         searchable={false}
         preferSheet
+      />
+      <MyDropdownInput
+        options={unitOptions}
+        value={fullscreenValue}
+        onValueChange={handleFullscreenChange}
+        placeholder={t('components.dropdownSelect')}
+        title={t('playground.dropdownFullscreenTitle')}
+        searchable={false}
+        preferFullscreen
       />
       <MyDropdownInput
         options={options}

@@ -33,6 +33,8 @@ export interface MyDropdownInputProps {
   searchable?: boolean
   /** Native: always use a bottom sheet, even when the option list is long. */
   preferSheet?: boolean
+  /** Native: always use the iOS/Android fullscreen picker (wins over `preferSheet`). */
+  preferFullscreen?: boolean
   subTitle?: string
   error?: boolean
   errorMessage?: string

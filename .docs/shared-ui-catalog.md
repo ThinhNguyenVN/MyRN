@@ -31,11 +31,14 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Pick image from library (web/iOS/Android) | `pickImage` / `buildImageFormData` (`components/ui/image-picker`) | Ad-hoc `<input type="file">` / Files document picker for photos |
 | Image dropzone + preview + clear | `ImagePickerField` (`components/ui/image-picker`) | Feature-only upload boxes that reimplement dashed dropzone UI |
 | Edge nav drawer (hamburger menu) | `DrawerMenu` | Ad-hoc `Modal` + absolute panel |
+| Native full-screen picker / filter | `NativeFullscreenModal` | Feature-local `Modal` with one-off iOS/Android padding |
+| Status / tag color | `MyTag` | One-off badge StyleSheets / `MyChip` for status |
 | App rail (web) | `SideBar` (`card` \| `flush`, icons, header/footer) | One-off left nav View |
 | Bottom tabs (pill active) | `useTabBar` / `TabBarButton` | Raw `tabBarButton` + default RN border/elevation |
 | Form sticky footer (save + extras + amount) | `FormFooterBar` | One-off absolute footer rows |
 | Order line (product / unit / qty / price) | `OrderFormLineEditor` | Feature-only line cards |
 | Desktop table row overflow | `TableRowMoreMenu` | Ad-hoc `TriggerModal` per table |
+| Client-side list paging | `useClientListPaging` | Per-feature page/load-more state |
 
 ## Layout surfaces
 
@@ -55,6 +58,13 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 - Playground: `…/playground/card.tsx` (includes elevation cases: `none`, soft/hard)
 - Canonical: `src/features/todo/screens/todo-list.view.tsx` (row surface)
 
+### `MyTag`
+
+- Path: `@/components/elements/my-tag`
+- Pill status label: `tone` `success` \| `neutral` \| `alert` \| `warning` \| `info`; `size` `default` \| `compact`
+- Use for order/history/stock status — do not restyle `MyChip` or duplicate badge StyleSheets
+- Playground: `…/playground/tag.tsx`
+
 ## Navigation chrome
 
 ### `DrawerMenu`
@@ -63,6 +73,13 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 - Edge panel with backdrop fade + slide; props: `visible`, `onClose`, `title`, `subtitle?`, `meta?`, `data`, `onSelected?`, `side?: 'left' \| 'right'` (default `left`), `width?`, `headerContent?`, `footer?`
 - `DrawerProvider` / `useOpenDrawer` for hamburger → open drawer without product chrome
 - Playground: `src/app/(public)/(tabs)/playground/drawer-menu.tsx`
+
+### `NativeFullscreenModal`
+
+- Path: `@/components/ui/native-fullscreen-modal`
+- Native-only full-window picker chrome: iOS `presentationStyle` (`fullScreen` or `pageSheet`), Android full `Modal` + top inset
+- Props: `visible`, `title`, `onClose`, `children`, `presentation?`, `onDismiss?`, `footer?`, `avoidKeyboard?`
+- Used by `MyDropdownInput` (`pageSheet`) and mobile list filters (`fullScreen`)
 
 ### `SideBar`
 
@@ -85,6 +102,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 
 - Path: `@/components/ui/website-header`
 - Desktop page header: title, optional back, notifications + profile actions
+- `right?` slot before notifications; `WebsiteHeaderNav` forwards stack `options.headerRight`
 - Pair with `WebsiteHeaderNav` for stack header options; `useComingSoon` backs unwired actions
 - Playground: `…/playground/website-header.tsx`
 
@@ -143,7 +161,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 
 - Path: `@/components/elements/my-dropdown-input`
 - Single/multi select; searchable list when options are long enough to scroll; Vietnamese-insensitive filter
-- `searchable={false}` skips search; `preferSheet` forces a native bottom sheet (~50%) instead of a full-screen picker
+- `searchable={false}` skips search; `preferSheet` forces a native bottom sheet (~50%); `preferFullscreen` always uses `NativeFullscreenModal` (iOS `pageSheet`, Android full window + status-bar padding) and wins over `preferSheet`
 - Optional `imageUrl` on options shows a thumb in the list (`undefined` hides the column; `null` uses placeholder)
 - Form adapter: `MyFormDropdown` (`pickerTitle` for sheet heading)
 - Playground: `…/playground/dropdown.tsx`
@@ -212,6 +230,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 
 - Path: `@/components/ui/image-picker`
 - `pickImage` + `buildImageFormData` for library pick + multipart; `ImagePickerField` for dropzone UI (web drag-drop)
+- `readOnly` — preview only (no pick, drop, or clear)
 - Playground: `…/playground/image-picker.tsx`
 
 ### `MediaListRow`
@@ -252,6 +271,8 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - `useFormEntityImage` (`src/hooks/use-form-entity-image.ts`) — pick / pending / upload / cache-bust display URL
 - `useOrderListExport` (`src/hooks/use-order-list-export.ts`) — filtered PDF/Excel export with cap confirm
 - `useDebouncedValue` (`src/hooks/commons-hooks.ts`)
+- `useClientListPaging` (`src/hooks/use-client-list-paging.ts`) — web pages / mobile load-more over an in-memory list (default page size 10)
+- Date/id filter helpers (`src/utils/list-filter.ts`) — month ranges, toggle ids, `toApiDateTimeRange`, `singleDropdownValue`
 
 ## Import cheat sheet
 
@@ -262,6 +283,7 @@ import MyEmptyState from '@/components/elements/my-empty-state'
 import MyErrorState from '@/components/elements/my-error-state'
 import MySearchInput from '@/components/elements/my-search-input'
 import MySkeleton from '@/components/elements/my-skeleton'
+import MyTag from '@/components/elements/my-tag'
 import { MyFormCheckbox } from '@/components/form'
 import { MyKeyboardAvoiding } from '@/components/ui/my-keyboard-avoiding'
 import { ExpandableSearch } from '@/components/ui/expandable-search'
@@ -276,6 +298,7 @@ import { WebsiteHeader } from '@/components/ui/website-header'
 import { FormFooterBar } from '@/components/ui/form-footer-bar'
 import { OrderFormLineEditor } from '@/components/ui/order-form-line'
 import { TableRowMoreMenu } from '@/components/ui/table-row-more-menu'
+import { NativeFullscreenModal } from '@/components/ui/native-fullscreen-modal'
 import DrawerMenu from '@/components/ui/drawer-menu'
 import SideBar from '@/components/ui/side-bar'
 ```
