@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { ScrollView } from 'react-native'
 import { useTranslation } from 'react-i18next'
 
@@ -28,26 +28,51 @@ export default function DropdownScreen() {
   const { t } = useTranslation()
   const [dropdownValue, setDropdownValue] = useState<string | null>(null)
   const [dropdownMultiValue, setDropdownMultiValue] = useState<string[]>([])
+  const [unitValue, setUnitValue] = useState<string | null>(null)
   const options = dropdownOptions.map((option) => ({
     label: t(option.labelKey),
     value: option.value,
   }))
+  const unitOptions = useMemo(
+    () => options.slice(0, 4).map((option) => ({ ...option, imageUrl: null as string | null })),
+    [options],
+  )
+
+  const handleSingleChange = useCallback((v: string | string[]) => {
+    setDropdownValue(Array.isArray(v) ? (v[0] ?? null) : v)
+  }, [])
+  const handleMultiChange = useCallback((v: string | string[]) => {
+    setDropdownMultiValue(Array.isArray(v) ? v : [v])
+  }, [])
+  const handleUnitChange = useCallback((v: string | string[]) => {
+    setUnitValue(Array.isArray(v) ? (v[0] ?? null) : v)
+  }, [])
+  const handleDisabledChange = useCallback(() => {}, [])
 
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
       <MyDropdownInput
         options={options}
         value={dropdownValue}
-        onValueChange={(v) => setDropdownValue(Array.isArray(v) ? (v[0] ?? null) : v)}
+        onValueChange={handleSingleChange}
         placeholder={t('playground.dropdownPlaceholderPrimary')}
         title={t('playground.linksDropdown')}
         subTitle={t('playground.dropdownSubTitleMobile')}
         required
       />
       <MyDropdownInput
+        options={unitOptions}
+        value={unitValue}
+        onValueChange={handleUnitChange}
+        placeholder={t('components.dropdownSelect')}
+        title={t('playground.dropdownSheetTitle')}
+        searchable={false}
+        preferSheet
+      />
+      <MyDropdownInput
         options={options}
         value={dropdownValue}
-        onValueChange={(v) => setDropdownValue(Array.isArray(v) ? (v[0] ?? null) : v)}
+        onValueChange={handleSingleChange}
         placeholder={t('components.dropdownSelect')}
         error={!!dropdownValue && dropdownValue === 'a'}
         errorMessage={t('playground.dropdownErrorWhenA')}
@@ -55,7 +80,7 @@ export default function DropdownScreen() {
       <MyDropdownInput
         options={options}
         value={dropdownMultiValue}
-        onValueChange={(v) => setDropdownMultiValue(Array.isArray(v) ? v : [v])}
+        onValueChange={handleMultiChange}
         multiSelect
         placeholder={t('playground.dropdownPlaceholderMulti')}
         title={t('playground.dropdownMultiSelectTitle')}
@@ -63,7 +88,7 @@ export default function DropdownScreen() {
       <MyDropdownInput
         options={options}
         value="b"
-        onValueChange={() => {}}
+        onValueChange={handleDisabledChange}
         placeholder={t('components.dropdownSelect')}
         title={t('common.disabled')}
         disabled

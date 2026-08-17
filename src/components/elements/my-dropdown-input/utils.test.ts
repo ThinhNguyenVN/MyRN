@@ -1,14 +1,23 @@
+import { DROPDOWN_MIN_ITEMS } from './styles'
 import {
+  DROPDOWN_FULLSCREEN_MIN_OPTIONS,
   filterDropdownOptions,
   normalizeDropdownSearchText,
   shouldShowDropdownSearch,
+  shouldUseDropdownBottomSheet,
 } from './utils'
-import { DROPDOWN_MIN_ITEMS } from './styles'
 
 describe('shouldShowDropdownSearch', () => {
   it('shows search only when the list is long enough to scroll', () => {
     expect(shouldShowDropdownSearch(DROPDOWN_MIN_ITEMS)).toBe(false)
     expect(shouldShowDropdownSearch(DROPDOWN_MIN_ITEMS + 1)).toBe(true)
+  })
+})
+
+describe('shouldUseDropdownBottomSheet', () => {
+  it('uses a bottom sheet below the fullscreen option threshold', () => {
+    expect(shouldUseDropdownBottomSheet(DROPDOWN_FULLSCREEN_MIN_OPTIONS - 1)).toBe(true)
+    expect(shouldUseDropdownBottomSheet(DROPDOWN_FULLSCREEN_MIN_OPTIONS)).toBe(false)
   })
 })
 

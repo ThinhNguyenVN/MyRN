@@ -3,9 +3,15 @@ import { DROPDOWN_MIN_ITEMS } from './styles'
 
 export const DROPDOWN_SEARCH_DEBOUNCE_MS = 300
 export const DROPDOWN_SELECT_CLOSE_MS = 80
+/** Native lists this long open a fullscreen picker instead of a bottom sheet. */
+export const DROPDOWN_FULLSCREEN_MIN_OPTIONS = 10
 
 export function shouldShowDropdownSearch(optionCount: number): boolean {
   return optionCount > DROPDOWN_MIN_ITEMS
+}
+
+export function shouldUseDropdownBottomSheet(optionCount: number): boolean {
+  return optionCount < DROPDOWN_FULLSCREEN_MIN_OPTIONS
 }
 
 export function normalizeDropdownSearchText(value: string): string {
