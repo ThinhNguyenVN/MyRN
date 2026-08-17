@@ -1,9 +1,8 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FlatList, Keyboard, Modal, View } from 'react-native'
+import { FlatList, Keyboard, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { isNil } from 'lodash'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
 import { FlashList, type FlashListRef } from '@shopify/flash-list'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
@@ -16,6 +15,7 @@ import MyTextInput from '@/components/elements/my-text-input'
 import type { MyTextInputRef } from '@/components/elements/my-text-input/type'
 import MyView from '@/components/elements/my-view'
 import { ConditionRenderer } from '@/components/ui/condition-renderer'
+import { NativeFullscreenModal } from '@/components/ui/native-fullscreen-modal'
 import { TriggerModal } from '@/components/ui/trigger-modal'
 import { isAndroid, isIos, isWeb } from '@/constants/dimensions'
 import { useDebouncedValue } from '@/hooks/commons-hooks'
@@ -57,6 +57,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
   allowClear: allowClearProp,
   searchable: searchableProp,
   preferSheet = false,
+  preferFullscreen = false,
   style,
 }: MyDropdownInputProps) {
   const styles = useThemedStyles(generateStyles)
@@ -90,7 +91,8 @@ const MyDropdownInput = memo(function MyDropdownInput({
   const isPickerDisabled = disabled || isWaiting
   const waitPlaceholder = loading ? t('components.dropdownLoading') : t('components.dropdownEmpty')
   const searchable = searchableProp ?? shouldShowDropdownSearch(options.length)
-  const liveIsSheet = preferSheet || shouldUseDropdownBottomSheet(options.length)
+  const liveIsSheet =
+    !preferFullscreen && (preferSheet || shouldUseDropdownBottomSheet(options.length))
   const useSheet = isNative && (lockedIsSheet ?? liveIsSheet)
   const allowClear = allowClearProp ?? !required
 
@@ -147,14 +149,14 @@ const MyDropdownInput = memo(function MyDropdownInput({
   }, [open, chevronRotation])
 
   useEffect(() => {
-    if (!open || !searchable || !isWeb) {
+    if (!open || !searchable || useSheet) {
       return
     }
     const timer = setTimeout(() => {
       mobileSearchRef.current?.focus()
     }, 80)
     return () => clearTimeout(timer)
-  }, [open, searchable])
+  }, [open, searchable, useSheet])
 
   const skipDismissRef = useRef(false)
 
@@ -489,42 +491,16 @@ const MyDropdownInput = memo(function MyDropdownInput({
         {trigger}
 
         <ConditionRenderer when={isNative && !useSheet}>
-          <Modal
+          <NativeFullscreenModal
             visible={open}
-            animationType="slide"
-            presentationStyle={isIos ? 'pageSheet' : undefined}
-            onRequestClose={closePicker}
-            onDismiss={isIos ? handleNativeDismiss : undefined}
+            title={pickerHeading}
+            presentation="pageSheet"
+            onClose={closePicker}
+            onDismiss={handleNativeDismiss}
           >
-            <MyView
-              style={isAndroid ? [styles.pickerRoot, styles.pickerRootAndroid] : styles.pickerRoot}
-              backgroundColor="fill/background/primary"
-            >
-              <KeyboardAvoidingView
-                behavior="padding"
-                automaticOffset
-                style={styles.pickerKeyboardAvoid}
-              >
-                <MyView style={styles.pickerHeader} fillParent={false}>
-                  <MyText typography="h3" style={styles.pickerTitle} numberOfLines={1}>
-                    {pickerHeading}
-                  </MyText>
-                  <MyPressable
-                    onPress={closePicker}
-                    haptic={false}
-                    animatedType="opacity"
-                    accessibilityRole="button"
-                    accessibilityLabel={t('common.close')}
-                    style={styles.pickerCloseHit}
-                  >
-                    <MyIcon name="close" size={24} color="icon/active/primary" />
-                  </MyPressable>
-                </MyView>
-                <ConditionRenderer when={searchable}>{mobileSearchField}</ConditionRenderer>
-                {pickerList}
-              </KeyboardAvoidingView>
-            </MyView>
-          </Modal>
+            <ConditionRenderer when={searchable}>{mobileSearchField}</ConditionRenderer>
+            {pickerList}
+          </NativeFullscreenModal>
         </ConditionRenderer>
 
         <ConditionRenderer when={useSheet}>

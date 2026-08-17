@@ -9,6 +9,8 @@ export type WebsiteHeaderProps = {
   onBackPress?: () => void
   onNotificationsPress?: () => void
   onProfilePress?: () => void
+  /** Optional slot before notifications (e.g. stack `headerRight`). */
+  right?: ReactNode
 }
 
 /** Minimal stack state used to detect in-stack back (not parent tab history). */

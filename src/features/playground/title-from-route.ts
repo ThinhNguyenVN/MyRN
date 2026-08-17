@@ -29,6 +29,7 @@ export function titleFromRoute(routeName: string): string {
     'error-state': 'playground.linksErrorState',
     skeleton: 'playground.linksSkeleton',
     'search-input': 'playground.linksSearchInput',
+    tag: 'playground.linksTag',
   }
 
   const mapped = titleKeys[normalizedRouteName]

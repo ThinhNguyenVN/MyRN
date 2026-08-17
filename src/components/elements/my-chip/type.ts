@@ -7,13 +7,17 @@ import type { MyPressableProps } from '../my-pressable'
 
 export type ChipType = 'primary' | 'secondary' | 'outlined' | 'filled'
 
-export type ChipSize = 'small' | 'medium'
+/** Status / tag colors. When set, overrides `type` surface colors. */
+export type ChipTone = 'neutral' | 'success' | 'alert' | 'warning' | 'info'
+
+export type ChipSize = 'xs' | 'tag' | 'small' | 'medium'
 
 export type ChipElevation = ElevationToken | 'none'
 
 export interface MyChipProps extends Omit<MyPressableProps, 'children'> {
   label: string
   type?: ChipType
+  tone?: ChipTone
   size?: ChipSize
   selected?: boolean
   disabled?: boolean

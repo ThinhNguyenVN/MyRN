@@ -43,11 +43,13 @@ function ImagePickerFieldComponent({
   onImagePicked,
   onPickError,
   pickOptions,
+  readOnly = false,
 }: ImagePickerFieldProps) {
   const styles = useThemedStyles(generateStyles)
   const { getColor } = useTheme()
   const hasPreview = Boolean(imageUri)
-  const showClear = hasPreview && !isUploading
+  const showClear = hasPreview && !isUploading && !readOnly
+  const dropHandler = readOnly ? undefined : onImagePicked
   const dragProgress = useSharedValue(0)
 
   const idleBorder = getColor('border/inactive/secondary')
@@ -57,13 +59,13 @@ function ImagePickerFieldComponent({
 
   const handleDroppedImage = useCallback(
     (image: PickedImage) => {
-      onImagePicked?.(image)
+      dropHandler?.(image)
     },
-    [onImagePicked],
+    [dropHandler],
   )
 
   const { isDragging, hostRef } = useImageDropZone({
-    disabled: isUploading || !onImagePicked,
+    disabled: isUploading || readOnly || !dropHandler,
     pickOptions,
     onImagePicked: handleDroppedImage,
     onError: onPickError,
@@ -93,7 +95,7 @@ function ImagePickerFieldComponent({
             hasPreview || isUploading ? styles.dropzonePressableFilled : styles.dropzonePressable
           }
           onPress={onPick}
-          disabled={isUploading}
+          disabled={isUploading || readOnly}
         >
           <ConditionRenderer when={hasPreview}>
             <View style={styles.preview} pointerEvents="none">

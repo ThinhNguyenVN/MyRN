@@ -40,6 +40,8 @@ export type ImagePickerFieldProps = {
   onPick: () => void
   /** Clears the current preview. */
   onClear: () => void
+  /** Preview only: no pick, drop, or clear. */
+  readOnly?: boolean
   /**
    * Web drag-and-drop: called with a validated {@link PickedImage}.
    * When omitted, drop is ignored (click-to-pick still works).

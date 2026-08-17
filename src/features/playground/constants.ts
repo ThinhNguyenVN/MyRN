@@ -4,6 +4,7 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string }[] = [
   { labelKey: 'playground.linksForm', href: '/playground/form' },
   { labelKey: 'playground.linksButtons', href: '/playground/buttons' },
   { labelKey: 'playground.linksChips', href: '/playground/chips' },
+  { labelKey: 'playground.linksTag', href: '/playground/tag' },
   { labelKey: 'playground.linksCheckbox', href: '/playground/checkbox' },
   { labelKey: 'playground.linksSwitch', href: '/playground/switch' },
   { labelKey: 'playground.linksDropdown', href: '/playground/dropdown' },

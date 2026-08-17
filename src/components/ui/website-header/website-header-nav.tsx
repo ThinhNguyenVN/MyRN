@@ -42,11 +42,14 @@ const WebsiteHeaderNav: React.FC<WebsiteHeaderNavProps & WebsiteHeaderNavExtraPr
     }
   }, [fallbackBackHref, navigation, stackCanGoBack])
 
+  const right = options?.headerRight?.({ canGoBack })
+
   return (
     <WebsiteHeader
       title={title}
       showBack={showBack}
       onBackPress={showBack ? handleBack : undefined}
+      right={right}
     />
   )
 }

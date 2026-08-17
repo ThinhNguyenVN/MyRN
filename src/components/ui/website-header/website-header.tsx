@@ -16,6 +16,7 @@ function WebsiteHeaderComponent({
   onBackPress,
   onNotificationsPress,
   onProfilePress,
+  right,
 }: WebsiteHeaderProps) {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
@@ -46,6 +47,7 @@ function WebsiteHeaderComponent({
         </MyText>
       </MyView>
       <MyView style={styles.actions}>
+        {right}
         <MyButton.Icon
           icon="notifications-outline"
           type="light"
