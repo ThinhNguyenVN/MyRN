@@ -1,6 +1,7 @@
 import type { ComponentProps, ReactNode, RefObject } from 'react'
 import type { StyleProp, View, ViewStyle } from 'react-native'
 import type { Ionicons } from '@expo/vector-icons'
+import type { SharedValue } from 'react-native-reanimated'
 import type { ElevationToken } from '@/theme/elevation'
 
 export type SideBarIconName = ComponentProps<typeof Ionicons>['name']
@@ -16,6 +17,8 @@ export interface SideBarItem {
    * (playground). Product icon rows typically omit the chevron.
    */
   showChevron?: boolean
+  /** Non-interactive section header row. */
+  kind?: 'link' | 'section'
 }
 
 export type SideBarVariant = 'card' | 'flush'
@@ -36,6 +39,10 @@ export interface SideBarProps {
   variant?: SideBarVariant
   /** Override sliding highlight fill (e.g. product Stitch CTA blue). */
   highlightColor?: string
+  /** Icon-only rail (product web compact). */
+  collapsed?: boolean
+  /** 0 = expanded, 1 = collapsed — drives width/label animation without layout jumps. */
+  collapseProgress?: SharedValue<number>
 }
 
 export interface SideBarRowProps {
@@ -45,4 +52,5 @@ export interface SideBarRowProps {
   onSelected: () => void
   containerRef?: RefObject<View | null>
   onMeasureLayout?: (index: number, y: number, height: number) => void
+  collapseProgress: SharedValue<number>
 }

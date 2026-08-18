@@ -85,7 +85,10 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 
 - Path: `@/components/ui/side-bar`
 - Sliding highlight nav list; `variant?: 'card' \| 'flush'`; optional `icon` / `iconFocused`, `header`, `footer`, `highlightColor`
-- Used by playground layout rail; product flush rail for authenticated chrome
+- Collapse: `collapsed?` + optional `collapseProgress` SharedValue; width `SIDEBAR_COLLAPSED_WIDTH` (72). Section rows: `kind: 'section'`
+- `SidebarCollapseToggle` — circular chevron chip for product rails (props: `collapsed`, `onPress`, `accessibilityLabel`)
+- Auto-collapse helper: `BREAKPOINT_SIDEBAR_COMPACT` (1200) in `@/constants/dimensions`
+- Used by playground layout rail; product flush rail for authenticated chrome (`PrivateSidebar` stays in the product)
 
 ### `Tab bar` (`useTabBar` / `TabBarButton`)
 
@@ -123,6 +126,20 @@ Wire in this order for list-first screens:
 4. Success with items → list content (`MyList` + row UI)
 
 Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
+
+### `MyList`
+
+- Path: `@/components/ui/my-list`
+- FlashList/FlatList wrapper with pull-to-refresh arc + optional scroll-to-hide binding (`useScrollToHideScrollBinding`)
+- `PullToRefreshScrollView` — same refresh chrome for non-list `ScrollView` screens
+- Playground: `…/playground/my-list`
+
+### `ScrollToHide`
+
+- Path: `@/components/ui/scroll-to-hide`
+- Hide header/tab bar on scroll: `ScrollToHideProvider` + `ScrollToHideHeader` / `Footer`
+- `useScrollToHideScrollBinding` — lists register without wrapping `ScrollToHideContent`
+- `ScrollToHideInset` — animated padding when header/footer is `position: absolute`
 
 ### `MySkeleton`
 

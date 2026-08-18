@@ -3,6 +3,23 @@ import { StyleSheet } from 'react-native'
 
 export const SIDEBAR_WIDTH = 260
 export const SIDEBAR_FLUSH_WIDTH = 248
+export const SIDEBAR_COLLAPSED_WIDTH = 72
+export const SIDEBAR_PADDING = 12
+/** Active pill horizontal inset — expanded uses theme x4 (16px). */
+export const SIDEBAR_HIGHLIGHT_INSET_EXPANDED = 16
+/** Space between pill edge and icon/label when expanded (theme x4). */
+export const SIDEBAR_ITEM_INNER_PADDING_EXPANDED = 16
+/** Collapsed pill width (icon 22px + inner breathing room). Inset is derived to center it. */
+export const SIDEBAR_COLLAPSED_ACTIVE_PILL_WIDTH = 40
+export const SIDEBAR_ITEM_PADDING_EXPANDED =
+  SIDEBAR_HIGHLIGHT_INSET_EXPANDED + SIDEBAR_ITEM_INNER_PADDING_EXPANDED
+export const SIDEBAR_LIST_WIDTH_EXPANDED = SIDEBAR_FLUSH_WIDTH - SIDEBAR_PADDING * 2
+export const SIDEBAR_LIST_WIDTH_COLLAPSED = SIDEBAR_COLLAPSED_WIDTH - SIDEBAR_PADDING * 2
+export const SIDEBAR_HIGHLIGHT_INSET_COLLAPSED =
+  (SIDEBAR_LIST_WIDTH_COLLAPSED - SIDEBAR_COLLAPSED_ACTIVE_PILL_WIDTH) / 2
+export const SIDEBAR_HIGHLIGHT_WIDTH_EXPANDED =
+  SIDEBAR_LIST_WIDTH_EXPANDED - SIDEBAR_HIGHLIGHT_INSET_EXPANDED * 2
+export const SIDEBAR_ITEM_PADDING_COLLAPSED = (SIDEBAR_LIST_WIDTH_COLLAPSED - 22) / 2
 export const ITEM_ROW_HEIGHT = 44
 export const ANIMATION_DURATION = 350
 export const HIGHLIGHT_ANIMATION_DURATION = Math.round(ANIMATION_DURATION * 1.25)
@@ -14,8 +31,14 @@ export function generateStyles(theme: ThemeType) {
       zIndex: 2,
     },
     sidebarOuterFlush: {
+      position: 'relative',
       zIndex: 2,
       height: '100%',
+      overflow: 'visible',
+    },
+    sidebarRailAnimated: {
+      height: '100%',
+      overflow: 'hidden',
     },
 
     sidebar: {
@@ -30,12 +53,11 @@ export function generateStyles(theme: ThemeType) {
     },
     sidebarFlush: {
       flex: 1,
-      margin: 0,
-      width: SIDEBAR_FLUSH_WIDTH,
+      width: '100%',
       backgroundColor: getColor('fill/background/tertiary'),
       paddingTop: Math.max(insets.top ?? 0, getSpacing('x4')),
       paddingBottom: Math.max(insets.bottom ?? 0, getSpacing('x4')),
-      paddingHorizontal: getSpacing('x3'),
+      paddingHorizontal: SIDEBAR_PADDING,
       borderWidth: 0,
       borderRightWidth: StyleSheet.hairlineWidth,
       borderRightColor: getColor('border/inactive/secondary'),
@@ -56,24 +78,46 @@ export function generateStyles(theme: ThemeType) {
     listContent: {
       flex: 1,
       paddingVertical: getSpacing('x1'),
-      zIndex: 1,
+    },
+
+    sectionLabel: {
+      paddingHorizontal: getSpacing('x3'),
+      color: getColor('text/inactive/primary'),
+      overflow: 'hidden',
+    },
+
+    sectionLayer: {
+      zIndex: 0,
+    },
+
+    itemLayer: {
+      position: 'relative',
+      zIndex: 2,
     },
 
     itemRow: {
+      position: 'relative',
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: getSpacing('x4'),
+      height: ITEM_ROW_HEIGHT,
       minHeight: ITEM_ROW_HEIGHT,
       width: '100%',
       gap: getSpacing('x3'),
+      overflow: 'hidden',
     },
-    itemRowFlush: {
-      paddingHorizontal: getSpacing('x3'),
+    itemRowLabelWrap: {
+      position: 'absolute',
+      left: 34,
+      right: 0,
+      height: ITEM_ROW_HEIGHT,
+      justifyContent: 'center',
+      overflow: 'hidden',
+    },
+    itemRowLabelWrapWithChevron: {
+      right: 28,
     },
     itemRowLabel: {
-      flex: 1,
-      flexGrow: 1,
-      width: '100%',
+      flexShrink: 0,
     },
     itemRowLeading: {
       width: 22,
@@ -94,10 +138,9 @@ export function generateStyles(theme: ThemeType) {
     highlight: {
       position: 'absolute',
       top: 0,
-      left: getSpacing('x2'),
-      right: getSpacing('x2'),
       borderRadius: getRadius('medium'),
-      zIndex: 0,
+      zIndex: 1,
+      height: ITEM_ROW_HEIGHT,
       minHeight: ITEM_ROW_HEIGHT,
       backgroundColor: getColor('fill/active/primary'),
     },

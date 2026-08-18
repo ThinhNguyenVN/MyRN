@@ -1,4 +1,6 @@
 export { MyList } from './my-list'
+export { PullToRefreshScrollView } from './pull-to-refresh-scroll-view'
+export type { PullToRefreshScrollViewProps } from './pull-to-refresh-scroll-view'
 export type {
   MyListProps,
   MyListRef,

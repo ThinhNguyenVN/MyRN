@@ -1,52 +1,33 @@
-import React, { cloneElement, isValidElement, useEffect } from 'react'
-import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+import React, { cloneElement, isValidElement } from 'react'
 
-import { useScrollToHide } from './context'
 import type { ScrollToHideContentProps } from './types'
-import { useThemedStyles } from '@/theme/theme-context'
-import { generateStyles } from './styles'
+import { useScrollToHideScrollBinding } from './hooks'
+import { ScrollToHideInset } from './scroll-to-hide-inset'
 
 export function ScrollToHideContent({
   children,
   scrollEventThrottle = 16,
 }: ScrollToHideContentProps) {
-  const styles = useThemedStyles(generateStyles)
-  const ctx = useScrollToHide()
-  if (ctx && isValidElement(children)) {
-    ctx.childOnScrollRef.current = (children as React.ReactElement<any>).props?.onScroll
-  }
+  const childOnScroll = isValidElement(children)
+    ? (children as React.ReactElement<{ onScroll?: (event: unknown) => void }>).props?.onScroll
+    : undefined
 
-  useEffect(() => {
-    ctx?.register()
-    return () => ctx?.unregister()
-  }, [ctx])
+  const scrollBinding = useScrollToHideScrollBinding({
+    enabled: true,
+    onScroll: childOnScroll,
+    scrollEventThrottle,
+  })
 
-  const hideProgress = ctx?.hideProgress
-  const measuredHeaderHeight = ctx?.measuredHeaderHeight
-  const measuredFooterHeight = ctx?.measuredFooterHeight
-
-  const animatedPaddingStyle = useAnimatedStyle(() => {
-    'worklet'
-    if (!hideProgress) return { paddingTop: 0, paddingBottom: 0 }
-    const p = hideProgress.value
-    const top = (measuredHeaderHeight?.value ?? 0) * (1 - p)
-    const bottom = (measuredFooterHeight?.value ?? 0) * (1 - p)
-    return {
-      paddingTop: top,
-      paddingBottom: bottom,
-    }
-  }, [hideProgress, measuredHeaderHeight, measuredFooterHeight])
-
-  if (!ctx || !isValidElement(children)) {
+  if (!scrollBinding.isActive || !isValidElement(children)) {
     return <>{children}</>
   }
 
   return (
-    <Animated.View style={[styles.content, animatedPaddingStyle]}>
-      {cloneElement(children as React.ReactElement<any>, {
-        onScroll: ctx.animatedScrollHandler,
-        scrollEventThrottle,
+    <ScrollToHideInset>
+      {cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+        onScroll: scrollBinding.onScroll,
+        scrollEventThrottle: scrollBinding.scrollEventThrottle,
       })}
-    </Animated.View>
+    </ScrollToHideInset>
   )
 }

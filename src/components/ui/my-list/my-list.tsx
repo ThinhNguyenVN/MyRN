@@ -15,7 +15,7 @@ import { generateStyles } from './styles'
 import { RefreshIndicator } from './refresh-indicator'
 import { PULL_TO_REFRESH_OVERSCROLL_THRESHOLD } from './constants'
 import { usePullToRefresh } from './use-pull-to-refresh'
-import { useScrollToHide } from '../scroll-to-hide'
+import { useScrollToHideScrollBinding } from '../scroll-to-hide'
 import { isWeb } from '@/constants/dimensions'
 
 const DEFAULT_DRAW_DISTANCE = 500
@@ -78,9 +78,6 @@ function MyListInner<T>(
   const pullScrollRef = useRef(pullToRefresh.scrollProps)
   pullScrollRef.current = pullToRefresh.scrollProps
 
-  const scrollToHideCtx = useScrollToHide()
-  const hasScrollToHide = !isNil(scrollToHideCtx)
-
   const wrappedFlashRenderItem = useCallback(
     (info: FlashListRenderItemInfo<T>) => renderItem({ item: info.item, index: info.index }),
     [renderItem],
@@ -122,21 +119,27 @@ function MyListInner<T>(
     [hasPullToRefresh, userOnScrollEndDrag],
   )
 
-  if (hasScrollToHide && hasPullToRefresh) {
-    scrollToHideCtx.childOnScrollRef.current = handleScroll
-  }
+  const listScrollThrottle = hasPullToRefresh
+    ? pullToRefresh.scrollProps.scrollEventThrottle
+    : scrollEventThrottle
+
+  const scrollBinding = useScrollToHideScrollBinding({
+    enabled: true,
+    onScroll: handleScroll,
+    onScrollBeginDrag: handleScrollBeginDrag,
+    onScrollEndDrag: handleScrollEndDrag,
+    scrollEventThrottle: listScrollThrottle,
+  })
+  const hasScrollToHide = scrollBinding.isActive
 
   const needsAnimatedFlashList = hasScrollToHide && !enableLayoutAnimated
 
   const needsJsCallback = hasPullToRefresh || (isWeb && onScrollEnd)
-  let scrollProp: any
-  if (hasScrollToHide && hasPullToRefresh) {
-    scrollProp = scrollToHideCtx.animatedScrollHandler
-  } else if (needsJsCallback) {
-    scrollProp = handleScroll
-  } else {
-    scrollProp = onScroll
-  }
+  const scrollProp = scrollBinding.isActive
+    ? scrollBinding.onScroll
+    : needsJsCallback
+      ? handleScroll
+      : onScroll
 
   useEffect(() => {
     return () => {
@@ -163,10 +166,6 @@ function MyListInner<T>(
     [hasPullToRefresh, pullToRefresh.refreshControlProps],
   )
 
-  const listScrollThrottle = hasPullToRefresh
-    ? pullToRefresh.scrollProps.scrollEventThrottle
-    : scrollEventThrottle
-
   const safeData = data ?? (EMPTY_ARRAY as T[])
   const safeRef = !isNil(ref) ? ref : undefined
 
@@ -181,12 +180,12 @@ function MyListInner<T>(
     ListFooterComponent,
     onEndReached,
     onEndReachedThreshold,
-    scrollEventThrottle: listScrollThrottle,
+    scrollEventThrottle: scrollBinding.scrollEventThrottle,
     contentContainerStyle: contentStyle,
     style,
     onScroll: scrollProp,
-    onScrollBeginDrag: handleScrollBeginDrag,
-    onScrollEndDrag: handleScrollEndDrag,
+    onScrollBeginDrag: scrollBinding.onScrollBeginDrag,
+    onScrollEndDrag: scrollBinding.onScrollEndDrag,
     ...(hasPullToRefresh && refreshControlEl ? { refreshControl: refreshControlEl } : {}),
     ...rest,
   }
@@ -203,12 +202,12 @@ function MyListInner<T>(
     ListFooterComponent,
     onEndReached: onEndReached ?? undefined,
     onEndReachedThreshold: onEndReachedThreshold ?? undefined,
-    scrollEventThrottle: listScrollThrottle,
+    scrollEventThrottle: scrollBinding.scrollEventThrottle,
     contentContainerStyle: contentStyle,
     style,
     onScroll: scrollProp,
-    onScrollBeginDrag: handleScrollBeginDrag,
-    onScrollEndDrag: handleScrollEndDrag,
+    onScrollBeginDrag: scrollBinding.onScrollBeginDrag,
+    onScrollEndDrag: scrollBinding.onScrollEndDrag,
     itemLayoutAnimation: LIST_ITEM_LAYOUT,
     ...(hasPullToRefresh && refreshControlEl ? { refreshControl: refreshControlEl } : {}),
     ...restForFlatList,
@@ -232,7 +231,7 @@ function MyListInner<T>(
       {list}
       <RefreshIndicator
         pullDistance={pullToRefresh.pullDistance}
-        refreshing={pullToRefresh.refreshingForPullIndicator}
+        refreshing={pullToRefresh.refreshing}
         threshold={PULL_TO_REFRESH_OVERSCROLL_THRESHOLD}
         fixedLayoutSlotHeight={
           pullToRefresh.iosListTopInset > 0 ? pullToRefresh.iosListTopInset : undefined

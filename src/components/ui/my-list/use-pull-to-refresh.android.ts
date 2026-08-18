@@ -32,8 +32,13 @@ export function usePullToRefresh({
   const hapticFiredRef = useRef(false)
   const wasRefreshingRef = useRef(false)
   const androidPullAccumRef = useRef(0)
+  const pullRefreshChromeActiveRef = useRef(false)
   const onRefreshRef = useRef(onRefresh)
   onRefreshRef.current = onRefresh
+
+  useEffect(() => {
+    pullRefreshChromeActiveRef.current = pullRefreshChromeActive
+  }, [pullRefreshChromeActive])
 
   useEffect(() => {
     if (!refreshing) return
@@ -80,7 +85,12 @@ export function usePullToRefresh({
       const y = getScrollOffsetY(e)
       if (y === undefined) return
 
-      if (!refreshing && y > PULL_TO_REFRESH_ANDROID_CLEAR_BELOW_Y) {
+      if (
+        !refreshing &&
+        !pullRefreshChromeActiveRef.current &&
+        progress.value < 1 &&
+        y > PULL_TO_REFRESH_ANDROID_CLEAR_BELOW_Y
+      ) {
         androidPullAccumRef.current = 0
         pullDistance.value = 0
         progress.value = 0
@@ -113,11 +123,17 @@ export function usePullToRefresh({
   const onScrollEndDrag = useCallback<PullToRefreshScrollProps['onScrollEndDrag']>(() => {
     draggingRef.current = false
     hapticFiredRef.current = false
-    androidPullAccumRef.current = 0
-    if (!refreshing) {
-      progress.value = withTiming(0, { duration: 200 })
-      pullDistance.value = withTiming(0, { duration: 200 })
+    if (refreshing) return
+    const readyToRefresh = progress.value >= 1
+    if (readyToRefresh) {
+      setPullRefreshChromeActive(true)
+      pullDistance.value = Math.max(pullDistance.value, PULL_TO_REFRESH_OVERSCROLL_THRESHOLD)
+      progress.value = 1
+      return
     }
+    androidPullAccumRef.current = 0
+    progress.value = withTiming(0, { duration: 200 })
+    pullDistance.value = withTiming(0, { duration: 200 })
   }, [refreshing, progress, pullDistance])
 
   const scrollProps = useMemo<PullToRefreshScrollProps>(

@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import MyText from '@/components/elements/my-text'
 import { MyList } from '@/components/ui/my-list'
 import type { ListRenderItemInfo } from '@/components/ui/my-list'
-import { ScrollToHideContent } from '@/components/ui/scroll-to-hide'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { useMyListData, type Post } from '@/features/playground/my-list/hooks'
@@ -59,25 +58,23 @@ export default function MyListPlaygroundScreen() {
   }, [loading, styles.footer, styles.skeletonListContainer, t])
 
   return (
-    <ScrollToHideContent scrollEventThrottle={16}>
-      <MyList<Post>
-        data={list}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        ListEmptyComponent={listEmpty}
-        ListFooterComponent={listFooter}
-        style={styles.list}
-        contentContainerStyle={styles.listContent}
-        refreshing={refreshing}
-        onRefresh={() => {
-          setRefreshing(true)
-          setTimeout(() => {
-            setRefreshing(false)
-          }, 3000)
-        }}
-        onEndReached={hasMore && !loading && !loadingMore ? loadMore : undefined}
-        onEndReachedThreshold={0.5}
-      />
-    </ScrollToHideContent>
+    <MyList<Post>
+      data={list}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      ListEmptyComponent={listEmpty}
+      ListFooterComponent={listFooter}
+      style={styles.list}
+      contentContainerStyle={styles.listContent}
+      refreshing={refreshing}
+      onRefresh={() => {
+        setRefreshing(true)
+        setTimeout(() => {
+          setRefreshing(false)
+        }, 3000)
+      }}
+      onEndReached={hasMore && !loading && !loadingMore ? loadMore : undefined}
+      onEndReachedThreshold={0.5}
+    />
   )
 }

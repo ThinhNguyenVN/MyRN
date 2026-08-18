@@ -17,6 +17,36 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import type { RefreshIndicatorProps } from './types'
 import { generateStyles } from './styles'
 
+/** Must match `./constants` — literals only inside worklets (Reanimated UI thread). */
+const ARC_EASE_EXPONENT = 0.88
+const ARC_MAX = 0.85
+const MAX_PULL_VISUAL_PX = 120
+const ARC_FOLLOW_MS = 220
+const PULL_DIRECT_DELTA_PX = 8
+const REFRESH_HANDOFF_MS = 180
+const SPIN_CYCLE_MS = 800
+
+/** UI-thread helpers — keep in-file so Reanimated can compile them as worklets. */
+function pullRefreshArcPhaseWorklet(
+  pullDistance: number,
+  triggerThreshold: number,
+  maxVisualPull: number,
+): number {
+  'worklet'
+  const visualThreshold = Math.max(triggerThreshold, maxVisualPull)
+  const rawPhase = Math.min(1, Math.max(0, pullDistance / visualThreshold))
+  return rawPhase ** ARC_EASE_EXPONENT
+}
+
+function pullRefreshArcProgressWorklet(
+  pullDistance: number,
+  triggerThreshold: number,
+  maxVisualPull: number,
+): number {
+  'worklet'
+  return pullRefreshArcPhaseWorklet(pullDistance, triggerThreshold, maxVisualPull) * ARC_MAX
+}
+
 const SPINNER_SIZE = 32
 const STROKE_WIDTH = 3
 const RADIUS = (SPINNER_SIZE - STROKE_WIDTH) / 2
@@ -72,18 +102,29 @@ export function RefreshIndicator({
       spinnerFade.value = 1
       checkDraw.value = 0
       checkOpacity.value = 0
-      rotation.value = 0
 
-      process.value = withRepeat(
-        withSequence(
-          withTiming(0.75, { duration: 600, easing: Easing.out(Easing.ease) }),
-          withTiming(0.1, { duration: 800, easing: Easing.in(Easing.ease) }),
+      const startRotation = rotation.value
+      const startProcess = process.value
+
+      process.value = withSequence(
+        withTiming(Math.max(startProcess, ARC_MAX), {
+          duration: REFRESH_HANDOFF_MS,
+          easing: Easing.out(Easing.cubic),
+        }),
+        withRepeat(
+          withSequence(
+            withTiming(0.75, { duration: 600, easing: Easing.out(Easing.ease) }),
+            withTiming(0.12, { duration: 800, easing: Easing.in(Easing.ease) }),
+          ),
+          -1,
+          false,
         ),
-        -1,
-        false,
       )
       rotation.value = withRepeat(
-        withTiming(360, { duration: 800, easing: Easing.linear }),
+        withTiming(startRotation + 360, {
+          duration: SPIN_CYCLE_MS,
+          easing: Easing.linear,
+        }),
         -1,
         false,
       )
@@ -138,9 +179,36 @@ export function RefreshIndicator({
       if (dist > 0 && (prev ?? 0) <= 0) {
         spinnerFade.value = 1
       }
-      const phase = Math.min(1, Math.max(0, dist / threshold))
-      process.value = phase * 0.85
-      rotation.value = phase * 720
+      const targetProcess = pullRefreshArcProgressWorklet(dist, threshold, MAX_PULL_VISUAL_PX)
+      const easedPhase = pullRefreshArcPhaseWorklet(dist, threshold, MAX_PULL_VISUAL_PX)
+      const targetRotation = easedPhase * 540
+      const prevDist = prev ?? 0
+      const delta = dist - prevDist
+
+      if (dist > prevDist) {
+        if (delta >= PULL_DIRECT_DELTA_PX) {
+          process.value = withTiming(targetProcess, {
+            duration: ARC_FOLLOW_MS,
+            easing: Easing.out(Easing.cubic),
+          })
+          rotation.value = withTiming(targetRotation, {
+            duration: ARC_FOLLOW_MS,
+            easing: Easing.out(Easing.cubic),
+          })
+        } else {
+          process.value = targetProcess
+          rotation.value = targetRotation
+        }
+      } else {
+        process.value = withTiming(targetProcess, {
+          duration: 120,
+          easing: Easing.out(Easing.quad),
+        })
+        rotation.value = withTiming(targetRotation, {
+          duration: 120,
+          easing: Easing.out(Easing.quad),
+        })
+      }
     },
   )
 
@@ -174,16 +242,15 @@ export function RefreshIndicator({
   )
 
   const spinnerStyle = useAnimatedStyle(() => {
-    const phase = Math.min(1, Math.max(0, pullDistance.value / threshold))
-    const pullOpacity =
-      refreshing || isDone.value === 1 ? 1 : Math.min(1, pullDistance.value / (threshold * 0.88))
-    // Android: indicator overlay trên content — không scale từ nhỏ → lớn như iOS overscroll.
-    const scale = isAndroid ? 1 : 0.3 + phase * 0.7
+    const easedPhase = pullRefreshArcPhaseWorklet(pullDistance.value, threshold, MAX_PULL_VISUAL_PX)
+    const isActive = isRefreshing.value === 1 || isDone.value === 1
+    const pullOpacity = isActive ? 1 : Math.min(1, easedPhase / 0.88)
+    const scale = isAndroid ? 1 : isActive ? 1 : 0.3 + easedPhase * 0.7
     return {
       opacity: pullOpacity * spinnerFade.value,
       transform: [{ scale }, { rotate: `${rotation.value}deg` }],
     }
-  }, [refreshing, threshold])
+  }, [threshold])
 
   const checkStyle = useAnimatedStyle(() => ({
     opacity: checkOpacity.value,
