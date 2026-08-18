@@ -41,6 +41,11 @@ export function usePullToRefresh({
   const isSlotVisibleRef = useRef(false)
   const prevRefreshingWhenPullActiveRef = useRef(false)
 
+  const pullRefreshChromeActiveRef = useRef(false)
+  useEffect(() => {
+    pullRefreshChromeActiveRef.current = pullRefreshChromeActive
+  }, [pullRefreshChromeActive])
+
   const showSlot = useCallback(() => {
     if (isSlotVisibleRef.current) return
     isSlotVisibleRef.current = true
@@ -148,7 +153,13 @@ export function usePullToRefresh({
           hapticFiredRef.current = true
           triggerHaptic('Light')
         }
-      } else if (!refreshing && y > PULL_TO_REFRESH_IOS_RESET_BELOW_Y && !draggingRef.current) {
+      } else if (
+        !refreshing &&
+        !pullRefreshChromeActiveRef.current &&
+        progress.value < 1 &&
+        y > PULL_TO_REFRESH_IOS_RESET_BELOW_Y &&
+        !draggingRef.current
+      ) {
         pullDistance.value = 0
         progress.value = 0
         hapticFiredRef.current = false
@@ -168,6 +179,9 @@ export function usePullToRefresh({
     const d = pullDistance.value
     const readyToRefresh = progress.value >= 1
     if (d >= PULL_TO_REFRESH_IOS_TOP_INSET_PX && readyToRefresh) {
+      setPullRefreshChromeActive(true)
+      pullDistance.value = Math.max(d, PULL_TO_REFRESH_OVERSCROLL_THRESHOLD)
+      progress.value = 1
       scheduleSlotHide(PULL_TO_REFRESH_IOS_CLEAR_AFTER_RELEASE_MS)
     }
   }, [refreshing, progress, pullDistance, scheduleSlotHide])

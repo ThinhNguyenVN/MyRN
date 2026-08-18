@@ -5,6 +5,9 @@ export const BREAKPOINT_DESKTOP = 768
 /** Min width to show playground sidebar (tablet / iPad and up). */
 export const BREAKPOINT_SIDEBAR = 600
 
+/** Web product sidebar auto-collapses below this width (still ≥ desktop). */
+export const BREAKPOINT_SIDEBAR_COMPACT = 1200
+
 export const isMobileSize = Dimensions.get('window').width < BREAKPOINT_DESKTOP
 
 export const NAVIGATION_BAR_HEIGHT = 70

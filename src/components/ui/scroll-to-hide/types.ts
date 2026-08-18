@@ -33,3 +33,8 @@ export type ScrollToHideContentProps = {
   children: React.ReactElement
   scrollEventThrottle?: number
 }
+
+export type ScrollToHideInsetProps = {
+  children: React.ReactNode
+  style?: StyleProp<ViewStyle>
+}
