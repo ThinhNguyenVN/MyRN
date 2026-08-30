@@ -26,7 +26,7 @@ export function generateTabBarStyles(theme: ThemeType) {
       padding: getSpacing('x2'),
       paddingHorizontal: getSpacing('x4'),
       borderRadius: getRadius('large'),
-      minWidth: 68,
+      minWidth: 48,
       gap: 2,
     },
     pillActive: {

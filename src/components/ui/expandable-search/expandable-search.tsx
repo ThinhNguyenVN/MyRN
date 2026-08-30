@@ -96,7 +96,7 @@ function ExpandableSearchComponent({
       {expanded ? (
         <MyButton.Icon
           icon="close"
-          type="light"
+          type="secondary"
           size="small"
           elevation="none"
           onPress={handleClose}
@@ -110,7 +110,7 @@ function ExpandableSearchComponent({
           ) : null}
           <MyButton.Icon
             icon="search"
-            type="light"
+            type="secondary"
             size="small"
             elevation="none"
             onPress={handleOpen}

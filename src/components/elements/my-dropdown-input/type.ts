@@ -5,6 +5,9 @@ export interface DropdownOption {
   value: string
   /** Set on product options (`null` = placeholder). Omit to hide the thumb column. */
   imageUrl?: string | null
+  /** Optional quantity suffix rendered with tone color (inventory checks). */
+  suffix?: string
+  suffixTone?: 'success' | 'warning' | 'alert' | 'neutral'
 }
 
 export interface DropdownOptionRowProps {
@@ -35,6 +38,8 @@ export interface MyDropdownInputProps {
   preferSheet?: boolean
   /** Native: always use the iOS/Android fullscreen picker (wins over `preferSheet`). */
   preferFullscreen?: boolean
+  /** Chiều cao bottom sheet picker (vd '50%', '90%'). Mặc định '90%'. */
+  sheetHeight?: string
   subTitle?: string
   error?: boolean
   errorMessage?: string

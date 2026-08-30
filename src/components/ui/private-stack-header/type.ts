@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from 'react'
+import type { ReactElement } from 'react'
 import type { Href } from 'expo-router'
 
 import type {
@@ -9,12 +9,13 @@ import type {
 export type PrivateStackHeaderProps = NavigationBarHeaderProps & NavigationBarHeaderExtraProps
 
 export type UsePrivateStackHeadersParams = {
-  /** List/index route used when a child screen cannot pop within this stack. */
+  /** Child screens (create/edit) fall back here when this stack cannot pop. */
   fallbackBackHref: Href
+  /** Mobile list/index: back target when opened from Menu (omit for tab roots like History). */
+  listFallbackBackHref?: Href
 }
 
 export type UsePrivateStackHeadersResult = {
-  renderListMenu: () => ReactNode
   renderListHeader: (props: NavigationBarHeaderProps) => ReactElement
   renderChildHeader: (props: NavigationBarHeaderProps) => ReactElement
 }

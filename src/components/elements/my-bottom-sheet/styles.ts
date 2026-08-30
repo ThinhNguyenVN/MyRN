@@ -1,5 +1,5 @@
-import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
 import { Radius } from '@/theme/radius'
+import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
@@ -12,6 +12,7 @@ export const generateStyles = (theme: ThemeType) => {
       borderTopLeftRadius: Radius.medium,
       borderTopRightRadius: Radius.medium,
     },
+    /** Web desktop: dialog căn giữa. */
     modalOverlay: {
       flex: 1,
       backgroundColor: 'rgba(0,0,0,0.5)',
@@ -25,6 +26,29 @@ export const generateStyles = (theme: ThemeType) => {
       borderRadius: Radius.medium,
       backgroundColor: getColor('fill/background/tertiary'),
       overflow: 'hidden',
+    },
+    /** Web mobile-responsive: bottom sheet Android-like — neo đáy, full-width, cap chiều cao. */
+    webSheetOverlay: {
+      flex: 1,
+      justifyContent: 'flex-end',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    webSheetPanel: {
+      width: '100%',
+      borderTopLeftRadius: Radius.large,
+      borderTopRightRadius: Radius.large,
+      backgroundColor: getColor('fill/background/tertiary'),
+      overflow: 'hidden',
+    },
+    /** Co theo content nhưng bị giới hạn bởi maxHeight của panel → scroll bên trong. */
+    webSheetScroll: {
+      flexGrow: 0,
+      flexShrink: 1,
+    },
+    /** Panel height cố định: body chiếm phần còn lại → footer luôn neo đáy. */
+    webSheetScrollFixed: {
+      flex: 1,
+      minHeight: 0,
     },
     header: {
       height: HEADER_HEIGHT,
@@ -56,9 +80,7 @@ export const generateStyles = (theme: ThemeType) => {
       paddingBottom: getSpacing('x4'),
     },
     footer: {
-      paddingHorizontal: getSpacing('x4'),
-      paddingTop: getSpacing('x4'),
-      paddingBottom: getSpacing('x2'),
+      paddingVertical: getSpacing('x4'),
     },
     modalFooter: {
       paddingHorizontal: getSpacing('x4'),

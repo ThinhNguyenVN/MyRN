@@ -43,19 +43,19 @@ const NavigationBarHeader: React.FC<NavigationBarHeaderProps & NavigationBarHead
   const canGoBackForSlots = stackCanGoBack || Boolean(fallbackBackHref) || router.canGoBack()
 
   const handleBack = useCallback(() => {
-    // 1) Pop within this nested stack only (avoids jumping to previous tab on web).
+    // 1) Pop within this nested stack (list → create/edit).
     if (stackCanGoBack && navigation) {
       navigation.goBack()
       return
     }
-    // 2) Feature fallback (e.g. products list) when stack has no parent screen.
-    if (fallbackBackHref) {
-      router.navigate(fallbackBackHref)
-      return
-    }
-    // 3) Last resort — root history (may leave the current tab).
+    // 2) Follow session history (Home → create, Menu → list, …) — matches browser back.
     if (router.canGoBack()) {
       router.back()
+      return
+    }
+    // 3) Direct entry / refresh — fall back to the feature list or hub route.
+    if (fallbackBackHref) {
+      router.navigate(fallbackBackHref)
     }
   }, [fallbackBackHref, navigation, stackCanGoBack])
 

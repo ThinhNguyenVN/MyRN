@@ -7,13 +7,18 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { Dimensions, Modal, Pressable, ScrollView, View } from 'react-native'
-
 import {
-  BottomSheetModal,
-  BottomSheetScrollView,
-  type BottomSheetMethods,
-} from '@expo/ui/community/bottom-sheet'
+  Dimensions,
+  Modal,
+  Pressable,
+  ScrollView,
+  View,
+  type DimensionValue,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native'
+
+import { BottomSheetModal, BottomSheetScrollView } from '@expo/ui/community/bottom-sheet'
 
 import MyIcon from '@/components/elements/my-icon'
 import MyText from '@/components/elements/my-text'
@@ -24,6 +29,9 @@ import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 
 import type { MyBottomSheetProps, MyBottomSheetRef } from './type'
 import { generateStyles } from './styles'
+
+/** Re-export cho các nơi cũ wrap content bằng BottomSheetView/ScrollView. */
+export { BottomSheetView, BottomSheetScrollView } from '@expo/ui/community/bottom-sheet'
 
 const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
   (
@@ -43,34 +51,61 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       useScrollView = true,
       enableDynamicSizing,
       snapPoints,
+      visible: visibleProp,
+      onClose: onCloseProp,
       index,
       onChange,
     },
     ref,
   ) => {
     const { getColor } = useTheme()
-    const bottomSheetRef = useRef<BottomSheetMethods>(null)
+    const bottomSheetRef = useRef<BottomSheetModal>(null)
     const styles = useThemedStyles(generateStyles)
-    const isMobile = useIsMobileSize()
-    const [modalVisible, setModalVisible] = useState(false)
+    const isMobileSize = useIsMobileSize()
+    /** Mobile = bottom sheet thật (kéo, snap) trên mọi platform. Desktop web = modal thường. */
+    const useBottomSheet = isMobileSize
+    /** Controlled mode: cha truyền visible — state nội bộ chỉ dùng khi không controlled (web desktop modal). */
+    const [internalVisible, setInternalVisible] = useState(false)
 
     const panDownEnabled = enablePanDownToClose && pressBackdropToClose
 
-    const close = useCallback(() => {
-      if (isMobile) {
-        bottomSheetRef.current?.dismiss()
-      } else {
-        setModalVisible(false)
-      }
-    }, [isMobile])
-
     const open = useCallback(() => {
-      if (isMobile) {
+      if (useBottomSheet) {
         bottomSheetRef.current?.present()
-      } else {
-        setModalVisible(true)
+        return
       }
-    }, [isMobile])
+      if (visibleProp === undefined) {
+        setInternalVisible(true)
+      }
+    }, [useBottomSheet, visibleProp])
+
+    const close = useCallback(() => {
+      if (useBottomSheet) {
+        bottomSheetRef.current?.dismiss()
+        return
+      }
+      if (visibleProp === undefined) {
+        setInternalVisible(false)
+      }
+    }, [useBottomSheet, visibleProp])
+
+    /**
+     * Đóng do TƯƠNG TÁC người dùng (X / backdrop / hệ thống) — báo cha qua onClose/onClosed.
+     * Controlled mode: cha tự flip `visible`; internal mode: tự tắt.
+     */
+    const requestClose = useCallback(() => {
+      if (useBottomSheet) {
+        bottomSheetRef.current?.dismiss()
+        return
+      }
+      if (visibleProp !== undefined) {
+        onCloseProp?.()
+        return
+      }
+      setInternalVisible(false)
+      onClosed?.()
+      onDismiss?.()
+    }, [useBottomSheet, visibleProp, onCloseProp, onClosed, onDismiss])
 
     useImperativeHandle(ref, () => ({ open, close }), [open, close])
 
@@ -79,11 +114,6 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       onDismiss?.()
     }, [onClosed, onDismiss])
 
-    const handleModalClose = useCallback(() => {
-      setModalVisible(false)
-      handleDismiss()
-    }, [handleDismiss])
-
     const resolvedBackgroundStyle = useMemo(
       () => [{ backgroundColor: getColor('fill/background/tertiary') }, backgroundStyle],
       [getColor, backgroundStyle],
@@ -91,29 +121,31 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
 
     const headerContent = useMemo(() => {
       if (header) return null
-      if (title) {
-        return (
-          <MyView style={styles.header}>
-            {showClose && <View style={styles.headerClose} />}
-            <MyView style={styles.headerTitleWrap}>
-              <MyText typography="subtitle" style={styles.headerTitle}>
-                {title}
-              </MyText>
-            </MyView>
-            {showClose && (
-              <MyPressable style={styles.headerClose} onPress={close}>
-                <MyIcon name="close" color="icon/active/primary" />
-              </MyPressable>
-            )}
+      if (!title) return null
+      return (
+        <MyView style={styles.header}>
+          {showClose && <View style={styles.headerClose} />}
+          <MyView style={styles.headerTitleWrap}>
+            <MyText typography="subtitle" style={styles.headerTitle}>
+              {title}
+            </MyText>
           </MyView>
-        )
-      }
-      return null
+          {showClose && (
+            <MyPressable
+              style={styles.headerClose}
+              onPress={requestClose}
+              accessibilityRole="button"
+            >
+              <MyIcon name="close" color="icon/active/primary" />
+            </MyPressable>
+          )}
+        </MyView>
+      )
     }, [
       header,
       title,
       showClose,
-      close,
+      requestClose,
       styles.header,
       styles.headerClose,
       styles.headerTitleWrap,
@@ -122,32 +154,48 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
 
     const footerNode = footer ? <MyView style={styles.footer}>{footer}</MyView> : null
 
-    const windowHeight = Dimensions.get('window').height
-    const modalPanelStyle = useMemo(
-      () => [styles.modalPanel, { maxHeight: windowHeight * 0.8 }],
-      [styles.modalPanel, windowHeight],
-    )
+    // Đồng bộ controlled visible cho bottom sheet (mobile)
+    React.useEffect(() => {
+      if (!useBottomSheet || visibleProp === undefined) return
+      if (visibleProp) bottomSheetRef.current?.present()
+      else bottomSheetRef.current?.dismiss()
+    }, [useBottomSheet, visibleProp])
 
-    if (!isMobile) {
-      return (
-        <Modal
-          visible={modalVisible}
-          transparent
-          onRequestClose={handleModalClose}
-          animationType="fade"
+    // Lồng trong filter sheet: backdrop trong suốt để outer không tối thêm (chỉ áp dụng cho BottomSheetModal).
+
+    if (!useBottomSheet) {
+      /** Mobile responsive: neo đáy; có snapPoints → height cố định (footer luôn sát đáy panel). */
+      const windowHeight = Dimensions.get('window').height
+      const maxHeightPct = Number(String(snapPoints?.[0] ?? '85%').replace('%', ''))
+      const maxHeight: DimensionValue = `${maxHeightPct}%`
+      const hasFixedHeight = Boolean(snapPoints?.length)
+      const panelStyle: StyleProp<ViewStyle> = [
+        styles.webSheetPanel,
+        hasFixedHeight
+          ? { height: Math.round((windowHeight * maxHeightPct) / 100) }
+          : { maxHeight },
+      ]
+      const isOpen = visibleProp ?? internalVisible
+      const body = useScrollView ? (
+        <ScrollView
+          style={hasFixedHeight ? styles.webSheetScrollFixed : styles.webSheetScroll}
+          contentContainerStyle={[styles.content, contentContainerStyle]}
+          keyboardShouldPersistTaps="handled"
         >
+          {children}
+        </ScrollView>
+      ) : (
+        <View style={[styles.content, contentContainerStyle]}>{children}</View>
+      )
+      return (
+        <Modal visible={isOpen} transparent onRequestClose={requestClose} animationType="none">
           <Pressable
-            style={styles.modalOverlay}
-            onPress={pressBackdropToClose ? handleModalClose : undefined}
+            style={styles.webSheetOverlay}
+            onPress={pressBackdropToClose ? requestClose : undefined}
           >
-            <Pressable style={modalPanelStyle} onPress={() => {}}>
+            <Pressable style={panelStyle} onPress={() => {}}>
               {header ?? headerContent}
-              <ScrollView
-                contentContainerStyle={[styles.content, contentContainerStyle]}
-                keyboardShouldPersistTaps="handled"
-              >
-                {children}
-              </ScrollView>
+              {body}
               {footer ? <MyView style={styles.modalFooter}>{footer}</MyView> : null}
             </Pressable>
           </Pressable>

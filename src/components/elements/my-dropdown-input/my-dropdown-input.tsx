@@ -19,6 +19,7 @@ import { NativeFullscreenModal } from '@/components/ui/native-fullscreen-modal'
 import { TriggerModal } from '@/components/ui/trigger-modal'
 import { isAndroid, isIos, isWeb } from '@/constants/dimensions'
 import { useDebouncedValue } from '@/hooks/commons-hooks'
+import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { DropdownOptionRow } from './dropdown-option-row'
@@ -58,11 +59,14 @@ const MyDropdownInput = memo(function MyDropdownInput({
   searchable: searchableProp,
   preferSheet = false,
   preferFullscreen = false,
+  sheetHeight = '90%',
   style,
 }: MyDropdownInputProps) {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
   const isNative = isIos || isAndroid
+  /** Web mobile responsive dùng bottom sheet chồng thay vì popover (TriggerModal). */
+  const isMobileSize = useIsMobileSize()
   const triggerInputRef = useRef<MyTextInputRef>(null)
   const mobileSearchRef = useRef<MyTextInputRef>(null)
   const sheetRef = useRef<MyBottomSheetRef>(null)
@@ -91,9 +95,12 @@ const MyDropdownInput = memo(function MyDropdownInput({
   const isPickerDisabled = disabled || isWaiting
   const waitPlaceholder = loading ? t('components.dropdownLoading') : t('components.dropdownEmpty')
   const searchable = searchableProp ?? shouldShowDropdownSearch(options.length)
-  const liveIsSheet =
+  // Có nên dùng sheet dựa trên nội dung/props không (chưa tính platform).
+  const wantsSheetByContent =
     !preferFullscreen && (preferSheet || shouldUseDropdownBottomSheet(options.length))
-  const useSheet = isNative && (lockedIsSheet ?? liveIsSheet)
+  // Native tôn trọng lockedIsSheet (khoá do gesture), web-mobile thì luôn sheet.
+  const nativeWantsSheet = lockedIsSheet ?? wantsSheetByContent
+  const shouldUseSheet = (isNative && nativeWantsSheet) || (isWeb && isMobileSize)
   const allowClear = allowClearProp ?? !required
 
   const selectedValues = useMemo<string[]>(
@@ -149,19 +156,19 @@ const MyDropdownInput = memo(function MyDropdownInput({
   }, [open, chevronRotation])
 
   useEffect(() => {
-    if (!open || !searchable || useSheet) {
+    if (!open || !searchable || shouldUseSheet) {
       return
     }
     const timer = setTimeout(() => {
       mobileSearchRef.current?.focus()
     }, 80)
     return () => clearTimeout(timer)
-  }, [open, searchable, useSheet])
+  }, [open, searchable, shouldUseSheet])
 
   const skipDismissRef = useRef(false)
 
   useEffect(() => {
-    if (!open || !isNative || useSheet) {
+    if (!open || !isNative || nativeWantsSheet) {
       return
     }
     skipDismissRef.current = true
@@ -169,16 +176,16 @@ const MyDropdownInput = memo(function MyDropdownInput({
       skipDismissRef.current = false
     }, 500)
     return () => clearTimeout(timer)
-  }, [isNative, open, options.length, useSheet])
+  }, [isNative, open, options.length, nativeWantsSheet])
 
   useEffect(() => {
-    if (!useSheet) {
+    if (!shouldUseSheet) {
       return
     }
     if (open) {
       sheetRef.current?.open()
     }
-  }, [open, useSheet])
+  }, [open, shouldUseSheet])
 
   useEffect(() => {
     if (!isWaiting || !open) {
@@ -218,7 +225,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
     }
     setSearchQuery('')
     if (isNative) {
-      setLockedIsSheet(liveIsSheet)
+      setLockedIsSheet(wantsSheetByContent)
       setOpen(true)
       return
     }
@@ -231,7 +238,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
       captureTriggerLayout(x, y, width, height)
       setOpen(true)
     })
-  }, [captureTriggerLayout, isNative, isPickerDisabled, liveIsSheet, measureTrigger])
+  }, [captureTriggerLayout, isNative, isPickerDisabled, wantsSheetByContent, measureTrigger])
 
   const closePicker = useCallback(() => {
     if (closeAfterSelectRef.current) {
@@ -274,9 +281,14 @@ const MyDropdownInput = memo(function MyDropdownInput({
     onValueChange?.('')
   }, [multiSelect, onValueChange])
 
-  const handleTriggerClear = useCallback(() => {
-    clearValue()
-  }, [clearValue])
+  const handleTriggerClear = useCallback(
+    (e?: { stopPropagation?: () => void; preventDefault?: () => void }) => {
+      e?.stopPropagation?.()
+      e?.preventDefault?.()
+      clearValue()
+    },
+    [clearValue],
+  )
 
   const handlePickerClear = useCallback(() => {
     clearValue()
@@ -386,7 +398,9 @@ const MyDropdownInput = memo(function MyDropdownInput({
           accessibilityRole="button"
           accessibilityLabel={t('components.dropdownClear')}
           style={styles.triggerClearHit}
-        />
+        >
+          <View style={{ flex: 1 }} />
+        </MyPressable>
       ) : null}
     </View>
   )
@@ -480,7 +494,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholder={t('components.dropdownSearch')}
-        useBottomSheetTextInput={useSheet}
+        useBottomSheetTextInput={nativeWantsSheet}
       />
     </MyView>
   )
@@ -490,7 +504,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
       <MyView style={styles.relativeWrap}>
         {trigger}
 
-        <ConditionRenderer when={isNative && !useSheet}>
+        <ConditionRenderer when={isNative && !nativeWantsSheet}>
           <NativeFullscreenModal
             visible={open}
             title={pickerHeading}
@@ -503,14 +517,14 @@ const MyDropdownInput = memo(function MyDropdownInput({
           </NativeFullscreenModal>
         </ConditionRenderer>
 
-        <ConditionRenderer when={useSheet}>
+        <ConditionRenderer when={shouldUseSheet}>
           <MyBottomSheet
             ref={sheetRef}
             title={pickerHeading}
             showClose
             pressBackdropToClose
-            enableDynamicSizing={!preferSheet}
-            snapPoints={preferSheet ? ['50%'] : undefined}
+            snapPoints={[sheetHeight]}
+            enableDynamicSizing
             onClosed={closePicker}
             contentContainerStyle={styles.sheetPickerContent}
           >
@@ -522,7 +536,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
           </MyBottomSheet>
         </ConditionRenderer>
 
-        <ConditionRenderer when={isWeb}>
+        <ConditionRenderer when={isWeb && !isMobileSize}>
           <TriggerModal
             visible={open}
             onClose={closePicker}

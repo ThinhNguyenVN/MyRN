@@ -93,7 +93,7 @@ export function generateStyles(theme: ThemeType) {
       },
       calendarTableWrap: {
         width: '100%',
-        minWidth: CALENDAR_PANEL_MIN_WIDTH,
+        ...(isWeb ? {} : { minWidth: CALENDAR_PANEL_MIN_WIDTH }),
       },
       weekDayRow: {
         marginBottom: getSpacing('x1'),

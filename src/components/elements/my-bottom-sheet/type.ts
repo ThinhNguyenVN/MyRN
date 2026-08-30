@@ -19,6 +19,10 @@ export interface MyBottomSheetProps {
   backgroundStyle?: StyleProp<ViewStyle>
   enableDynamicSizing?: boolean
   snapPoints?: (string | number)[]
+  /** Controlled mode (web): state cha là nguồn sự thật duy nhất — không cần ref/effects. */
+  visible?: boolean
+  /** Gọi khi sheet đóng do tương tác (backdrop/X/hệ thống) trong controlled mode. */
+  onClose?: () => void
   index?: number
 }
 

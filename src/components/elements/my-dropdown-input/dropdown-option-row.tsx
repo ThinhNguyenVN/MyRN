@@ -53,9 +53,25 @@ function DropdownOptionRowComponent({
           />
         </ConditionRenderer>
       </ConditionRenderer>
-      <MyText typography="body" style={styles.optionLabelMobile} numberOfLines={1}>
-        {option.label}
-      </MyText>
+      <MyView style={styles.optionLabelWrap} fillParent={false}>
+        <MyText typography="body" style={styles.optionLabelMobile} numberOfLines={1}>
+          {option.label}
+        </MyText>
+        {option.suffix ? (
+          <MyText
+            typography="caption"
+            style={[
+              styles.optionSuffix,
+              option.suffixTone === 'warning' && styles.optionSuffixWarning,
+              option.suffixTone === 'alert' && styles.optionSuffixAlert,
+              option.suffixTone === 'success' && styles.optionSuffixSuccess,
+            ]}
+            numberOfLines={1}
+          >
+            {option.suffix}
+          </MyText>
+        ) : null}
+      </MyView>
       <View
         style={[
           styles.optionMark,

@@ -1,10 +1,10 @@
+import { DROPDOWN_FULLSCREEN_MIN_OPTIONS } from '@/constants/constants'
+
 import type { DropdownOption } from './type'
 import { DROPDOWN_MIN_ITEMS } from './styles'
 
 export const DROPDOWN_SEARCH_DEBOUNCE_MS = 300
 export const DROPDOWN_SELECT_CLOSE_MS = 80
-/** Native lists this long open a fullscreen picker instead of a bottom sheet. */
-export const DROPDOWN_FULLSCREEN_MIN_OPTIONS = 10
 
 export function shouldShowDropdownSearch(optionCount: number): boolean {
   return optionCount > DROPDOWN_MIN_ITEMS
@@ -87,6 +87,7 @@ export function filterDropdownOptions(options: DropdownOption[], query: string):
       index,
       score: Math.max(
         scoreDropdownQuery(option.label, needle),
+        scoreDropdownQuery(option.suffix ?? '', needle),
         scoreDropdownQuery(option.value, needle),
       ),
     }))

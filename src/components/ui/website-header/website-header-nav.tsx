@@ -33,12 +33,12 @@ const WebsiteHeaderNav: React.FC<WebsiteHeaderNavProps & WebsiteHeaderNavExtraPr
       navigation.goBack()
       return
     }
-    if (fallbackBackHref) {
-      router.navigate(fallbackBackHref)
-      return
-    }
     if (router.canGoBack()) {
       router.back()
+      return
+    }
+    if (fallbackBackHref) {
+      router.navigate(fallbackBackHref)
     }
   }, [fallbackBackHref, navigation, stackCanGoBack])
 

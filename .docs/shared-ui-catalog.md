@@ -35,6 +35,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Status / tag color | `MyTag` | One-off badge StyleSheets / `MyChip` for status |
 | App rail (web) | `SideBar` (`card` \| `flush`, icons, header/footer) | One-off left nav View |
 | Bottom tabs (pill active) | `useTabBar` / `TabBarButton` | Raw `tabBarButton` + default RN border/elevation |
+| In-page tab switcher (2+ content panes, animated slide) | `MyTabSwitcher` (`components/ui/my-tab-switcher`) | Ad-hoc `useState` + conditional render without transition |
 | Form sticky footer (save + extras + amount) | `FormFooterBar` | One-off absolute footer rows |
 | Order line (product / unit / qty / price) | `OrderFormLineEditor` | Feature-only line cards |
 | Desktop table row overflow | `TableRowMoreMenu` | Ad-hoc `TriggerModal` per table |
@@ -100,6 +101,15 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 - `openDrawer` enables mobile header menu button
 - Nested routes can hide the bar via pathname heuristics in `use-tab-bar` (e.g. create/edit screens)
 - Sample wiring: `src/app/(public)/(tabs)/_layout.tsx`
+
+### `MyTabSwitcher`
+
+- Path: `@/components/ui/my-tab-switcher`
+- In-page pill tab switcher with animated slide between panes (not a route-level tab bar — use `useTabBar` for that)
+- Props: `tabs: MyTabItem<TId>[]` (`id`, `label`), `activeId`, `onChange`, `renderContent(id)`, `duration?` (default 220ms), `containerStyle?`, `tabBarStyle?`
+- Direction-aware: slides content in from the side matching tab order (right tab → slides in from right)
+- Generic over `TId extends string` — pass a union of tab ids for type-safe `activeId`/`onChange`
+- Playground: `…/playground/my-tab-switcher.tsx`
 
 ### `WebsiteHeader`
 
@@ -318,6 +328,7 @@ import { TableRowMoreMenu } from '@/components/ui/table-row-more-menu'
 import { NativeFullscreenModal } from '@/components/ui/native-fullscreen-modal'
 import DrawerMenu from '@/components/ui/drawer-menu'
 import SideBar from '@/components/ui/side-bar'
+import MyTabSwitcher from '@/components/ui/my-tab-switcher'
 ```
 
 ## Anti-patterns

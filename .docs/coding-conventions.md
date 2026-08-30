@@ -60,6 +60,14 @@ src/features/<feature>/components/
 
 Import dùng alias `@/*`.
 
+### Ngưỡng tách file (khi nào là "quá dài")
+
+Không có con số cứng, nhưng dùng các mốc sau làm tín hiệu review — vượt mốc thì tìm đường tách trước khi mở PR:
+
+- **`container.tsx`**: nếu vượt ~150–200 dòng hoặc có hơn ~5 `useState`/`useCallback`/`useMemo` riêng lẻ, đó là container "khó scan" theo `screen-standard.md` → tách `use-<screen>.ts` (hoặc `hooks/use-<name>.ts` nếu feature đã có thư mục `hooks/`), container chỉ giữ lại wiring điều hướng (`useNavigation`, header, bottom sheet) + JSX compose.
+- **`.tsx` component / view**: vượt ~350–400 dòng → tìm mảng JSX lặp lại hoặc tách biệt (vd 1 khối cho web, 1 khối cho mobile) để tách thành component riêng trong `components/`.
+- **`styles.ts` dùng chung**: vượt ~400 dòng vẫn OK nếu tất cả style key đang thực sự được dùng (styles vẫn phải nằm 1 file theo layout B) — nhưng nếu 2 file `styles.ts` khác nhau (vd `screens/*.styles.ts` và `components/styles.ts`) định nghĩa **cùng một con số** (width cột, spacing, breakpoint) cho cùng 1 khái niệm UI, đó là dấu hiệu duplicate — gộp về 1 nguồn, file kia import lại thay vì định nghĩa số riêng.
+
 ---
 
 ## 2. Null / undefined

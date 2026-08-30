@@ -30,6 +30,7 @@ export interface MyFormFieldProps<TFieldValues extends FieldValues> {
   subTitle?: string
   required?: boolean
   externalInvalid?: boolean
+  hideErrorMessage?: boolean
   children: ReactNode
 }
 

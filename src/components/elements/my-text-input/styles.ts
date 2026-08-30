@@ -52,7 +52,7 @@ export function generateStyles(theme: ThemeType) {
       borderWidth: 1,
       borderRadius: Radius.large,
       paddingHorizontal: getSpacing('x3'),
-      gap: getSpacing('x1'),
+      gap: getSpacing('x2'),
       alignItems: 'center' as const,
       minHeight: 44,
       backgroundColor: getColor('fill/background/tertiary'),
