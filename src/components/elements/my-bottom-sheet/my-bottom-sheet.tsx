@@ -114,8 +114,17 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       onDismiss?.()
     }, [onClosed, onDismiss])
 
+    /**
+     * `padding: 0` đè lên `padding: '0 16px'` hard-code trong vaul (web polyfill của
+     * @expo/ui bottom-sheet) — nếu không, header/content/footer bên trong luôn bị ăn
+     * thêm 16px hai bên dù đã tự set padding riêng, border không sát rìa được.
+     * Native bỏ qua field lạ trong backgroundStyle nên không ảnh hưởng iOS/Android.
+     */
     const resolvedBackgroundStyle = useMemo(
-      () => [{ backgroundColor: getColor('fill/background/tertiary') }, backgroundStyle],
+      () => [
+        { backgroundColor: getColor('fill/background/tertiary'), padding: 0 },
+        backgroundStyle,
+      ],
       [getColor, backgroundStyle],
     )
 
@@ -204,18 +213,20 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     }
 
     const sheetBody = useScrollView ? (
-      <BottomSheetScrollView
-        contentContainerStyle={[styles.content, contentContainerStyle]}
-        keyboardShouldPersistTaps="handled"
-      >
-        {children}
+      <>
+        <BottomSheetScrollView
+          contentContainerStyle={[styles.content, contentContainerStyle]}
+          keyboardShouldPersistTaps="handled"
+        >
+          {children}
+        </BottomSheetScrollView>
         {footerNode}
-      </BottomSheetScrollView>
+      </>
     ) : (
-      <View style={[styles.content, contentContainerStyle]}>
-        {children}
+      <>
+        <View style={[styles.content, contentContainerStyle]}>{children}</View>
         {footerNode}
-      </View>
+      </>
     )
 
     return (

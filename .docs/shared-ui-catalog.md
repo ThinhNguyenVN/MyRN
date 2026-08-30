@@ -34,6 +34,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Native full-screen picker / filter | `NativeFullscreenModal` | Feature-local `Modal` with one-off iOS/Android padding |
 | Status / tag color | `MyTag` | One-off badge StyleSheets / `MyChip` for status |
 | App rail (web) | `SideBar` (`card` \| `flush`, icons, header/footer) | One-off left nav View |
+| List filter menu (mobile sheet + desktop popover) | `MyBottomSheet` (mobile) + `TriggerModal` (desktop), Clear/Apply through `footer` prop | Rendering Clear/Apply inside the scrollable panel; `useScrollView={false}` + custom `contentContainerStyle` as a footer-spacing workaround |
 | Bottom tabs (pill active) | `useTabBar` / `TabBarButton` | Raw `tabBarButton` + default RN border/elevation |
 | In-page tab switcher (2+ content panes, animated slide) | `MyTabSwitcher` (`components/ui/my-tab-switcher`) | Ad-hoc `useState` + conditional render without transition |
 | Form sticky footer (save + extras + amount) | `FormFooterBar` | One-off absolute footer rows |
@@ -90,6 +91,19 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 - `SidebarCollapseToggle` — circular chevron chip for product rails (props: `collapsed`, `onPress`, `accessibilityLabel`)
 - Auto-collapse helper: `BREAKPOINT_SIDEBAR_COMPACT` (1200) in `@/constants/dimensions`
 - Used by playground layout rail; product flush rail for authenticated chrome (`PrivateSidebar` stays in the product)
+
+### Filter menu (`MyBottomSheet` mobile + `TriggerModal` desktop)
+
+Product pattern for a list filter that renders as a real bottom sheet on mobile and a positioned popover on desktop, sharing one panel + one actions component. No generic playground demo (product-specific fields) — this documents the contract, not a concrete screen.
+
+- **`XxxFilterPanel`**: pure form fields only — no internal `ScrollView`, no internal Clear/Apply row, no `showActions` prop. `MyBottomSheet` already wraps `children` in a scrollable area (default `useScrollView={true}`) and `TriggerModal`'s content area does the same for the desktop popover — do not add a second scroller or override `contentContainerStyle`/`useScrollView` inside the panel.
+- **`XxxFilterActions`** (exported alongside the panel): pure button-row layout only — `flexDirection: 'row', alignItems: 'center', width: '100%', gap`. No border, no padding, no background. The same component renders inside two different footer slots (`MyBottomSheet`'s `footer` prop and `TriggerModal`'s `footer` prop), and both slots already own their own border/padding — giving the buttons row its own chrome too just stacks/doubles it.
+- **Wiring**: always pass Clear/Apply through the `footer` prop — `<MyBottomSheet footer={<XxxFilterActions .../>}>…</MyBottomSheet>` and `<TriggerModal footer={filterFooter}>…</TriggerModal>` — never as a sibling child or nested inside the panel. `MyBottomSheet` renders `footer` **outside** the scrollable content so it stays pinned to the bottom; nesting it inside the scroll means it scrolls away and can clip or double-render.
+
+Two gotchas are already handled centrally inside `MyBottomSheet` — do not re-solve them per feature:
+
+- **Web horizontal padding**: `@expo/ui`'s web bottom-sheet polyfill (`vaul`) hard-codes `padding: '0 16px'` on its outer wrapper. `MyBottomSheet` counters this with `padding: 0` in `resolvedBackgroundStyle` so header/content/footer borders reach the true left/right edges.
+- **Native bottom safe-area**: the native sheet (SwiftUI `.sheet` / Android `ModalBottomSheet`) already reserves safe-area space at the bottom by itself. `MyBottomSheet`'s own `footer` style only adds a small extra cushion on top (skipped entirely once the OS inset already covers it) — do not add another `insets.bottom` in a feature's `filterActions` style, it will double-count and the footer ends up with too much bottom padding.
 
 ### `Tab bar` (`useTabBar` / `TabBarButton`)
 
