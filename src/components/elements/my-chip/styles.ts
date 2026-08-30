@@ -15,7 +15,6 @@ export function generateStyles(theme: ThemeType) {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: getSpacing('x2'),
   }
   const withBorder: ViewStyle = { borderWidth: 1 }
 

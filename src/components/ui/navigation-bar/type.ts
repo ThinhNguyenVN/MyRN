@@ -53,4 +53,6 @@ export type NavigationBarHeaderExtraProps = {
    * navigate here instead of `router.back()` which often returns to the previous tab.
    */
   fallbackBackHref?: Href
+  /** Prefer `router.back()` before `fallbackBackHref` (menu-pushed list screens on mobile). */
+  preferHistoryBack?: boolean
 }

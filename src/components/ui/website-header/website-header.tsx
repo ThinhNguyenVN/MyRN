@@ -39,7 +39,7 @@ function WebsiteHeaderComponent({
             size="small"
             elevation="none"
             onPress={handleBack}
-            accessibilityLabel={t('common.back')}
+            accessibilityLabel={t('shell.back')}
           />
         ) : null}
         <MyText typography="h3" style={styles.title} numberOfLines={1}>
@@ -54,7 +54,7 @@ function WebsiteHeaderComponent({
           size="small"
           elevation="none"
           onPress={handleNotifications}
-          accessibilityLabel={t('components.websiteHeader.notifications')}
+          accessibilityLabel={t('dashboard.header.notifications')}
         />
         <MyButton.Icon
           icon="person-circle-outline"
@@ -62,7 +62,7 @@ function WebsiteHeaderComponent({
           size="small"
           elevation="none"
           onPress={handleProfile}
-          accessibilityLabel={t('components.websiteHeader.profile')}
+          accessibilityLabel={t('dashboard.header.profile')}
         />
       </MyView>
     </MyView>

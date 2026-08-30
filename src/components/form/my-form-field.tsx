@@ -16,6 +16,7 @@ function MyFormFieldInner<TFieldValues extends FieldValues>({
   subTitle,
   required,
   externalInvalid = false,
+  hideErrorMessage = false,
   children,
 }: MyFormFieldProps<TFieldValues>) {
   const styles = useThemedStyles(generateStyles)
@@ -39,7 +40,7 @@ function MyFormFieldInner<TFieldValues extends FieldValues>({
         error={showErrorVisual}
       />
       {children}
-      <FormFieldError error={error ?? null} />
+      {hideErrorMessage ? null : <FormFieldError error={error ?? null} />}
     </View>
   )
 }

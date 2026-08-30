@@ -37,4 +37,5 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string }[] = [
   { labelKey: 'playground.linksCollapsible', href: '/playground/collapsible' },
   { labelKey: 'playground.linksSpinner', href: '/playground/spinner' },
   { labelKey: 'playground.linksSurface', href: '/playground/surface' },
+  { labelKey: 'playground.linksMyTabSwitcher', href: '/playground/my-tab-switcher' },
 ]

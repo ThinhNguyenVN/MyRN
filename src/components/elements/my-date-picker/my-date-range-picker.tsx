@@ -33,6 +33,7 @@ const DateRangePickerTrigger = memo(function DateRangePickerTrigger({
   errorMessage,
   required,
   triggerInputStyle,
+  startIcon,
 }: DatePickerTriggerProps) {
   const chevronRotation = useSharedValue(0)
   useEffect(() => {
@@ -53,6 +54,7 @@ const DateRangePickerTrigger = memo(function DateRangePickerTrigger({
         error={error}
         errorMessage={errorMessage}
         required={required}
+        startIcon={startIcon}
         endIcon={
           <Animated.View style={chevronAnimatedStyle}>
             <MyIcon name="chevron-down" size={20} color="icon/active/primary" />
@@ -118,6 +120,7 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
   errorMessage,
   required = false,
   style,
+  startIcon,
 }: MyDateRangePickerProps) {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
@@ -166,6 +169,7 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
         displayText={displayText}
         placeholder={resolvedPlaceholder}
         title={resolvedTitle}
+        startIcon={startIcon}
         error={error}
         errorMessage={errorMessage}
         required={required}
@@ -180,6 +184,7 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
       errorMessage,
       required,
       styles.triggerInput,
+      startIcon,
     ],
   )
 

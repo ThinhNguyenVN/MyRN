@@ -13,7 +13,7 @@ export function generateStyles(theme: ThemeType) {
       paddingHorizontal: getSpacing('x4'),
       paddingVertical: getSpacing('x2'),
       paddingTop: insets.top || getSpacing('x4'),
-      backgroundColor: getColor('fill/background/primary'),
+      backgroundColor: getColor('fill/background/tertiary'),
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: getColor('border/inactive/secondary'),
     },

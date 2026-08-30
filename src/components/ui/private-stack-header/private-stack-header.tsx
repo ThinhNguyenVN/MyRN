@@ -12,6 +12,7 @@ import type { PrivateStackHeaderProps } from './type'
 function PrivateStackHeader({
   hideBackButton = false,
   fallbackBackHref,
+  preferHistoryBack,
   ...props
 }: PrivateStackHeaderProps) {
   const isMobileSize = useIsMobileSize()
@@ -22,6 +23,7 @@ function PrivateStackHeader({
         {...props}
         hideBackButton={hideBackButton}
         fallbackBackHref={fallbackBackHref}
+        preferHistoryBack={preferHistoryBack}
       />
     )
   }

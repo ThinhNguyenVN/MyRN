@@ -1,6 +1,7 @@
+import { DROPDOWN_FULLSCREEN_MIN_OPTIONS } from '@/constants/constants'
+
 import { DROPDOWN_MIN_ITEMS } from './styles'
 import {
-  DROPDOWN_FULLSCREEN_MIN_OPTIONS,
   filterDropdownOptions,
   normalizeDropdownSearchText,
   shouldShowDropdownSearch,

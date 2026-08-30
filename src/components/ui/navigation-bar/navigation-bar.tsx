@@ -18,9 +18,13 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
 }) => {
   const styles = useThemedStyles(generateStyles)
 
+  const [barWidth, setBarWidth] = useState(0)
   const [leftWidth, setLeftWidth] = useState(0)
   const [rightWidth, setRightWidth] = useState(0)
 
+  const onBarLayout = useCallback((e: LayoutChangeEvent) => {
+    setBarWidth(e.nativeEvent.layout.width)
+  }, [])
   const onLeftLayout = useCallback((e: LayoutChangeEvent) => {
     setLeftWidth(e.nativeEvent.layout.width)
   }, [])
@@ -31,16 +35,25 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const shouldShowBack = !left && showBack && onBackPress
 
   const padding = Math.max(leftWidth, rightWidth)
+
+  /**
+   * The title is absolutely centered over the bar, inset by the widest side slot.
+   * When a slot grows huge (e.g. expanded search) its box collapses to zero width;
+   * native clips it but web keeps painting it over the input — hide instead.
+   */
+  const MIN_TITLE_SPACE = 80
+  const hasTitleRoom = barWidth === 0 || leftWidth + rightWidth + MIN_TITLE_SPACE <= barWidth
+
   return (
-    <MyView style={styles.bar} fillParent={false}>
+    <MyView style={styles.bar} fillParent={false} onLayout={onBarLayout}>
       <MyView style={styles.left} onLayout={onLeftLayout}>
         {left ??
           (shouldShowBack ? (
-            <MyButton.Icon icon="arrow-back" type="light" size="small" onPress={onBackPress} />
+            <MyButton.Icon icon="arrow-back" type="secondary" size="small" onPress={onBackPress} />
           ) : null)}
       </MyView>
       <View style={styles.contentHeight}>
-        <MyButton.Icon icon="arrow-back" type="light" size="small" onPress={onBackPress} />
+        <MyButton.Icon icon="arrow-back" type="secondary" size="small" onPress={onBackPress} />
       </View>
       <MyView style={styles.center}>
         <MyView
@@ -49,7 +62,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             paddingLeft: padding,
           }}
         >
-          {!!title ? (
+          {!!title && hasTitleRoom ? (
             <MyText typography="subtitle" style={styles.title} numberOfLines={1}>
               {title}
             </MyText>

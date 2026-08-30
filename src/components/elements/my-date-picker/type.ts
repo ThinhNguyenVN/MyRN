@@ -51,6 +51,7 @@ export interface MyDateRangePickerProps {
   required?: boolean
   footer?: ReactNode
   style?: StyleProp<ViewStyle>
+  startIcon?: ReactNode
 }
 
 export interface CalendarRangeProps {
@@ -91,6 +92,7 @@ export interface DatePickerTriggerProps {
   errorMessage?: string
   required?: boolean
   triggerInputStyle: StyleProp<ViewStyle>
+  startIcon?: ReactNode
 }
 
 export interface DatePickerTriggerRenderProps {

@@ -96,6 +96,7 @@
     "linksCollapsible": "Collapsible",
     "linksSpinner": "Spinner",
     "linksSurface": "Surface",
+    "linksMyTabSwitcher": "Tab switcher",
     "dividerIntro": "Horizontal and vertical separators using border tokens.",
     "dividerHorizontal": "Horizontal",
     "dividerVertical": "Vertical",

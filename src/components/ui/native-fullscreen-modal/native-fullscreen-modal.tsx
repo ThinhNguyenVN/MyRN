@@ -32,7 +32,7 @@ function NativeFullscreenModalComponent({
     ? [styles.root, styles.rootAndroid]
     : presentation === 'fullScreen'
       ? [styles.root, styles.rootIosFullScreen]
-      : styles.root
+      : [styles.root, styles.rootIosPageSheet]
   const closeLabel = closeAccessibilityLabel ?? t('common.close')
 
   const inner = (

@@ -1,6 +1,5 @@
 import type { MyAlertType } from './type'
 import type { ThemeType } from '@/theme/theme-context'
-import { BUTTON_SMALL_HEIGHT } from '@/components/elements/my-button/styles'
 import { Radius } from '@/theme/radius'
 import { StyleSheet } from 'react-native'
 
@@ -17,13 +16,12 @@ export const generateStyles = (theme: ThemeType) => {
       borderColor: getColor('border/inactive/quaternary'),
       width: '100%',
       maxWidth: 400,
+      padding: getSpacing('x4'),
+      gap: getSpacing('x4'),
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: getSpacing('x5'),
-      paddingTop: getSpacing('x5'),
-      paddingBottom: getSpacing('x3'),
       gap: getSpacing('x3'),
     },
     headerTitle: {
@@ -32,15 +30,12 @@ export const generateStyles = (theme: ThemeType) => {
     },
     content: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
-      paddingHorizontal: getSpacing('x5'),
-      paddingBottom: getSpacing('x4'),
+      alignItems: 'center',
       gap: getSpacing('x3'),
     },
     iconWrap: {
       justifyContent: 'center',
       alignItems: 'center',
-      paddingTop: getSpacing('x1'),
     },
     imageWrap: {
       width: IMAGE_SIZE,
@@ -60,10 +55,7 @@ export const generateStyles = (theme: ThemeType) => {
       flexDirection: 'row',
       alignItems: 'center',
       width: '100%',
-      paddingHorizontal: getSpacing('x5'),
-      paddingBottom: getSpacing('x5'),
       gap: getSpacing('x2'),
-      minHeight: BUTTON_SMALL_HEIGHT + getSpacing('x5'),
     },
     footerButtonWrap: {
       flexGrow: 1,

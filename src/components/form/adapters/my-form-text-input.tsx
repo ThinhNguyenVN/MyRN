@@ -16,6 +16,7 @@ export type MyFormTextInputProps<TFieldValues extends FieldValues> = Omit<
   subTitle?: string
   required?: boolean
   forceError?: boolean
+  hideErrorMessage?: boolean
 }
 
 function MyFormTextInputInner<TFieldValues extends FieldValues>({
@@ -24,6 +25,7 @@ function MyFormTextInputInner<TFieldValues extends FieldValues>({
   subTitle,
   required,
   forceError = false,
+  hideErrorMessage = false,
   ...rest
 }: MyFormTextInputProps<TFieldValues>) {
   const { value, onChange, onBlur, error, clearError } = useFormField<
@@ -38,6 +40,7 @@ function MyFormTextInputInner<TFieldValues extends FieldValues>({
       subTitle={subTitle}
       required={required}
       externalInvalid={forceError}
+      hideErrorMessage={hideErrorMessage}
     >
       <MyTextInput
         {...rest}

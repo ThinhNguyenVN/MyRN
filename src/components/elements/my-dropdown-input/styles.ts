@@ -127,7 +127,27 @@ export function generateStyles(theme: ThemeType) {
         color: getColor('text/active/tertiary'),
       },
       optionLabelMobile: {
+        flexShrink: 1,
+      },
+      optionLabelWrap: {
         flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: getSpacing('x2'),
+        minWidth: 0,
+      },
+      optionSuffix: {
+        flexShrink: 0,
+        color: getColor('text/inactive/primary'),
+      },
+      optionSuffixSuccess: {
+        color: getColor('text/success/primary'),
+      },
+      optionSuffixWarning: {
+        color: getColor('text/warning/primary'),
+      },
+      optionSuffixAlert: {
+        color: getColor('text/alert/primary'),
       },
       relativeWrap: {
         position: 'relative',

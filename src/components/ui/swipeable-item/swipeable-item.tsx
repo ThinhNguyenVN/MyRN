@@ -358,6 +358,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
                     rowKey={rowKey}
                     stripPx={leftStripPx}
                     stripStyle={[styles.strip, styles.stripLeft]}
+                    translateX={translateX}
                     wrapAction={wrapAction}
                   />
                 ) : null}
@@ -375,6 +376,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
                     rowKey={rowKey}
                     stripPx={rightStripPx}
                     stripStyle={[styles.strip, styles.stripRight]}
+                    translateX={translateX}
                     wrapAction={wrapAction}
                   />
                 ) : null}

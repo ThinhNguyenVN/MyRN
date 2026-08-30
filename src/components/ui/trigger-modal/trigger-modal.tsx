@@ -43,14 +43,18 @@ const TriggerModal = memo(function TriggerModal({
   const panelLayout = useMemo(() => {
     if (!triggerLayout) return null
     const { x, y, width, height } = triggerLayout
-    const windowHeight = Dimensions.get('window').height
+    const { width: windowWidth, height: windowHeight } = Dimensions.get('window')
     const spaceBelow = windowHeight - (y + height + gap) - safeInset
     const openAbove = spaceBelow < estimatedPanelHeight
     const panelWidth = Math.min(MAX_INPUT_WIDTH, Math.max(width, panelMinWidth ?? 0))
     const maxHeightBelow = windowHeight - (y + height + gap) - safeInset
     const maxHeightAbove = y - gap - safeInset
+    const alignStartLeft = x
+    const alignEndLeft = x + width - panelWidth
+    const overflowsEnd = alignStartLeft + panelWidth > windowWidth - safeInset
+    const left = Math.max(safeInset, overflowsEnd ? alignEndLeft : alignStartLeft)
     return {
-      left: x,
+      left,
       width: panelWidth,
       top: openAbove ? undefined : y + height + gap,
       bottom: openAbove ? windowHeight - y + gap : undefined,
@@ -109,10 +113,10 @@ const TriggerModal = memo(function TriggerModal({
   return (
     <Portal hostName="root">
       <Animated.View
-        style={[StyleSheet.absoluteFillObject, animatedBackdropStyle]}
+        style={[StyleSheet.absoluteFill, animatedBackdropStyle]}
         pointerEvents={allowPointerEvents ? 'auto' : 'none'}
       >
-        <Pressable style={[StyleSheet.absoluteFillObject, styles.backdrop]} onPress={onClose} />
+        <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} />
         <MyView
           elevation={'soft/down/small'}
           radius="medium"

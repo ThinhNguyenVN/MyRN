@@ -17,6 +17,10 @@ export function generateStyles(theme: ThemeType) {
       paddingTop: insets.top,
       paddingBottom: insets.bottom,
     },
+    /** pageSheet: RN Modal không tự inset nội dung, footer sát đáy sheet cần padding tránh bị home indicator che. */
+    rootIosPageSheet: {
+      paddingBottom: insets.bottom,
+    },
     keyboardAvoid: {
       flex: 1,
     },
