@@ -4,6 +4,8 @@ import { getEnv } from '@/utils/env'
 export const API_TIMEOUT = 30_000
 
 export const API_BASE_URL = getEnv('EXPO_PUBLIC_API_BASE_URL', '')
+/** Fixed host for the `todo` structure-reference feature — independent of the product's own API_BASE_URL. */
+export const DUMMYJSON_BASE_URL = 'https://dummyjson.com'
 
 export const API_AXIOS_CONFIG: CreateAxiosDefaults = {
   baseURL: API_BASE_URL,
@@ -17,6 +19,7 @@ export const Endpoints = {
   login: '/auth/login',
   refresh: '/auth/refresh',
   me: '/auth/me',
+  // `todo` structure reference — always DummyJSON via DUMMYJSON_BASE_URL, regardless of product API_BASE_URL
   todos: '/todos',
   addTodo: '/todos/add',
   todoById: (id: number | string) => `/todos/${id}`,
