@@ -126,12 +126,12 @@ function FormFooterBarComponent({
 
   if (onNext) {
     return (
-      <MyView style={[styles.shell, styles.shellWizard]} fillParent={false}>
-        <MyView style={styles.wizardStack} fillParent={false}>
+      <MyView style={[styles.shell, styles.shellWizard]}>
+        <MyView style={styles.wizardStack}>
           {amountBar}
-          <MyView style={styles.wizardActions} fillParent={false}>
+          <MyView style={styles.wizardActions}>
             <ConditionRenderer when={showBackButton} fallback={null}>
-              <MyView style={styles.wizardButtonGrow} fillParent={false}>
+              <MyView style={styles.wizardButtonGrow}>
                 <MyButton
                   text={backLabel}
                   type="secondary"
@@ -143,7 +143,7 @@ function FormFooterBarComponent({
                 />
               </MyView>
             </ConditionRenderer>
-            <MyView style={styles.wizardButtonGrow} fillParent={false}>
+            <MyView style={styles.wizardButtonGrow}>
               <MyButton
                 text={isLastStep ? saveLabel : nextLabel}
                 type="primary"
@@ -247,11 +247,9 @@ function FormFooterBarComponent({
   )
 
   return (
-    <MyView style={styles.shell} fillParent={false}>
-      <MyView style={styles.row} fillParent={false}>
-        <MyView style={styles.actions} fillParent={false}>
-          {isMobileSize ? mobileActions : desktopActions}
-        </MyView>
+    <MyView style={styles.shell}>
+      <MyView style={styles.row}>
+        <MyView style={styles.actions}>{isMobileSize ? mobileActions : desktopActions}</MyView>
         <ConditionRenderer when={showAmount}>{amountBar}</ConditionRenderer>
       </MyView>
       <ConditionRenderer when={showMoreMenu}>

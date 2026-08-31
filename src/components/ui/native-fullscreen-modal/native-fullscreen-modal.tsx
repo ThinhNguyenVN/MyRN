@@ -37,7 +37,7 @@ function NativeFullscreenModalComponent({
 
   const inner = (
     <>
-      <MyView style={styles.header} fillParent={false}>
+      <MyView style={styles.header}>
         <MyText typography="h3" style={styles.title} numberOfLines={1}>
           {title}
         </MyText>
@@ -53,11 +53,7 @@ function NativeFullscreenModalComponent({
         </MyPressable>
       </MyView>
       <MyView style={[styles.body, bodyStyle]}>{children}</MyView>
-      {footer ? (
-        <MyView style={styles.footer} fillParent={false}>
-          {footer}
-        </MyView>
-      ) : null}
+      {footer ? <MyView style={styles.footer}>{footer}</MyView> : null}
     </>
   )
 

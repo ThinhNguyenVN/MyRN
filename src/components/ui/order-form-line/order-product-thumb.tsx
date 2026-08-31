@@ -14,7 +14,7 @@ const ProductThumbPlaceholder = memo(function ProductThumbPlaceholder() {
   const styles = useThemedStyles(generateStyles)
   const isMobileSize = useIsMobileSize()
   return (
-    <MyView style={styles.productThumb} fillParent={false}>
+    <MyView style={styles.productThumb}>
       <MyIcon name="cube-outline" size={isMobileSize ? 30 : 20} color="icon/inactive/primary" />
     </MyView>
   )

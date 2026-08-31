@@ -7,15 +7,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
+import MyView from '@/components/elements/my-view'
 import { isWeb } from '@/constants/dimensions'
 import { useTheme } from '@/theme/theme-context'
 import { triggerHaptic } from '@/utils/haptic'
-
-import MyView from '@/components/elements/my-view'
-
-import type { AnimatedType, MyPressableEvent, MyPressableProps } from './type'
-
 import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
+
+import type { MyPressableEvent, MyPressableProps } from './type'
 
 export const SCALE_LARGE = 0.985
 export const SCALE_SMALL = 0.95
@@ -24,6 +22,9 @@ const SPRING_CONFIG = { damping: 20, stiffness: 200 }
 const TIMING_DURATION = 100
 const OPACITY_PRESSED = 0.8
 const OPACITY_IDLE = 1
+const MULTI_PRESS_BLOCK_MS = 600
+/** Reused instead of an inline literal so both style arrays below share one object identity. */
+const VISIBLE_OVERFLOW_STYLE = { overflow: 'visible' as const }
 
 const MyPressable: React.FC<MyPressableProps> = ({
   children,
@@ -35,20 +36,26 @@ const MyPressable: React.FC<MyPressableProps> = ({
   scaleBySize = true,
   animatedType = 'scale',
   haptic: hapticProp,
+  preventMultiPress = true,
   style,
   surfaceProps,
   ...rest
 }) => {
   const { hapticEnabled } = useTheme()
   const haptic = hapticProp ?? hapticEnabled
-  const containerStyle = useMemo(
-    () =>
-      getContainerStyle(
-        pickContainerProps(rest as Record<string, unknown>) as Parameters<
-          typeof getContainerStyle
-        >[0],
-      ),
-    [rest],
+  const lastPressAtRef = useRef(0)
+  // A recycled list cell (FlashList) can reuse this same component instance for a different
+  // row without unmounting it — reset the throttle so that row's first tap isn't swallowed by
+  // a leftover timestamp from whatever row this instance rendered before.
+  const lastOnPressRef = useRef(onPress)
+  if (lastOnPressRef.current !== onPress) {
+    lastOnPressRef.current = onPress
+    lastPressAtRef.current = 0
+  }
+  // `rest` is a fresh object every render (object-rest destructuring), so a useMemo keyed on
+  // it would never hit its cache — plain computation avoids paying for that bookkeeping.
+  const containerStyle = getContainerStyle(
+    pickContainerProps(rest as Record<string, unknown>) as Parameters<typeof getContainerStyle>[0],
   )
   const hasContainerStyle = Object.keys(containerStyle).length > 0
   const pressableProps = omitContainerProps(rest as Record<string, unknown>)
@@ -92,11 +99,11 @@ const MyPressable: React.FC<MyPressableProps> = ({
 
   const handlePressIn = useCallback(() => {
     if (disabled) return
-    const handlers: Record<AnimatedType, () => void> = {
-      scale: handlePressInScale,
-      opacity: handlePressInOpacity,
+    if (animatedType === 'scale') {
+      handlePressInScale()
+    } else {
+      handlePressInOpacity()
     }
-    handlers[animatedType]()
     if (haptic) {
       triggerHaptic()
     }
@@ -116,17 +123,29 @@ const MyPressable: React.FC<MyPressableProps> = ({
   const handlePressOut = useCallback(() => {
     onPressOutProp?.()
     if (disabled) return
-    const handlers: Record<AnimatedType, () => void> = {
-      scale: handlePressOutScale,
-      opacity: handlePressOutOpacity,
+    if (animatedType === 'scale') {
+      handlePressOutScale()
+    } else {
+      handlePressOutOpacity()
     }
-    handlers[animatedType]()
   }, [disabled, animatedType, handlePressOutOpacity, handlePressOutScale, onPressOutProp])
 
   // Match React Navigation PlatformPressable: href → <a> on web; preventDefault for SPA nav.
   const handlePress = useCallback(
     (e: MyPressableEvent) => {
       if (disabled) return
+
+      const firePress = () => {
+        if (preventMultiPress) {
+          const now = Date.now()
+          if (now - lastPressAtRef.current < MULTI_PRESS_BLOCK_MS) {
+            return
+          }
+          lastPressAtRef.current = now
+        }
+        onPress?.(e)
+      }
+
       if (isWeb && typeof href === 'string') {
         const hasModifierKey =
           ('metaKey' in e && e.metaKey) ||
@@ -139,13 +158,13 @@ const MyPressable: React.FC<MyPressableProps> = ({
         const isSelfTarget = [undefined, null, '', 'self'].includes(target as string | null)
         if (!hasModifierKey && isLeftClick && isSelfTarget) {
           e.preventDefault?.()
-          onPress?.(e)
+          firePress()
         }
         return
       }
-      onPress?.(e)
+      firePress()
     },
-    [disabled, href, onPress],
+    [disabled, href, onPress, preventMultiPress],
   )
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -185,9 +204,9 @@ const MyPressable: React.FC<MyPressableProps> = ({
       onPressOut={handlePressOut}
       onLayout={scaleBySize ? onLayout : undefined}
       disabled={disabled}
-      style={[...(hasContainerStyle ? [containerStyle] : []), style, { overflow: 'visible' }]}
+      style={[...(hasContainerStyle ? [containerStyle] : []), style, VISIBLE_OVERFLOW_STYLE]}
     >
-      <Animated.View style={[innerLayoutStyle, { overflow: 'visible' }, animatedStyle]}>
+      <Animated.View style={[innerLayoutStyle, VISIBLE_OVERFLOW_STYLE, animatedStyle]}>
         {content}
       </Animated.View>
     </Pressable>

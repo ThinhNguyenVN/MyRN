@@ -4,6 +4,9 @@ import { ViewStyle } from 'react-native'
  * Style được support cho MySurface
  * - Layout cơ bản
  * - Không bao gồm background / shadow
+ * - Không có `borderRadius`: dùng prop `radius` (token) — `style.borderRadius` từng được
+ *   khai báo ở đây nhưng chưa bao giờ được `splitSurfaceStyle`/`index.tsx` đọc, nên bị bỏ
+ *   qua âm thầm.
  */
 export type SurfaceStyle = Pick<
   ViewStyle,
@@ -24,7 +27,6 @@ export type SurfaceStyle = Pick<
   | 'alignSelf'
   | 'backgroundColor'
   | 'gap'
-  | 'borderRadius'
   // --- Size ---
   | 'width'
   | 'height'
@@ -98,7 +100,6 @@ export const CONTAINER_STYLE_KEYS: (keyof SurfaceStyle)[] = [
   // misc
   'opacity',
   'transform',
-  'overflow',
 ]
 
 export const CONTENT_STYLE_KEYS: (keyof SurfaceStyle)[] = [

@@ -10,5 +10,7 @@ export interface MyViewProps extends Omit<ViewProps, 'style'>, ContainerStylePro
   backgroundColor?: FillColorType
   radius?: RadiusType
   elevation?: ElevationToken | 'none'
+  /** Only applies with `elevation` set (delegates to `MySurface`). Default false: content
+   *  sizes to children — set true for pressable/stretch surfaces like buttons. */
   fillParent?: boolean
 }

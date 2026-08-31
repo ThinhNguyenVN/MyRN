@@ -104,10 +104,8 @@ function ExpandableSearchComponent({
           style={styles.closeButton}
         />
       ) : (
-        <MyView style={styles.searchButtonWrap} fillParent={false}>
-          {hasActiveKeyword ? (
-            <MyView style={styles.activeKeywordBadge} fillParent={false} />
-          ) : null}
+        <MyView style={styles.searchButtonWrap}>
+          {hasActiveKeyword ? <MyView style={styles.activeKeywordBadge} /> : null}
           <MyButton.Icon
             icon="search"
             type="secondary"

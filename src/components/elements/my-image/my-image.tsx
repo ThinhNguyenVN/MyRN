@@ -209,7 +209,7 @@ const MyImage: React.FC<MyImageProps> = ({
   ].filter(Boolean)
 
   return (
-    <MyView elevation={elevation} style={containerStyle}>
+    <MyView elevation={elevation} fillParent style={containerStyle}>
       {onPress ? (
         <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.touchable}>
           {content}

@@ -1,12 +1,11 @@
-import React, { memo, useMemo } from 'react'
+import React, { memo } from 'react'
+import { isNil } from 'lodash'
 import { View, StyleProp, ViewStyle } from 'react-native'
 
 import MySurface from '@/components/elements/my-surface'
 import { Radius } from '@/theme/radius'
 import { useTheme } from '@/theme/theme-context'
 import { getContainerStyle, omitContainerProps, pickContainerProps } from '@/utils/styles'
-
-import { isNil } from 'lodash'
 
 import type { MyViewProps } from './type'
 
@@ -15,7 +14,7 @@ const MyView: React.FC<MyViewProps> = ({
   backgroundColor,
   radius,
   elevation,
-  fillParent = true,
+  fillParent = false,
   children,
   ...rest
 }) => {
@@ -23,20 +22,22 @@ const MyView: React.FC<MyViewProps> = ({
 
   const useSurface = !!elevation && elevation !== 'none'
 
-  const containerStyle = useMemo(() => {
-    const s = getContainerStyle(pickContainerProps<MyViewProps>(rest))
-    if (!isNil(backgroundColor)) s.backgroundColor = getColor(backgroundColor!)
-    if (!isNil(radius) && !useSurface) {
-      s.overflow = 'hidden'
-      s.borderRadius = Radius[radius!]
-    }
-    return s
-  }, [rest, backgroundColor, radius, useSurface, getColor])
+  // Resolved once and reused below — `containerStyle.backgroundColor` and the `MySurface`
+  // prop used to each call `getColor` separately for the same value.
+  const resolvedBg = !isNil(backgroundColor) ? getColor(backgroundColor!) : undefined
+
+  // `rest` is a fresh object every render (object-rest destructuring), so a useMemo keyed on
+  // it would never hit its cache — plain computation avoids paying for that bookkeeping.
+  const containerStyle = getContainerStyle(pickContainerProps<MyViewProps>(rest))
+  if (!isNil(resolvedBg)) containerStyle.backgroundColor = resolvedBg
+  if (!isNil(radius) && !useSurface) {
+    containerStyle.overflow = 'hidden'
+    containerStyle.borderRadius = Radius[radius!]
+  }
 
   const hasContainerStyle = Object.keys(containerStyle).length > 0
   const mergedStyle: StyleProp<ViewStyle> = hasContainerStyle ? [containerStyle, style] : style
   const viewProps = omitContainerProps(rest as Record<string, unknown>)
-  const resolvedBg = !isNil(backgroundColor) ? getColor(backgroundColor!) : undefined
 
   if (useSurface) {
     return (

@@ -372,7 +372,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
         haptic={false}
         animatedType="opacity"
       >
-        <MyView pointerEvents="none" fillParent={false}>
+        <MyView pointerEvents="none">
           <MyTextInput
             ref={triggerInputRef}
             title={title}
@@ -415,7 +415,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
   }, [modalMaxHeigh])
 
   const emptySearch = (
-    <MyView style={styles.emptyWrap} fillParent={false}>
+    <MyView style={styles.emptyWrap}>
       <MyEmptyState
         title={
           filterQuery.length > 0
@@ -485,10 +485,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
   )
 
   const mobileSearchField = (
-    <MyView
-      style={isWeb ? [styles.searchWrap, styles.searchWrapWeb] : styles.searchWrap}
-      fillParent={false}
-    >
+    <MyView style={isWeb ? [styles.searchWrap, styles.searchWrapWeb] : styles.searchWrap}>
       <MySearchInput
         ref={mobileSearchRef}
         value={searchQuery}

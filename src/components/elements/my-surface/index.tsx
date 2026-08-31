@@ -1,16 +1,21 @@
-import React, { memo, useId, useMemo, useRef, useState } from 'react'
+import React, { memo, useCallback, useId, useMemo, useRef, useState } from 'react'
 import { View, type ViewStyle, LayoutChangeEvent, StyleProp, StyleSheet } from 'react-native'
 import Svg, { Defs, FeGaussianBlur, Filter, Rect } from 'react-native-svg'
 
-import { Radius, RadiusType } from '@/theme/radius'
-import { ElevationToken, getElevation } from '@/theme/elevation'
-import { SurfaceStyle } from './type'
-import { splitSurfaceStyle } from './utils'
 import { isAndroid, isIos, isWeb } from '@/constants/dimensions'
+import { type ElevationToken, getElevation } from '@/theme/elevation'
+import { Radius, type RadiusType } from '@/theme/radius'
+
+import type { SurfaceStyle } from './type'
+import { splitSurfaceStyle } from './utils'
 
 /** Android SVG shadow: giảm đậm, tăng blur (tránh shadow quá đậm/sắc) */
 const ANDROID_OPACITY_FACTOR = 0.5
 const ANDROID_BLUR_FACTOR = 2
+/** Native `elevation` (dp) shown on Android for the one render before layout is measured and
+ *  the real SVG shadow can be sized — rough, since it's only ever visible for a frame. */
+const ANDROID_PLACEHOLDER_ELEVATION_DIVISOR = 4
+const ANDROID_PLACEHOLDER_ELEVATION_MIN = 2
 
 export interface MySurfaceProps extends Omit<
   SurfaceStyle,
@@ -22,7 +27,8 @@ export interface MySurfaceProps extends Omit<
   backgroundColor?: string
   style?: StyleProp<SurfaceStyle>
   children?: React.ReactNode
-  /** false = content size theo children (auto height, e.g. MyAlert). true = flex:1 fill parent (e.g. MyButton) */
+  /** Default false: content sizes to children (e.g. MyAlert). true = flex:1 fill parent —
+   *  set explicitly for pressable/stretch surfaces (e.g. MyButton). */
   fillParent?: boolean
 }
 
@@ -36,10 +42,12 @@ const MySurface: React.FC<MySurfaceProps> = ({
   backgroundColor,
   style,
   children,
-  fillParent = true,
+  fillParent = false,
   ...rest
 }) => {
-  const filterId = useId().replace(/:/g, '')
+  // useId() never changes for the component's lifetime — memoize so the regex only runs once.
+  const rawId = useId()
+  const filterId = useMemo(() => rawId.replace(/:/g, ''), [rawId])
   const fs = useMemo(() => {
     if (!style) return {}
     return StyleSheet.flatten(style)
@@ -53,15 +61,18 @@ const MySurface: React.FC<MySurfaceProps> = ({
   })
   const [, forceUpdate] = useState(0)
 
-  const onLayout = (e: LayoutChangeEvent) => {
-    if (hasStaticSize) return
-    const { width, height } = e.nativeEvent.layout
-    const s = sizeRef.current
-    if (s.w !== width || s.h !== height) {
-      sizeRef.current = { w: width, h: height }
-      forceUpdate((x) => x + 1)
-    }
-  }
+  const onLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      if (hasStaticSize) return
+      const { width, height } = e.nativeEvent.layout
+      const s = sizeRef.current
+      if (s.w !== width || s.h !== height) {
+        sizeRef.current = { w: width, h: height }
+        forceUpdate((x) => x + 1)
+      }
+    },
+    [hasStaticSize],
+  )
 
   /** Khi có width/height (số) trong style thì dùng luôn; không thì dùng size từ onLayout */
   const w = hasStaticSize ? (fs.width as number) : sizeRef.current.w
@@ -95,6 +106,7 @@ const MySurface: React.FC<MySurfaceProps> = ({
 
   const borderWidth = typeof fs.borderWidth === 'number' ? fs.borderWidth : 0
   const borderColor = typeof fs.borderColor === 'string' ? fs.borderColor : undefined
+  const borderStyle = fs.borderStyle
 
   // Inset đủ để shadow (blur + offset) không bị cắt
   const blurExtent = Math.ceil(shadowBlur * BLUR_EXTENT_FACTOR)
@@ -118,6 +130,14 @@ const MySurface: React.FC<MySurfaceProps> = ({
     [insetLeft, insetTop],
   )
 
+  // SVG shadow needs a measured size first — before that (one render, right after mount),
+  // fall back to Android's native `elevation` shadow so the surface isn't shadowless.
+  const needsSvgShadow = isAndroid && elevation && elevation !== 'none' && w > 0 && h > 0
+  const androidPlaceholderElevation = Math.max(
+    ANDROID_PLACEHOLDER_ELEVATION_MIN,
+    Math.round(blur / ANDROID_PLACEHOLDER_ELEVATION_DIVISOR),
+  )
+
   const finalContainerStyle = useMemo(() => {
     const base: Record<string, unknown> = { ...containerStyle }
     // Outer container owns the shadow; inner content can safely clip children.
@@ -136,7 +156,8 @@ const MySurface: React.FC<MySurfaceProps> = ({
     return base as ViewStyle
   }, [containerStyle, elevation, resolvedBackgroundColor, r, dx, dy, opacity, blur])
 
-  // Inner content: clip, border, background. iOS/Web: native shadow; Android: SVG
+  // Inner content: clip, border, background. iOS/Web: native shadow; Android: SVG (+ a
+  // native-elevation stand-in for the render before that SVG has a measured size).
   const finalContentStyle = useMemo(() => {
     const base: ViewStyle = { ...contentStyle }
     if (!(elevation && elevation !== 'none')) return base
@@ -146,6 +167,7 @@ const MySurface: React.FC<MySurfaceProps> = ({
     if (borderWidth > 0) {
       base.borderWidth = borderWidth
       base.borderColor = borderColor
+      if (borderStyle) base.borderStyle = borderStyle
     }
     if (hasUserOverflowHidden) base.overflow = 'hidden'
 
@@ -153,6 +175,10 @@ const MySurface: React.FC<MySurfaceProps> = ({
     if (isWeb) {
       ;(base as Record<string, unknown>).boxShadow =
         `${dx}px ${dy}px ${blur * 2}px rgba(0,0,0,${opacity})`
+    }
+
+    if (isAndroid && !needsSvgShadow) {
+      base.elevation = androidPlaceholderElevation
     }
     return base
   }, [
@@ -162,14 +188,15 @@ const MySurface: React.FC<MySurfaceProps> = ({
     resolvedBackgroundColor,
     borderWidth,
     borderColor,
+    borderStyle,
     hasUserOverflowHidden,
     dx,
     dy,
     opacity,
     blur,
+    needsSvgShadow,
+    androidPlaceholderElevation,
   ])
-
-  const needsSvgShadow = isAndroid && elevation && elevation !== 'none' && w > 0 && h > 0
 
   return (
     <View style={finalContainerStyle} onLayout={onLayout}>

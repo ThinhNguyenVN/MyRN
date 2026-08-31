@@ -152,7 +152,7 @@ function ImagePickerFieldComponent({
   )
 
   return (
-    <MyView style={styles.root} fillParent={false}>
+    <MyView style={styles.root}>
       {isWeb
         ? createElement('div', { ref: hostRef, style: WEB_HOST_STYLE }, dropzoneBody)
         : dropzoneBody}

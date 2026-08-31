@@ -35,9 +35,9 @@ function StepperComponent({
   )
 
   return (
-    <MyView style={[styles.root, style]} fillParent={false}>
-      <MyView style={styles.row} fillParent={false} onLayout={handleRowLayout}>
-        <MyView style={styles.connectorsLayer} fillParent={false} pointerEvents="none">
+    <MyView style={[styles.root, style]}>
+      <MyView style={styles.row} onLayout={handleRowLayout}>
+        <MyView style={styles.connectorsLayer} pointerEvents="none">
           {steps.slice(1).map((_, index) => {
             const segmentIndex = index
             const destinationStep = index + 1

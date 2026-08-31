@@ -18,11 +18,11 @@ function FormFooterAmountBarComponent({
   const layoutStyle = layout === 'compact' ? styles.compact : styles.stacked
 
   return (
-    <MyView style={[styles.bar, layoutStyle]} fillParent={false}>
+    <MyView style={[styles.bar, layoutStyle]}>
       <ConditionRenderer when={Boolean(leading)} fallback={null}>
         {leading}
       </ConditionRenderer>
-      <MyView style={styles.total} fillParent={false}>
+      <MyView style={styles.total}>
         <MyText typography="caption" style={styles.totalLabel}>
           {totalLabel}
         </MyText>

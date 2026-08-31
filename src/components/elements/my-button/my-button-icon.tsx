@@ -64,7 +64,7 @@ const MyButtonIcon: React.FC<MyButtonIconProps> = ({
       {...pressableProps}
       style={touchableStyle}
     >
-      <MyView elevation={elevation} style={surfaceStyle} radius="full">
+      <MyView elevation={elevation} style={surfaceStyle} radius="full" fillParent>
         {content}
       </MyView>
     </MyPressable>

@@ -38,12 +38,7 @@ function StepConnectorComponent({ filled, style }: StepConnectorProps) {
   }))
 
   return (
-    <MyView
-      style={[styles.connector, style]}
-      fillParent={false}
-      pointerEvents="none"
-      onLayout={handleLayout}
-    >
+    <MyView style={[styles.connector, style]} pointerEvents="none" onLayout={handleLayout}>
       <Animated.View style={[styles.connectorFill, fillStyle]} />
     </MyView>
   )

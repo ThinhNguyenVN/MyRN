@@ -17,8 +17,8 @@ const ShadowPreloader: React.FC = () => {
 
   return (
     <View style={styles.wrapper}>
-      <MySurface elevation="soft/down/small" radius="medium" style={styles.surface} />
-      <MySurface elevation="soft/right/small" radius="medium" style={styles.surface} />
+      <MySurface elevation="soft/down/small" radius="medium" fillParent style={styles.surface} />
+      <MySurface elevation="soft/right/small" radius="medium" fillParent style={styles.surface} />
     </View>
   )
 }

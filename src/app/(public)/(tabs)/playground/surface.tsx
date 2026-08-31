@@ -27,7 +27,6 @@ export default function SurfacePlaygroundScreen() {
         elevation="soft/down/small"
         radius="medium"
         backgroundColor={surfaceBg}
-        fillParent={false}
         style={styles.surfaceDemoBox}
       >
         <MyView style={styles.surfaceDemoInner}>
@@ -42,7 +41,6 @@ export default function SurfacePlaygroundScreen() {
         elevation="soft/down/medium"
         radius="medium"
         backgroundColor={surfaceBg}
-        fillParent={false}
         style={styles.surfaceDemoBox}
       >
         <MyView style={styles.surfaceDemoInner}>
@@ -57,7 +55,6 @@ export default function SurfacePlaygroundScreen() {
         elevation="hard/down/large"
         radius="large"
         backgroundColor={surfaceBg}
-        fillParent={false}
         style={styles.surfaceDemoBox}
       >
         <MyView style={styles.surfaceDemoInner}>

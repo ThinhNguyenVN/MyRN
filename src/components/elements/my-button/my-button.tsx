@@ -103,7 +103,7 @@ const MyButton: React.FC<MyButtonProps> = ({
       {...pressableProps}
       style={touchableStyle}
     >
-      <MyView radius="large" elevation={elevation} style={surfaceStyle}>
+      <MyView radius="large" elevation={elevation} fillParent style={surfaceStyle}>
         {content}
       </MyView>
     </MyPressable>
