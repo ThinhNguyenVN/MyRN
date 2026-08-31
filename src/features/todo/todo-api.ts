@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
 
 import { axiosBaseQuery } from '@/api/axios-base-query'
-import { Endpoints } from '@/constants/api'
+import { DUMMYJSON_BASE_URL, Endpoints } from '@/constants/api'
 import type {
   CreateTodoPayload,
   DeleteTodoResponse,
@@ -43,12 +43,14 @@ export const todoApi = createApi({
             url: Endpoints.todosByUser(userId),
             method: 'GET',
             params: { limit, skip },
+            baseUrl: DUMMYJSON_BASE_URL,
           }
         }
         return {
           url: Endpoints.todos,
           method: 'GET',
           params: { limit, skip },
+          baseUrl: DUMMYJSON_BASE_URL,
         }
       },
       providesTags: (result) => [
@@ -57,7 +59,7 @@ export const todoApi = createApi({
       ],
     }),
     getTodoById: builder.query<TodoItem, number>({
-      query: (id) => ({ url: Endpoints.todoById(id), method: 'GET' }),
+      query: (id) => ({ url: Endpoints.todoById(id), method: 'GET', baseUrl: DUMMYJSON_BASE_URL }),
       providesTags: (_result, _error, id) => [{ type: 'Todo', id }],
     }),
     createTodo: builder.mutation<TodoItem, CreateTodoPayload>({
@@ -65,6 +67,7 @@ export const todoApi = createApi({
         url: Endpoints.addTodo,
         method: 'POST',
         data: body,
+        baseUrl: DUMMYJSON_BASE_URL,
       }),
       async onQueryStarted(arg, { dispatch, getState, queryFulfilled }) {
         const tempId = -Date.now()
@@ -96,6 +99,7 @@ export const todoApi = createApi({
         url: Endpoints.todoById(id),
         method: 'PUT',
         data: body,
+        baseUrl: DUMMYJSON_BASE_URL,
       }),
       async onQueryStarted(arg, { dispatch, getState, queryFulfilled }) {
         const patches = patchAllTodoLists(dispatch, getState as () => RootState, (draft) => {
@@ -130,6 +134,7 @@ export const todoApi = createApi({
       query: (id) => ({
         url: Endpoints.todoById(id),
         method: 'DELETE',
+        baseUrl: DUMMYJSON_BASE_URL,
       }),
       async onQueryStarted(id, { dispatch, getState, queryFulfilled }) {
         const patches = patchAllTodoLists(dispatch, getState as () => RootState, (draft) => {
