@@ -136,7 +136,7 @@ const MyChip: React.FC<MyChipProps> = ({
   if (!!onPress) {
     return (
       <MyPressable disabled={disabled} onPress={onPress} {...pressableProps} style={touchableStyle}>
-        <MyView radius="full" elevation={elevation} style={surfaceStyle}>
+        <MyView radius="full" elevation={elevation} fillParent style={surfaceStyle}>
           {content}
         </MyView>
       </MyPressable>
@@ -144,7 +144,7 @@ const MyChip: React.FC<MyChipProps> = ({
   }
 
   return (
-    <MyView radius="full" elevation={elevation} style={[surfaceStyle, touchableStyle]}>
+    <MyView radius="full" elevation={elevation} fillParent style={[surfaceStyle, touchableStyle]}>
       {content}
     </MyView>
   )

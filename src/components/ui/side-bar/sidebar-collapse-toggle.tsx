@@ -47,7 +47,7 @@ function SidebarCollapseToggleComponent({
       accessibilityLabel={accessibilityLabel}
       haptic={false}
     >
-      <MySurface elevation="soft/down/small" radius="full" style={styles.surface}>
+      <MySurface elevation="soft/down/small" radius="full" fillParent style={styles.surface}>
         <Animated.View style={[styles.iconWrap, iconAnimatedStyle]}>
           <MyIcon name="chevron-back" size={18} color={getColor('icon/active/primary')} />
         </Animated.View>

@@ -114,6 +114,7 @@ export const ImageSlider = memo(function ImageSlider({
         backgroundColor="fill/background/secondary"
         elevation="soft/down/large"
         radius="medium"
+        fillParent
         style={[styles.frame, { aspectRatio }]}
         onLayout={handleLayout}
       >

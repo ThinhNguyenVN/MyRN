@@ -37,7 +37,6 @@ const MyCard: React.FC<MyCardProps> = ({
       elevation={elevation}
       radius={radius}
       backgroundColor={backgroundColor}
-      fillParent={false}
       style={[styles.surface, style]}
     >
       {content}

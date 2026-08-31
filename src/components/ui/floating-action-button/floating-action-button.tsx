@@ -34,7 +34,7 @@ function FloatingActionButtonComponent({
   )
 
   return (
-    <MyView style={rootStyle} pointerEvents="box-none" fillParent={false} testID={testID}>
+    <MyView style={rootStyle} pointerEvents="box-none" testID={testID}>
       <MyButton.Icon
         icon={icon}
         type={type}

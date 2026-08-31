@@ -223,6 +223,7 @@ function SideBarInner({
       elevation={elevation === 'none' ? undefined : elevation}
       style={isFlush ? styles.sidebarFlush : styles.sidebar}
       radius={isFlush ? 'none' : 'medium'}
+      fillParent
     >
       {header ? <View style={styles.header}>{header}</View> : null}
       {listContent}

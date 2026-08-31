@@ -58,7 +58,12 @@ const MyCheckbox = memo(function MyCheckbox({
   )
 
   const box = (
-    <MyView elevation={elevation} radius={type === 'checkbox' ? 'small' : 'full'} style={boxStyle}>
+    <MyView
+      elevation={elevation}
+      radius={type === 'checkbox' ? 'small' : 'full'}
+      fillParent
+      style={boxStyle}
+    >
       {boxContent}
     </MyView>
   )

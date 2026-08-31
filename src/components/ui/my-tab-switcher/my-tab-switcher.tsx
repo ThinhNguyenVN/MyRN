@@ -47,7 +47,7 @@ function MyTabSwitcherComponent<TId extends string = string>({
 
   return (
     <MyView style={[styles.root, containerStyle]}>
-      <MyView style={[styles.tabBar, tabBarStyle]} fillParent={false}>
+      <MyView style={[styles.tabBar, tabBarStyle]}>
         {tabs.map((tab) => {
           const isActive = tab.id === activeId
           const accessibilityState: AccessibilityState = { selected: isActive }

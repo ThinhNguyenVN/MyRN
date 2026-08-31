@@ -34,8 +34,8 @@ function StepItemComponent({ index, active, completed, reachable, title, onPress
       accessibilityState={{ selected: active, disabled: !reachable }}
       accessibilityLabel={title}
     >
-      <MyView style={wrapStyle} fillParent={false}>
-        <MyView style={circleStyle} fillParent={false}>
+      <MyView style={wrapStyle}>
+        <MyView style={circleStyle}>
           <ConditionRenderer
             when={completed}
             fallback={

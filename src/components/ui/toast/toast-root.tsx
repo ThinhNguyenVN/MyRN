@@ -149,12 +149,7 @@ const ToastRoot = forwardRef<ToastRef, object>(function ToastRoot(_, ref) {
   const elevationFinal = elevation && elevation !== 'none' ? elevation : undefined
 
   const wrapper = (
-    <MyView
-      elevation={elevationFinal}
-      radius="medium"
-      fillParent={false}
-      style={[styles.container, containerStyle]}
-    >
+    <MyView elevation={elevationFinal} radius="medium" style={[styles.container, containerStyle]}>
       <MyView style={styles.toastRow}>{body}</MyView>
     </MyView>
   )

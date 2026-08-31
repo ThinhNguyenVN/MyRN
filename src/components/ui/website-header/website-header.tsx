@@ -30,7 +30,7 @@ function WebsiteHeaderComponent({
   }, [onBackPress])
 
   return (
-    <MyView style={styles.root} fillParent={false}>
+    <MyView style={styles.root}>
       <MyView style={styles.titleRow}>
         {showBack ? (
           <MyButton.Icon

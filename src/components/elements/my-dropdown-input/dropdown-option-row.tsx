@@ -14,7 +14,7 @@ import type { DropdownOptionRowProps } from './type'
 const OptionThumbPlaceholder = memo(function OptionThumbPlaceholder() {
   const styles = useThemedStyles(generateStyles)
   return (
-    <MyView style={styles.optionThumbPlaceholder} fillParent={false}>
+    <MyView style={styles.optionThumbPlaceholder}>
       <MyIcon name="cube-outline" size={18} color="icon/inactive/primary" />
     </MyView>
   )
@@ -53,7 +53,7 @@ function DropdownOptionRowComponent({
           />
         </ConditionRenderer>
       </ConditionRenderer>
-      <MyView style={styles.optionLabelWrap} fillParent={false}>
+      <MyView style={styles.optionLabelWrap}>
         <MyText typography="body" style={styles.optionLabelMobile} numberOfLines={1}>
           {option.label}
         </MyText>

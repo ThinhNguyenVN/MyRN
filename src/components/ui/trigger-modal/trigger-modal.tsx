@@ -120,6 +120,7 @@ const TriggerModal = memo(function TriggerModal({
         <MyView
           elevation={'soft/down/small'}
           radius="medium"
+          fillParent
           style={[
             styles.panel,
             panelLayout && {

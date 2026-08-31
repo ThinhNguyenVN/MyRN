@@ -49,11 +49,7 @@ const MyAlert: React.FC<MyAlertProps> = ({
 
   const renderFooterButton = useCallback(
     (btn: MyAlertButtonProp, index: number) => (
-      <MyView
-        key={`alert-footer-${btn.text}-${index}`}
-        style={styles.footerButtonWrap}
-        fillParent={false}
-      >
+      <MyView key={`alert-footer-${btn.text}-${index}`} style={styles.footerButtonWrap}>
         <MyButton
           text={btn.text}
           type={btn.type ?? 'primary'}
@@ -79,7 +75,6 @@ const MyAlert: React.FC<MyAlertProps> = ({
       radius="large"
       style={[styles.container, style]}
       elevation={elevation && elevation !== 'none' ? elevation : undefined}
-      fillParent={false}
       {...(rest as Record<string, unknown>)}
     >
       <ConditionRenderer when={hasHeader}>

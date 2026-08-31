@@ -102,6 +102,7 @@ const MyCounter = memo(function MyCounter({
         onPressIn={onMinusPressIn}
         onPressOut={clearTimers}
         disabled={disabled}
+        preventMultiPress={false}
       />
       <MyView style={styles.numberWrap}>
         <MyText typography="body">{currentValue}</MyText>
@@ -114,6 +115,7 @@ const MyCounter = memo(function MyCounter({
         onPressIn={onPlusPressIn}
         onPressOut={clearTimers}
         disabled={disabled}
+        preventMultiPress={false}
       />
     </MyView>
   )

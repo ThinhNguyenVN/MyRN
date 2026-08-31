@@ -7,3 +7,4 @@ export type {
   OrderFormLineProductChange,
   OrderProductThumbProps,
 } from './type'
+export { withOrderLineProductOptions } from './utils'

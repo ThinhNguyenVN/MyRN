@@ -39,4 +39,8 @@ export interface MyPressableProps
   surfaceProps?: Partial<MyViewProps>
   /** When set (e.g. tab bar), RN web renders an `<a>`; must preventDefault for SPA nav. */
   href?: string
+  /** Ignores a repeat `onPress` within the block window of the last one (default on) — guards
+   *  against a double-tap firing navigation/a mutation twice. Turn off for controls meant to
+   *  fire repeatedly in quick succession, e.g. `MyCounter`'s +/- buttons. */
+  preventMultiPress?: boolean
 }

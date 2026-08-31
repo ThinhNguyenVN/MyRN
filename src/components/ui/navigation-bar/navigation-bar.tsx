@@ -45,7 +45,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const hasTitleRoom = barWidth === 0 || leftWidth + rightWidth + MIN_TITLE_SPACE <= barWidth
 
   return (
-    <MyView style={styles.bar} fillParent={false} onLayout={onBarLayout}>
+    <MyView style={styles.bar} onLayout={onBarLayout}>
       <MyView style={styles.left} onLayout={onLeftLayout}>
         {left ??
           (shouldShowBack ? (

@@ -83,7 +83,10 @@ export function pickContainerProps<T>(props: Partial<T>): Partial<T> {
   return out as Partial<T>
 }
 
+const CONTAINER_STYLE_KEYS_SET = new Set<string>(CONTAINER_STYLE_KEYS as unknown as string[])
+
 export function omitContainerProps<T extends Record<string, unknown>>(props: T): T {
-  const keysSet = new Set<string>(CONTAINER_STYLE_KEYS as unknown as string[])
-  return Object.fromEntries(Object.entries(props).filter(([k]) => !keysSet.has(k))) as T
+  return Object.fromEntries(
+    Object.entries(props).filter(([k]) => !CONTAINER_STYLE_KEYS_SET.has(k)),
+  ) as T
 }
