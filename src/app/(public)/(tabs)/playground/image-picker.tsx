@@ -67,6 +67,20 @@ export default function ImagePickerScreen() {
         onImagePicked={applyPicked}
         onPickError={handlePickError}
       />
+      <MyText typography="body" color="text/active/secondary" style={styles.introText}>
+        {t('playground.imagePickerAvatarIntro')}
+      </MyText>
+      <ImagePickerField
+        shape="circle"
+        imageUri={imageUri}
+        isUploading={isUploading}
+        emptyTitle={t('playground.imagePickerEmptyTitle')}
+        clearAccessibilityLabel={t('playground.imagePickerClear')}
+        onPick={handlePick}
+        onClear={handleClear}
+        onImagePicked={applyPicked}
+        onPickError={handlePickError}
+      />
     </MyKeyboardAvoiding.ScrollView>
   )
 }

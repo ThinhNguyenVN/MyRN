@@ -95,6 +95,14 @@ export default function TextInputScreen() {
           height={100}
         />
         <MyTextInput
+          title={t('playground.textInputLargeSize')}
+          placeholder={t('playground.textInputMultipleLines')}
+          multiline
+          size="large"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <MyTextInput
           title={t('playground.textInputReadOnly')}
           placeholder="editable={false}"
           editable={false}

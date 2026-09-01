@@ -41,6 +41,8 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Order line (product / unit / qty / price) | `OrderFormLineEditor` | Feature-only line cards |
 | Desktop table row overflow | `TableRowMoreMenu` | Ad-hoc `TriggerModal` per table |
 | Client-side list paging | `useClientListPaging` | Per-feature page/load-more state |
+| Grouped nav rows in a card (settings/profile-style) | `MenuListCard` (`components/ui/menu-list-card`) | One-off row list with hand-rolled dividers/chevrons |
+| Avatar-triggered popover menu (e.g. header profile action) | `ProfileMenuButton` (`components/ui/profile-menu-button`) | Ad-hoc `TriggerModal` + avatar wiring per screen |
 
 ## Layout surfaces
 
@@ -131,6 +133,7 @@ Two gotchas are already handled centrally inside `MyBottomSheet` — do not re-s
 - Desktop page header: title, optional back, notifications + profile actions
 - `right?` slot before notifications; `WebsiteHeaderNav` forwards stack `options.headerRight`
 - Pair with `WebsiteHeaderNav` for stack header options; `useComingSoon` backs unwired actions
+- Profile action: pass `profileMenuItems: ProfileMenuItem[]` (+ optional `avatarUri`) to render a `ProfileMenuButton` popover instead of the plain icon; omit both to keep the old `onProfilePress` icon-only behavior. Product-specific data (e.g. "what goes in the menu") stays in the product — don't hardwire a domain hook into this component.
 - Playground: `…/playground/website-header.tsx`
 
 ### `PrivateStackHeader`
@@ -272,6 +275,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Path: `@/components/ui/image-picker`
 - `pickImage` + `buildImageFormData` for library pick + multipart; `ImagePickerField` for dropzone UI (web drag-drop)
 - `readOnly` — preview only (no pick, drop, or clear)
+- `shape?: 'square' | 'circle'` — `square` (default) is a full-width rectangle (e.g. product photo); `circle` is a fixed-size (`AVATAR_PICKER_SIZE`, 140) centered avatar dropzone with an icon-only empty state (no title/hint — not enough room)
 - Playground: `…/playground/image-picker.tsx`
 
 ### `MediaListRow`
@@ -279,6 +283,13 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Path: `@/components/ui/media-list-row`
 - Thumb + title + subtitle + optional trailing for list rows
 - Playground: `…/playground/media-list-row.tsx`
+
+### `MenuListCard`
+
+- Path: `@/components/ui/menu-list-card`
+- One or more icon + label + chevron rows grouped in a single card — settings/profile-style nav lists
+- Props: `items: MenuListItem[]` (`key`, `icon`, `label`, `onPress`), optional `title?` (label above the card), `showChevron?` (default `true`)
+- Playground: `…/playground/menu-list-card.tsx`
 
 ### `FloatingActionButton`
 
@@ -305,6 +316,14 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Path: `@/components/ui/table-row-more-menu`
 - Ellipsis trigger + `TriggerModal` panel of full-width `MyButton` actions
 - Playground: `…/playground/table-row-more-menu.tsx`
+
+### `ProfileMenuButton`
+
+- Path: `@/components/ui/profile-menu-button`
+- Avatar (falls back to a placeholder person icon when `avatarUri` is not set) trigger + `TriggerModal` panel of full-width `MyButton` actions — same shape as `TableRowMoreMenu` but sized/styled for a header avatar trigger
+- Props: `items: ProfileMenuItem[]` (`key`, `text`, `icon`, `onPress`), `avatarUri?`, `accessibilityLabel`
+- Used by `WebsiteHeader`'s `profileMenuItems` prop; can also be used standalone
+- Playground: `…/playground/profile-menu-button.tsx`
 
 ### Shared form hooks
 

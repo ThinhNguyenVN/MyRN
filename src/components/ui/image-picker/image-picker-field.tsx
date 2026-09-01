@@ -44,9 +44,11 @@ function ImagePickerFieldComponent({
   onPickError,
   pickOptions,
   readOnly = false,
+  shape = 'square',
 }: ImagePickerFieldProps) {
   const styles = useThemedStyles(generateStyles)
   const { getColor } = useTheme()
+  const isAvatar = shape === 'circle'
   const hasPreview = Boolean(imageUri)
   const showClear = hasPreview && !isUploading && !readOnly
   const dropHandler = readOnly ? undefined : onImagePicked
@@ -88,14 +90,21 @@ function ImagePickerFieldComponent({
   }, [activeBorder, activeFill, idleBorder, idleFill])
 
   const dropzoneBody = (
-    <View style={styles.dropzoneHost}>
-      <Animated.View style={[styles.dropzone, dropzoneAnimatedStyle]}>
+    <View style={isAvatar ? styles.dropzoneHostAvatar : styles.dropzoneHost}>
+      <Animated.View
+        style={[isAvatar ? styles.dropzoneAvatar : styles.dropzone, dropzoneAnimatedStyle]}
+      >
         <MyPressable
           style={
-            hasPreview || isUploading ? styles.dropzonePressableFilled : styles.dropzonePressable
+            hasPreview || isUploading
+              ? styles.dropzonePressableFilled
+              : isAvatar
+                ? styles.dropzonePressableAvatar
+                : styles.dropzonePressable
           }
           onPress={onPick}
           disabled={isUploading || readOnly}
+          accessibilityLabel={isAvatar ? emptyTitle : undefined}
         >
           <ConditionRenderer when={hasPreview}>
             <View style={styles.preview} pointerEvents="none">
@@ -108,7 +117,10 @@ function ImagePickerFieldComponent({
               />
             </View>
           </ConditionRenderer>
-          <ConditionRenderer when={!hasPreview && !isUploading}>
+          <ConditionRenderer when={!hasPreview && !isUploading && isAvatar}>
+            <MyIcon name="camera-outline" size={32} color="icon/inactive/primary" />
+          </ConditionRenderer>
+          <ConditionRenderer when={!hasPreview && !isUploading && !isAvatar}>
             <>
               <MyIcon name="cloud-upload-outline" size={40} color="icon/inactive/primary" />
               <MyText typography="body">{emptyTitle}</MyText>
@@ -152,7 +164,7 @@ function ImagePickerFieldComponent({
   )
 
   return (
-    <MyView style={styles.root}>
+    <MyView style={isAvatar ? styles.rootAvatar : styles.root}>
       {isWeb
         ? createElement('div', { ref: hostRef, style: WEB_HOST_STYLE }, dropzoneBody)
         : dropzoneBody}

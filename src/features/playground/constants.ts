@@ -29,6 +29,8 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string }[] = [
   { labelKey: 'playground.linksFormFooterBar', href: '/playground/form-footer-bar' },
   { labelKey: 'playground.linksOrderFormLine', href: '/playground/order-form-line' },
   { labelKey: 'playground.linksTableRowMoreMenu', href: '/playground/table-row-more-menu' },
+  { labelKey: 'playground.linksMenuListCard', href: '/playground/menu-list-card' },
+  { labelKey: 'playground.linksProfileMenuButton', href: '/playground/profile-menu-button' },
   { labelKey: 'playground.linksDivider', href: '/playground/divider' },
   { labelKey: 'playground.linksCard', href: '/playground/card' },
   { labelKey: 'playground.linksEmptyState', href: '/playground/empty-state' },

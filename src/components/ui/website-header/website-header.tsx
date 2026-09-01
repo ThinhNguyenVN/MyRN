@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
+import { ProfileMenuButton } from '@/components/ui/profile-menu-button'
 import { useComingSoon } from '@/hooks/use-coming-soon'
 import { useThemedStyles } from '@/theme/theme-context'
 
@@ -16,6 +17,8 @@ function WebsiteHeaderComponent({
   onBackPress,
   onNotificationsPress,
   onProfilePress,
+  avatarUri,
+  profileMenuItems,
   right,
 }: WebsiteHeaderProps) {
   const styles = useThemedStyles(generateStyles)
@@ -56,14 +59,22 @@ function WebsiteHeaderComponent({
           onPress={handleNotifications}
           accessibilityLabel={t('dashboard.header.notifications')}
         />
-        <MyButton.Icon
-          icon="person-circle-outline"
-          type="light"
-          size="small"
-          elevation="none"
-          onPress={handleProfile}
-          accessibilityLabel={t('dashboard.header.profile')}
-        />
+        {profileMenuItems && profileMenuItems.length > 0 ? (
+          <ProfileMenuButton
+            avatarUri={avatarUri}
+            items={profileMenuItems}
+            accessibilityLabel={t('dashboard.header.profile')}
+          />
+        ) : (
+          <MyButton.Icon
+            icon="person-circle-outline"
+            type="light"
+            size="small"
+            elevation="none"
+            onPress={handleProfile}
+            accessibilityLabel={t('dashboard.header.profile')}
+          />
+        )}
       </MyView>
     </MyView>
   )

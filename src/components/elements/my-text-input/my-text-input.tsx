@@ -27,10 +27,15 @@ import MyText from '../my-text'
 import MyView from '../my-view'
 
 import { generateStyles } from './styles'
-import type { MyTextInputProps, MyTextInputRef } from './type'
+import type { MyTextInputProps, MyTextInputRef, TextInputSize } from './type'
 
 const INPUT_FONT_SIZE = 16
 const INPUT_HEIGHT = 40
+const INPUT_HEIGHT_LARGE = 100
+const DEFAULT_HEIGHT_BY_SIZE: Record<TextInputSize, number> = {
+  small: INPUT_HEIGHT,
+  large: INPUT_HEIGHT_LARGE,
+}
 
 function resolveNumberFormatOptions(
   numberFormat: MyTextInputProps['numberFormat'],
@@ -67,7 +72,8 @@ const MyTextInput = memo(
       onStartIconPress,
       onEndIconPress,
       width = 'auto',
-      height = INPUT_HEIGHT,
+      size = 'small',
+      height,
       borderless = false,
       onFocus: onFocusProp,
       onBlur: onBlurProp,
@@ -178,23 +184,24 @@ const MyTextInput = memo(
       }
     }, [width])
 
+    const resolvedHeight = height ?? DEFAULT_HEIGHT_BY_SIZE[size]
     const inputRowStateStyle = useMemo(
       () => ({
         borderColor: stateColors.border,
-        height,
+        height: resolvedHeight,
         ...(borderless ? { borderWidth: 0, backgroundColor: 'transparent' } : null),
       }),
-      [borderless, stateColors.border, height],
+      [borderless, stateColors.border, resolvedHeight],
     )
     const inputDynamicStyle = useMemo(
       () => ({
         fontSize: INPUT_FONT_SIZE,
         color: stateColors.value,
-        alignItems: height > INPUT_HEIGHT ? 'flex-start' : 'center',
+        alignItems: resolvedHeight > INPUT_HEIGHT ? 'flex-start' : 'center',
         minHeight: INPUT_HEIGHT,
-        height,
+        height: resolvedHeight,
       }),
-      [stateColors.value, height],
+      [stateColors.value, resolvedHeight],
     )
     const webInputStyle = useMemo(
       () =>
@@ -250,7 +257,7 @@ const MyTextInput = memo(
             style={[
               styles.inputBase,
               inputDynamicStyle as TextStyle,
-              height > INPUT_HEIGHT && styles.inputMultilinePadding,
+              resolvedHeight > INPUT_HEIGHT && styles.inputMultilinePadding,
               webInputStyle,
               inputStyle,
             ]}

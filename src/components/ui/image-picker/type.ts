@@ -51,4 +51,6 @@ export type ImagePickerFieldProps = {
   onPickError?: (error: unknown) => void
   /** Forwarded to {@link pickedImageFromFile} for drop validation. */
   pickOptions?: PickImageOptions
+  /** `square` (default): full-width rectangle, e.g. product photo. `circle`: fixed-size avatar. */
+  shape?: 'square' | 'circle'
 }
