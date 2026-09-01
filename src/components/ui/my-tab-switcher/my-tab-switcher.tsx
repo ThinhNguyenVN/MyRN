@@ -16,7 +16,7 @@ const DEFAULT_DURATION = 220
  * Tab switcher tái sử dụng — truyền mảng tabs + renderContent theo id.
  * Nội dung slide theo hướng chuyển (tab bên phải trượt từ phải vào và ngược lại).
  */
-function MyTabSwitcherComponent<TId extends string = string>({
+function MyTabSwitcher<TId extends string = string>({
   tabs,
   activeId,
   onChange,
@@ -80,6 +80,6 @@ function MyTabSwitcherComponent<TId extends string = string>({
 /**
  * memo() xoá generic của function component — cast để giữ nguyên TId khi dùng trong JSX.
  */
-export default memo(MyTabSwitcherComponent) as <TId extends string>(
+export default memo(MyTabSwitcher) as <TId extends string>(
   props: MyTabSwitcherProps<TId>,
 ) => ReactNode

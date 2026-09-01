@@ -14,7 +14,7 @@ import { PROGRESS_MS } from './constants'
 import { generateStyles } from './styles'
 import type { StepConnectorProps } from './type'
 
-function StepConnectorComponent({ filled, style }: StepConnectorProps) {
+function StepConnectorInner({ filled, style }: StepConnectorProps) {
   const styles = useThemedStyles(generateStyles)
   const trackWidth = useSharedValue(0)
   const progress = useSharedValue(filled ? 1 : 0)
@@ -44,4 +44,4 @@ function StepConnectorComponent({ filled, style }: StepConnectorProps) {
   )
 }
 
-export const StepConnector = memo(StepConnectorComponent)
+export const StepConnector = memo(StepConnectorInner)

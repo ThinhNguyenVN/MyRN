@@ -10,7 +10,7 @@ import { StepItem } from './step-item'
 import { generateStyles } from './styles'
 import type { StepperProps } from './type'
 
-function StepperComponent({
+function Stepper({
   steps,
   activeStep,
   maxReached,
@@ -76,4 +76,4 @@ function StepperComponent({
   )
 }
 
-export default memo(StepperComponent)
+export default memo(Stepper)

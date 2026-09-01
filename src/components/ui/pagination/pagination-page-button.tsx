@@ -7,7 +7,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 import type { PaginationPageButtonProps } from './type'
 
-function PaginationPageButtonComponent({ pageNumber, active, onPress }: PaginationPageButtonProps) {
+function PaginationPageButtonInner({ pageNumber, active, onPress }: PaginationPageButtonProps) {
   const styles = useThemedStyles(generateStyles)
 
   const handlePress = useCallback(() => {
@@ -29,4 +29,4 @@ function PaginationPageButtonComponent({ pageNumber, active, onPress }: Paginati
   )
 }
 
-export const PaginationPageButton = memo(PaginationPageButtonComponent)
+export const PaginationPageButton = memo(PaginationPageButtonInner)

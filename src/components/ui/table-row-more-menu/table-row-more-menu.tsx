@@ -47,7 +47,7 @@ function MoreMenuItemButton({
   )
 }
 
-function TableRowMoreMenuComponent({
+function TableRowMoreMenuInner({
   items,
   accessibilityLabel,
   panelMinWidth = 220,
@@ -108,4 +108,4 @@ function TableRowMoreMenuComponent({
   )
 }
 
-export const TableRowMoreMenu = memo(TableRowMoreMenuComponent)
+export const TableRowMoreMenu = memo(TableRowMoreMenuInner)

@@ -13,11 +13,7 @@ import type { ProfileMenuButtonProps, ProfileMenuItem } from './type'
 const ITEM_HEIGHT_ESTIMATE = 52
 const PANEL_PADDING_ESTIMATE = 40
 
-function ProfileMenuButtonComponent({
-  avatarUri,
-  items,
-  accessibilityLabel,
-}: ProfileMenuButtonProps) {
+function ProfileMenuButtonInner({ avatarUri, items, accessibilityLabel }: ProfileMenuButtonProps) {
   const styles = useThemedStyles(generateStyles)
   const triggerRef = useRef<View>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -100,4 +96,4 @@ function ProfileMenuButtonComponent({
   )
 }
 
-export const ProfileMenuButton = memo(ProfileMenuButtonComponent)
+export const ProfileMenuButton = memo(ProfileMenuButtonInner)

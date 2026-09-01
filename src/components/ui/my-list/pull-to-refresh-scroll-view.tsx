@@ -26,7 +26,7 @@ export type PullToRefreshScrollViewProps = ScrollViewProps & {
   enableScrollToHide?: boolean
 }
 
-function PullToRefreshScrollViewComponent({
+function PullToRefreshScrollViewInner({
   refreshing,
   onRefresh,
   children,
@@ -104,11 +104,11 @@ function PullToRefreshScrollViewComponent({
     return <RefreshControl {...pullToRefresh.refreshControlProps} />
   }, [hasPullToRefresh, pullToRefresh.refreshControlProps, refreshControlProp])
 
-  const ScrollComponent = scrollBinding.isActive ? Animated.ScrollView : ScrollView
+  const Scroll = scrollBinding.isActive ? Animated.ScrollView : ScrollView
 
   return (
     <MyView style={styles.flex}>
-      <ScrollComponent
+      <Scroll
         {...rest}
         refreshControl={refreshControl}
         onScroll={scrollBinding.onScroll}
@@ -117,7 +117,7 @@ function PullToRefreshScrollViewComponent({
         scrollEventThrottle={scrollBinding.scrollEventThrottle}
       >
         {children}
-      </ScrollComponent>
+      </Scroll>
       {hasPullToRefresh ? (
         <RefreshIndicator
           pullDistance={pullToRefresh.pullDistance}
@@ -132,4 +132,4 @@ function PullToRefreshScrollViewComponent({
   )
 }
 
-export const PullToRefreshScrollView = memo(PullToRefreshScrollViewComponent)
+export const PullToRefreshScrollView = memo(PullToRefreshScrollViewInner)

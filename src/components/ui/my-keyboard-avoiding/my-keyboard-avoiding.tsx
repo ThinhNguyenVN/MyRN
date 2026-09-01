@@ -27,7 +27,7 @@ function Toolbar() {
   )
 }
 
-const ScrollViewComponent = forwardRef<
+const MyKeyboardAvoidingScrollView = forwardRef<
   MyKeyboardAvoidingScrollViewRef,
   MyKeyboardAvoidingScrollViewProps
 >(function MyKeyboardAvoidingScrollView({ showToolbar = false, ...rest }, ref) {
@@ -49,6 +49,6 @@ const ScrollViewComponent = forwardRef<
 })
 
 export const MyKeyboardAvoiding = {
-  ScrollView: ScrollViewComponent,
+  ScrollView: MyKeyboardAvoidingScrollView,
   Toolbar,
 }

@@ -20,7 +20,7 @@ const OptionThumbPlaceholder = memo(function OptionThumbPlaceholder() {
   )
 })
 
-function DropdownOptionRowComponent({
+function DropdownOptionRowInner({
   option,
   selected,
   multiSelect,
@@ -91,4 +91,4 @@ function DropdownOptionRowComponent({
   )
 }
 
-export const DropdownOptionRow = memo(DropdownOptionRowComponent)
+export const DropdownOptionRow = memo(DropdownOptionRowInner)

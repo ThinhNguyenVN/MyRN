@@ -15,7 +15,7 @@ import { generateStyles } from './styles'
 import type { OrderFormLineEditorProps } from './type'
 import { orderLineTotal } from './utils'
 
-function OrderFormLineEditorComponent({
+function OrderFormLineEditorInner({
   index,
   productOptions,
   unitOptions,
@@ -189,4 +189,4 @@ function OrderFormLineEditorComponent({
   )
 }
 
-export const OrderFormLineEditor = memo(OrderFormLineEditorComponent)
+export const OrderFormLineEditor = memo(OrderFormLineEditorInner)

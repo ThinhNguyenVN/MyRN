@@ -15,7 +15,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { generateStyles, orderLineNoteEntering, orderLineNoteExiting } from './styles'
 import type { OrderFormLineNoteProps } from './type'
 
-function OrderFormLineNoteComponent({ index, disabled }: OrderFormLineNoteProps) {
+function OrderFormLineNoteInner({ index, disabled }: OrderFormLineNoteProps) {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
   const { getColor } = useTheme()
@@ -129,4 +129,4 @@ function OrderFormLineNoteComponent({ index, disabled }: OrderFormLineNoteProps)
   )
 }
 
-export const OrderFormLineNote = memo(OrderFormLineNoteComponent)
+export const OrderFormLineNote = memo(OrderFormLineNoteInner)

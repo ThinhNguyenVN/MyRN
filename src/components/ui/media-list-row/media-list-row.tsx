@@ -10,7 +10,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 import type { MediaListRowProps } from './type'
 
-function MediaListRowComponent({
+function MediaListRow({
   title,
   subtitle,
   imageUrl,
@@ -60,4 +60,4 @@ function MediaListRowComponent({
   )
 }
 
-export default memo(MediaListRowComponent)
+export default memo(MediaListRow)

@@ -20,7 +20,7 @@ const ProductThumbPlaceholder = memo(function ProductThumbPlaceholder() {
   )
 })
 
-function OrderProductThumbComponent({ imageUrl }: OrderProductThumbProps) {
+function OrderProductThumbInner({ imageUrl }: OrderProductThumbProps) {
   const styles = useThemedStyles(generateStyles)
 
   return (
@@ -39,4 +39,4 @@ function OrderProductThumbComponent({ imageUrl }: OrderProductThumbProps) {
   )
 }
 
-export const OrderProductThumb = memo(OrderProductThumbComponent)
+export const OrderProductThumb = memo(OrderProductThumbInner)

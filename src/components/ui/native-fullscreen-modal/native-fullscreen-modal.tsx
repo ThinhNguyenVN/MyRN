@@ -13,7 +13,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 import type { NativeFullscreenModalProps } from './type'
 
-function NativeFullscreenModalComponent({
+function NativeFullscreenModal({
   visible,
   title,
   children,
@@ -78,4 +78,4 @@ function NativeFullscreenModalComponent({
   )
 }
 
-export default memo(NativeFullscreenModalComponent)
+export default memo(NativeFullscreenModal)
