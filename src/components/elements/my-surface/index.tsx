@@ -152,12 +152,21 @@ const MySurface: React.FC<MySurfaceProps> = ({
         base.shadowOpacity = opacity
         base.shadowRadius = blur
       }
+
+      // Web: CSS boxShadow must live on the outer (overflow: visible) container — if it were on
+      // the inner content, a caller's `overflow: 'hidden'` (for rounded-corner clipping) would
+      // clip the shadow itself, since box-shadow is clipped by its own element's overflow.
+      if (isWeb) {
+        base.borderRadius = r
+        base.boxShadow = `${dx}px ${dy}px ${blur * 2}px rgba(0,0,0,${opacity})`
+      }
     }
     return base as ViewStyle
   }, [containerStyle, elevation, resolvedBackgroundColor, r, dx, dy, opacity, blur])
 
-  // Inner content: clip, border, background. iOS/Web: native shadow; Android: SVG (+ a
-  // native-elevation stand-in for the render before that SVG has a measured size).
+  // Inner content: clip, border, background. iOS/Web shadow lives on the outer container
+  // (above); Android: SVG (+ a native-elevation stand-in for the render before that SVG has a
+  // measured size).
   const finalContentStyle = useMemo(() => {
     const base: ViewStyle = { ...contentStyle }
     if (!(elevation && elevation !== 'none')) return base
@@ -170,12 +179,6 @@ const MySurface: React.FC<MySurfaceProps> = ({
       if (borderStyle) base.borderStyle = borderStyle
     }
     if (hasUserOverflowHidden) base.overflow = 'hidden'
-
-    // Web: CSS boxShadow — nhanh, không cần SVG
-    if (isWeb) {
-      ;(base as Record<string, unknown>).boxShadow =
-        `${dx}px ${dy}px ${blur * 2}px rgba(0,0,0,${opacity})`
-    }
 
     if (isAndroid && !needsSvgShadow) {
       base.elevation = androidPlaceholderElevation
@@ -190,10 +193,6 @@ const MySurface: React.FC<MySurfaceProps> = ({
     borderColor,
     borderStyle,
     hasUserOverflowHidden,
-    dx,
-    dy,
-    opacity,
-    blur,
     needsSvgShadow,
     androidPlaceholderElevation,
   ])

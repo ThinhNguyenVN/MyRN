@@ -499,6 +499,9 @@
     "wheelSelect": "Chọn",
     "imageEmpty": "Không có ảnh",
     "imageError": "Không thể tải ảnh",
+    "imagePickerSourceTitle": "Thêm ảnh",
+    "imagePickerCamera": "Chụp ảnh",
+    "imagePickerLibrary": "Chọn từ thư viện",
     "chipsAdd": "Thêm...",
     "orderFormLine": {
       "product": "Sản phẩm",

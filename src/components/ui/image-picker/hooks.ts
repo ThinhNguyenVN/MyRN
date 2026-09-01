@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState, type RefCallback } from 'reac
 
 import { isWeb } from '@/constants/dimensions'
 
-import { pickedImageFromFile } from './pick-image'
 import type { PickedImage, PickImageOptions } from './type'
+import { pickedImageFromFile } from './utils'
 
 export type UseImageDropZoneParams = {
   disabled?: boolean

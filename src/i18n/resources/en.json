@@ -499,6 +499,9 @@
     "wheelSelect": "Select",
     "imageEmpty": "No image",
     "imageError": "Failed to load image",
+    "imagePickerSourceTitle": "Add photo",
+    "imagePickerCamera": "Take Photo",
+    "imagePickerLibrary": "Choose from Library",
     "chipsAdd": "Add...",
     "orderFormLine": {
       "product": "Product",

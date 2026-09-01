@@ -1,5 +1,6 @@
-import { createElement, memo, useCallback, useEffect } from 'react'
+import { createElement, memo, useCallback, useEffect, useRef } from 'react'
 import { View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import Animated, {
   Easing,
   interpolate,
@@ -9,6 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
+import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import MyButton from '@/components/elements/my-button'
 import MyIcon from '@/components/elements/my-icon'
 import MyImage from '@/components/elements/my-image'
@@ -23,6 +25,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { useImageDropZone } from './hooks'
 import { generateStyles } from './styles'
 import type { ImagePickerFieldProps, PickedImage } from './type'
+import { pickImage, pickImageFromCamera } from './utils'
 
 const DRAG_ANIM_MS = 180
 
@@ -47,13 +50,15 @@ function ImagePickerFieldInner({
   shape = 'square',
 }: ImagePickerFieldProps) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const { getColor } = useTheme()
   const isAvatar = shape === 'circle'
   const hasPreview = Boolean(imageUri)
   const showClear = hasPreview && !isUploading && !readOnly
+
+  // --- Web drag-and-drop ---
   const dropHandler = readOnly ? undefined : onImagePicked
   const dragProgress = useSharedValue(0)
-
   const idleBorder = getColor('border/inactive/secondary')
   const activeBorder = getColor('border/active/primary')
   const idleFill = getColor('fill/background/secondary')
@@ -89,6 +94,42 @@ function ImagePickerFieldInner({
     }
   }, [activeBorder, activeFill, idleBorder, idleFill])
 
+  // --- Native camera/library choice sheet ---
+  const sourceSheetRef = useRef<MyBottomSheetRef>(null)
+
+  const runPick = useCallback(
+    async (source: 'camera' | 'library') => {
+      sourceSheetRef.current?.close()
+      try {
+        const picked =
+          source === 'camera'
+            ? await pickImageFromCamera(pickOptions)
+            : await pickImage(pickOptions)
+        onImagePicked?.(picked)
+      } catch (err) {
+        onPickError?.(err)
+      }
+    },
+    [onImagePicked, onPickError, pickOptions],
+  )
+
+  const handlePickCamera = useCallback(() => {
+    void runPick('camera')
+  }, [runPick])
+
+  const handlePickLibrary = useCallback(() => {
+    void runPick('library')
+  }, [runPick])
+
+  // --- Trigger: web opens the caller's picker, native opens the sheet above ---
+  const handleTriggerPress = useCallback(() => {
+    if (isWeb) {
+      onPick()
+      return
+    }
+    sourceSheetRef.current?.open()
+  }, [onPick])
+
   const dropzoneBody = (
     <View style={isAvatar ? styles.dropzoneHostAvatar : styles.dropzoneHost}>
       <Animated.View
@@ -102,7 +143,7 @@ function ImagePickerFieldInner({
                 ? styles.dropzonePressableAvatar
                 : styles.dropzonePressable
           }
-          onPress={onPick}
+          onPress={handleTriggerPress}
           disabled={isUploading || readOnly}
           accessibilityLabel={isAvatar ? emptyTitle : undefined}
         >
@@ -173,6 +214,34 @@ function ImagePickerFieldInner({
         <MyText typography="caption" style={styles.error}>
           {errorMessage}
         </MyText>
+      </ConditionRenderer>
+
+      <ConditionRenderer when={!isWeb}>
+        <MyBottomSheet
+          ref={sourceSheetRef}
+          title={t('components.imagePickerSourceTitle')}
+          pressBackdropToClose
+          contentContainerStyle={styles.sourceSheetBody}
+        >
+          <MyButton
+            text={t('components.imagePickerCamera')}
+            left={<MyIcon name="camera-outline" size={18} color="icon/active/primary" />}
+            type="light"
+            size="small"
+            width="full"
+            elevation="none"
+            onPress={handlePickCamera}
+          />
+          <MyButton
+            text={t('components.imagePickerLibrary')}
+            left={<MyIcon name="images-outline" size={18} color="icon/active/primary" />}
+            type="light"
+            size="small"
+            width="full"
+            elevation="none"
+            onPress={handlePickLibrary}
+          />
+        </MyBottomSheet>
       </ConditionRenderer>
     </MyView>
   )
