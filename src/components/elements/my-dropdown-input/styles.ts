@@ -67,6 +67,9 @@ export function generateStyles(theme: ThemeType) {
         height: 44,
         zIndex: 2,
       },
+      triggerClearHitFill: {
+        flex: 1,
+      },
       optionRowInner: {
         width: '100%',
       },

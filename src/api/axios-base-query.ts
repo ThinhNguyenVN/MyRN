@@ -1,5 +1,5 @@
 import type { BaseQueryFn } from '@reduxjs/toolkit/query'
-import axios, { AxiosHeaders, type AxiosRequestConfig } from 'axios'
+import axios, { AxiosHeaders, type AxiosHeaderValue, type AxiosRequestConfig } from 'axios'
 
 import { apiClient } from '@/api/axios-instance'
 import { toSerializedApiError, type ApiErrorCodeType } from '@/api/errors'
@@ -52,7 +52,7 @@ function headersForRequest(
     ? { ...(API_AXIOS_CONFIG.headers as Record<string, string>), ...headers }
     : { ...headers }
 
-  const next = AxiosHeaders.from(merged)
+  const next = AxiosHeaders.from(merged as Record<string, AxiosHeaderValue>)
 
   if (!isFormDataBody(data)) {
     return next

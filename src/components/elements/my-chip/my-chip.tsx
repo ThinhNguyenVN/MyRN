@@ -12,10 +12,7 @@ import MyView from '@/components/elements/my-view'
 import { generateStyles } from './styles'
 import type { ChipSize, ChipTone, ChipType, MyChipProps } from './type'
 
-function chipSizeStyle(
-  size: ChipSize,
-  styles: ReturnType<typeof generateStyles>,
-): (typeof styles)['sizeMedium'] {
+function chipSizeStyle(size: ChipSize, styles: ReturnType<typeof generateStyles>): ViewStyle {
   if (size === 'xs') {
     return styles.sizeXs
   }

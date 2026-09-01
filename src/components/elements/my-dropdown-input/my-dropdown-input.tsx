@@ -399,7 +399,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
           accessibilityLabel={t('components.dropdownClear')}
           style={styles.triggerClearHit}
         >
-          <View style={{ flex: 1 }} />
+          <View style={styles.triggerClearHitFill} />
         </MyPressable>
       ) : null}
     </View>

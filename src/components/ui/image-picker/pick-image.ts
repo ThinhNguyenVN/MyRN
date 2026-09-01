@@ -136,7 +136,7 @@ export function buildImageFormData(
     name: image.name,
     type: image.mimeType,
   }
-  formData.append(fieldName, nativeFile as Blob)
+  formData.append(fieldName, nativeFile as unknown as Blob)
 
   return formData
 }

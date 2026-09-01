@@ -14,7 +14,7 @@ export type ChipSize = 'xs' | 'tag' | 'small' | 'medium'
 
 export type ChipElevation = ElevationToken | 'none'
 
-export interface MyChipProps extends Omit<MyPressableProps, 'children'> {
+export interface MyChipProps extends Omit<MyPressableProps, 'children' | 'left' | 'right'> {
   label: string
   type?: ChipType
   tone?: ChipTone

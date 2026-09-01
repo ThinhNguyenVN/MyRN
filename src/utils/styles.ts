@@ -40,6 +40,8 @@ export const CONTAINER_STYLE_KEYS: (keyof ContainerStyleProps)[] = [
 export function getContainerStyle(props: Partial<ContainerStyleProps>): ViewStyle {
   const s: ViewStyle = {}
   const map = (v: FlexAlignKey | undefined) => (v ? flexAlignMap[v] : undefined)
+  const mapJustify = (v: ContainerStyleProps['justifyContent']) =>
+    isNil(v) ? undefined : v in flexAlignMap ? flexAlignMap[v as FlexAlignKey] : v
   if (!isNil(props.margin)) s.margin = props.margin
   if (!isNil(props.marginLeft)) s.marginLeft = props.marginLeft
   if (!isNil(props.marginRight)) s.marginRight = props.marginRight
@@ -64,7 +66,7 @@ export function getContainerStyle(props: Partial<ContainerStyleProps>): ViewStyl
   if (!isNil(props.gap)) s.gap = props.gap
   if (!isNil(props.width)) s.width = props.width
   if (!isNil(props.height)) s.height = props.height
-  const j = map(props.justifyContent ?? props.flexHorizontal)
+  const j = mapJustify(props.justifyContent ?? props.flexHorizontal)
   const a = map(props.alignItems ?? props.flexVertical)
   if (!isNil(j)) s.justifyContent = j as ViewStyle['justifyContent']
   if (!isNil(a)) s.alignItems = a as ViewStyle['alignItems']

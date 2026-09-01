@@ -73,7 +73,15 @@ const ConfirmationRoot = forwardRef<ConfirmationRef, object>(function Confirmati
   const confirmType = type === 'error' ? 'tertiary' : 'primary'
   const buttons: MyAlertButtonProp[] = customButtons ?? [
     { text: resolvedCancelText, type: 'light', onPress: handleCancel },
-    ...(confirmText ? [{ text: confirmText, type: confirmType, onPress: handleConfirm }] : []),
+    ...(confirmText
+      ? [
+          {
+            text: confirmText,
+            type: confirmType,
+            onPress: handleConfirm,
+          } satisfies MyAlertButtonProp,
+        ]
+      : []),
   ]
 
   return (
