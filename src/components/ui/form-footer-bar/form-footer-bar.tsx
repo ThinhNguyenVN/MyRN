@@ -60,7 +60,7 @@ const SheetFooterActionButton = memo(function SheetFooterActionButton({
   return <FooterActionButton action={action} busy={busy} width="full" onPress={handlePress} />
 })
 
-function FormFooterBarComponent({
+function FormFooterBarInner({
   canSave,
   busy,
   saveLabel,
@@ -267,4 +267,4 @@ function FormFooterBarComponent({
   )
 }
 
-export const FormFooterBar = memo(FormFooterBarComponent)
+export const FormFooterBar = memo(FormFooterBarInner)

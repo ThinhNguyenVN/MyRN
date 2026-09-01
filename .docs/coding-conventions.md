@@ -60,6 +60,14 @@ src/features/<feature>/components/
 
 Import dùng alias `@/*`.
 
+### Đặt tên hàm component — không hậu tố `Component`
+
+Tên hàm/const của component **không** thêm hậu tố `Component` (vd `OrderSummaryCardComponent`, `TodoListViewComponent`). Hậu tố này không giúp phân biệt gì (file đã đủ context), làm identifier trong file khác với tên khi search/copy, và không khớp file name (`order-summary-card.tsx` → phải là `OrderSummaryCard`, không phải `OrderSummaryCardComponent`).
+
+- **Không cần wrap `memo`**: đặt tên khớp file, không hậu tố. `function OrderSummaryCard() { ... }` → `export default memo(OrderSummaryCard)`.
+- **Cần wrap `memo` nhưng tên export đã trùng tên file** (ví dụ file `.view.tsx` export named `XxxView`): hàm implementation dùng hậu tố **`Inner`**, không phải `Component` — theo đúng pattern đã có ở `auth`/`todo`: `function TodoListViewInner({ ... }) { ... }` → `export const TodoListView = memo(TodoListViewInner)`.
+- **Ngoại lệ**: giữ nguyên hậu tố `Component` khi đó là **prop API thật** của RN/FlashList (`ListEmptyComponent`, `ListHeaderComponent`, `ListFooterComponent`, `ItemSeparatorComponent`, `CellRendererComponent`, …) — không đổi tên các prop này.
+
 ### Ngưỡng tách file (khi nào là "quá dài")
 
 Không có con số cứng, nhưng dùng các mốc sau làm tín hiệu review — vượt mốc thì tìm đường tách trước khi mở PR:

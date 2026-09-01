@@ -15,7 +15,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { generateSidebarCollapseToggleStyles } from './sidebar-collapse-toggle.styles'
 import type { SidebarCollapseToggleProps } from './sidebar-collapse-toggle.type'
 
-function SidebarCollapseToggleComponent({
+function SidebarCollapseToggle({
   collapsed,
   onPress,
   accessibilityLabel,
@@ -56,4 +56,4 @@ function SidebarCollapseToggleComponent({
   )
 }
 
-export default memo(SidebarCollapseToggleComponent)
+export default memo(SidebarCollapseToggle)

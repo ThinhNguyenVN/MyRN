@@ -31,7 +31,7 @@ const WEB_HOST_STYLE = {
   width: '100%',
 }
 
-function ImagePickerFieldComponent({
+function ImagePickerFieldInner({
   imageUri,
   isUploading = false,
   errorMessage,
@@ -178,4 +178,4 @@ function ImagePickerFieldComponent({
   )
 }
 
-export const ImagePickerField = memo(ImagePickerFieldComponent)
+export const ImagePickerField = memo(ImagePickerFieldInner)

@@ -10,7 +10,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 import type { StepItemProps } from './type'
 
-function StepItemComponent({ index, active, completed, reachable, title, onPress }: StepItemProps) {
+function StepItemInner({ index, active, completed, reachable, title, onPress }: StepItemProps) {
   const styles = useThemedStyles(generateStyles)
   const { getColor } = useTheme()
 
@@ -55,4 +55,4 @@ function StepItemComponent({ index, active, completed, reachable, title, onPress
   )
 }
 
-export const StepItem = memo(StepItemComponent)
+export const StepItem = memo(StepItemInner)

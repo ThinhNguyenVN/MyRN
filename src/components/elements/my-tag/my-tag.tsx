@@ -29,7 +29,7 @@ const TONE_TEXT: Record<
   info: 'textInfo',
 }
 
-function MyTagComponent({ label, tone = 'neutral', size = 'default' }: MyTagProps) {
+function MyTag({ label, tone = 'neutral', size = 'default' }: MyTagProps) {
   const styles = useThemedStyles(generateStyles)
 
   return (
@@ -47,4 +47,4 @@ function MyTagComponent({ label, tone = 'neutral', size = 'default' }: MyTagProp
   )
 }
 
-export default memo(MyTagComponent)
+export default memo(MyTag)

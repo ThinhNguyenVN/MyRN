@@ -8,7 +8,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 import type { FormFooterAmountBarProps } from './type'
 
-function FormFooterAmountBarComponent({
+function FormFooterAmountBarInner({
   totalLabel,
   totalText,
   layout,
@@ -34,4 +34,4 @@ function FormFooterAmountBarComponent({
   )
 }
 
-export const FormFooterAmountBar = memo(FormFooterAmountBarComponent)
+export const FormFooterAmountBar = memo(FormFooterAmountBarInner)

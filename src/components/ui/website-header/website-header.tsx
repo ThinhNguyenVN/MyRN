@@ -11,7 +11,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 import type { WebsiteHeaderProps } from './type'
 
-function WebsiteHeaderComponent({
+function WebsiteHeader({
   title,
   showBack = false,
   onBackPress,
@@ -80,4 +80,4 @@ function WebsiteHeaderComponent({
   )
 }
 
-export default memo(WebsiteHeaderComponent)
+export default memo(WebsiteHeader)

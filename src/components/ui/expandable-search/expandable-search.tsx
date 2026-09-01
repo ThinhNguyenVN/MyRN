@@ -27,7 +27,7 @@ const EXPAND_MS = 280
  */
 const DEFAULT_EDGE_RESERVE = 112
 
-function ExpandableSearchComponent({
+function ExpandableSearch({
   value,
   onChangeText,
   placeholder,
@@ -120,4 +120,4 @@ function ExpandableSearchComponent({
   )
 }
 
-export default memo(ExpandableSearchComponent)
+export default memo(ExpandableSearch)

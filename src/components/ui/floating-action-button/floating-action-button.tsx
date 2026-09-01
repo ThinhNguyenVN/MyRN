@@ -7,7 +7,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 import type { FloatingActionButtonProps } from './type'
 
-function FloatingActionButtonComponent({
+function FloatingActionButton({
   icon = 'add',
   onPress,
   accessibilityLabel,
@@ -48,4 +48,4 @@ function FloatingActionButtonComponent({
   )
 }
 
-export default memo(FloatingActionButtonComponent)
+export default memo(FloatingActionButton)

@@ -12,14 +12,7 @@ import { PaginationPageButton } from './pagination-page-button'
 import { generateStyles } from './styles'
 import type { PaginationProps } from './type'
 
-function PaginationComponent({
-  page,
-  pageSize,
-  total,
-  onPrev,
-  onNext,
-  onPageChange,
-}: PaginationProps) {
+function Pagination({ page, pageSize, total, onPrev, onNext, onPageChange }: PaginationProps) {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
 
@@ -70,4 +63,4 @@ function PaginationComponent({
   )
 }
 
-export default memo(PaginationComponent)
+export default memo(Pagination)

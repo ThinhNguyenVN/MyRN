@@ -9,7 +9,7 @@ import { useThemedStyles } from '@/theme/theme-context'
 import { generateStyles } from './styles'
 import type { MenuListCardProps } from './type'
 
-function MenuListCardComponent({ items, title, showChevron = true }: MenuListCardProps) {
+function MenuListCardInner({ items, title, showChevron = true }: MenuListCardProps) {
   const styles = useThemedStyles(generateStyles)
 
   return (
@@ -42,4 +42,4 @@ function MenuListCardComponent({ items, title, showChevron = true }: MenuListCar
   )
 }
 
-export const MenuListCard = memo(MenuListCardComponent)
+export const MenuListCard = memo(MenuListCardInner)

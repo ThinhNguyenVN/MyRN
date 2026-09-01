@@ -53,6 +53,14 @@ src/features/<feature>/components/
 
 - Imports: alias `@/*` only.
 
+### Component function naming — no `Component` suffix
+
+Do **not** suffix the component function/const name with `Component` (e.g. `OrderSummaryCardComponent`, `TodoListViewComponent`). It adds no disambiguation, breaks search/copy-paste of the component name, and drifts from the file name (`order-summary-card.tsx` → `OrderSummaryCard`, not `OrderSummaryCardComponent`).
+
+- No `memo` wrap needed: name matches the file, no suffix — `function OrderSummaryCard() { ... }` → `export default memo(OrderSummaryCard)`.
+- `memo` wrap needed and the exported name already matches the file (e.g. `*.view.tsx` exporting `XxxView`): suffix the inner implementation with **`Inner`**, not `Component` — same pattern as `auth`/`todo`: `function TodoListViewInner({ ... }) { ... }` → `export const TodoListView = memo(TodoListViewInner)`.
+- Exception: keep the `Component` suffix for real RN/FlashList prop names (`ListEmptyComponent`, `ListHeaderComponent`, `ListFooterComponent`, `ItemSeparatorComponent`, `CellRendererComponent`, …) — those are library API, not our naming.
+
 ---
 
 ## 2. Styles & theme
