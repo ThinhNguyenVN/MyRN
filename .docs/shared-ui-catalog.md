@@ -13,6 +13,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Need | Use | Do not invent |
 |------|-----|---------------|
 | List / settings row surface | `MyCard` | One-off card StyleSheet / raw `Pressable` + shadow |
+| Form/settings section (soft elevation, optional title) | `MySectionCard` | Feature-local `*-section-card.tsx` copy + duplicated `sectionSurface`/`sectionBody` styles |
 | Section separator | `MyDivider` | Hardcoded `borderBottomWidth` / hex borders |
 | Search field | `MySearchInput` | Manual search icon + clear on `MyTextInput` |
 | Header search that expands | `ExpandableSearch` (`components/ui/expandable-search`) | Ad-hoc animated width + icon toggle |
@@ -28,7 +29,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Form body scroll (native keyboard) | `MyKeyboardAvoiding.ScrollView` | Raw `ScrollView` / `KeyboardAvoidingView` around form fields |
 | Initial list loading (page-level) | `LoadingPlaceholder` (`components/ui/loading-placeholder`) | Ad-hoc `MySkeleton` wrappers per screen |
 | Image carousel + fullscreen preview | `ImageSlider` + `ImagePreview` | Custom pager/zoom unless kit cannot support the case |
-| Pick image from library (web/iOS/Android) | `pickImage` / `buildImageFormData` (`components/ui/image-picker`) | Ad-hoc `<input type="file">` / Files document picker for photos |
+| Pick image from library or camera (web/iOS/Android) | `pickImage` / `pickImageFromCamera` / `buildImageFormData` (`components/ui/image-picker`) | Ad-hoc `<input type="file">` / Files document picker for photos |
 | Image dropzone + preview + clear | `ImagePickerField` (`components/ui/image-picker`) | Feature-only upload boxes that reimplement dashed dropzone UI |
 | Edge nav drawer (hamburger menu) | `DrawerMenu` | Ad-hoc `Modal` + absolute panel |
 | Native full-screen picker / filter | `NativeFullscreenModal` | Feature-local `Modal` with one-off iOS/Android padding |
@@ -61,6 +62,14 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 - Prefer for list/settings rows; use `MySurface` directly when you only need elevation without card padding/press API
 - Playground: `…/playground/card.tsx` (includes elevation cases: `none`, soft/hard)
 - Canonical: `src/features/todo/screens/todo-list.view.tsx` (row surface)
+
+### `MySectionCard`
+
+- Path: `@/components/elements/my-section-card`
+- Compose: `MySurface` (`elevation="soft/down/small"`, `fill/background/tertiary`) + padded `MyView` body + optional title
+- Key props: `title?: string`, `children`, `radius?: RadiusType` (default `'large'`), `gap?: number` (default `getSpacing('x6')`)
+- Use for a titled form/settings section card — do **not** re-create a local `*-section-card.tsx` per feature, that's exactly the duplication this component replaces
+- If the ScrollView content wrapping a `MySectionCard` sits flush against its container's horizontal edges (no `paddingHorizontal` inside the `ScrollView`'s `contentContainerStyle`), the card's elevation shadow gets clipped left/right on web — `react-native-web`'s `ScrollView` sets `overflow-x: hidden`, so shadow needs padding *inside* the scroll content (not just on a wrapper outside the `ScrollView`) to have room to spread into
 
 ### `MyTag`
 
@@ -273,7 +282,8 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 ### `ImagePickerField` / `pickImage`
 
 - Path: `@/components/ui/image-picker`
-- `pickImage` + `buildImageFormData` for library pick + multipart; `ImagePickerField` for dropzone UI (web drag-drop)
+- `pickImage` (library) / `pickImageFromCamera` (native camera) + `buildImageFormData` for the pick + multipart; `ImagePickerField` for dropzone UI (web drag-drop)
+- Native (iOS/Android): tapping the field opens a `MyBottomSheet` to choose Take Photo vs Choose from Library, then routes through the same `onImagePicked`/`onPickError`/`pickOptions` props already used for web drag-drop — no extra wiring needed by feature callers. Web is unchanged (`onPick` opens the browser file picker directly, no camera option)
 - `readOnly` — preview only (no pick, drop, or clear)
 - `shape?: 'square' | 'circle'` — `square` (default) is a full-width rectangle (e.g. product photo); `circle` is a fixed-size (`AVATAR_PICKER_SIZE`, 140) centered avatar dropzone with an icon-only empty state (no title/hint — not enough room)
 - Playground: `…/playground/image-picker.tsx`

@@ -17,8 +17,6 @@ export type ImagePickErrorCode =
 export type PickImageOptions = {
   /** Max bytes; default 5MB. When file size is unknown (some iOS assets), size check is skipped. */
   maxBytes?: number
-  /** Multipart field name used by {@link buildImageFormData}. Default `file`. */
-  formField?: string
   allowsEditing?: boolean
   quality?: number
 }
@@ -36,20 +34,21 @@ export type ImagePickerFieldProps = {
   emptyTitle: string
   emptyHint?: string
   clearAccessibilityLabel: string
-  /** Opens the system/browser picker (click / tap). */
+  /** Web only: opens the browser file picker (click). Native shows the camera/library sheet instead. */
   onPick: () => void
   /** Clears the current preview. */
   onClear: () => void
   /** Preview only: no pick, drop, or clear. */
   readOnly?: boolean
   /**
-   * Web drag-and-drop: called with a validated {@link PickedImage}.
-   * When omitted, drop is ignored (click-to-pick still works).
+   * Called with a validated {@link PickedImage} from web drag-and-drop, or from the
+   * native camera/library choice sheet. When omitted, drop is ignored and the native
+   * sheet's picks are silently dropped (click-to-pick via `onPick` still works on web).
    */
   onImagePicked?: (image: PickedImage) => void
-  /** Web drag-and-drop validation / read errors (`ImagePickError`, etc.). */
+  /** Errors from web drag-and-drop or the native camera/library pick (`ImagePickError`, etc.). */
   onPickError?: (error: unknown) => void
-  /** Forwarded to {@link pickedImageFromFile} for drop validation. */
+  /** Forwarded to {@link pickedImageFromFile} (web drop) and {@link pickImage}/{@link pickImageFromCamera} (native). */
   pickOptions?: PickImageOptions
   /** `square` (default): full-width rectangle, e.g. product photo. `circle`: fixed-size avatar. */
   shape?: 'square' | 'circle'

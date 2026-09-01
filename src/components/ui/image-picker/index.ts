@@ -2,9 +2,10 @@ export {
   IMAGE_PICK_MAX_BYTES,
   ImagePickError,
   pickImage,
+  pickImageFromCamera,
   pickedImageFromFile,
   buildImageFormData,
-} from './pick-image'
+} from './utils'
 export { ImagePickerField } from './image-picker-field'
 export type {
   PickedImage,

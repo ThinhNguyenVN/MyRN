@@ -58,6 +58,44 @@ function guessName(uri: string, mimeType: string): string {
   return `image.${ext}`
 }
 
+function assetToPickedImage(asset: ImagePicker.ImagePickerAsset, maxBytes: number): PickedImage {
+  const mimeType = asset.mimeType || 'image/jpeg'
+  const size = asset.fileSize ?? 0
+  assertValidImage(mimeType, size, maxBytes)
+
+  return {
+    uri: asset.uri,
+    name: asset.fileName || guessName(asset.uri, mimeType),
+    mimeType,
+    size,
+    file: asset.file,
+  }
+}
+
+/** Shared `pickImage`/`pickImageFromCamera` flow: request permission, launch, validate. */
+async function launchPicker(
+  requestPermission: () => Promise<{ granted: boolean }>,
+  launch: (options: ImagePicker.ImagePickerOptions) => Promise<ImagePicker.ImagePickerResult>,
+  options: PickImageOptions,
+): Promise<PickedImage> {
+  const permission = await requestPermission()
+  if (!permission.granted) {
+    throw new ImagePickError('permission_denied')
+  }
+
+  const result = await launch({
+    mediaTypes: ['images'],
+    allowsEditing: options.allowsEditing ?? false,
+    quality: options.quality ?? 0.9,
+  })
+
+  if (result.canceled || isNil(result.assets?.[0])) {
+    throw new ImagePickError('cancelled')
+  }
+
+  return assetToPickedImage(result.assets[0], options.maxBytes ?? IMAGE_PICK_MAX_BYTES)
+}
+
 /**
  * Builds a {@link PickedImage} from a browser `File` (drag-and-drop / input).
  * Web-only — validates MIME + size with the same rules as {@link pickImage}.
@@ -82,35 +120,23 @@ export function pickedImageFromFile(file: File, options: PickImageOptions = {}):
  * same ImagePicker API on web (asset may include `file` for FormData).
  */
 export async function pickImage(options: PickImageOptions = {}): Promise<PickedImage> {
-  const maxBytes = options.maxBytes ?? IMAGE_PICK_MAX_BYTES
+  return launchPicker(
+    ImagePicker.requestMediaLibraryPermissionsAsync,
+    ImagePicker.launchImageLibraryAsync,
+    options,
+  )
+}
 
-  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
-  if (!permission.granted) {
-    throw new ImagePickError('permission_denied')
-  }
-
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ['images'],
-    allowsEditing: options.allowsEditing ?? false,
-    quality: options.quality ?? 0.9,
-  })
-
-  if (result.canceled || isNil(result.assets?.[0])) {
-    throw new ImagePickError('cancelled')
-  }
-
-  const asset = result.assets[0]
-  const mimeType = asset.mimeType || 'image/jpeg'
-  const size = asset.fileSize ?? 0
-  assertValidImage(mimeType, size, maxBytes)
-
-  return {
-    uri: asset.uri,
-    name: asset.fileName || guessName(asset.uri, mimeType),
-    mimeType,
-    size,
-    file: asset.file,
-  }
+/**
+ * Opens the device camera via `expo-image-picker`. Native (iOS/Android) only —
+ * callers should not offer this on web.
+ */
+export async function pickImageFromCamera(options: PickImageOptions = {}): Promise<PickedImage> {
+  return launchPicker(
+    ImagePicker.requestCameraPermissionsAsync,
+    ImagePicker.launchCameraAsync,
+    options,
+  )
 }
 
 /**

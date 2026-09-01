@@ -1,14 +1,19 @@
+import * as ImagePicker from 'expo-image-picker'
+
 import {
   buildImageFormData,
   IMAGE_PICK_MAX_BYTES,
   ImagePickError,
   pickedImageFromFile,
-} from './pick-image'
+  pickImageFromCamera,
+} from './utils'
 import type { PickedImage } from './type'
 
 jest.mock('expo-image-picker', () => ({
   requestMediaLibraryPermissionsAsync: jest.fn(),
   launchImageLibraryAsync: jest.fn(),
+  requestCameraPermissionsAsync: jest.fn(),
+  launchCameraAsync: jest.fn(),
 }))
 
 describe('pickedImageFromFile', () => {
@@ -57,6 +62,47 @@ describe('pickedImageFromFile', () => {
     } catch (error) {
       expect((error as ImagePickError).code).toBe('too_large')
     }
+  })
+})
+
+describe('pickImageFromCamera', () => {
+  const requestCameraPermissionsAsync = ImagePicker.requestCameraPermissionsAsync as jest.Mock
+  const launchCameraAsync = ImagePicker.launchCameraAsync as jest.Mock
+
+  beforeEach(() => {
+    requestCameraPermissionsAsync.mockReset()
+    launchCameraAsync.mockReset()
+  })
+
+  it('returns a PickedImage on success', async () => {
+    requestCameraPermissionsAsync.mockResolvedValue({ granted: true })
+    launchCameraAsync.mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file:///tmp/photo.jpg', mimeType: 'image/jpeg', fileSize: 100 }],
+    })
+
+    const picked = await pickImageFromCamera()
+
+    expect(picked).toMatchObject({
+      uri: 'file:///tmp/photo.jpg',
+      name: 'photo.jpg',
+      mimeType: 'image/jpeg',
+      size: 100,
+    })
+  })
+
+  it('throws permission_denied when camera permission is not granted', async () => {
+    requestCameraPermissionsAsync.mockResolvedValue({ granted: false })
+
+    await expect(pickImageFromCamera()).rejects.toMatchObject({ code: 'permission_denied' })
+    expect(launchCameraAsync).not.toHaveBeenCalled()
+  })
+
+  it('throws cancelled when the user backs out', async () => {
+    requestCameraPermissionsAsync.mockResolvedValue({ granted: true })
+    launchCameraAsync.mockResolvedValue({ canceled: true, assets: null })
+
+    await expect(pickImageFromCamera()).rejects.toMatchObject({ code: 'cancelled' })
   })
 })
 

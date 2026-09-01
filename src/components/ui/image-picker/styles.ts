@@ -28,10 +28,6 @@ export function generateStyles(theme: ThemeType) {
       height: AVATAR_PICKER_SIZE,
       position: 'relative',
     },
-    dropzoneWrap: {
-      width: '100%',
-      position: 'relative',
-    },
     dropzone: {
       borderWidth: 2,
       borderStyle: 'dashed',
@@ -133,6 +129,11 @@ export function generateStyles(theme: ThemeType) {
     error: {
       color: getColor('text/alert/primary'),
       textAlign: 'center',
+    },
+    sourceSheetBody: {
+      gap: getSpacing('x3'),
+      width: '100%',
+      paddingBottom: getSpacing('x4'),
     },
   })
 }
