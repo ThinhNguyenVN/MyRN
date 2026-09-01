@@ -1,5 +1,11 @@
 import { memo, useCallback, useMemo, useRef } from 'react'
-import { RefreshControl, ScrollView, type ScrollViewProps } from 'react-native'
+import {
+  RefreshControl,
+  ScrollView,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  type ScrollViewProps,
+} from 'react-native'
 import Animated from 'react-native-reanimated'
 
 import MyView from '@/components/elements/my-view'
@@ -47,7 +53,7 @@ function PullToRefreshScrollViewComponent({
   const chainOnScroll = useCallback(
     (event: unknown) => {
       if (hasPullToRefresh) {
-        pullScrollRef.current.onScroll?.(event)
+        pullScrollRef.current.onScroll?.(event as NativeSyntheticEvent<NativeScrollEvent>)
       }
       userOnScroll?.(event as Parameters<NonNullable<ScrollViewProps['onScroll']>>[0])
     },
@@ -57,7 +63,7 @@ function PullToRefreshScrollViewComponent({
   const chainOnScrollBeginDrag = useCallback(
     (event: unknown) => {
       if (hasPullToRefresh) {
-        pullScrollRef.current.onScrollBeginDrag?.(event)
+        pullScrollRef.current.onScrollBeginDrag?.(event as NativeSyntheticEvent<NativeScrollEvent>)
       }
       userOnScrollBeginDrag?.(
         event as Parameters<NonNullable<ScrollViewProps['onScrollBeginDrag']>>[0],
@@ -69,7 +75,7 @@ function PullToRefreshScrollViewComponent({
   const chainOnScrollEndDrag = useCallback(
     (event: unknown) => {
       if (hasPullToRefresh) {
-        pullScrollRef.current.onScrollEndDrag?.(event)
+        pullScrollRef.current.onScrollEndDrag?.(event as NativeSyntheticEvent<NativeScrollEvent>)
       }
       userOnScrollEndDrag?.(event as Parameters<NonNullable<ScrollViewProps['onScrollEndDrag']>>[0])
     },

@@ -26,4 +26,7 @@ export const Endpoints = {
   todosByUser: (userId: number | string) => `/todos/user/${userId}`,
 }
 
+/** Upload can be slower than JSON APIs. */
+export const API_UPLOAD_TIMEOUT = 60_000
+
 export const AUTH_SKIP_REFRESH_PATHS = [Endpoints.login, Endpoints.refresh] as const

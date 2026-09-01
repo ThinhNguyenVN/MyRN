@@ -36,7 +36,7 @@ export function generateStyles(theme: ThemeType) {
       borderWidth: 2,
       borderStyle: 'dashed',
       borderColor: getColor('border/inactive/secondary'),
-      borderRadius: getRadius('xl'),
+      borderRadius: getRadius('large'),
       backgroundColor: getColor('fill/background/secondary'),
       height: '100%',
       width: '100%',
