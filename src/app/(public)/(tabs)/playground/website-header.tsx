@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import MyText from '@/components/elements/my-text'
@@ -26,6 +26,32 @@ export default function WebsiteHeaderScreen() {
     Toast.show({ text: t('components.websiteHeader.profile'), type: 'info' })
   }, [t])
 
+  const handleEditProfile = useCallback(() => {
+    Toast.show({ text: t('playground.profileMenuButtonEditProfile'), type: 'info' })
+  }, [t])
+
+  const handleChangePassword = useCallback(() => {
+    Toast.show({ text: t('playground.profileMenuButtonChangePassword'), type: 'info' })
+  }, [t])
+
+  const profileMenuItems = useMemo(
+    () => [
+      {
+        key: 'edit-profile',
+        text: t('playground.profileMenuButtonEditProfile'),
+        icon: 'person-outline' as const,
+        onPress: handleEditProfile,
+      },
+      {
+        key: 'change-password',
+        text: t('playground.profileMenuButtonChangePassword'),
+        icon: 'lock-closed-outline' as const,
+        onPress: handleChangePassword,
+      },
+    ],
+    [handleChangePassword, handleEditProfile, t],
+  )
+
   return (
     <MyKeyboardAvoiding.ScrollView showToolbar contentContainerStyle={styles.screenContent}>
       <MyText typography="body" color="text/active/secondary" style={styles.introText}>
@@ -38,6 +64,18 @@ export default function WebsiteHeaderScreen() {
           onBackPress={handleBack}
           onNotificationsPress={handleNotifications}
           onProfilePress={handleProfile}
+        />
+      </MyView>
+      <MyText typography="body" color="text/active/secondary" style={styles.introText}>
+        {t('playground.websiteHeaderProfileMenuIntro')}
+      </MyText>
+      <MyView style={styles.content}>
+        <WebsiteHeader
+          title={t('playground.websiteHeaderTitle')}
+          showBack
+          onBackPress={handleBack}
+          onNotificationsPress={handleNotifications}
+          profileMenuItems={profileMenuItems}
         />
       </MyView>
     </MyKeyboardAvoiding.ScrollView>

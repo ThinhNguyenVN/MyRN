@@ -1,6 +1,8 @@
 import type { Href } from 'expo-router'
 import type { ReactNode } from 'react'
 
+import type { ProfileMenuItem } from '@/components/ui/profile-menu-button'
+
 /** Presentational desktop page header (private web chrome). */
 export type WebsiteHeaderProps = {
   title: string
@@ -8,7 +10,15 @@ export type WebsiteHeaderProps = {
   showBack?: boolean
   onBackPress?: () => void
   onNotificationsPress?: () => void
+  /** Plain icon fallback when `profileMenuItems` is not passed. */
   onProfilePress?: () => void
+  /** Avatar shown on the profile trigger when `profileMenuItems` is passed (falls back to a placeholder icon). */
+  avatarUri?: string | null
+  /**
+   * When passed (non-empty), the profile action renders as a `ProfileMenuButton`
+   * popover with these items instead of the plain `onProfilePress` icon button.
+   */
+  profileMenuItems?: ProfileMenuItem[]
   /** Optional slot before notifications (e.g. stack `headerRight`). */
   right?: ReactNode
 }

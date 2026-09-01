@@ -2,6 +2,8 @@ import { StyleSheet } from 'react-native'
 
 import type { ThemeType } from '@/theme/theme-context'
 
+export const AVATAR_PICKER_SIZE = 140
+
 export function generateStyles(theme: ThemeType) {
   const { getColor, getSpacing, getRadius } = theme
 
@@ -10,10 +12,20 @@ export function generateStyles(theme: ThemeType) {
       gap: getSpacing('x3'),
       width: '100%',
     },
+    rootAvatar: {
+      gap: getSpacing('x3'),
+      width: AVATAR_PICKER_SIZE,
+      alignSelf: 'center',
+    },
     /** Positioning context for overlay + clear button. */
     dropzoneHost: {
       width: '100%',
       height: 200,
+      position: 'relative',
+    },
+    dropzoneHostAvatar: {
+      width: AVATAR_PICKER_SIZE,
+      height: AVATAR_PICKER_SIZE,
       position: 'relative',
     },
     dropzoneWrap: {
@@ -30,6 +42,16 @@ export function generateStyles(theme: ThemeType) {
       width: '100%',
       overflow: 'hidden',
     },
+    dropzoneAvatar: {
+      borderWidth: 2,
+      borderStyle: 'dashed',
+      borderColor: getColor('border/inactive/secondary'),
+      borderRadius: getRadius('full'),
+      backgroundColor: getColor('fill/background/secondary'),
+      height: '100%',
+      width: '100%',
+      overflow: 'hidden',
+    },
     dropzonePressable: {
       flex: 1,
       width: '100%',
@@ -38,6 +60,13 @@ export function generateStyles(theme: ThemeType) {
       alignItems: 'center',
       justifyContent: 'center',
       gap: getSpacing('x2'),
+    },
+    dropzonePressableAvatar: {
+      flex: 1,
+      width: '100%',
+      height: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     /** Same fixed field size — only padding removed so preview can use the full frame. */
     dropzonePressableFilled: {

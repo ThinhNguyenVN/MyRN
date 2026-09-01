@@ -16,6 +16,8 @@ export function titleFromRoute(routeName: string): string {
     'form-footer-bar': 'playground.linksFormFooterBar',
     'order-form-line': 'playground.linksOrderFormLine',
     'table-row-more-menu': 'playground.linksTableRowMoreMenu',
+    'menu-list-card': 'playground.linksMenuListCard',
+    'profile-menu-button': 'playground.linksProfileMenuButton',
     'floating-action-button': 'playground.linksFab',
     'website-header': 'playground.linksWebsiteHeader',
     stepper: 'playground.linksStepper',
