@@ -24,6 +24,14 @@ export function generateStyles(theme: ThemeType) {
       borderRadius: getRadius('large'),
       backgroundColor: getColor('fill/background/tertiary'),
     },
+    /** Shadow/border layer — a sibling of `clip`, not a descendant, so it isn't cut by `clip`'s
+     *  `overflow: hidden`; animated with the same `translateX` so it slides with the content. */
+    cardShell: {
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      left: 0,
+    },
     row: {
       flexDirection: 'row',
       alignItems: 'stretch',
@@ -32,6 +40,7 @@ export function generateStyles(theme: ThemeType) {
       flexGrow: 0,
       flexShrink: 0,
       backgroundColor: getColor('fill/background/tertiary'),
+      borderWidth: 1,
     },
     /** First layout pass before clip width is measured. */
     contentFill: {

@@ -106,6 +106,10 @@ function localStyles(theme: ThemeType) {
     rowCard: {
       backgroundColor: getColor('fill/background/primary'),
       padding: getSpacing('x3'),
+    },
+    /** Border on the card-shell layer (via `cardStyle`) so it slides with the row instead of
+     *  staying fixed while the row opens underneath it. */
+    cardBorder: {
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: getColor('border/inactive/secondary'),
     },
@@ -159,6 +163,7 @@ function SwipeableItemListBody() {
         swipeToRemove={item.swipeToRemove}
         onDelete={() => remove(item.id)}
         elevation="soft/down/small"
+        cardStyle={styles.cardBorder}
       >
         <MyView style={styles.rowCard} fillParent>
           <MyText typography="body">{item.title}</MyText>
@@ -168,7 +173,7 @@ function SwipeableItemListBody() {
         </MyView>
       </SwipeableItem>
     ),
-    [styles.captionMargin, styles.rowCard, remove],
+    [styles.captionMargin, styles.rowCard, styles.cardBorder, remove],
   )
 
   const header = useMemo(

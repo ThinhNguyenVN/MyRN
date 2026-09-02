@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { LayoutChangeEvent, useWindowDimensions, View } from 'react-native'
+import { LayoutChangeEvent, useWindowDimensions, View, ViewStyle } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
   Easing,
@@ -18,9 +18,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
-import MyView from '@/components/elements/my-view'
-import { isWeb } from '@/constants/dimensions'
-import { useThemedStyles } from '@/theme/theme-context'
+import { isAndroid, isIos, isWeb } from '@/constants/dimensions'
+import { Radius } from '@/theme/radius'
+import { getElevation, type ElevationToken } from '@/theme/elevation'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { triggerHaptic } from '@/utils/haptic'
 import { isNil } from 'lodash'
 
@@ -63,10 +64,12 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
       swipeToRemove,
       testID,
       elevation,
+      cardStyle,
     },
     ref,
   ) {
     const styles = useThemedStyles(generateStyles)
+    const { getColor } = useTheme()
     const { width: windowWidth } = useWindowDimensions()
     const swipeableItem = useSwipeableItemOptional()
     const [clipWidth, setClipWidth] = useState(0)
@@ -352,55 +355,96 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
     const measured = clipWidth > 0
     const hasElevation = !isNil(elevation) && elevation !== 'none'
 
+    /**
+     * Card shell (shadow + radius + border) rendered on its own layer, a *sibling* of the clip
+     * container instead of a descendant — a shadow set on something inside `clip` gets cut by
+     * its `overflow: hidden` (needed to hide the reveal strips), no matter how much it would
+     * otherwise bleed. Transparent (no background) and painted *after* `clip` in the JSX below
+     * — on top of it — so the shell isn't hidden behind a revealed action strip's own opaque
+     * background the moment it slides under where the shadow/border would show. Animated with
+     * the same `translateX` as the content (see `cardAnimatedStyle` below) so the shell — and
+     * any border passed via `cardStyle` — slides together with it instead of staying fixed while
+     * the row opens underneath.
+     */
+    const shellStyle = useMemo((): ViewStyle => {
+      if (!hasElevation) return { borderRadius: Radius.large }
+      const { blur, opacity, dx, dy } = getElevation(elevation as ElevationToken)
+      const base: ViewStyle = {
+        borderRadius: Radius.large,
+      }
+      if (isIos || isWeb) {
+        base.shadowColor = getColor('brand/black')
+        base.shadowOffset = { width: dx, height: dy }
+        base.shadowOpacity = opacity
+        base.shadowRadius = blur
+      }
+      if (isAndroid) {
+        // Approximate — matches MySurface's own placeholder-elevation fallback. The precise
+        // SVG-based shadow MySurface otherwise draws can't be driven by a worklet transform.
+        base.elevation = Math.max(2, Math.round(blur / 2))
+      }
+      return base
+    }, [hasElevation, elevation, getColor])
+
+    const cardAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ translateX: translateX.value }],
+    }))
+
     return (
       <Animated.View
         entering={SWIPEABLE_ITEM_ROW_ENTERING}
         exiting={SWIPEABLE_ITEM_ROW_EXITING}
         collapsable={false}
       >
-        <MyView
-          elevation={elevation}
-          radius={hasElevation ? 'large' : undefined}
-          backgroundColor={hasElevation ? 'fill/background/tertiary' : undefined}
-        >
-          <SwipeableRowPressProvider value={rowPressValue}>
-            <View style={styles.clip} testID={testID} collapsable={false} onLayout={onLayoutClip}>
-              <GestureDetector gesture={pan}>
-                <Animated.View style={[styles.row, rowStyle]} collapsable={false}>
-                  {measured ? (
-                    <SwipeableActionStrip
-                      actions={leftActions}
-                      side="left"
-                      rowKey={rowKey}
-                      stripPx={leftStripPx}
-                      stripStyle={[styles.strip, styles.stripLeft]}
-                      translateX={translateX}
-                      wrapAction={wrapAction}
-                    />
-                  ) : null}
-                  <View
-                    style={contentStyle}
-                    collapsable={false}
-                    {...(isWeb ? { onClickCapture: onContentClickCapture } : null)}
-                  >
-                    {children}
-                  </View>
-                  {measured ? (
-                    <SwipeableActionStrip
-                      actions={rightActions}
-                      side="right"
-                      rowKey={rowKey}
-                      stripPx={rightStripPx}
-                      stripStyle={[styles.strip, styles.stripRight]}
-                      translateX={translateX}
-                      wrapAction={wrapAction}
-                    />
-                  ) : null}
-                </Animated.View>
-              </GestureDetector>
-            </View>
-          </SwipeableRowPressProvider>
-        </MyView>
+        <SwipeableRowPressProvider value={rowPressValue}>
+          <View style={styles.clip} testID={testID} collapsable={false} onLayout={onLayoutClip}>
+            <GestureDetector gesture={pan}>
+              <Animated.View style={[styles.row, rowStyle]} collapsable={false}>
+                {measured ? (
+                  <SwipeableActionStrip
+                    actions={leftActions}
+                    side="left"
+                    rowKey={rowKey}
+                    stripPx={leftStripPx}
+                    stripStyle={[styles.strip, styles.stripLeft]}
+                    translateX={translateX}
+                    wrapAction={wrapAction}
+                  />
+                ) : null}
+                <View
+                  style={contentStyle}
+                  collapsable={false}
+                  {...(isWeb ? { onClickCapture: onContentClickCapture } : null)}
+                >
+                  {children}
+                </View>
+                {measured ? (
+                  <SwipeableActionStrip
+                    actions={rightActions}
+                    side="right"
+                    rowKey={rowKey}
+                    stripPx={rightStripPx}
+                    stripStyle={[styles.strip, styles.stripRight]}
+                    translateX={translateX}
+                    wrapAction={wrapAction}
+                  />
+                ) : null}
+              </Animated.View>
+            </GestureDetector>
+          </View>
+        </SwipeableRowPressProvider>
+        {measured ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.cardShell,
+              { width: clipWidth },
+              shellStyle,
+              cardStyle,
+              cardAnimatedStyle,
+            ]}
+          />
+        ) : null}
       </Animated.View>
     )
   },
