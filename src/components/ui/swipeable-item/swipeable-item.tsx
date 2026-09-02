@@ -367,10 +367,15 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
      * the row opens underneath.
      */
     const shellStyle = useMemo((): ViewStyle => {
-      if (!hasElevation) return { borderRadius: Radius.large }
+      if (!hasElevation) return { borderRadius: Radius.large, backgroundColor: 'transparent' }
       const { blur, opacity, dx, dy } = getElevation(elevation as ElevationToken)
       const base: ViewStyle = {
         borderRadius: Radius.large,
+        // Explicit (not omitted) so iOS derives a precise, radius-aware shadowPath from this
+        // view's own bounds instead of falling back to a fuzzy, content-based shadow — an empty
+        // view with no backgroundColor at all renders `shadowRadius`/`shadowOpacity` blurry/soft
+        // on iOS regardless of how small the blur value is.
+        backgroundColor: 'transparent',
       }
       if (isIos || isWeb) {
         base.shadowColor = getColor('brand/black')
