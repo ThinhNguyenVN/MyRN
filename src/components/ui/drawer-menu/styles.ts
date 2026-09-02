@@ -18,6 +18,7 @@ export function generateStyles(theme: ThemeType) {
     zIndex: 41,
   }
   return StyleSheet.create({
+    // theme-exempt: modal backdrop scrim stays the same dark tint in both themes.
     backdrop: {
       position: 'absolute',
       top: 0,

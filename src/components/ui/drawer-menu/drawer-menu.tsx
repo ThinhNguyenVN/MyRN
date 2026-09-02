@@ -23,6 +23,34 @@ const CLOSE_MS = 220
 const OPEN_EASING = Easing.out(Easing.cubic)
 const CLOSE_EASING = Easing.in(Easing.cubic)
 
+interface DrawerItemProps {
+  readonly item: DrawerMenuItem
+  readonly index: number
+  readonly onPress: (item: DrawerMenuItem, index: number) => void
+  readonly styles: ReturnType<typeof generateStyles>
+}
+
+function DrawerItemInner({ item, index, onPress, styles }: DrawerItemProps) {
+  const handlePress = useCallback(() => onPress(item, index), [onPress, item, index])
+
+  return (
+    <MyPressable
+      style={styles.item}
+      onPress={handlePress}
+      haptic={false}
+      accessibilityRole="button"
+      accessibilityLabel={item.label}
+    >
+      {item.icon ? <MyIcon name={item.icon} size={22} color="icon/active/primary" /> : null}
+      <MyText typography="body" style={styles.itemLabel}>
+        {item.label}
+      </MyText>
+    </MyPressable>
+  )
+}
+
+const DrawerItem = memo(DrawerItemInner)
+
 function DrawerMenuInner({
   visible,
   onClose,
@@ -141,19 +169,13 @@ function DrawerMenuInner({
 
         <MyView style={styles.items}>
           {data.map((item, index) => (
-            <MyPressable
+            <DrawerItem
               key={`drawer-item-${item.id}`}
-              style={styles.item}
-              onPress={() => handlePress(item, index)}
-              haptic={false}
-              accessibilityRole="button"
-              accessibilityLabel={item.label}
-            >
-              {item.icon ? <MyIcon name={item.icon} size={22} color="icon/active/primary" /> : null}
-              <MyText typography="body" style={styles.itemLabel}>
-                {item.label}
-              </MyText>
-            </MyPressable>
+              item={item}
+              index={index}
+              onPress={handlePress}
+              styles={styles}
+            />
           ))}
         </MyView>
 

@@ -45,6 +45,7 @@ export const generateStyles = (theme: ThemeType) =>
     buttonDisabled: {
       opacity: 0.35,
     },
+    // theme-exempt: dark badge sits over the slide image regardless of app theme.
     counter: {
       position: 'absolute',
       right: theme.getSpacing('x3'),
@@ -56,7 +57,7 @@ export const generateStyles = (theme: ThemeType) =>
       backgroundColor: 'rgba(0, 0, 0, 0.72)',
     },
     counterText: {
-      color: '#FFFFFF',
+      color: theme.getColor('brand/white'),
       fontSize: 12,
       lineHeight: 16,
     },

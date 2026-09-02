@@ -147,6 +147,8 @@ export function usePullToRefresh({
   )
 
   const refreshControlProps = useMemo<PullToRefreshControlPropsBundle>(
+    // theme-exempt: fully transparent is the point — Android's native RefreshControl needs a
+    // real color value here, and this hides its default spinner track regardless of theme.
     () => ({
       refreshing,
       onRefresh: handleRefreshControlRefresh,

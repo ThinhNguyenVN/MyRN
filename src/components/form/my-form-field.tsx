@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useCallback } from 'react'
 import { View } from 'react-native'
 import type { FieldPath, FieldValues } from 'react-hook-form'
 
@@ -24,15 +24,16 @@ function MyFormFieldInner<TFieldValues extends FieldValues>({
   const { registerFieldRef, unregisterFieldRef } = useFormScrollContext()
   const showErrorVisual = !!error || externalInvalid
 
+  const setFieldRef = useCallback(
+    (r: View | null) => {
+      registerFieldRef(name as string, r)
+      if (r === null) unregisterFieldRef(name as string)
+    },
+    [name, registerFieldRef, unregisterFieldRef],
+  )
+
   return (
-    <View
-      ref={(r) => {
-        registerFieldRef(name as string, r)
-        if (r === null) unregisterFieldRef(name as string)
-      }}
-      style={styles.field}
-      collapsable={false}
-    >
+    <View ref={setFieldRef} style={styles.field} collapsable={false}>
       <FormFieldLabel
         title={title}
         subTitle={subTitle}

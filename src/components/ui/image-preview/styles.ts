@@ -4,10 +4,12 @@ import type { ThemeType } from '@/theme/theme-context'
 
 export const generateStyles = (theme: ThemeType) =>
   StyleSheet.create({
+    // theme-exempt: fullscreen photo-viewer chrome stays dark regardless of app theme.
     container: {
       flex: 1,
       backgroundColor: '#0A0A0A',
     },
+    // theme-exempt: see container above.
     page: {
       alignItems: 'center',
       justifyContent: 'center',
@@ -18,6 +20,7 @@ export const generateStyles = (theme: ThemeType) =>
       width: '100%',
       height: '100%',
     },
+    // theme-exempt: translucent white control over a photo, independent of app theme.
     closeButton: {
       position: 'absolute',
       right: theme.getSpacing('x4'),
@@ -29,6 +32,7 @@ export const generateStyles = (theme: ThemeType) =>
       borderRadius: theme.getRadius('full'),
       backgroundColor: 'rgba(255, 255, 255, 0.14)',
     },
+    // theme-exempt: see closeButton above.
     navigationButton: {
       position: 'absolute',
       top: '50%',
@@ -50,6 +54,7 @@ export const generateStyles = (theme: ThemeType) =>
     disabledButton: {
       opacity: 0.3,
     },
+    // theme-exempt: see closeButton above.
     counter: {
       position: 'absolute',
       alignSelf: 'center',
@@ -60,7 +65,7 @@ export const generateStyles = (theme: ThemeType) =>
       backgroundColor: 'rgba(255, 255, 255, 0.14)',
     },
     counterText: {
-      color: '#FFFFFF',
+      color: theme.getColor('brand/white'),
       fontSize: 13,
       lineHeight: 18,
     },

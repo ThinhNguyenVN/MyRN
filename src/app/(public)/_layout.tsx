@@ -10,7 +10,6 @@ export default function PublicLayout() {
           animation: 'slide_from_bottom',
         }}
       />
-      <Stack.Screen name="home" />
     </Stack>
   )
 }

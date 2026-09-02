@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import { View, type StyleProp, type ViewStyle } from 'react-native'
 
 import MyPressable from '@/components/elements/my-pressable'
@@ -42,6 +42,7 @@ const CarouselDotsInner: React.FC<CarouselDotsProps> = ({
   activeDotStyle,
 }) => {
   const styles = useThemedStyles(generateStyles)
+  const mergedDotStyle = useMemo(() => [styles.dot, dotStyle], [styles.dot, dotStyle])
 
   return (
     <View style={[styles.row, style]}>
@@ -51,7 +52,7 @@ const CarouselDotsInner: React.FC<CarouselDotsProps> = ({
           index={index}
           active={index === activeIndex}
           onSelect={onSelect}
-          dotStyle={[styles.dot, dotStyle]}
+          dotStyle={mergedDotStyle}
           activeDotStyle={activeDotStyle ?? styles.dotActive}
         />
       ))}

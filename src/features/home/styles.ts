@@ -5,6 +5,12 @@ export const generateStyles = (theme: ThemeType) => {
   const { getColor, getSpacing, getRadius } = theme
   return StyleSheet.create({
     // ─── Playground index ───────────────────────────────────────────────────
+    playgroundHeader: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: getSpacing('x10'),
+      backgroundColor: getColor('fill/background/secondary'),
+    },
     playgroundHeaderImage: {
       alignSelf: 'center',
     },
@@ -31,6 +37,12 @@ export const generateStyles = (theme: ThemeType) => {
     },
 
     // ─── Shared (other tabs / playground buttons) ───────────────────────────
+    homeHeader: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: getSpacing('x10'),
+      backgroundColor: getColor('fill/background/secondary'),
+    },
     titleContainer: {
       alignItems: 'center',
       gap: getSpacing('x2'),
@@ -41,11 +53,8 @@ export const generateStyles = (theme: ThemeType) => {
       backgroundColor: getColor('fill/active/primary'),
     },
     reactLogo: {
-      height: 178,
-      width: 290,
-      bottom: 0,
-      left: 0,
-      position: 'absolute',
+      height: 120,
+      width: 196,
     },
     sectionTitle: {
       marginTop: getSpacing('x6'),

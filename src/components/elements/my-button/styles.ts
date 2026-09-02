@@ -42,7 +42,7 @@ export const generateStyles = (theme: ThemeType) => {
     },
     dark: {
       ...base,
-      backgroundColor: '#000000',
+      backgroundColor: getColor('brand/black'),
       borderWidth: 0,
     },
     sizeSmall: { height: BUTTON_SMALL_HEIGHT, paddingHorizontal: 12 },

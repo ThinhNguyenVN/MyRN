@@ -35,7 +35,7 @@ export const generateStyles = (theme: ThemeType) => {
       height: 44,
       borderRadius: 22,
       backgroundColor: getColor('fill/background/tertiary'),
-      shadowColor: '#000',
+      shadowColor: getColor('brand/black'),
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 8,

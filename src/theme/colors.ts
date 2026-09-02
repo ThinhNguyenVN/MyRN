@@ -1,15 +1,12 @@
+import { BrandColorsDark, BrandColorsLight } from '@/configs/brand.config'
+
 // =============================
 // LIGHT — Nền ấm, chữ đậm. Tông jewel + stone.
 // Gray (stone): 50 = nền sáng nhất → 900 = chữ đậm nhất.
 // =============================
 export const ColorPaletteLight = {
-  // Brand — teal, amber, violet, rose
-  primary: '#0d9488',
-  secondary: '#c2410c',
-  tertiary: '#6d28d9',
-  quaternary: '#be185d',
-  // Accent — dùng cho highlight / link / CTA phụ
-  accent: '#0891b2',
+  // Brand — see src/configs/brand.config.ts to rebrand this kit for a new product.
+  ...BrandColorsLight,
   // Neutrals — stone (ấm, không lạnh)
   white: '#ffffff',
   black: '#000000',
@@ -42,12 +39,8 @@ export const ColorPaletteLight = {
 // DARK — Nền tối, chữ mềm (không chói). Gray: 50 = nền tối nhất → 900 = chữ sáng nhất.
 // =============================
 export const ColorPaletteDark = {
-  // Brand — giảm độ chói, vẫn nổi trên nền tối
-  primary: '#0d9488',
-  secondary: '#fdba74',
-  tertiary: '#c4b5fd',
-  quaternary: '#f9a8d4',
-  accent: '#67e8f9',
+  // Brand — see src/configs/brand.config.ts to rebrand this kit for a new product.
+  ...BrandColorsDark,
   // Neutrals — tông xám mềm, không đẩy lên trắng tuyệt đối
   white: '#e4e4e7',
   black: '#09090b',

@@ -1,4 +1,4 @@
-import { memo, useRef, type ReactNode } from 'react'
+import { memo, useCallback, useRef, type ReactNode } from 'react'
 import type { AccessibilityState } from 'react-native'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 
@@ -8,9 +8,40 @@ import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import type { MyTabSwitcherProps } from './type'
+import type { MyTabItem, MyTabSwitcherProps } from './type'
 
 const DEFAULT_DURATION = 220
+
+interface TabItemProps<TId extends string> {
+  readonly tab: MyTabItem<TId>
+  readonly isActive: boolean
+  readonly onChange: (id: TId) => void
+  readonly styles: ReturnType<typeof generateStyles>
+}
+
+function TabItemInner<TId extends string>({ tab, isActive, onChange, styles }: TabItemProps<TId>) {
+  const handlePress = useCallback(() => onChange(tab.id), [onChange, tab.id])
+  const accessibilityState: AccessibilityState = { selected: isActive }
+
+  return (
+    <MyPressable
+      style={[styles.tabItem, isActive ? styles.tabItemActive : null]}
+      onPress={handlePress}
+      accessibilityRole="tab"
+      accessibilityState={accessibilityState}
+      accessibilityLabel={tab.label}
+    >
+      <MyText
+        typography="button"
+        style={[styles.tabLabel, isActive ? styles.tabLabelActive : null]}
+      >
+        {tab.label}
+      </MyText>
+    </MyPressable>
+  )
+}
+
+const TabItem = memo(TabItemInner) as <TId extends string>(props: TabItemProps<TId>) => ReactNode
 
 /**
  * Tab switcher tái sử dụng — truyền mảng tabs + renderContent theo id.
@@ -48,27 +79,15 @@ function MyTabSwitcher<TId extends string = string>({
   return (
     <MyView style={[styles.root, containerStyle]}>
       <MyView style={[styles.tabBar, tabBarStyle]}>
-        {tabs.map((tab) => {
-          const isActive = tab.id === activeId
-          const accessibilityState: AccessibilityState = { selected: isActive }
-          return (
-            <MyPressable
-              key={`tab-switcher-${tab.id}`}
-              style={[styles.tabItem, isActive ? styles.tabItemActive : null]}
-              onPress={() => onChange(tab.id)}
-              accessibilityRole="tab"
-              accessibilityState={accessibilityState}
-              accessibilityLabel={tab.label}
-            >
-              <MyText
-                typography="button"
-                style={[styles.tabLabel, isActive ? styles.tabLabelActive : null]}
-              >
-                {tab.label}
-              </MyText>
-            </MyPressable>
-          )
-        })}
+        {tabs.map((tab) => (
+          <TabItem
+            key={`tab-switcher-${tab.id}`}
+            tab={tab}
+            isActive={tab.id === activeId}
+            onChange={onChange}
+            styles={styles}
+          />
+        ))}
       </MyView>
       <Animated.View key={`tab-content-${activeId}`} entering={entering} style={styles.contentWrap}>
         {renderContent(activeId)}

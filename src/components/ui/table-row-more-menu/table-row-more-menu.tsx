@@ -24,7 +24,11 @@ function MoreMenuItemButton({
   const useWhiteIcon = usesOnPrimaryButtonText(buttonType, Boolean(item.disabled))
   const icon = useMemo(
     () => (
-      <MyIcon name={item.icon} size={18} color={useWhiteIcon ? '#ffffff' : 'icon/active/primary'} />
+      <MyIcon
+        name={item.icon}
+        size={18}
+        color={useWhiteIcon ? 'icon/active/tertiary' : 'icon/active/primary'}
+      />
     ),
     [item.icon, useWhiteIcon],
   )

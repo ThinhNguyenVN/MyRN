@@ -3,7 +3,7 @@ import { Animated, Easing, View } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 
 import MyPressable from '@/components/elements/my-pressable'
-import { useThemedStyles } from '@/theme/theme-context'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import { PULSE_DURATION } from './constants'
 import { generateStyles } from './styles'
@@ -15,6 +15,7 @@ interface FloatingContactButtonProps {
 }
 
 const FloatingContactButtonInner: React.FC<FloatingContactButtonProps> = ({ item, styles }) => {
+  const { getColor } = useTheme()
   const scaleAnim = useRef(new Animated.Value(1)).current
   const opacityAnim = useRef(new Animated.Value(0.4)).current
 
@@ -81,7 +82,11 @@ const FloatingContactButtonInner: React.FC<FloatingContactButtonProps> = ({ item
         accessibilityLabel={item.accessibilityLabel}
         haptic
       >
-        <Feather name={item.icon} size={item.emphasized ? 24 : 20} color="#ffffff" />
+        <Feather
+          name={item.icon}
+          size={item.emphasized ? 24 : 20}
+          color={getColor('icon/active/tertiary')}
+        />
       </MyPressable>
     </View>
   )
