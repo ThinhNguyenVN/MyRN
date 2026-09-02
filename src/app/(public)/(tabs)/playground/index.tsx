@@ -1,12 +1,12 @@
 import { Href, router } from 'expo-router'
 import { memo, useCallback } from 'react'
-import { ScrollView } from 'react-native'
 import { useTranslation } from 'react-i18next'
 
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
+import ParallaxScrollView from '@/components/ui/parallax-scroll-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { PLAYGROUND_LINKS } from '@/features/playground/constants'
@@ -39,15 +39,17 @@ export default function PlaygroundScreen() {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
   return (
-    <ScrollView>
-      <MyView style={styles.playgroundHeader}>
+    <ParallaxScrollView
+      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
+      headerImage={
         <MyIcon
           name="code-slash"
           size={80}
           color="icon/inactive/primary"
           style={styles.playgroundHeaderImage}
         />
-      </MyView>
+      }
+    >
       <MyView style={styles.playgroundContent}>
         <MyText typography={'h3'} style={styles.playgroundTitle}>
           {t('playground.title')}
@@ -64,6 +66,6 @@ export default function PlaygroundScreen() {
           ))}
         </MyView>
       </MyView>
-    </ScrollView>
+    </ParallaxScrollView>
   )
 }

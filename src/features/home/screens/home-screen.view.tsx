@@ -1,11 +1,11 @@
 import { Image } from 'expo-image'
-import { ScrollView } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import templateConfig from '@root/template.config.json'
 
 import MyButton from '@/components/elements/my-button'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
+import ParallaxScrollView from '@/components/ui/parallax-scroll-view'
 import { getEnv } from '@/utils/env'
 import { useThemedStyles } from '@/theme/theme-context'
 
@@ -23,13 +23,15 @@ export function HomeScreenView({
   const { t } = useTranslation()
 
   return (
-    <ScrollView>
-      <MyView style={styles.homeHeader}>
+    <ParallaxScrollView
+      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerImage={
         <Image
           source={require('@/assets/images/partial-react-logo.png')}
           style={styles.reactLogo}
         />
-      </MyView>
+      }
+    >
       <MyView style={styles.titleContainer}>
         <MyText typography="subtitle" style={styles.sectionTitle}>
           {t('home.welcome', { appName: templateConfig.appName })}
@@ -66,6 +68,6 @@ export function HomeScreenView({
           />
         )}
       </MyView>
-    </ScrollView>
+    </ParallaxScrollView>
   )
 }

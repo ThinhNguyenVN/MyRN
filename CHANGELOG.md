@@ -43,6 +43,9 @@ product finds out what changed since it forked.
   `src/features/home/screens/{home-screen.container,home-screen.view,use-home-screen}` per
   `screen-standard.md`; the unreachable second `src/app/(public)/home.tsx` (dead, non-functional
   buttons) was removed.
-- Retired remaining Expo-template scaffolding: `external-link.tsx`, `parallax-scroll-view.tsx`,
-  `icon-symbol.tsx`/`.ios.tsx` deleted; `collapsible` rebuilt on `MyIcon`/`MyPressable`; home and
-  playground headers use a plain `ScrollView` instead of `ParallaxScrollView`.
+- Retired some Expo-template scaffolding: `external-link.tsx` deleted (dead code);
+  `icon-symbol.tsx`/`.ios.tsx` deleted; `collapsible` rebuilt on `MyIcon`/`MyPressable`.
+  `parallax-scroll-view.tsx` was deleted in the same pass and home/playground headers were moved
+  to a plain `ScrollView`, but that dropped a `padding: 16` the component supplied around its own
+  content with nothing replacing it, leaving those two screens edge-to-edge with no inset — it
+  was restored and both screens use it again.
