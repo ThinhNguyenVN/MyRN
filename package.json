@@ -9,6 +9,7 @@
     "reset-project": "node ./scripts/reset-project.js",
     "branch:create": "node ./scripts/create-branch-name.js",
     "check:branch-name": "node ./scripts/check-branch-name.js",
+    "seo:generate": "node ./scripts/generate-seo-files.js",
     "test": "jest --runInBand",
     "lint": "eslint src",
     "fix": "eslint src --fix",

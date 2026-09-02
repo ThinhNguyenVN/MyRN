@@ -22,6 +22,7 @@ This is an **Expo SDK 57 React Native** template app (`myrn`) for iOS, Android, 
    - Shared UI/theme changes → `.docs/ui-theme-standard.md`
    - API / RTK / auth → `.docs/data-state-standard.md`
    - Missing UX detail → `.docs/default-behavior-rules.md`
+   - SEO (title/meta/OG/JSON-LD/robots/sitemap) → `.docs/seo-standard.md`
    - Ambiguity → precedence in `.docs/README.md`
    - Prompt templates → `.docs/prompt-template-scope-lock.md`, `prompt-template-feature.md`, `prompt-template-full-app.md`
 4. Platform OpenSpec capabilities under `openspec/specs/` are **baseline already shipped** — read `openspec/specs/README.md` before treating them as work to redo.
@@ -43,3 +44,4 @@ This is an **Expo SDK 57 React Native** template app (`myrn`) for iOS, Android, 
 - **postinstall:** copies `canvaskit.wasm` into `public/` (`mkdir public` warning is harmless).
 - **DummyJSON demo login:** `emilys` / `emilyspass`.
 - **Playground bundler warnings:** some co-located non-route files under `playground/` warn “missing default export” — ignore for demos.
+- **SEO is off by default:** `seo.config.json` ships with `enabled: false` — zero effect on mobile-only/admin products until a task explicitly turns it on. See `.docs/seo-standard.md` before touching anything SEO-related; it documents a real gotcha (`AppInitGate` hides `<head>` tags from static export unless mounted above it) that already broke this once.

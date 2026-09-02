@@ -58,6 +58,7 @@ Rules:
 - `data-state-standard.md`: how to call APIs and structure RTK Query, Redux Toolkit, hooks, and auth.
 - `default-behavior-rules.md`: fallback product and UX behavior when the design or prompt does not specify enough detail.
 - `canonical-references.md`: which existing files are the source of truth when there is ambiguity.
+- `seo-standard.md`: web SEO (title/meta/OG/JSON-LD/robots/sitemap) — config-driven via `seo.config.json`, opt-in, off by default. Read before any task mentioning SEO, meta tags, Open Graph, or search indexing.
 - `prompt-template-full-app.md`: reusable prompt template for generating a whole app or a large domain.
 - `prompt-template-feature.md`: reusable prompt template for implementing one feature or a small set of screens.
 - `prompt-template-scope-lock.md`: reusable prompt template for a planning or scope-confirmation pass before coding.
@@ -105,6 +106,13 @@ Read:
 1. `data-state-standard.md`
 2. `default-behavior-rules.md`
 3. `canonical-references.md`
+
+### Enable or update SEO for a product
+
+Read:
+
+1. `seo-standard.md`
+2. `canonical-references.md`
 
 ### Build a whole app or a large new domain **on this template**
 

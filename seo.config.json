@@ -1,0 +1,21 @@
+{
+  "enabled": false,
+  "indexable": false,
+  "siteUrl": "",
+  "lang": "en",
+  "locale": "en_US",
+  "defaultTitle": "",
+  "defaultDescription": "",
+  "defaultKeywords": [],
+  "themeColor": "#000000",
+  "ogImagePath": "/og-image.jpg",
+  "twitterCard": "summary_large_image",
+  "organization": {
+    "enabled": false,
+    "name": "",
+    "phone": "",
+    "email": "",
+    "address": ""
+  },
+  "sitemapRoutes": ["/"]
+}

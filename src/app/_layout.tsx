@@ -15,6 +15,7 @@ import { ToastRoot, setToastRef } from '@/components/ui/toast'
 import type { ToastRef } from '@/components/ui/toast'
 import { MyThemeProvider } from '@/theme/theme-context'
 import { ScrollToHideProvider } from '@/components/ui/scroll-to-hide'
+import { SiteSeo } from '@/components/ui/site-seo'
 import { Provider } from 'react-redux'
 
 import { useAppInit } from '@/hooks/app-init-hooks'
@@ -39,6 +40,11 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={styles.root}>
+      {/* Rendered unconditionally, outside AppInitGate, so document <head> meta tags
+          are present in the static web export even though AppInitGate blocks the rest
+          of the tree until font/notification init resolves. No-op on native (see
+          `.docs/seo-standard.md`). Disabled entirely unless `seo.config.json.enabled`. */}
+      <SiteSeo />
       <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
         <PortalProvider shouldAddRootHost={false}>
           <MyThemeProvider value={colorScheme}>
