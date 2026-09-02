@@ -40,7 +40,6 @@ export function generateStyles(theme: ThemeType) {
       flexGrow: 0,
       flexShrink: 0,
       backgroundColor: getColor('fill/background/tertiary'),
-      borderWidth: 1,
     },
     /** First layout pass before clip width is measured. */
     contentFill: {
