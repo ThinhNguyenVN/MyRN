@@ -4,7 +4,7 @@ import { View } from 'react-native'
 
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { CROSSFADE_MS } from './constants'
+import { CROSSFADE_MS } from '../constants'
 import { generateStyles } from './styles'
 import type { HeroBackgroundProps } from './type'
 
