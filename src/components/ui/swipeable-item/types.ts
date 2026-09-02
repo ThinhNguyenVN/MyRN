@@ -3,6 +3,7 @@ import type { Ionicons } from '@expo/vector-icons'
 import type { SharedValue } from 'react-native-reanimated'
 
 import type { ButtonType } from '@/components/elements/my-button'
+import type { ElevationToken } from '@/theme/elevation'
 
 export type SwipeableItemIconName = ComponentProps<typeof Ionicons>['name']
 
@@ -45,6 +46,13 @@ export interface SwipeableItemProps {
    */
   swipeToRemove?: SwipeToRemoveOption
   testID?: string
+  /**
+   * Renders the row's shadow on the outer (un-clipped) wrapper instead of leaving it to
+   * `children` — a shadow set on a child inside the row gets cut by the clip container that
+   * hides the reveal strips until swiped open (RN `overflow: hidden` clips descendant shadows
+   * regardless of how much they'd otherwise bleed). Omit for a flat row with no shadow.
+   */
+  elevation?: ElevationToken | 'none'
 }
 
 export interface SwipeableItemRef {

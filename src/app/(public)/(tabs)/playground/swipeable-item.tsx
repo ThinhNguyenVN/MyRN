@@ -158,8 +158,9 @@ function SwipeableItemListBody() {
         rightActions={item.right}
         swipeToRemove={item.swipeToRemove}
         onDelete={() => remove(item.id)}
+        elevation="soft/down/small"
       >
-        <MyView style={styles.rowCard} elevation={'soft/down/small'} radius="large" fillParent>
+        <MyView style={styles.rowCard} fillParent>
           <MyText typography="body">{item.title}</MyText>
           <MyText typography="caption" color="text/active/tertiary" style={styles.captionMargin}>
             {item.caption}

@@ -18,6 +18,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
+import MyView from '@/components/elements/my-view'
 import { isWeb } from '@/constants/dimensions'
 import { useThemedStyles } from '@/theme/theme-context'
 import { triggerHaptic } from '@/utils/haptic'
@@ -53,7 +54,16 @@ const hapticDelete = () => {
 
 export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
   function SwipeableItem(
-    { rowKey, children, leftActions = [], rightActions = [], onDelete, swipeToRemove, testID },
+    {
+      rowKey,
+      children,
+      leftActions = [],
+      rightActions = [],
+      onDelete,
+      swipeToRemove,
+      testID,
+      elevation,
+    },
     ref,
   ) {
     const styles = useThemedStyles(generateStyles)
@@ -340,6 +350,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
     )
 
     const measured = clipWidth > 0
+    const hasElevation = !isNil(elevation) && elevation !== 'none'
 
     return (
       <Animated.View
@@ -347,43 +358,49 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
         exiting={SWIPEABLE_ITEM_ROW_EXITING}
         collapsable={false}
       >
-        <SwipeableRowPressProvider value={rowPressValue}>
-          <View style={styles.clip} testID={testID} collapsable={false} onLayout={onLayoutClip}>
-            <GestureDetector gesture={pan}>
-              <Animated.View style={[styles.row, rowStyle]} collapsable={false}>
-                {measured ? (
-                  <SwipeableActionStrip
-                    actions={leftActions}
-                    side="left"
-                    rowKey={rowKey}
-                    stripPx={leftStripPx}
-                    stripStyle={[styles.strip, styles.stripLeft]}
-                    translateX={translateX}
-                    wrapAction={wrapAction}
-                  />
-                ) : null}
-                <View
-                  style={contentStyle}
-                  collapsable={false}
-                  {...(isWeb ? { onClickCapture: onContentClickCapture } : null)}
-                >
-                  {children}
-                </View>
-                {measured ? (
-                  <SwipeableActionStrip
-                    actions={rightActions}
-                    side="right"
-                    rowKey={rowKey}
-                    stripPx={rightStripPx}
-                    stripStyle={[styles.strip, styles.stripRight]}
-                    translateX={translateX}
-                    wrapAction={wrapAction}
-                  />
-                ) : null}
-              </Animated.View>
-            </GestureDetector>
-          </View>
-        </SwipeableRowPressProvider>
+        <MyView
+          elevation={elevation}
+          radius={hasElevation ? 'large' : undefined}
+          backgroundColor={hasElevation ? 'fill/background/tertiary' : undefined}
+        >
+          <SwipeableRowPressProvider value={rowPressValue}>
+            <View style={styles.clip} testID={testID} collapsable={false} onLayout={onLayoutClip}>
+              <GestureDetector gesture={pan}>
+                <Animated.View style={[styles.row, rowStyle]} collapsable={false}>
+                  {measured ? (
+                    <SwipeableActionStrip
+                      actions={leftActions}
+                      side="left"
+                      rowKey={rowKey}
+                      stripPx={leftStripPx}
+                      stripStyle={[styles.strip, styles.stripLeft]}
+                      translateX={translateX}
+                      wrapAction={wrapAction}
+                    />
+                  ) : null}
+                  <View
+                    style={contentStyle}
+                    collapsable={false}
+                    {...(isWeb ? { onClickCapture: onContentClickCapture } : null)}
+                  >
+                    {children}
+                  </View>
+                  {measured ? (
+                    <SwipeableActionStrip
+                      actions={rightActions}
+                      side="right"
+                      rowKey={rowKey}
+                      stripPx={rightStripPx}
+                      stripStyle={[styles.strip, styles.stripRight]}
+                      translateX={translateX}
+                      wrapAction={wrapAction}
+                    />
+                  ) : null}
+                </Animated.View>
+              </GestureDetector>
+            </View>
+          </SwipeableRowPressProvider>
+        </MyView>
       </Animated.View>
     )
   },
