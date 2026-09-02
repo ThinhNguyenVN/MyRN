@@ -20,6 +20,8 @@ Without these, do scope-lock / ask — do not invent a product:
 - Theme + `My*` kit — prefer `shared-ui-catalog.md`
 - `auth` + `todo` = **structure references only** (not required product features)
 - RTK Query / Redux / form / i18n patterns — `data-state-standard.md`
+- Web SEO (title/meta/OG/JSON-LD/robots/sitemap), config-driven and **off by default**
+  — `seo-standard.md`
 - Playground = component catalog only
 - Conventions in `.docs/` + change process via OpenSpec
 
@@ -92,4 +94,5 @@ OpenSpec change artifacts in this repo are written in **Vietnamese** (`openspec/
 | API / Redux | `data-state-standard.md` |
 | UX fallbacks | `default-behavior-rules.md` |
 | Canonical code | `canonical-references.md` |
+| SEO (public web products only) | `seo-standard.md` |
 | Prompts | `prompt-template-scope-lock.md`, `prompt-template-feature.md`, `prompt-template-full-app.md` |
