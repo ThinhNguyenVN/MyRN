@@ -2,13 +2,11 @@ import { useCallback, useMemo, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 
-import MyText from '@/components/elements/my-text'
 import { HeroBackground, HeroCarousel, TestimonialsCarousel } from '@/components/ui/carousel'
 import type { HeroSlide, Testimonial } from '@/components/ui/carousel'
 import { FloatingContact } from '@/components/ui/floating-contact'
 import type { FloatingContactItem } from '@/components/ui/floating-contact'
-import { generateStyles } from '@/features/playground/styles'
-import { useTheme, useThemedStyles } from '@/theme/theme-context'
+import { useTheme } from '@/theme/theme-context'
 
 const DEMO_SLIDES: readonly HeroSlide[] = [
   {
@@ -54,7 +52,6 @@ const DEMO_TESTIMONIALS: readonly Testimonial[] = [
 
 export default function HeroLandingKitScreen() {
   const { isMobileSize } = useTheme()
-  const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
   const [currentSlide, setCurrentSlide] = useState(0)
 
@@ -99,20 +96,22 @@ export default function HeroLandingKitScreen() {
   )
 
   const heroImages = useMemo(() => DEMO_SLIDES.map((slide) => slide.image), [])
+  const heroHeight = isMobileSize ? 460 : 740
 
   return (
     <View style={demoStyles.root}>
-      <ScrollView>
-        <View style={styles.screenContent}>
-          <MyText typography="body">{t('playground.heroLandingKitIntro')}</MyText>
-        </View>
+      {/* Sibling of the ScrollView, not inside it — pinned behind everything while the
+          ScrollView's content (transparent background, higher zIndex) scrolls over it.
+          The hero background only disappears once an opaque section (TestimonialsCarousel)
+          scrolls up far enough to cover it. Same technique the source product uses. */}
+      <View style={demoStyles.stage}>
+        <HeroBackground
+          images={heroImages}
+          currentSlide={currentSlide}
+          style={[demoStyles.heroBackground, { height: heroHeight }]}
+        />
 
-        <View style={demoStyles.heroStage}>
-          <HeroBackground
-            images={heroImages}
-            currentSlide={currentSlide}
-            style={StyleSheet.absoluteFill}
-          />
+        <ScrollView style={demoStyles.scrollView} contentContainerStyle={demoStyles.scrollContent}>
           <HeroCarousel
             slides={DEMO_SLIDES}
             currentSlide={currentSlide}
@@ -121,14 +120,14 @@ export default function HeroLandingKitScreen() {
             onNext={handleNext}
             isMobileSize={isMobileSize}
           />
-        </View>
 
-        <TestimonialsCarousel
-          testimonials={DEMO_TESTIMONIALS}
-          title={t('playground.heroLandingKitTitle')}
-          isMobileSize={isMobileSize}
-        />
-      </ScrollView>
+          <TestimonialsCarousel
+            testimonials={DEMO_TESTIMONIALS}
+            title={t('playground.heroLandingKitTitle')}
+            isMobileSize={isMobileSize}
+          />
+        </ScrollView>
+      </View>
 
       <FloatingContact items={contactItems} />
     </View>
@@ -139,7 +138,22 @@ const demoStyles = StyleSheet.create({
   root: {
     flex: 1,
   },
-  heroStage: {
-    position: 'relative',
+  stage: {
+    flex: 1,
+  },
+  heroBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 0,
+  },
+  scrollView: {
+    flex: 1,
+    zIndex: 10,
+    backgroundColor: 'transparent',
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
 })
