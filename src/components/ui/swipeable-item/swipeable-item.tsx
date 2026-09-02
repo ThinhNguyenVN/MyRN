@@ -356,26 +356,34 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
     const hasElevation = !isNil(elevation) && elevation !== 'none'
 
     /**
-     * Card shell (shadow + radius + border) rendered on its own layer, a *sibling* of the clip
-     * container instead of a descendant — a shadow set on something inside `clip` gets cut by
+     * Card shadow/border are two separate layers, both animated with the same `translateX` as
+     * the content (see `cardAnimatedStyle`) so they slide together with it instead of staying
+     * fixed while the row opens underneath — and both are *siblings* of the clip container
+     * instead of descendants, since a shadow/border set on something inside `clip` gets cut by
      * its `overflow: hidden` (needed to hide the reveal strips), no matter how much it would
-     * otherwise bleed. Transparent (no background) and painted *after* `clip` in the JSX below
-     * — on top of it — so the shell isn't hidden behind a revealed action strip's own opaque
-     * background the moment it slides under where the shadow/border would show. Animated with
-     * the same `translateX` as the content (see `cardAnimatedStyle` below) so the shell — and
-     * any border passed via `cardStyle` — slides together with it instead of staying fixed while
-     * the row opens underneath.
+     * otherwise bleed.
+     *
+     * They're split into two layers, on opposite sides of `clip` in the JSX below, because they
+     * have conflicting requirements:
+     * - The shadow layer needs an *opaque* background for iOS to derive a crisp, radius-aware
+     *   shadowPath from it (a fully transparent shadow-casting view renders a soft, ill-defined
+     *   shadow on iOS, regardless of how small the blur value is) — so it has to render *behind*
+     *   `clip`, where that opaque fill is always hidden under `clip`'s own content.
+     * - The border layer has to render *after* `clip` (on top of it) so it isn't hidden behind a
+     *   revealed action strip's own opaque background the moment it slides under where the
+     *   border would show — which means it must stay fully transparent itself, or it would hide
+     *   `children` every time it's on top of them.
      */
-    const shellStyle = useMemo((): ViewStyle => {
-      if (!hasElevation) return { borderRadius: Radius.large, backgroundColor: 'transparent' }
+    const shadowLayerStyle = useMemo((): ViewStyle => {
+      if (!hasElevation) return {}
       const { blur, opacity, dx, dy } = getElevation(elevation as ElevationToken)
       const base: ViewStyle = {
         borderRadius: Radius.large,
-        // Explicit (not omitted) so iOS derives a precise, radius-aware shadowPath from this
-        // view's own bounds instead of falling back to a fuzzy, content-based shadow — an empty
-        // view with no backgroundColor at all renders `shadowRadius`/`shadowOpacity` blurry/soft
-        // on iOS regardless of how small the blur value is.
-        backgroundColor: 'transparent',
+        backgroundColor: getColor('fill/background/tertiary'),
+        // A view with an opaque backgroundColor + borderRadius clips its own shadow by default
+        // (RN/iOS treats it like `masksToBounds`) unless overflow is explicitly 'visible' — see
+        // MySurface, which relies on the same override for its own shadow.
+        overflow: 'visible',
       }
       if (isIos || isWeb) {
         base.shadowColor = getColor('brand/black')
@@ -401,6 +409,12 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
         exiting={SWIPEABLE_ITEM_ROW_EXITING}
         collapsable={false}
       >
+        {measured && hasElevation ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.cardShell, { width: clipWidth }, shadowLayerStyle, cardAnimatedStyle]}
+          />
+        ) : null}
         <SwipeableRowPressProvider value={rowPressValue}>
           <View style={styles.clip} testID={testID} collapsable={false} onLayout={onLayoutClip}>
             <GestureDetector gesture={pan}>
@@ -443,8 +457,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
             pointerEvents="none"
             style={[
               styles.cardShell,
-              { width: clipWidth },
-              shellStyle,
+              { width: clipWidth, borderRadius: Radius.large },
               cardStyle,
               cardAnimatedStyle,
             ]}
