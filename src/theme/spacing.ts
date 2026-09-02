@@ -7,6 +7,8 @@ export const Spacing = {
   x6: 24,
   x8: 32,
   x10: 40,
+  x12: 48,
+  x14: 56,
 } as const
 
 export type SpacingType = keyof typeof Spacing
