@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { LayoutChangeEvent, useWindowDimensions, View, ViewStyle } from 'react-native'
+import { LayoutChangeEvent, useWindowDimensions, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
   Easing,
@@ -18,10 +18,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
-import { isAndroid, isIos, isWeb } from '@/constants/dimensions'
-import { Radius } from '@/theme/radius'
-import { getElevation, type ElevationToken } from '@/theme/elevation'
-import { useTheme, useThemedStyles } from '@/theme/theme-context'
+import { isWeb } from '@/constants/dimensions'
+import { useThemedStyles } from '@/theme/theme-context'
 import { triggerHaptic } from '@/utils/haptic'
 import { isNil } from 'lodash'
 
@@ -42,6 +40,7 @@ import { useSwipeableItemOptional } from './swipe-item-context'
 import { SwipeableRowPressProvider } from './swipe-row-press'
 import { SwipeableActionStrip } from './swipeable-action-strip'
 import { generateStyles, stripWidthPx } from './styles'
+import { CARD_SHELL_RADIUS, useCardShell } from './use-card-shell'
 import type { SwipeableItemProps, SwipeableItemRef } from './types'
 
 /** Block the synthetic click / Pressable onPress that follows a pan on web. */
@@ -51,6 +50,14 @@ const OPEN_PRESS_IGNORE_PX = 8
 
 const hapticDelete = () => {
   triggerHaptic('Medium')
+}
+
+/** Distance a strip must be dragged past to commit a swipe-to-delete on its side. Zero-width
+ *  strips (no actions on that side) still get `COMMIT_EXTRA` alone, so a swipe past that point
+ *  on an empty side commits too (see the `left`/`right` demo rows in the playground screen). */
+function commitThreshold(stripWidth: number) {
+  'worklet'
+  return stripWidth > 0 ? stripWidth + COMMIT_EXTRA : COMMIT_EXTRA
 }
 
 export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
@@ -69,7 +76,6 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
     ref,
   ) {
     const styles = useThemedStyles(generateStyles)
-    const { getColor } = useTheme()
     const { width: windowWidth } = useWindowDimensions()
     const swipeableItem = useSwipeableItemOptional()
     const [clipWidth, setClipWidth] = useState(0)
@@ -198,8 +204,8 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
         const exitDistPos = wRow + exitPad
         const exitDistNeg = -(wRow + exitPad)
 
-        const commitL = lw > 0 ? lw + COMMIT_EXTRA : COMMIT_EXTRA
-        const commitR = rsw > 0 ? rsw + COMMIT_EXTRA : COMMIT_EXTRA
+        const commitL = commitThreshold(lw)
+        const commitR = commitThreshold(rsw)
 
         const velocityOpenLeft = lw > 0 ? lw * VELOCITY_MENU_LEEWAY_FRAC : 0
         const velocityOpenRight = rsw > 0 ? rsw * VELOCITY_MENU_LEEWAY_FRAC : 0
@@ -285,7 +291,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
           }
           translateX.value = next
 
-          const commitL = lw > 0 ? lw + COMMIT_EXTRA : COMMIT_EXTRA
+          const commitL = commitThreshold(lw)
           if (
             allowSwipeRemovePlusSV.value === 1 &&
             next > commitL &&
@@ -298,7 +304,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
             leftDelHapticDone.value = 0
           }
 
-          const commitR = rsw > 0 ? rsw + COMMIT_EXTRA : COMMIT_EXTRA
+          const commitR = commitThreshold(rsw)
           if (
             allowSwipeRemoveMinusSV.value === 1 &&
             next < -commitR &&
@@ -353,55 +359,10 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
     )
 
     const measured = clipWidth > 0
-    const hasElevation = !isNil(elevation) && elevation !== 'none'
-
-    /**
-     * Card shadow/border are two separate layers, both animated with the same `translateX` as
-     * the content (see `cardAnimatedStyle`) so they slide together with it instead of staying
-     * fixed while the row opens underneath — and both are *siblings* of the clip container
-     * instead of descendants, since a shadow/border set on something inside `clip` gets cut by
-     * its `overflow: hidden` (needed to hide the reveal strips), no matter how much it would
-     * otherwise bleed.
-     *
-     * They're split into two layers, on opposite sides of `clip` in the JSX below, because they
-     * have conflicting requirements:
-     * - The shadow layer needs an *opaque* background for iOS to derive a crisp, radius-aware
-     *   shadowPath from it (a fully transparent shadow-casting view renders a soft, ill-defined
-     *   shadow on iOS, regardless of how small the blur value is) — so it has to render *behind*
-     *   `clip`, where that opaque fill is always hidden under `clip`'s own content.
-     * - The border layer has to render *after* `clip` (on top of it) so it isn't hidden behind a
-     *   revealed action strip's own opaque background the moment it slides under where the
-     *   border would show — which means it must stay fully transparent itself, or it would hide
-     *   `children` every time it's on top of them.
-     */
-    const shadowLayerStyle = useMemo((): ViewStyle => {
-      if (!hasElevation) return {}
-      const { blur, opacity, dx, dy } = getElevation(elevation as ElevationToken)
-      const base: ViewStyle = {
-        borderRadius: Radius.large,
-        backgroundColor: getColor('fill/background/tertiary'),
-        // A view with an opaque backgroundColor + borderRadius clips its own shadow by default
-        // (RN/iOS treats it like `masksToBounds`) unless overflow is explicitly 'visible' — see
-        // MySurface, which relies on the same override for its own shadow.
-        overflow: 'visible',
-      }
-      if (isIos || isWeb) {
-        base.shadowColor = getColor('brand/black')
-        base.shadowOffset = { width: dx, height: dy }
-        base.shadowOpacity = opacity
-        base.shadowRadius = blur
-      }
-      if (isAndroid) {
-        // Approximate — matches MySurface's own placeholder-elevation fallback. The precise
-        // SVG-based shadow MySurface otherwise draws can't be driven by a worklet transform.
-        base.elevation = Math.max(2, Math.round(blur / 2))
-      }
-      return base
-    }, [hasElevation, elevation, getColor])
-
-    const cardAnimatedStyle = useAnimatedStyle(() => ({
-      transform: [{ translateX: translateX.value }],
-    }))
+    const { hasElevation, shadowLayerStyle, cardAnimatedStyle } = useCardShell(
+      elevation,
+      translateX,
+    )
 
     return (
       <Animated.View
@@ -457,7 +418,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
             pointerEvents="none"
             style={[
               styles.cardShell,
-              { width: clipWidth, borderRadius: Radius.large },
+              { width: clipWidth, borderRadius: CARD_SHELL_RADIUS },
               cardStyle,
               cardAnimatedStyle,
             ]}

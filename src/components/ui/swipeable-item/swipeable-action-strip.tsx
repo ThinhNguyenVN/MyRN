@@ -12,12 +12,7 @@ import MyButton from '@/components/elements/my-button'
 import { BUTTON_SMALL_HEIGHT } from '@/components/elements/my-button/styles'
 
 import { SCALE_MIN, SCALE_RANGE, SLOT_STEP, UNDERLAY_PADDING_X } from './constants'
-import type {
-  StaggeredIconScaleProps,
-  SwipeableActionButtonsProps,
-  SwipeableItemAction,
-  SwipeStripSide,
-} from './types'
+import type { StaggeredIconScaleProps, SwipeableItemAction, SwipeStripSide } from './types'
 
 interface SwipeableActionStripProps {
   actions: SwipeableItemAction[]
@@ -111,20 +106,6 @@ export function SwipeableActionStrip({
         </StaggeredIconScale>
       ))}
     </View>
-  )
-}
-
-export function SwipeableActionButtons({
-  actions,
-  rowKey,
-  wrapAction,
-}: SwipeableActionButtonsProps) {
-  return (
-    <>
-      {actions.map((action, index) => (
-        <ActionButton key={`action-${rowKey}-${index}`} action={action} wrapAction={wrapAction} />
-      ))}
-    </>
   )
 }
 

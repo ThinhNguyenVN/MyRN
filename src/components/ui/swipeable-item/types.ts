@@ -16,12 +16,6 @@ export interface SwipeableItemAction {
   disabled?: boolean
 }
 
-export interface SwipeableActionButtonsProps {
-  actions: SwipeableItemAction[]
-  rowKey: string
-  wrapAction?: (fn: () => void) => void
-}
-
 /** Mặc định không set → **không** swipe-to-remove. */
 export type SwipeToRemoveOption = 'left' | 'right' | 'both'
 
