@@ -44,6 +44,10 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Client-side list paging | `useClientListPaging` | Per-feature page/load-more state |
 | Grouped nav rows in a card (settings/profile-style) | `MenuListCard` (`components/ui/menu-list-card`) | One-off row list with hand-rolled dividers/chevrons |
 | Avatar-triggered popover menu (e.g. header profile action) | `ProfileMenuButton` (`components/ui/profile-menu-button`) | Ad-hoc `TriggerModal` + avatar wiring per screen |
+| Marketing/landing hero with slide transition | `HeroCarousel` + `HeroBackground` (`components/ui/carousel`) | Feature-local carousel + manual crossfade `Animated.Image` |
+| Testimonial / review carousel | `TestimonialsCarousel` (`components/ui/carousel`) | One-off card + `useState` index per landing feature |
+| Sliding dot indicator (any carousel) | `CarouselDots` (`components/ui/carousel`) | Inline `onPress={() => setIndex(i)}` per dot (violates `no-inline-render-handlers`) |
+| Floating contact buttons (call/email/chat stack) | `FloatingContact` (`components/ui/floating-contact`) | Ad-hoc absolute `View` + per-button `Animated` pulse |
 
 ## Layout surfaces
 
@@ -334,6 +338,37 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Props: `items: ProfileMenuItem[]` (`key`, `text`, `icon`, `onPress`), `avatarUri?`, `accessibilityLabel`
 - Used by `WebsiteHeader`'s `profileMenuItems` prop; can also be used standalone
 - Playground: `…/playground/profile-menu-button.tsx`
+
+### `HeroCarousel` / `HeroBackground`
+
+- Path: `@/components/ui/carousel` (barrel), or `@/components/ui/carousel/hero-carousel` / `@/components/ui/carousel/hero-background` directly
+- `HeroCarousel`: full-bleed hero content (title, subtitle, prev/next arrows, `CarouselDots`) over 4 feature-chip variants — `badge` (icon + label), `stat` (big number + label), `service` (title + subtitle), `process` (step + label). Props: `slides: HeroSlide[]`, `currentSlide`, `onSlideChange`, `onPrev`, `onNext`, `isMobileSize`. All colors come from `theme.getColor(...)` — no brand props to configure.
+- `HeroBackground`: crossfades between `images: ImageSourcePropType[]` on `currentSlide` change using `expo-image`'s `transition` (no manual `Animated` composition). Renders behind `HeroCarousel` as a sibling — give the shared parent `position: 'relative'` and pass `style={StyleSheet.absoluteFill}` to `HeroBackground`.
+- **Must mount above `AppInitGate`** if used on a web route that needs to be crawlable/indexed via static export — see `.docs/seo-standard.md`'s AppInitGate gotcha; this component itself has no such restriction, but anything it's composed into for a public marketing page does.
+- Playground: `…/playground/hero-landing-kit.tsx`
+
+### `TestimonialsCarousel`
+
+- Path: `@/components/ui/carousel` (barrel), or `@/components/ui/carousel/testimonials-carousel` directly
+- Single-card carousel: avatar (`MyImage`, remote URL) + quote + name + company, prev/next arrows, `CarouselDots`
+- Props: `testimonials: Testimonial[]`, `title?`, `isMobileSize`. Guards empty arrays and clamps the active index if the list shrinks.
+- Playground: `…/playground/hero-landing-kit.tsx`
+
+### `CarouselDots`
+
+- Path: `@/components/ui/carousel` (barrel), or `@/components/ui/carousel/carousel-dots` directly
+- Row of pressable dot indicators; each dot owns its own stable `onPress` via `useCallback` (do not inline `onPress={() => onSelect(i)}` per dot elsewhere — that's exactly what this exists to avoid)
+- Props: `count`, `activeIndex`, `onSelect`, optional `style` / `dotStyle` / `activeDotStyle` to override the theme-token default look
+- Used internally by `HeroCarousel` and `TestimonialsCarousel`; also usable standalone for any other carousel
+- Playground: `…/playground/hero-landing-kit.tsx`
+
+### `FloatingContact`
+
+- Path: `@/components/ui/floating-contact`
+- Stack of floating action buttons (bottom-right, `position: fixed` on web) for contact channels (call/email/chat/...). One item may set `emphasized: true` for a bigger button with a pulsing ring (native-driver `Animated`, one instance per emphasized item).
+- Props: `items: FloatingContactItem[]` (`key`, `icon`, `color`, `accessibilityLabel`, `onPress`, `emphasized?`), optional `style`
+- Each item carries its own `onPress` — wire real actions (`Linking.openURL('tel:...')`, `mailto:`, chat deep link) at the call site; this component has no default behavior
+- Playground: `…/playground/hero-landing-kit.tsx`
 
 ### Shared form hooks
 
