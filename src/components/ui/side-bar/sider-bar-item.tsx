@@ -1,5 +1,5 @@
-import { memo, useCallback, useEffect, useRef } from 'react'
-import { View, type TextStyle } from 'react-native'
+import { memo, useCallback, useEffect } from 'react'
+import { View, type LayoutChangeEvent, type TextStyle } from 'react-native'
 import Animated, {
   Extrapolation,
   interpolate,
@@ -38,32 +38,31 @@ function SideBarItemRow({
   index,
   isActive,
   onSelected,
-  containerRef,
   onMeasureLayout,
   collapseProgress,
 }: SideBarRowProps) {
   const styles = useThemedStyles(generateStyles)
   const { getColor } = useTheme()
-  const rowRef = useRef<View>(null)
   const progress = useSharedValue(isActive ? 1 : 0)
 
   useEffect(() => {
     progress.value = withTiming(isActive ? 1 : 0, { duration: ANIMATION_DURATION })
   }, [isActive, progress])
 
-  const measureLayout = useCallback(() => {
-    const container = containerRef?.current
-    if (!rowRef.current || !container || !onMeasureLayout) {
-      return
-    }
-    rowRef.current.measureLayout(
-      container as never,
-      (_x, y, _w, height) => {
-        onMeasureLayout(index, y, height)
-      },
-      () => {},
-    )
-  }, [containerRef, index, onMeasureLayout])
+  /** `event.nativeEvent.layout` is relative to this row's direct parent (`listContent`), so it
+   *  stays correct regardless of how many scroll-container layers wrap that parent — unlike
+   *  `measureLayout()`, whose cross-node DOM measurement on web breaks once the shared
+   *  container sits inside a `ScrollView`'s own scrolling wrapper. */
+  const measureLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      if (!onMeasureLayout) {
+        return
+      }
+      const { y, height } = event.nativeEvent.layout
+      onMeasureLayout(index, y, height)
+    },
+    [index, onMeasureLayout],
+  )
 
   const textColorInactive = getColor('text/active/primary')
   const textColorActive = getColor('brand/white')
@@ -153,7 +152,7 @@ function SideBarItemRow({
         >
           <Animated.Text
             numberOfLines={1}
-            ellipsizeMode="clip"
+            ellipsizeMode="tail"
             style={[Typography.body as TextStyle, textAnimatedStyle, styles.itemRowLabel]}
           >
             {item.label}
@@ -168,9 +167,9 @@ function SideBarItemRow({
     </Animated.View>
   )
 
-  if (containerRef && onMeasureLayout) {
+  if (onMeasureLayout) {
     return (
-      <View ref={rowRef} style={styles.itemLayer} onLayout={measureLayout} collapsable={false}>
+      <View style={styles.itemLayer} onLayout={measureLayout} collapsable={false}>
         {content}
       </View>
     )

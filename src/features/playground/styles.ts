@@ -1,5 +1,6 @@
 import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
-import { SIDEBAR_WIDTH } from '@/components/ui/side-bar/styles'
+import { SIDEBAR_FLUSH_WIDTH } from '@/components/ui/side-bar/styles'
+import { SIDEBAR_COLLAPSE_TOGGLE_SIZE } from '@/components/ui/side-bar/sidebar-collapse-toggle.styles'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
@@ -13,15 +14,25 @@ export const generateStyles = (theme: ThemeType) => {
     },
     contentContainer: {
       flex: 1,
-      paddingLeft: SIDEBAR_WIDTH + getSpacing('x2'),
+      // Static fallback for the very first paint — the actual value is driven by the animated
+      // `collapseProgress`-linked style in playground/_layout.tsx once mounted.
+      paddingLeft: SIDEBAR_FLUSH_WIDTH + getSpacing('x2'),
     },
     sidebarWrapper: {
       position: 'absolute',
       left: 0,
       top: 0,
       bottom: 0,
-      width: SIDEBAR_WIDTH,
+      // No fixed width: the flush rail sizes itself via its own animated width — forcing one
+      // here would clip it (expanded) or leave dead space (collapsed).
       zIndex: 2,
+    },
+    /** Straddles the rail's right edge; `left` is animated in playground/_layout.tsx. */
+    collapseToggle: {
+      position: 'absolute',
+      top: getSpacing('x6'),
+      width: SIDEBAR_COLLAPSE_TOGGLE_SIZE,
+      zIndex: 3,
     },
     screenContent: {
       padding: getSpacing('x4'),

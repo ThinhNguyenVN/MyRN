@@ -4,7 +4,8 @@ export type ExpandableSearchProps = {
   placeholder?: string
   expanded: boolean
   onExpandedChange: (expanded: boolean) => void
-  /** Max expanded width in px. Defaults to ~window width minus chrome. */
+  /** Max expanded width in px. Defaults to ~window width minus chrome, capped at
+   *  `EXPANDABLE_SEARCH_MAX_WIDTH` so it doesn't stretch edge-to-edge on wide windows. */
   expandedWidth?: number
   searchAccessibilityLabel?: string
   closeAccessibilityLabel?: string

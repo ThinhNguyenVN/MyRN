@@ -66,6 +66,8 @@
   },
   "playground": {
     "title": "Component Playground",
+    "sidebarCollapse": "Thu gọn sidebar",
+    "sidebarExpand": "Mở rộng sidebar",
     "toastAndConfirmation": "Toast & Confirmation",
     "swipeableItem": "Swipeable item",
     "linksMyList": "My List",

@@ -20,8 +20,6 @@ import MyPressable from '../my-pressable'
 
 import MyButtonIcon from './my-button-icon'
 
-const TEXT_ON_PRIMARY = '#ffffff'
-
 const MyButton: React.FC<MyButtonProps> = ({
   text,
   style,
@@ -55,17 +53,20 @@ const MyButton: React.FC<MyButtonProps> = ({
 
   const widthStyle: ViewStyle | null = useMemo(() => getButtonWidthStyle(width), [width])
 
-  const buttonStyle: ViewStyle[] = [
-    styles?.[type],
-    size === 'small' ? styles.sizeSmall : styles.sizeLarge,
-    ...(widthStyle ? [widthStyle] : []),
-  ]
+  const buttonStyle: ViewStyle[] = useMemo(
+    () => [
+      styles?.[type],
+      size === 'small' ? styles.sizeSmall : styles.sizeLarge,
+      ...(widthStyle ? [widthStyle] : []),
+    ],
+    [styles, type, size, widthStyle],
+  )
   const useWhiteText = usesOnPrimaryButtonText(type, disabled)
   const textColor = disabled
-    ? TEXT_ON_PRIMARY
+    ? getColor('brand/white')
     : (textColorProp ??
       (useWhiteText
-        ? TEXT_ON_PRIMARY
+        ? getColor('brand/white')
         : type === 'secondary'
           ? getColor('brand/secondary')
           : getColor('text/active/primary')))
@@ -89,13 +90,26 @@ const MyButton: React.FC<MyButtonProps> = ({
     </>
   )
 
-  const surfaceStyle = [buttonStyle, disabled && styles.disabled, style]
-  const touchableStyle = [
-    width === 'full' ? styles.touchable : null,
-    ...(widthStyle ? [widthStyle] : []),
-    ...(hasContainerPropsStyle ? [containerPropsStyle] : []),
-    containerStyle,
-  ]
+  const surfaceStyle = useMemo(
+    () => [buttonStyle, disabled && styles.disabled, style],
+    [buttonStyle, disabled, styles.disabled, style],
+  )
+  const touchableStyle = useMemo(
+    () => [
+      width === 'full' ? styles.touchable : null,
+      ...(widthStyle ? [widthStyle] : []),
+      ...(hasContainerPropsStyle ? [containerPropsStyle] : []),
+      containerStyle,
+    ],
+    [
+      width,
+      styles.touchable,
+      widthStyle,
+      hasContainerPropsStyle,
+      containerPropsStyle,
+      containerStyle,
+    ],
+  )
 
   return (
     <MyPressable

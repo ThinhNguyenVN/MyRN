@@ -13,6 +13,29 @@ import type { ProfileMenuButtonProps, ProfileMenuItem } from './type'
 const ITEM_HEIGHT_ESTIMATE = 52
 const PANEL_PADDING_ESTIMATE = 40
 
+interface MenuItemProps {
+  readonly item: ProfileMenuItem
+  readonly onPick: (item: ProfileMenuItem) => void
+}
+
+function MenuItemInner({ item, onPick }: MenuItemProps) {
+  const handlePress = useCallback(() => onPick(item), [onPick, item])
+
+  return (
+    <MyButton
+      text={item.text}
+      left={<MyIcon name={item.icon} size={18} color="icon/active/primary" />}
+      type="light"
+      size="small"
+      width="full"
+      elevation="none"
+      onPress={handlePress}
+    />
+  )
+}
+
+const MenuItem = memo(MenuItemInner)
+
 function ProfileMenuButtonInner({ avatarUri, items, accessibilityLabel }: ProfileMenuButtonProps) {
   const styles = useThemedStyles(generateStyles)
   const triggerRef = useRef<View>(null)
@@ -80,16 +103,7 @@ function ProfileMenuButtonInner({ avatarUri, items, accessibilityLabel }: Profil
         contentContainerStyle={styles.itemList}
       >
         {items.map((item) => (
-          <MyButton
-            key={`profile-menu-${item.key}`}
-            text={item.text}
-            left={<MyIcon name={item.icon} size={18} color="icon/active/primary" />}
-            type="light"
-            size="small"
-            width="full"
-            elevation="none"
-            onPress={() => handlePick(item)}
-          />
+          <MenuItem key={`profile-menu-${item.key}`} item={item} onPick={handlePick} />
         ))}
       </TriggerModal>
     </>

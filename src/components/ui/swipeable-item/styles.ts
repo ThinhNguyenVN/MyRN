@@ -24,6 +24,15 @@ export function generateStyles(theme: ThemeType) {
       borderRadius: getRadius('large'),
       backgroundColor: getColor('fill/background/tertiary'),
     },
+    /** Shared base for the shadow + border layers — see the comment at their usage site in
+     *  swipeable-item.tsx. Siblings of `clip`, not descendants, so they aren't cut by `clip`'s
+     *  `overflow: hidden`; animated with the same `translateX` so they slide with the content. */
+    cardShell: {
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      left: 0,
+    },
     row: {
       flexDirection: 'row',
       alignItems: 'stretch',

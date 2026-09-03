@@ -40,6 +40,7 @@ import { useSwipeableItemOptional } from './swipe-item-context'
 import { SwipeableRowPressProvider } from './swipe-row-press'
 import { SwipeableActionStrip } from './swipeable-action-strip'
 import { generateStyles, stripWidthPx } from './styles'
+import { CARD_SHELL_RADIUS, useCardShell } from './use-card-shell'
 import type { SwipeableItemProps, SwipeableItemRef } from './types'
 
 /** Block the synthetic click / Pressable onPress that follows a pan on web. */
@@ -51,9 +52,27 @@ const hapticDelete = () => {
   triggerHaptic('Medium')
 }
 
+/** Distance a strip must be dragged past to commit a swipe-to-delete on its side. Zero-width
+ *  strips (no actions on that side) still get `COMMIT_EXTRA` alone, so a swipe past that point
+ *  on an empty side commits too (see the `left`/`right` demo rows in the playground screen). */
+function commitThreshold(stripWidth: number) {
+  'worklet'
+  return stripWidth > 0 ? stripWidth + COMMIT_EXTRA : COMMIT_EXTRA
+}
+
 export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
   function SwipeableItem(
-    { rowKey, children, leftActions = [], rightActions = [], onDelete, swipeToRemove, testID },
+    {
+      rowKey,
+      children,
+      leftActions = [],
+      rightActions = [],
+      onDelete,
+      swipeToRemove,
+      testID,
+      elevation,
+      cardStyle,
+    },
     ref,
   ) {
     const styles = useThemedStyles(generateStyles)
@@ -185,8 +204,8 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
         const exitDistPos = wRow + exitPad
         const exitDistNeg = -(wRow + exitPad)
 
-        const commitL = lw > 0 ? lw + COMMIT_EXTRA : COMMIT_EXTRA
-        const commitR = rsw > 0 ? rsw + COMMIT_EXTRA : COMMIT_EXTRA
+        const commitL = commitThreshold(lw)
+        const commitR = commitThreshold(rsw)
 
         const velocityOpenLeft = lw > 0 ? lw * VELOCITY_MENU_LEEWAY_FRAC : 0
         const velocityOpenRight = rsw > 0 ? rsw * VELOCITY_MENU_LEEWAY_FRAC : 0
@@ -272,7 +291,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
           }
           translateX.value = next
 
-          const commitL = lw > 0 ? lw + COMMIT_EXTRA : COMMIT_EXTRA
+          const commitL = commitThreshold(lw)
           if (
             allowSwipeRemovePlusSV.value === 1 &&
             next > commitL &&
@@ -285,7 +304,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
             leftDelHapticDone.value = 0
           }
 
-          const commitR = rsw > 0 ? rsw + COMMIT_EXTRA : COMMIT_EXTRA
+          const commitR = commitThreshold(rsw)
           if (
             allowSwipeRemoveMinusSV.value === 1 &&
             next < -commitR &&
@@ -340,6 +359,10 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
     )
 
     const measured = clipWidth > 0
+    const { hasElevation, shadowLayerStyle, cardAnimatedStyle } = useCardShell(
+      elevation,
+      translateX,
+    )
 
     return (
       <Animated.View
@@ -347,6 +370,12 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
         exiting={SWIPEABLE_ITEM_ROW_EXITING}
         collapsable={false}
       >
+        {measured && hasElevation ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.cardShell, { width: clipWidth }, shadowLayerStyle, cardAnimatedStyle]}
+          />
+        ) : null}
         <SwipeableRowPressProvider value={rowPressValue}>
           <View style={styles.clip} testID={testID} collapsable={false} onLayout={onLayoutClip}>
             <GestureDetector gesture={pan}>
@@ -384,6 +413,17 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
             </GestureDetector>
           </View>
         </SwipeableRowPressProvider>
+        {measured ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.cardShell,
+              { width: clipWidth, borderRadius: CARD_SHELL_RADIUS },
+              cardStyle,
+              cardAnimatedStyle,
+            ]}
+          />
+        ) : null}
       </Animated.View>
     )
   },

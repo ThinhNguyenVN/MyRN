@@ -3,7 +3,7 @@ import { Platform, StyleSheet } from 'react-native'
 import type { ThemeType } from '@/theme/theme-context'
 
 export const generateStyles = (theme: ThemeType) => {
-  const { getSpacing } = theme
+  const { getColor, getSpacing } = theme
 
   return StyleSheet.create({
     container: {
@@ -27,7 +27,7 @@ export const generateStyles = (theme: ThemeType) => {
       borderRadius: 26,
       justifyContent: 'center',
       alignItems: 'center',
-      shadowColor: '#000',
+      shadowColor: getColor('brand/black'),
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.25,
       shadowRadius: 12,

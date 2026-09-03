@@ -1,6 +1,4 @@
-import type { PropsWithChildren } from 'react'
-import { memo, useEffect, useState } from 'react'
-import { TouchableOpacity } from 'react-native'
+import { memo, useCallback, useEffect, useState } from 'react'
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -8,19 +6,20 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
+import MyIcon from '@/components/elements/my-icon'
+import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
-import { IconSymbol } from '@/components/ui/icon-symbol'
-import { useThemedStyles, useTheme } from '@/theme/theme-context'
-
-import { generateStyles } from './styles'
-import CollapsibleContent from './collapsible-content'
 import MyView from '@/components/elements/my-view'
+import { useThemedStyles } from '@/theme/theme-context'
+
+import CollapsibleContent from './collapsible-content'
+import { generateStyles } from './styles'
+import type { CollapsibleProps } from './type'
 
 const ANIM_DURATION = 250
 
-const Collapsible: React.FC<PropsWithChildren<{ title: string }>> = ({ children, title }) => {
+function Collapsible({ children, title }: CollapsibleProps) {
   const styles = useThemedStyles(generateStyles)
-  const { getColor } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
   const rotation = useSharedValue(0)
 
@@ -32,16 +31,16 @@ const Collapsible: React.FC<PropsWithChildren<{ title: string }>> = ({ children,
     transform: [{ rotate: `${interpolate(rotation.value, [0, 1], [0, 90])}deg` }],
   }))
 
-  const iconColor = getColor('icon/active/primary')
+  const handleToggle = useCallback(() => setIsOpen((value) => !value), [])
 
   return (
     <MyView style={styles.container}>
-      <TouchableOpacity style={styles.heading} onPress={() => setIsOpen((value) => !value)}>
+      <MyPressable style={styles.heading} onPress={handleToggle}>
         <Animated.View style={chevronAnimatedStyle}>
-          <IconSymbol name="chevron.right" size={18} weight="medium" color={iconColor} />
+          <MyIcon name="chevron-forward" size={18} color="icon/active/primary" />
         </Animated.View>
         <MyText typography="label">{title}</MyText>
-      </TouchableOpacity>
+      </MyPressable>
       <CollapsibleContent isExpanded={isOpen} duration={ANIM_DURATION} innerStyle={styles.content}>
         {children}
       </CollapsibleContent>

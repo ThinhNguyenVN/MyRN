@@ -66,6 +66,8 @@
   },
   "playground": {
     "title": "Component Playground",
+    "sidebarCollapse": "Collapse sidebar",
+    "sidebarExpand": "Expand sidebar",
     "toastAndConfirmation": "Toast & Confirmation",
     "swipeableItem": "Swipeable item",
     "linksMyList": "My List",

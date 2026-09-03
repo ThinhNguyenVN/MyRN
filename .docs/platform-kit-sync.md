@@ -57,7 +57,7 @@ If a new UI piece is useful beyond one product, it belongs in MyRN.
 3. **Port** generic code to the same paths; remove product imports.
 4. **API:** props-driven; no product strings inside the facade.
 5. **Playground:** add/update a demo route.
-6. **Docs:** update `shared-ui-catalog.md` (+ conventions if needed).
+6. **Docs:** update `shared-ui-catalog.md` (+ conventions if needed) and add a `CHANGELOG.md` entry under `Unreleased` — products pull this repo via a manual backport, not a package/submodule, so the changelog is the only way a forked product finds out what changed in `components/elements`/`components/ui` since it forked.
 7. **OpenSpec (optional):** kit-focused change only — not product step archives.
 8. **PR this repo;** note the product PR that originated the kit.
 9. **Forward sync:** products pull MyRN when upgrading platform / starting new work.

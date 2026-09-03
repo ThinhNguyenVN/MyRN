@@ -36,7 +36,7 @@ export function generateStyles(theme: ThemeType) {
       height: THUMB_SIZE,
       borderRadius: Radius.full,
       backgroundColor: getColor('brand/white'),
-      shadowColor: '#000',
+      shadowColor: getColor('brand/black'),
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.2,
       shadowRadius: 2,

@@ -1,6 +1,8 @@
 import * as ImagePicker from 'expo-image-picker'
 import { isNil } from 'lodash'
 
+import { isWeb } from '@/constants/dimensions'
+
 import type {
   BuildImageFormDataOptions,
   ImagePickErrorCode,
@@ -78,9 +80,18 @@ async function launchPicker(
   launch: (options: ImagePicker.ImagePickerOptions) => Promise<ImagePicker.ImagePickerResult>,
   options: PickImageOptions,
 ): Promise<PickedImage> {
-  const permission = await requestPermission()
-  if (!permission.granted) {
-    throw new ImagePickError('permission_denied')
+  // Browsers only open the native file dialog when `launch` runs synchronously within the
+  // click's own call stack — expo-image-picker's web shim opens it via a dispatched click on
+  // a hidden <input>. Web's permission check is an unconditional granted no-op (there's no
+  // real permission to request), but `await`-ing it still costs a microtask hop, which is
+  // enough for some browsers to drop the click's user-activation and silently no-op the
+  // dialog — leaving the picker stuck in its loading state forever. Skip it on web so `launch`
+  // is reached synchronously, in the same task as the original click.
+  if (!isWeb) {
+    const permission = await requestPermission()
+    if (!permission.granted) {
+      throw new ImagePickError('permission_denied')
+    }
   }
 
   const result = await launch({

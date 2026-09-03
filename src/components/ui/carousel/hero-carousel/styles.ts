@@ -26,6 +26,9 @@ export const generateStyles = (theme: ThemeType) => {
       paddingBottom: getSpacing('x8'),
       gap: getSpacing('x5'),
     },
+    // Intentional: photo-overlay chrome, independent of light/dark theme (glass panel sits on
+    // top of a hero photo — see hero-carousel/type.ts kind='badge'|'stat'|'service'|'process').
+    // theme-exempt: alpha-blended overlay colors, no token equivalent.
     heroGlassPanel: {
       backgroundColor: 'rgba(0, 0, 0, 0.55)',
       borderRadius: 24,
@@ -35,7 +38,7 @@ export const generateStyles = (theme: ThemeType) => {
       alignItems: 'center',
       gap: getSpacing('x3'),
       maxWidth: 700,
-      shadowColor: '#000',
+      shadowColor: getColor('brand/black'),
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.3,
       shadowRadius: 24,
@@ -44,8 +47,9 @@ export const generateStyles = (theme: ThemeType) => {
     heroTitle: {
       fontSize: 44,
       fontWeight: '700',
-      color: '#ffffff',
+      color: getColor('brand/white'),
       textAlign: 'center',
+      // theme-exempt: text sits on a photo, shadow needs to stay dark regardless of theme.
       textShadowColor: 'rgba(0,0,0,0.5)',
       textShadowOffset: { width: 0, height: 2 },
       textShadowRadius: 4,
@@ -71,6 +75,7 @@ export const generateStyles = (theme: ThemeType) => {
       flexWrap: 'wrap',
       gap: getSpacing('x2'),
     },
+    // theme-exempt: translucent white card floats over the hero photo in both themes.
     heroFeatureBadge: {
       flex: 1,
       backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -128,6 +133,7 @@ export const generateStyles = (theme: ThemeType) => {
     heroFeatureStepMobile: {
       fontSize: 18,
     },
+    // theme-exempt: translucent white nav ring over the hero photo in both themes.
     heroArrow: {
       position: 'absolute',
       top: '50%',
@@ -149,7 +155,7 @@ export const generateStyles = (theme: ThemeType) => {
       right: getSpacing('x4'),
     },
     heroArrowText: {
-      color: '#ffffff',
+      color: getColor('brand/white'),
       fontSize: 24,
       fontWeight: '300',
     },
@@ -162,6 +168,7 @@ export const generateStyles = (theme: ThemeType) => {
       justifyContent: 'center',
       gap: getSpacing('x3'),
     },
+    // theme-exempt: translucent white dots over the hero photo in both themes.
     heroDot: {
       width: getSpacing('x12'),
       height: 6,
@@ -169,7 +176,7 @@ export const generateStyles = (theme: ThemeType) => {
       backgroundColor: 'rgba(255, 255, 255, 0.3)',
     },
     heroDotActive: {
-      backgroundColor: '#ffffff',
+      backgroundColor: getColor('brand/white'),
     },
     heroFeatureIcon: {
       color: getColor('brand/primary'),

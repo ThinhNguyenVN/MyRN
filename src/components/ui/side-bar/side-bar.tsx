@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useRef } from 'react'
-import { View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { usePathname } from 'expo-router'
 import Animated, {
   cancelAnimation,
@@ -7,7 +7,6 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
   type SharedValue,
 } from 'react-native-reanimated'
@@ -17,6 +16,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import {
   ANIMATION_DURATION,
+  HIGHLIGHT_ANIMATION_DURATION,
   ITEM_ROW_HEIGHT,
   SIDEBAR_COLLAPSED_WIDTH,
   SIDEBAR_FLUSH_WIDTH,
@@ -29,13 +29,11 @@ import {
 import type { SideBarItem, SideBarProps } from './type'
 import SideBarRow from './sider-bar-item'
 
-const HIGHLIGHT_SPRING = {
-  damping: 22,
-  stiffness: 260,
-  mass: 0.75,
-  overshootClamping: true,
-  restSpeedThreshold: 0.8,
-  restDisplacementThreshold: 0.5,
+/** `withSpring` on react-native-web can get stuck mid-flight (never converges to the target,
+ *  and its completion callback never fires) — `withTiming` doesn't have that issue. */
+const HIGHLIGHT_TIMING = {
+  duration: HIGHLIGHT_ANIMATION_DURATION,
+  easing: Easing.out(Easing.cubic),
 } as const
 
 const HIGHLIGHT_NAV_DELAY_MS = 160
@@ -56,7 +54,6 @@ function SideBarInner({
   const { defaultElevation } = useTheme()
   const elevation = elevationProp ?? (variant === 'flush' ? 'none' : defaultElevation)
   const styles = useThemedStyles(generateStyles)
-  const listContentRef = useRef<View>(null)
   const layoutsRef = useRef<Record<number, { y: number; height: number }>>({})
   const activeIndexRef = useRef(0)
   const navigateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -75,7 +72,6 @@ function SideBarInner({
   activeIndexRef.current = activeIndex
 
   const highlightY = useSharedValue(0)
-  const isAnimating = useSharedValue(0)
 
   useEffect(() => {
     if (collapseProgressProp) {
@@ -115,17 +111,14 @@ function SideBarInner({
     }
   })
 
+  /** Re-asserts the highlight's target on every write path (nav-triggered sync, remeasure,
+   *  optimistic click) instead of gating on an animation-finished flag — `withSpring`'s
+   *  completion callback isn't reliably invoked on react-native-web, so a "still animating"
+   *  guard can get stuck and permanently block the highlight from ever moving again. */
   const syncHighlightFromLayouts = useCallback(() => {
-    if (isAnimating.value === 1) {
-      return
-    }
     const layout = layoutsRef.current?.[activeIndexRef.current]
-    if (layout) {
-      highlightY.value = layout.y
-    } else {
-      highlightY.value = 0
-    }
-  }, [highlightY, isAnimating])
+    highlightY.value = withTiming(layout?.y ?? 0, HIGHLIGHT_TIMING)
+  }, [highlightY])
 
   useEffect(() => {
     syncHighlightFromLayouts()
@@ -147,13 +140,10 @@ function SideBarInner({
       }
       layoutsRef.current = { ...layoutsRef.current, [index]: { y, height } }
       if (index === activeIndexRef.current) {
-        if (isAnimating.value === 1) {
-          return
-        }
         highlightY.value = y
       }
     },
-    [highlightY, isAnimating],
+    [highlightY],
   )
 
   const handleSelected = useCallback(
@@ -168,14 +158,8 @@ function SideBarInner({
 
       const layout = layoutsRef.current?.[index]
       if (layout) {
-        isAnimating.value = 1
         cancelAnimation(highlightY)
-        highlightY.value = withSpring(layout.y, HIGHLIGHT_SPRING, (finished) => {
-          if (!finished) {
-            return
-          }
-          isAnimating.value = 0
-        })
+        highlightY.value = withTiming(layout.y, HIGHLIGHT_TIMING)
 
         navigateTimeoutRef.current = setTimeout(() => {
           onSelectedProp?.(item, index)
@@ -185,14 +169,14 @@ function SideBarInner({
 
       onSelectedProp?.(item, index)
     },
-    [highlightY, isAnimating, onSelectedProp],
+    [highlightY, onSelectedProp],
   )
 
   const showHighlight = activeIndex >= 0
   const isFlush = variant === 'flush'
 
   const listContent = (
-    <View ref={listContentRef} style={styles.listContent} collapsable={false}>
+    <View style={styles.listContent} collapsable={false}>
       {showHighlight ? (
         <Animated.View
           style={[
@@ -210,7 +194,6 @@ function SideBarInner({
           index={index}
           isActive={index === activeIndex}
           onSelected={handleSelected(item, index)}
-          containerRef={listContentRef}
           onMeasureLayout={handleMeasureLayout}
           collapseProgress={collapseProgress}
         />
@@ -226,7 +209,9 @@ function SideBarInner({
       fillParent
     >
       {header ? <View style={styles.header}>{header}</View> : null}
-      {listContent}
+      <ScrollView style={styles.listScrollView} showsVerticalScrollIndicator={false}>
+        {listContent}
+      </ScrollView>
       {footer ? <View style={styles.footer}>{footer}</View> : null}
     </MyView>
   )

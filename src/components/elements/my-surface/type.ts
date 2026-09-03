@@ -1,4 +1,8 @@
-import { ViewStyle } from 'react-native'
+import type { ReactNode } from 'react'
+import { StyleProp, ViewStyle } from 'react-native'
+
+import type { ElevationToken } from '@/theme/elevation'
+import type { RadiusType } from '@/theme/radius'
 
 /**
  * Style được support cho MySurface
@@ -64,6 +68,21 @@ export type SurfaceStyle = Pick<
   | 'transform'
   | 'overflow'
 >
+
+export interface MySurfaceProps extends Omit<
+  SurfaceStyle,
+  'elevation' | 'backgroundColor' | 'style'
+> {
+  elevation?: ElevationToken
+  radius?: RadiusType
+
+  backgroundColor?: string
+  style?: StyleProp<SurfaceStyle>
+  children?: ReactNode
+  /** Default false: content sizes to children (e.g. MyAlert). true = flex:1 fill parent —
+   *  set explicitly for pressable/stretch surfaces (e.g. MyButton). */
+  fillParent?: boolean
+}
 
 export const CONTAINER_STYLE_KEYS: (keyof SurfaceStyle)[] = [
   // layout / positioning

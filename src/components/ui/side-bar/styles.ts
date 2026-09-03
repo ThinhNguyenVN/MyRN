@@ -2,7 +2,7 @@ import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
 export const SIDEBAR_WIDTH = 260
-export const SIDEBAR_FLUSH_WIDTH = 248
+export const SIDEBAR_FLUSH_WIDTH = 280
 export const SIDEBAR_COLLAPSED_WIDTH = 72
 export const SIDEBAR_PADDING = 12
 /** Active pill horizontal inset — expanded uses theme x4 (16px). */
@@ -75,8 +75,11 @@ export function generateStyles(theme: ThemeType) {
       gap: getSpacing('x1'),
     },
 
-    listContent: {
+    /** Wraps `listContent` so items scroll instead of clipping past the rail's height. */
+    listScrollView: {
       flex: 1,
+    },
+    listContent: {
       paddingVertical: getSpacing('x1'),
     },
 

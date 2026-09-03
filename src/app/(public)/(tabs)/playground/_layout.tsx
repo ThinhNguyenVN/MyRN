@@ -1,11 +1,25 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { router, Stack, usePathname } from 'expo-router'
 import { Platform, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import Animated, {
+  Easing,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated'
 
 import { ScrollToHideHeader } from '@/components/ui/scroll-to-hide'
 import { NavigationBarHeader } from '@/components/ui/navigation-bar'
-import SideBar, { SideBarItem } from '@/components/ui/side-bar'
+import SideBar, {
+  SidebarCollapseToggle,
+  SideBarItem,
+  SIDEBAR_COLLAPSED_WIDTH,
+  SIDEBAR_FLUSH_WIDTH,
+} from '@/components/ui/side-bar'
+import { ANIMATION_DURATION } from '@/components/ui/side-bar/styles'
+import { SIDEBAR_COLLAPSE_TOGGLE_OFFSET } from '@/components/ui/side-bar/sidebar-collapse-toggle.styles'
 import { useShowSidebar } from '@/hooks/dimenstions-hooks'
 import { PLAYGROUND_LINKS } from '@/features/playground/constants'
 import { titleFromRoute } from '@/features/playground/title-from-route'
@@ -26,14 +40,58 @@ const screenOptions = {
 export default function PlaygroundLayout() {
   const showSidebar = useShowSidebar()
   const pathname = usePathname()
-  const { getColor } = useTheme()
+  const { getColor, getSpacing } = useTheme()
   const { t } = useTranslation()
 
   const styles = useThemedStyles(generateStyles)
   const sideBarLinks = useMemo(
-    () => PLAYGROUND_LINKS.map((item) => ({ href: item.href, label: t(item.labelKey) })),
+    () =>
+      PLAYGROUND_LINKS.map((item) => ({
+        href: item.href,
+        label: t(item.labelKey),
+        icon: item.icon,
+      })),
     [t],
   )
+
+  /** Default expanded. `collapseProgress` drives SideBar's own rail-width/label animation and
+   *  the content area's paddingLeft below in lockstep (see `SideBar`'s `collapseProgress` prop —
+   *  built for a parent to own the animation externally like this). */
+  const [collapsed, setCollapsed] = useState(false)
+  const collapseProgress = useSharedValue(0)
+  const gap = getSpacing('x2')
+
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((prev) => {
+      const next = !prev
+      collapseProgress.value = withTiming(next ? 1 : 0, {
+        duration: ANIMATION_DURATION,
+        easing: Easing.inOut(Easing.cubic),
+      })
+      return next
+    })
+  }, [collapseProgress])
+
+  const contentAnimatedStyle = useAnimatedStyle(() => ({
+    paddingLeft: interpolate(
+      collapseProgress.value,
+      [0, 1],
+      [SIDEBAR_FLUSH_WIDTH + gap, SIDEBAR_COLLAPSED_WIDTH + gap],
+    ),
+  }))
+
+  /** Slides in lockstep with the rail's own width animation instead of snapping — both are
+   *  driven by the same `collapseProgress` value. */
+  const toggleAnimatedStyle = useAnimatedStyle(() => ({
+    left: interpolate(
+      collapseProgress.value,
+      [0, 1],
+      [
+        SIDEBAR_FLUSH_WIDTH - SIDEBAR_COLLAPSE_TOGGLE_OFFSET,
+        SIDEBAR_COLLAPSED_WIDTH - SIDEBAR_COLLAPSE_TOGGLE_OFFSET,
+      ],
+    ),
+  }))
 
   useEffect(() => {
     if (Platform.OS !== 'web' || !showSidebar) return
@@ -79,8 +137,24 @@ export default function PlaygroundLayout() {
 
   return (
     <View style={styles.sideBarContainer}>
-      <SideBar data={sideBarLinks} onSelected={handleSelected} style={styles.sidebarWrapper} />
-      <View style={styles.contentContainer} collapsable={false}>
+      <SideBar
+        data={sideBarLinks}
+        onSelected={handleSelected}
+        style={styles.sidebarWrapper}
+        variant="flush"
+        collapsed={collapsed}
+        collapseProgress={collapseProgress}
+      />
+      <Animated.View style={[styles.collapseToggle, toggleAnimatedStyle]}>
+        <SidebarCollapseToggle
+          collapsed={collapsed}
+          onPress={toggleCollapsed}
+          accessibilityLabel={
+            collapsed ? t('playground.sidebarExpand') : t('playground.sidebarCollapse')
+          }
+        />
+      </Animated.View>
+      <Animated.View style={[styles.contentContainer, contentAnimatedStyle]} collapsable={false}>
         <Stack
           initialRouteName="buttons"
           screenOptions={({ route }) => {
@@ -102,7 +176,7 @@ export default function PlaygroundLayout() {
             }
           }}
         />
-      </View>
+      </Animated.View>
     </View>
   )
 }

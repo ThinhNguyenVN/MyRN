@@ -13,6 +13,7 @@ export const generateStyles = (theme: ThemeType) => {
       borderTopRightRadius: Radius.medium,
     },
     /** Web desktop: dialog căn giữa. */
+    // theme-exempt: modal backdrop scrim stays the same dark tint in both themes.
     modalOverlay: {
       flex: 1,
       backgroundColor: 'rgba(0,0,0,0.5)',
@@ -28,6 +29,7 @@ export const generateStyles = (theme: ThemeType) => {
       overflow: 'hidden',
     },
     /** Web mobile-responsive: bottom sheet Android-like — neo đáy, full-width, cap chiều cao. */
+    // theme-exempt: modal backdrop scrim stays the same dark tint in both themes.
     webSheetOverlay: {
       flex: 1,
       justifyContent: 'flex-end',

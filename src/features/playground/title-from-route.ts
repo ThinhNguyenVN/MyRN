@@ -12,7 +12,6 @@ export function titleFromRoute(routeName: string): string {
     'image-slider': 'playground.linksImageSlider',
     'image-picker': 'playground.linksImagePicker',
     'media-list-row': 'playground.linksMediaListRow',
-    'expandable-search': 'playground.linksExpandableSearch',
     'form-footer-bar': 'playground.linksFormFooterBar',
     'order-form-line': 'playground.linksOrderFormLine',
     'table-row-more-menu': 'playground.linksTableRowMoreMenu',
