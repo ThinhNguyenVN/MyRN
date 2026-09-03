@@ -6,6 +6,10 @@ import type { ThemeType } from '@/theme/theme-context'
 export const EXPANDABLE_SEARCH_COLLAPSED_WIDTH = BUTTON_SMALL_HEIGHT
 /** Match MyTextInput row minHeight so rounded border isn’t clipped into side arcs. */
 export const EXPANDABLE_SEARCH_HEIGHT = 44
+/** Caps the expanded width on wide windows — full window width reads as a search bar
+ *  stretching edge-to-edge on desktop, and pushes the trailing close button off past
+ *  whatever container the field actually sits in. */
+export const EXPANDABLE_SEARCH_MAX_WIDTH = 480
 
 export function generateStyles(theme: ThemeType) {
   const { getColor, getSpacing } = theme

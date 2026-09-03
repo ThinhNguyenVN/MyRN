@@ -62,11 +62,6 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string; icon: IconName 
     href: '/playground/search-input',
     icon: 'search-outline',
   },
-  {
-    labelKey: 'playground.linksExpandableSearch',
-    href: '/playground/expandable-search',
-    icon: 'search-circle-outline',
-  },
   { labelKey: 'playground.linksAlert', href: '/playground/alert', icon: 'alert-circle-outline' },
   { labelKey: 'playground.linksImage', href: '/playground/image', icon: 'image-outline' },
   {

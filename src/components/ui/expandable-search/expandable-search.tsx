@@ -16,6 +16,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import {
   EXPANDABLE_SEARCH_COLLAPSED_WIDTH,
   EXPANDABLE_SEARCH_HEIGHT,
+  EXPANDABLE_SEARCH_MAX_WIDTH,
   generateStyles,
 } from './styles'
 import type { ExpandableSearchProps } from './type'
@@ -43,7 +44,10 @@ function ExpandableSearch({
   const { width: windowWidth } = useWindowDimensions()
   const expandedWidth =
     expandedWidthProp ??
-    Math.max(200, windowWidth - DEFAULT_EDGE_RESERVE - (insets.right ?? 0) - (insets.left ?? 0))
+    Math.min(
+      EXPANDABLE_SEARCH_MAX_WIDTH,
+      Math.max(200, windowWidth - DEFAULT_EDGE_RESERVE - (insets.right ?? 0) - (insets.left ?? 0)),
+    )
   const progress = useSharedValue(expanded ? 1 : 0)
 
   useEffect(() => {
