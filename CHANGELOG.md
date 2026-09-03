@@ -12,6 +12,20 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Fixed
+- `swipeable-item`: the card shadow/border went through three rounds of fixes. It started
+  clipped by the row's own `overflow: hidden` reveal-strip container (moved outside `clip` via a
+  new `elevation`/`cardStyle` shell); the shell then rendered static (not sliding with the
+  content) and behind a revealed strip's opaque background (now animates with the same
+  `translateX` and paints after `clip`); and even once correctly positioned, it rendered
+  soft/blurry on iOS. Root cause of the blur: iOS needs an explicit `backgroundColor` to compute
+  a crisp, radius-aware shadow, but the shell had to stay transparent so it wouldn't paint over
+  `children` — two conflicting requirements on one layer. Split into two: an opaque shadow layer
+  hidden under `clip`, and a transparent border layer painted after it. Verified pixel-identical
+  to `MySurface`'s own shadow via direct pixel sampling on a real iOS Simulator (a screenshot-only
+  "looks fixed" claim was wrong the first time — don't trust rendering fixes on iOS without
+  sampling actual pixels on device/simulator).
+- `swipeable-item`: Android's elevation approximation used a divisor of 2 instead of
+  `MySurface`'s own 4, making the fallback ~2x more pronounced than intended.
 - `side-bar`: the active-item highlight pill could land on the wrong row after navigating (only
   surfaced once the item list became scrollable — see Changed below). Root cause was `withSpring`
   not reliably converging on react-native-web (it could get stuck mid-flight at an arbitrary
@@ -62,6 +76,13 @@ product finds out what changed since it forked.
   its structure intact).
 
 ### Changed
+- `swipeable-item`: card shadow/border layer logic extracted into `use-card-shell.ts` (the main
+  file had grown to 471 lines picking up loose ends across the shadow-fix commits above); the
+  swipe-to-delete commit-threshold formula, previously repeated identically 4x across
+  `settle()`/`onUpdate()` for the left/right strips, deduped into one `commitThreshold()` worklet
+  helper; the card corner radius, previously `Radius.large` hardcoded in two places plus
+  `getRadius('large')` in `styles.ts`, centralized into one `CARD_SHELL_RADIUS` export; the
+  `SwipeableActionButtons` export (zero consumers anywhere in the codebase) removed.
 - `side-bar`: item list is now scrollable (`ScrollView`) instead of a plain `View` that silently
   clipped once a product's menu grew past the rail's height. Row-position measurement switched
   from a cross-container `measureLayout()` call to reading each row's own `onLayout` event
