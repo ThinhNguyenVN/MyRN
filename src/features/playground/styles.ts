@@ -27,7 +27,7 @@ export const generateStyles = (theme: ThemeType) => {
       // here would clip it (expanded) or leave dead space (collapsed).
       zIndex: 2,
     },
-    /** Straddles the rail's right edge; `left` is set inline per collapsed state. */
+    /** Straddles the rail's right edge; `left` is animated in playground/_layout.tsx. */
     collapseToggle: {
       position: 'absolute',
       top: getSpacing('x6'),

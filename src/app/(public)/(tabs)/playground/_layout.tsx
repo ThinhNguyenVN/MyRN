@@ -45,7 +45,12 @@ export default function PlaygroundLayout() {
 
   const styles = useThemedStyles(generateStyles)
   const sideBarLinks = useMemo(
-    () => PLAYGROUND_LINKS.map((item) => ({ href: item.href, label: t(item.labelKey) })),
+    () =>
+      PLAYGROUND_LINKS.map((item) => ({
+        href: item.href,
+        label: t(item.labelKey),
+        icon: item.icon,
+      })),
     [t],
   )
 
@@ -72,6 +77,19 @@ export default function PlaygroundLayout() {
       collapseProgress.value,
       [0, 1],
       [SIDEBAR_FLUSH_WIDTH + gap, SIDEBAR_COLLAPSED_WIDTH + gap],
+    ),
+  }))
+
+  /** Slides in lockstep with the rail's own width animation instead of snapping — both are
+   *  driven by the same `collapseProgress` value. */
+  const toggleAnimatedStyle = useAnimatedStyle(() => ({
+    left: interpolate(
+      collapseProgress.value,
+      [0, 1],
+      [
+        SIDEBAR_FLUSH_WIDTH - SIDEBAR_COLLAPSE_TOGGLE_OFFSET,
+        SIDEBAR_COLLAPSED_WIDTH - SIDEBAR_COLLAPSE_TOGGLE_OFFSET,
+      ],
     ),
   }))
 
@@ -117,9 +135,6 @@ export default function PlaygroundLayout() {
     )
   }
 
-  const toggleLeft =
-    (collapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_FLUSH_WIDTH) - SIDEBAR_COLLAPSE_TOGGLE_OFFSET
-
   return (
     <View style={styles.sideBarContainer}>
       <SideBar
@@ -130,7 +145,7 @@ export default function PlaygroundLayout() {
         collapsed={collapsed}
         collapseProgress={collapseProgress}
       />
-      <View style={[styles.collapseToggle, { left: toggleLeft }]}>
+      <Animated.View style={[styles.collapseToggle, toggleAnimatedStyle]}>
         <SidebarCollapseToggle
           collapsed={collapsed}
           onPress={toggleCollapsed}
@@ -138,7 +153,7 @@ export default function PlaygroundLayout() {
             collapsed ? t('playground.sidebarExpand') : t('playground.sidebarCollapse')
           }
         />
-      </View>
+      </Animated.View>
       <Animated.View style={[styles.contentContainer, contentAnimatedStyle]} collapsable={false}>
         <Stack
           initialRouteName="buttons"

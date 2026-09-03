@@ -152,7 +152,7 @@ function SideBarItemRow({
         >
           <Animated.Text
             numberOfLines={1}
-            ellipsizeMode="clip"
+            ellipsizeMode="tail"
             style={[Typography.body as TextStyle, textAnimatedStyle, styles.itemRowLabel]}
           >
             {item.label}
