@@ -149,7 +149,7 @@ function SwipeableItemListBody() {
             onPress: () => Alert.alert(t('playground.swipeActionTrash')),
           },
         ],
-        swipeToRemove: 'left',
+        // TEMP-QA: swipeToRemove disabled for manual drag testing, revert before commit.
       },
     ])
   }, [t])

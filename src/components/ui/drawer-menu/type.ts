@@ -1,8 +1,8 @@
-import type { ComponentProps, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
-import type { Ionicons } from '@expo/vector-icons'
+import type { IconName } from '@/types/icon'
 
-export type DrawerMenuIconName = ComponentProps<typeof Ionicons>['name']
+export type DrawerMenuIconName = IconName
 
 /** Which edge the panel anchors to and slides from. Default `left`. */
 export type DrawerMenuSide = 'left' | 'right'

@@ -1,10 +1,10 @@
-import type { ComponentProps, ReactNode, RefObject } from 'react'
-import type { StyleProp, View, ViewStyle } from 'react-native'
-import type { Ionicons } from '@expo/vector-icons'
+import type { ReactNode } from 'react'
+import type { StyleProp, ViewStyle } from 'react-native'
 import type { SharedValue } from 'react-native-reanimated'
 import type { ElevationToken } from '@/theme/elevation'
+import type { IconName } from '@/types/icon'
 
-export type SideBarIconName = ComponentProps<typeof Ionicons>['name']
+export type SideBarIconName = IconName
 
 export interface SideBarItem {
   label: string
@@ -50,7 +50,6 @@ export interface SideBarRowProps {
   index: number
   isActive: boolean
   onSelected: () => void
-  containerRef?: RefObject<View | null>
   onMeasureLayout?: (index: number, y: number, height: number) => void
   collapseProgress: SharedValue<number>
 }

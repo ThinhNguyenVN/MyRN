@@ -75,8 +75,11 @@ export function generateStyles(theme: ThemeType) {
       gap: getSpacing('x1'),
     },
 
-    listContent: {
+    /** Wraps `listContent` so items scroll instead of clipping past the rail's height. */
+    listScrollView: {
       flex: 1,
+    },
+    listContent: {
       paddingVertical: getSpacing('x1'),
     },
 
