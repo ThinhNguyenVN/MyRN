@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cancelAnimation, useSharedValue, withTiming } from 'react-native-reanimated'
 
+import { useTheme } from '@/theme/theme-context'
 import { triggerHaptic } from '@/utils/haptic'
 import {
   PULL_TO_REFRESH_IOS_CLEAR_AFTER_REFRESH_MS,
@@ -23,6 +24,8 @@ export function usePullToRefresh({
   onRefresh,
   refreshing: refreshingProp,
 }: UsePullToRefreshOptions): UsePullToRefreshResult {
+  const { insets } = useTheme()
+  const insetTop = insets.top ?? 0
   const progress = useSharedValue(0)
   const pullDistance = useSharedValue(0)
   const [internalRefreshing, setInternalRefreshing] = useState(false)
@@ -49,8 +52,10 @@ export function usePullToRefresh({
   const showSlot = useCallback(() => {
     if (isSlotVisibleRef.current) return
     isSlotVisibleRef.current = true
-    setIosListTopInset(PULL_TO_REFRESH_IOS_TOP_INSET_PX)
-  }, [])
+    // Reserve room below the status bar / Dynamic Island — see `refresh-indicator.tsx`, which
+    // pads its icon by the same `insets.top` and must stay in sync with this slot height.
+    setIosListTopInset(insetTop + PULL_TO_REFRESH_IOS_TOP_INSET_PX)
+  }, [insetTop])
 
   const hideSlot = useCallback(() => {
     if (!isSlotVisibleRef.current) return

@@ -74,7 +74,8 @@ export function RefreshIndicator({
   threshold = 75,
   fixedLayoutSlotHeight,
 }: RefreshIndicatorProps) {
-  const { getColor } = useTheme()
+  const { getColor, insets } = useTheme()
+  const insetTop = insets.top ?? 0
   const styles = useThemedStyles(generateStyles)
   const trackColor = getColor('fill/inactive/primary')
   const strokeColor = getColor('fill/active/primary')
@@ -212,7 +213,9 @@ export function RefreshIndicator({
     },
   )
 
-  const minHeightRefreshing = 52
+  // Push the indicator below the status bar / Dynamic Island — without this it renders flush
+  // with the physical top edge of the screen and gets hidden behind the sensor housing.
+  const minHeightRefreshing = isIos ? 52 + insetTop : 52
 
   const fixedSlot =
     typeof fixedLayoutSlotHeight === 'number' && fixedLayoutSlotHeight > 0
@@ -224,21 +227,22 @@ export function RefreshIndicator({
       return { height: fixedSlot }
     }
     const minH = refreshing || isDone.value === 1 ? minHeightRefreshing : 0
-    const iosMinH = isIos && pullDistance.value > 0 ? IOS_INDICATOR_MIN_CONTAINER_HEIGHT : 0
+    const iosMinH =
+      isIos && pullDistance.value > 0 ? IOS_INDICATOR_MIN_CONTAINER_HEIGHT + insetTop : 0
     return {
       height: Math.max(pullDistance.value, minH, iosMinH),
     }
-  }, [refreshing, fixedSlot])
+  }, [refreshing, fixedSlot, insetTop])
 
   const containerPinStyle = useMemo(
     () =>
       isIos
         ? {
             justifyContent: 'flex-start' as const,
-            paddingTop: IOS_INDICATOR_FIXED_OFFSET_PX,
+            paddingTop: insetTop + IOS_INDICATOR_FIXED_OFFSET_PX,
           }
         : null,
-    [],
+    [insetTop],
   )
 
   const spinnerStyle = useAnimatedStyle(() => {
@@ -260,11 +264,11 @@ export function RefreshIndicator({
     () =>
       isIos
         ? {
-            top: IOS_INDICATOR_FIXED_OFFSET_PX,
+            top: insetTop + IOS_INDICATOR_FIXED_OFFSET_PX,
             alignSelf: 'center' as const,
           }
         : null,
-    [],
+    [insetTop],
   )
 
   const arcProps = useAnimatedProps(() => ({
