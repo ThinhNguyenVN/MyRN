@@ -17,11 +17,14 @@ export type OrderListExportController<TItem extends { id: string }> = {
 }
 
 export type UseOrderListExportParams<TOrder extends { id: string }> = {
-  filteredIds: Set<string>
+  /** Total count matching the current filter/search (from server-side `pagination.total`) — used to
+   * check emptiness / the PDF cap BEFORE fetching. No client-side re-filtering by id is needed
+   * because `fetchOrders` already receives the current filter and the server returns exactly that
+   * set. */
+  totalCount: number
   i18nPrefix: string
   pdfMaxOrders: number
   fetchOrders: (rowId?: string) => Promise<TOrder[]>
-  filterOrders: (orders: TOrder[], allowedIds: Set<string>) => TOrder[]
   isPdfOverCap: (orderCount: number) => boolean
   isPopupBlocked: (error: unknown) => boolean
   downloadExcel: (orders: TOrder[]) => Promise<void>
@@ -29,11 +32,10 @@ export type UseOrderListExportParams<TOrder extends { id: string }> = {
 }
 
 export function useOrderListExport<TItem extends { id: string }, TOrder extends { id: string }>({
-  filteredIds,
+  totalCount,
   i18nPrefix,
   pdfMaxOrders,
   fetchOrders,
-  filterOrders,
   isPdfOverCap,
   isPopupBlocked,
   downloadExcel,
@@ -47,12 +49,12 @@ export function useOrderListExport<TItem extends { id: string }, TOrder extends 
       if (isExporting) {
         return
       }
-      const allowedIds = rowId ? new Set([rowId]) : filteredIds
-      if (allowedIds.size === 0) {
+      const allowedCount = rowId ? 1 : totalCount
+      if (allowedCount === 0) {
         Toast.show({ text: t(`${i18nPrefix}.empty`), type: 'info' })
         return
       }
-      if (kind === 'pdf' && isPdfOverCap(allowedIds.size)) {
+      if (kind === 'pdf' && isPdfOverCap(allowedCount)) {
         await Confirmation.confirm({
           title: t(`${i18nPrefix}.pdfTooManyTitle`),
           message: t(`${i18nPrefix}.pdfTooMany`, { max: pdfMaxOrders }),
@@ -70,16 +72,15 @@ export function useOrderListExport<TItem extends { id: string }, TOrder extends 
       setIsExporting(true)
       try {
         const orders = await fetchOrders(rowId)
-        const kept = filterOrders(orders, allowedIds)
-        if (kept.length === 0) {
+        if (orders.length === 0) {
           Toast.show({ text: t(`${i18nPrefix}.empty`), type: 'info' })
           return
         }
         if (kind === 'excel') {
-          await downloadExcel(kept)
+          await downloadExcel(orders)
           return
         }
-        await printPdf(kept)
+        await printPdf(orders)
       } catch (error) {
         if (isPopupBlocked(error)) {
           Toast.show({ text: t(`${i18nPrefix}.popupBlocked`), type: 'warning' })
@@ -97,8 +98,6 @@ export function useOrderListExport<TItem extends { id: string }, TOrder extends 
     [
       downloadExcel,
       fetchOrders,
-      filterOrders,
-      filteredIds,
       i18nPrefix,
       isExporting,
       isPdfOverCap,
@@ -106,6 +105,7 @@ export function useOrderListExport<TItem extends { id: string }, TOrder extends 
       pdfMaxOrders,
       printPdf,
       t,
+      totalCount,
     ],
   )
 

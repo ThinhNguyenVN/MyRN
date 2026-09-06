@@ -1,4 +1,4 @@
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
 
 import { Routes } from '@/constants/routes'
@@ -14,6 +14,14 @@ export default function TodoListScreenContainer() {
   })
   const [deleteTodo] = useDeleteTodoMutation()
   const [isPullRefreshing, setIsPullRefreshing] = useState(false)
+
+  // No realtime DB — list screens MUST refetch on focus, not just on first mount
+  // (see .docs/screen-standard.md § "List screen MUST refetch on focus").
+  useFocusEffect(
+    useCallback(() => {
+      void refetch()
+    }, [refetch]),
+  )
 
   const handleRefresh = useCallback(() => {
     setIsPullRefreshing(true)

@@ -131,6 +131,41 @@ List screens should follow this flow:
 
 Canonical wiring: `src/features/todo/screens/todo-list.view.tsx`.
 
+### List screen MUST refetch on focus
+
+There is no realtime DB in this app — data shown on any list (or dashboard-style aggregate) screen
+can go stale the moment another screen changes it (create/update/delete/approve/cancel elsewhere,
+or the same record edited from a different tab). Every list/dashboard screen's data-fetching hook
+(the `use-<screen>.ts` hook, or the container itself when there is no separate hook) **MUST** call:
+
+```ts
+import { useFocusEffect } from 'expo-router'
+
+useFocusEffect(
+  useCallback(() => {
+    void refetch()
+  }, [refetch]),
+)
+```
+
+right after the RTK Query hook(s) it refetches — not only on first mount, and not only via manual
+pull-to-refresh/retry buttons. This is required even if pull-to-refresh already exists; focus-based
+refetch covers the common case where the user navigates away, changes data on another screen, and
+comes straight back without thinking to pull down.
+
+If the screen composes **more than one** independent query into a single `refetchAll`, do not put
+the raw query result objects in that `useCallback`'s dependency array — RTK Query hook results are
+new object references on every fetch-state change, so a `refetchAll` built that way gets a new
+identity mid-refetch, and `useFocusEffect` re-running on every identity change becomes an infinite
+refetch loop. Route the `.refetch()` calls through a `useRef` instead so `refetchAll` stays a
+stable, empty-deps function while still always calling the latest queries. A single-query screen
+does not need this — `refetch` itself is already a stable reference, so
+`useFocusEffect(useCallback(() => void refetch(), [refetch]))` is enough — see
+`src/features/todo/screens/todo-list.container.tsx` for the reference implementation.
+
+`useFocusEffect` cannot be meaningfully unit-tested in this codebase (it pulls in a native module
+that Jest cannot resolve) — verify it manually in the running app, not with a test.
+
 ## `styles.ts` standard
 
 Rules:
@@ -183,6 +218,7 @@ Avoid these in new production screens:
 - Does the form body use `MyKeyboardAvoiding.ScrollView` for native text inputs (excluding header search)?
 - Does the list use `MyList` instead of raw list primitives?
 - Does the list use `MySkeleton` / `MyEmptyState` / `MyErrorState` for async states?
+- Does a list/dashboard screen refetch on focus (`useFocusEffect`), not just on mount/pull-to-refresh?
 - Does the screen look closer to `auth` or `todo` than to `playground`?
 
 ## Default behavior fallback

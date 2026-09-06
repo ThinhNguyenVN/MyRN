@@ -205,6 +205,46 @@ Use `todo-api.ts` as the canonical reference for:
 
 If a feature is simple, invalidation is acceptable. If a feature is list-heavy and user-facing, optimistic behavior is preferred.
 
+### Server-side paginated / infinite-scroll lists + mutations
+
+A product built on this template that adds server-side pagination to a list (rather than fetching
+the full collection unconditionally with `builder.query<T[], void>`) hit real bugs before landing on
+the right shape: flashing empty state, duplicated items on infinite scroll, mutated items not
+reflecting their new state, deletes silently not working. Read this before wiring up server-side
+pagination on any list.
+
+**The mistake:** relying on `invalidatesTags` → automatic RTK Query refetch → a custom `merge`
+function to reconcile a mutation (delete/status change) into an already-paginated, multi-page-
+accumulated cache. This looks reasonable but is structurally broken for two reasons:
+
+- A mutation's `invalidatesTags` refetch only refreshes **the one page the component currently has
+  active** — whether that happens to be the page containing the mutated item is chance, not
+  guarantee. Result: updates that work "sometimes" depending on which page you're on.
+- A custom `merge` can express "add this item" or "replace this item," but has no way to express
+  "this item is gone" — a deleted row simply has no entry in the next page's response, so merge
+  never learns to remove it. It lingers in the cache forever. This is not a bug to patch, it's a
+  structural gap in the approach.
+
+**The fix, and the rule going forward:** for any mutation that changes an item already visible in a
+list (delete, status change, etc.), do **not** depend on refetch+merge for correctness. Use
+`onQueryStarted` + `api.util.updateQueryData` to patch the cache directly and optimistically, the
+same pattern `todo-api.ts` already uses for `deleteTodo`/`updateTodo` — the FE already knows exactly
+what changed (which id, what new value), so write that directly into every matching cache entry via
+`api.util.selectCachedArgsForQuery(getState(), '<queryName>')`, with `patch.undo()` rollback on
+failure. Keep `invalidatesTags` too, but treat it as a background reconciliation safety net, not the
+mechanism the feature's correctness depends on.
+
+Canonical references once pagination is involved:
+
+- `src/api/paginated-endpoint-config.ts` + `src/hooks/use-server-list-paging.ts` /
+  `use-server-list-state.ts` — shared server-side pagination + infinite-scroll plumbing. Spread
+  `paginatedEndpointConfig<Item, Arg>()` into a `builder.query` endpoint definition
+  (`serializeQueryArgs`/`merge`/`forceRefetch`) to get one cache entry per filter set (not per page),
+  with desktop pages replacing and mobile pages appending/reconciling by `id`.
+- `src/hooks/use-server-list-confirmed-action.ts` — shared confirm-then-act pattern for a row mutation
+  (approve/cancel/delete) that toasts the result.
+- `todo-api.ts` — the `onQueryStarted` cache-patch pattern to apply on top of a paginated list.
+
 ## Quick review checklist
 
 - Does the feature use RTK Query for server data by default?
