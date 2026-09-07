@@ -22,6 +22,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Desktop page header (title + back + actions) | `WebsiteHeader` (`components/ui/website-header`) | One-off private header chrome |
 | Multi-step wizard indicator | `Stepper` (`components/ui/stepper`) | Custom step circles / progress rows |
 | List pagination controls | `Pagination` (`components/ui/pagination`) | Ad-hoc prev/next + page buttons |
+| Web table (panel + horizontal scroll + pagination + responsive column-hiding) | `MyTable` (`components/ui/my-table`) | Re-implementing `MySurface` panel + `ScrollView horizontal` + `onLayout` width probe + `Pagination` per feature |
 | Initial list/page loading | `MySkeleton` | Ad-hoc gray boxes / spinner-only blank screen when skeleton fits |
 | Empty list / empty filter | `MyEmptyState` | Blank `View` or title-only without shared empty |
 | Fetch failure + retry | `MyErrorState` | Inline error text without retry affordance |
@@ -266,6 +267,25 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Path: `@/components/ui/pagination`
 - Prev / next + page buttons with summary copy from `pagination.*` i18n
 - Playground: `…/playground/pagination.tsx`
+
+### `MyTable` (web list table shell)
+
+- Path: `@/components/ui/my-table`
+- Shell + column geometry: `MySurface` panel + horizontal `ScrollView` + width probe (`onLayout`) + `Pagination` footer + `tableRow`/`tableHeader` chrome — **and** the width/alignment/spacing of every column. A product only owns *content*: what a header/cell renders (thumbnail, badge, action button, colored text) — never its width, alignment, or the gap around it. This split exists specifically so a header's style and a row's style can't hand-drift apart from each other.
+- Key props: `data`, `keyExtractor`, `resolveColumns: (width, previous) => Columns`, `fallbackWidth` (pass `useWindowWidth()`), `columns: MyTableColumn<Item, Columns>[]`, plus `Pagination` passthrough (`page`/`pageSize`/`total`/`onPrevPage`/`onNextPage`/`onPageChange`).
+- `MyTableColumn<Item, Columns>` — one entry per column:
+  - `key: string`
+  - sizing: either `flex` + `minWidth` (proportional, most columns) or `width` (fixed px — quantity/price/actions columns)
+  - `align?: 'left' | 'right' | 'center'` (default `'left'`) — turned into BOTH `alignItems` and `textAlign` on the cloned element, so it works whether the content is a `MyText` or a `MyView` wrapping a badge/button
+  - `gapAfter?: number` — extra px of breathing room after this column; use when a right-aligned numeric column sits directly before a left-aligned one so the two don't crowd the shared row gap
+  - `hideWhen?: (columns: Columns) => boolean` — column hides/shows together for header and row, from one place
+  - `renderHeader: () => ReactElement`, `renderCell: (item: Item) => ReactElement` — **must return a single element** (a `MyText`/`MyView`/`MyPressable`, not a Fragment or string): `MyTable` clones it via `React.cloneElement` to inject the column's width/align/gap on top of whatever style the product already set (color, typography, an internal `flexDirection` for a compound cell like thumbnail+text stay fully product-owned)
+  - Because `renderCell` is a plain function called during `MyTable`'s own render (not a component), it **cannot call hooks** — a product needing hook-derived data (e.g. a lookup built from an RTK Query result) must call that hook once in the screen component and close over the result.
+- Responsive column-hiding: `resolveColumns` MUST use `resolveHysteresisVisible` (`@/utils/responsive-visibility`) per hideable column — never a single threshold for both hide/show directions, or width measured via `onLayout` can oscillate (real bug: hiding a column narrows the table enough to hide the browser scrollbar, which nudges the measured width back over the same threshold, showing the column again, repeating indefinitely). `MyTable` calls `useMeasuredTableColumns` (`@/hooks/use-measured-table-columns`) internally — a product never manages its own `onLayout`/`useState` for this.
+- A table with nothing to hide passes a trivial `resolveColumns={() => ({})}` (`Columns = Record<string, never>`).
+- Convention: keep column definitions in a `<feature>-table-columns.tsx` file exporting a `use<Feature>TableColumns(...)` hook that returns `MyTableColumn[]` (built with `useMemo`) — the screen component just calls it and passes the result to `<MyTable columns={...} .../>`.
+- Playground: `…/playground/my-table.tsx`
+- Does **not** replace mobile card lists — web only (`useIsMobileSize()` false branch)
 
 ## Media (slider + preview + pick)
 

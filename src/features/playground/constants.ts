@@ -90,6 +90,11 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string; icon: IconName 
     icon: 'ellipsis-horizontal-outline',
   },
   {
+    labelKey: 'playground.linksMyTable',
+    href: '/playground/my-table',
+    icon: 'reorder-four-outline',
+  },
+  {
     labelKey: 'playground.linksWebsiteHeader',
     href: '/playground/website-header',
     icon: 'globe-outline',
