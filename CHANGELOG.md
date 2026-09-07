@@ -74,6 +74,24 @@ product finds out what changed since it forked.
   rewrites `template.config.json`. Replaces `reset-project` (the `create-expo-app` template
   script, which wiped the repo back to blank — the wrong move for a repo meant to be forked with
   its structure intact).
+- `src/components/ui/my-table`: shared web-table shell (`MySurface` panel + horizontal scroll +
+  `Pagination` footer) backported from `my-store`. A product declares `columns:
+  MyTableColumn[]` — width/align/gap/`hideWhen` are computed once and applied identically to the
+  header and every row cell via `React.cloneElement`, so a product can no longer let a header's
+  style and a row's style hand-drift apart (the recurring bug class this replaces). Cell content
+  stays fully product-owned via `renderHeader`/`renderCell`. See `shared-ui-catalog.md` § `MyTable`.
+- `src/hooks/use-measured-table-columns.ts` + `src/utils/responsive-visibility.ts`
+  (`resolveHysteresisVisible`): the width-measurement + hysteresis-based show/hide primitives
+  `MyTable`'s responsive column-hiding is built on — Schmitt-trigger-style (hide/show thresholds
+  a margin apart) so a table's own width oscillating a few px near a breakpoint (e.g. the
+  browser scrollbar appearing/disappearing as a column hides) can't flicker a column open/closed
+  forever.
+- `jest.config.js`: added a `resolver` for `react-native-worklets` (reanimated 4's native
+  runtime resolves to its non-`.native.ts` build under Jest) plus `moduleNameMapper` stubs for
+  `@expo/vector-icons` and `expo-haptics` — both pull in `expo-modules-core` native code at
+  import time that Jest/jsdom has no bridge for. Without these, no component that renders
+  `MyIcon` or `MyPressable` (i.e. almost everything) can be full-rendered in a test; `MyTable`'s
+  own test suite is the first component test in this repo that actually exercises this path.
 
 ### Changed
 - `swipeable-item`: card shadow/border layer logic extracted into `use-card-shell.ts` (the main
