@@ -25,7 +25,7 @@ export default function ButtonsScreen() {
         size={'large'}
         type="secondary"
         onPress={() => router.push('/playground/buttons/detail')}
-        left={<MyIcon name="arrow-forward" color="icon/active/tertiary" />}
+        left={<MyIcon name="arrow-forward" color="icon/contrast/dark" />}
       />
       <MyButton
         width={'full'}
@@ -33,8 +33,8 @@ export default function ButtonsScreen() {
         size={'large'}
         type="primary"
         onPress={() => {}}
-        left={<MyIcon name="key" color="icon/active/tertiary" />}
-        right={<MyIcon name="home" color="icon/active/tertiary" />}
+        left={<MyIcon name="key" color="icon/contrast/dark" />}
+        right={<MyIcon name="home" color="icon/contrast/dark" />}
       />
       <MyView style={styles.buttonRow}>
         <MyButton
@@ -43,7 +43,7 @@ export default function ButtonsScreen() {
           size={'small'}
           type="primary"
           onPress={() => {}}
-          left={<MyIcon name="home" color="icon/active/tertiary" />}
+          left={<MyIcon name="home" color="icon/contrast/dark" />}
         />
         <MyButton
           width={'full'}
@@ -78,7 +78,7 @@ export default function ButtonsScreen() {
         type="primary"
         size="small"
         onPress={() => {}}
-        left={<MyIcon name="key" color="icon/active/tertiary" />}
+        left={<MyIcon name="key" color="icon/contrast/dark" />}
       />
       <MyButton text={t('common.loading')} type="secondary" loading onPress={() => {}} />
       <MyButton text={t('common.disabled')} type="primary" onPress={() => {}} disabled />

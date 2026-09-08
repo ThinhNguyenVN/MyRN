@@ -46,7 +46,7 @@ const MyCheckbox = memo(function MyCheckbox({
 
   const checkedContent =
     type === 'checkbox' ? (
-      <MyIcon name="checkmark" size={16} color="icon/active/tertiary" style={styles.checkmark} />
+      <MyIcon name="checkmark" size={16} color="icon/contrast/dark" style={styles.checkmark} />
     ) : (
       <View style={styles.radioDot} />
     )

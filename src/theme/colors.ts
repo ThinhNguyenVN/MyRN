@@ -96,6 +96,15 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
         tertiary: palette.gray300,
         quaternary: palette.gray200,
       },
+      /**
+       * Contrast against a specific fill's actual lightness, not the app theme.
+       * A screen can show both a dark-fill button and a light-fill badge at once —
+       * pick `light`/`dark` by that fill's luminance (e.g. `warning` solid can be bright → `light`).
+       */
+      contrast: {
+        light: palette.gray900,
+        dark: palette.white,
+      },
       alert: {
         primary: palette.danger,
         secondary: palette.danger,
@@ -155,7 +164,7 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       active: {
         primary: palette.gray900,
         secondary: palette.gray700,
-        tertiary: palette.white,
+        tertiary: palette.gray500,
         quaternary: palette.gray300,
       },
       inactive: {
@@ -163,6 +172,10 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
         secondary: palette.gray400,
         tertiary: palette.gray300,
         quaternary: palette.gray200,
+      },
+      contrast: {
+        light: palette.gray900,
+        dark: palette.white,
       },
       alert: {
         primary: palette.danger,
@@ -232,10 +245,14 @@ type FillState = RoleState | 'background'
 type ActiveInactiveVariant = keyof TokensType['text']['active']
 type AlertWarningVariant = keyof TokensType['text']['alert']
 type FillBackgroundVariant = keyof TokensType['fill']['background']
+/** `light`/`dark`: contrast against a specific fill's lightness, independent of the active app theme. */
+type ContrastVariant = keyof TokensType['text']['contrast']
 type SemanticColorStringThree =
   | `text/${RoleState}/${ActiveInactiveVariant | AlertWarningVariant}`
+  | `text/contrast/${ContrastVariant}`
   | `fill/${FillState}/${ActiveInactiveVariant | AlertWarningVariant | FillBackgroundVariant}`
   | `icon/${RoleState}/${ActiveInactiveVariant | AlertWarningVariant}`
+  | `icon/contrast/${ContrastVariant}`
   | `border/${RoleState}/${ActiveInactiveVariant | AlertWarningVariant}`
 
 export type BrandColorType = `brand/${keyof TokensType['brand']}`

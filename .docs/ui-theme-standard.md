@@ -159,6 +159,14 @@ Rules:
 - Brand and semantic meaning should come from theme tokens, not raw hex values.
 - If a needed semantic token does not exist, add it in the theme layer instead of hardcoding in a screen.
 
+#### `active`/`inactive` vs `contrast` — two different axes
+
+- `active`/`inactive` × `primary..quaternary` pick emphasis **on the theme's default background** (`surface`/`background`). Never insert a color that isn't part of that role's own gray ladder in the middle of this ladder (e.g. don't reuse `white` as a `tertiary` step) — every step in `active`/`inactive` must stay legible on the default background, and each `active` step must stay at least as legible as the corresponding `inactive` step.
+- `contrast` (`text/contrast/light|dark`, `icon/contrast/light|dark`) picks a color that reads well **on top of one specific fill/badge/button**, independent of the app's light/dark theme. A single screen in one theme can contain both a dark-fill button and a light-fill badge at the same time, so this is not solved by switching theme.
+  - Use `contrast/dark` (white) when the fill underneath is dark/saturated (brand `primary`/`secondary`, `danger`/`info`/`success` solid).
+  - Use `contrast/light` (dark text) when the fill underneath is light — including a bright brand color like `warning` solid, and every `*Muted` variant. Don't assume "brand color = needs white text": pick by the fill's actual lightness, not by whether it "looks like a brand color." A rebranded product may also flip which brand colors are light vs dark — recompute, don't copy the previous product's choice.
+- Do not reach for `brand/white` or a hardcoded `'#ffffff'` as a substitute for a missing `contrast` token — extend `contrast` in the theme layer instead.
+
 ### Spacing
 
 Use the spacing scale:

@@ -27,7 +27,7 @@ function MoreMenuItemButton({
       <MyIcon
         name={item.icon}
         size={18}
-        color={useWhiteIcon ? 'icon/active/tertiary' : 'icon/active/primary'}
+        color={useWhiteIcon ? 'icon/contrast/dark' : 'icon/active/primary'}
       />
     ),
     [item.icon, useWhiteIcon],

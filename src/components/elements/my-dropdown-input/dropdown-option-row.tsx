@@ -81,7 +81,7 @@ function DropdownOptionRowInner({
       >
         {selected ? (
           multiSelect ? (
-            <MyIcon name="checkmark" size={16} color="icon/active/tertiary" />
+            <MyIcon name="checkmark" size={16} color="icon/contrast/dark" />
           ) : (
             <View style={styles.optionMarkDot} />
           )
