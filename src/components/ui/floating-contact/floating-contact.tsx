@@ -85,7 +85,7 @@ const FloatingContactButtonInner: React.FC<FloatingContactButtonProps> = ({ item
         <Feather
           name={item.icon}
           size={item.emphasized ? 24 : 20}
-          color={getColor('icon/active/tertiary')}
+          color={getColor('icon/contrast/dark')}
         />
       </MyPressable>
     </View>

@@ -168,7 +168,7 @@ export const ImagePreview = memo(function ImagePreview({
           accessibilityLabel={`Close ${label} image preview`}
           onPress={onClose}
         >
-          <MyIcon name="close" size={24} color="icon/active/tertiary" />
+          <MyIcon name="close" size={24} color="icon/contrast/dark" />
         </MyPressable>
 
         {images.length > 1 ? (
@@ -224,7 +224,7 @@ const PreviewNavigationButton = memo(function PreviewNavigationButton({
       <MyIcon
         name={isPrevious ? 'chevron-back' : 'chevron-forward'}
         size={24}
-        color="icon/active/tertiary"
+        color="icon/contrast/dark"
       />
     </MyPressable>
   )

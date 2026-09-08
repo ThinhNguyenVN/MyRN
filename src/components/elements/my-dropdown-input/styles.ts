@@ -179,7 +179,7 @@ export function generateStyles(theme: ThemeType) {
         color: getColor('text/active/primary'),
       },
       optionTextSelected: {
-        color: getColor('icon/active/tertiary'),
+        color: getColor('icon/contrast/dark'),
       },
       sheetContent: {
         paddingBottom: (insets.bottom || 0) + getSpacing('x4'),

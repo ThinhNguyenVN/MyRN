@@ -12,6 +12,12 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Fixed
+- `src/theme/colors.ts`: `icon.active.tertiary` was hardcoded to `white`, breaking the otherwise
+  monotonic `active` ladder (`900 → 700 → white → 300`) and making the icon disappear if that
+  token was ever used on a light surface. Now `gray500`, matching `text.active.tertiary`. The 13
+  call sites that relied on the old `white` value (playground buttons, `side-bar`, `image-preview`,
+  `table-row-more-menu`, `floating-contact`, `my-checkbox`, `my-dropdown-input`) now use the new
+  `icon/contrast/dark` token instead (see Added below) — same rendered color, correct token.
 - `swipeable-item`: the card shadow/border went through three rounds of fixes. It started
   clipped by the row's own `overflow: hidden` reveal-strip container (moved outside `clip` via a
   new `elevation`/`cardStyle` shell); the shell then rendered static (not sliding with the
@@ -60,6 +66,14 @@ product finds out what changed since it forked.
   with a `theme-exempt` comment instead of silently drifting.
 
 ### Added
+- `text/contrast/{light,dark}` and `icon/contrast/{light,dark}` theme tokens
+  (`src/theme/colors.ts`): pick a text/icon color that reads well **on top of one specific
+  fill/badge/button**, independent of the app's light/dark theme — a screen in one theme can have
+  both a dark-fill button and a light-fill badge at once, so this couldn't be solved by the
+  existing `active`/`inactive` ladder or by switching theme. Replaces the previous workarounds
+  (`brand/white`, hardcoded `'#ffffff'`) for that need; see `.docs/ui-theme-standard.md` §
+  "`active`/`inactive` vs `contrast`" for when to use which, including the `warning`-solid gotcha
+  (a bright brand color can still need dark text).
 - `src/types/icon.ts`: shared Ionicons name type, deduping the same
   `ComponentProps<typeof Ionicons>['name']` pattern independently redeclared in `side-bar` and
   `drawer-menu` (the same pattern still exists in ~9 other files — `menu-list-card`,

@@ -67,7 +67,7 @@ function SideBarItemRow({
   const textColorInactive = getColor('text/active/primary')
   const textColorActive = getColor('brand/white')
   const iconColorInactive = getColor('icon/active/primary')
-  const iconColorActive = getColor('icon/active/tertiary')
+  const iconColorActive = getColor('icon/contrast/dark')
 
   const rowAnimatedStyle = useAnimatedStyle(() => ({
     height: ITEM_ROW_HEIGHT,
