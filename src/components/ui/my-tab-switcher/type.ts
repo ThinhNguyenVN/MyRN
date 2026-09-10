@@ -15,6 +15,11 @@ export type MyTabSwitcherProps<TId extends string = string> = {
   renderContent: (id: TId) => ReactNode
   /** Thời lượng slide (ms). Mặc định 220. */
   duration?: number
+  /**
+   * Stretch to fill the parent (reports-style full-height pane).
+   * Turn off when nested in a page ScrollView so iOS does not trap the pan.
+   */
+  fillParent?: boolean
   containerStyle?: StyleProp<ViewStyle>
   tabBarStyle?: StyleProp<ViewStyle>
 }

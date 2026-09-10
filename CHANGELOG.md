@@ -12,6 +12,11 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Fixed
+- `pull-to-refresh-scroll-view`: scroll-to-hide never registered on phone/tablet browsers
+  because `enabled` required `!isWeb`. `Platform.OS === 'web'` is true there; the real gate is
+  mobile-width (`useIsMobileSize`). Also apply `minHeight: 0` on the list flex style (and on
+  `ScrollToHide` content) so nested flex children actually scroll — and fire `onScroll` —
+  instead of growing with content on web.
 - `side-bar`: the active-item highlight (and row color/opacity) stuttered on web when the
   destination screen did a heavy synchronous re-render. Reanimated `withTiming` interpolates on
   the JS main thread there, so it contended with that work; native is unaffected because it
@@ -114,6 +119,10 @@ product finds out what changed since it forked.
   own test suite is the first component test in this repo that actually exercises this path.
 
 ### Changed
+- `my-tab-switcher`: add `fillParent` (default `true`, reports-style full-height pane). Nested
+  inside a page `ScrollView`, `flex: 1` on both the switcher and its pane lets iOS trap pans in
+  the inner scroll. Pass `fillParent={false}` so the switcher hugs content. Playground demo
+  (already inside a scroll) now uses hug mode.
 - `swipeable-item`: card shadow/border layer logic extracted into `use-card-shell.ts` (the main
   file had grown to 471 lines picking up loose ends across the shadow-fix commits above); the
   swipe-to-delete commit-threshold formula, previously repeated identically 4x across

@@ -53,6 +53,7 @@ function MyTabSwitcher<TId extends string = string>({
   onChange,
   renderContent,
   duration = DEFAULT_DURATION,
+  fillParent = true,
   containerStyle,
   tabBarStyle,
 }: MyTabSwitcherProps<TId>) {
@@ -77,7 +78,7 @@ function MyTabSwitcher<TId extends string = string>({
     activeIndex >= prevIndex ? SlideInRight.duration(duration) : SlideInLeft.duration(duration)
 
   return (
-    <MyView style={[styles.root, containerStyle]}>
+    <MyView style={[fillParent ? styles.root : styles.rootHug, containerStyle]}>
       <MyView style={[styles.tabBar, tabBarStyle]}>
         {tabs.map((tab) => (
           <TabItem
@@ -89,7 +90,11 @@ function MyTabSwitcher<TId extends string = string>({
           />
         ))}
       </MyView>
-      <Animated.View key={`tab-content-${activeId}`} entering={entering} style={styles.contentWrap}>
+      <Animated.View
+        key={`tab-content-${activeId}`}
+        entering={entering}
+        style={fillParent ? styles.contentWrap : styles.contentWrapHug}
+      >
         {renderContent(activeId)}
       </Animated.View>
     </MyView>

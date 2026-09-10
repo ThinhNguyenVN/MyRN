@@ -20,6 +20,7 @@ export const generateStyles = (_: ThemeType) => {
     },
     content: {
       flex: 1,
+      minHeight: 0,
     },
   })
 }

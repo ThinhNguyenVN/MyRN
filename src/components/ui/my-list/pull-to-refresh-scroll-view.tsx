@@ -22,7 +22,7 @@ import { usePullToRefresh } from './use-pull-to-refresh'
 export type PullToRefreshScrollViewProps = ScrollViewProps & {
   refreshing?: boolean
   onRefresh?: () => void | Promise<void>
-  /** Mobile-only scroll-to-hide for tab bar chrome. Default true. */
+  /** Hide header/tab bar while scrolling. On by default for mobile-width layout (native + web). */
   enableScrollToHide?: boolean
 }
 
@@ -36,6 +36,7 @@ function PullToRefreshScrollViewInner({
   onScrollBeginDrag: userOnScrollBeginDrag,
   onScrollEndDrag: userOnScrollEndDrag,
   scrollEventThrottle = 16,
+  style,
   ...rest
 }: PullToRefreshScrollViewProps) {
   const styles = useThemedStyles(generateStyles)
@@ -87,7 +88,8 @@ function PullToRefreshScrollViewInner({
     : scrollEventThrottle
 
   const scrollBinding = useScrollToHideScrollBinding({
-    enabled: enableScrollToHide && isMobileSize && !isWeb,
+    // Mobile layout includes phone/tablet web. `isWeb` is Platform.OS, not viewport.
+    enabled: enableScrollToHide && isMobileSize,
     onScroll: chainOnScroll,
     onScrollBeginDrag: chainOnScrollBeginDrag,
     onScrollEndDrag: chainOnScrollEndDrag,
@@ -110,6 +112,7 @@ function PullToRefreshScrollViewInner({
     <MyView style={styles.flex}>
       <Scroll
         {...rest}
+        style={[styles.flex, style]}
         refreshControl={refreshControl}
         onScroll={scrollBinding.onScroll}
         onScrollBeginDrag={scrollBinding.onScrollBeginDrag}
