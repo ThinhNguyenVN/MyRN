@@ -12,6 +12,12 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Fixed
+- `side-bar`: the active-item highlight (and row color/opacity) stuttered on web when the
+  destination screen did a heavy synchronous re-render. Reanimated `withTiming` interpolates on
+  the JS main thread there, so it contended with that work; native is unaffected because it
+  already animates on the UI thread. Web now drives those properties with a compositor CSS
+  `transition` instead, and still `cancelAnimation`s before writing a new native `withTiming` so
+  overlapping updates cannot race.
 - `src/theme/colors.ts`: `icon.active.tertiary` was hardcoded to `white`, breaking the otherwise
   monotonic `active` ladder (`900 → 700 → white → 300`) and making the icon disappear if that
   token was ever used on a light surface. Now `gray500`, matching `text.active.tertiary`. The 13

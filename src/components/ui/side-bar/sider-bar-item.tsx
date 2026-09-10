@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect } from 'react'
 import { View, type LayoutChangeEvent, type TextStyle } from 'react-native'
 import Animated, {
+  cancelAnimation,
   Extrapolation,
   interpolate,
   interpolateColor,
@@ -14,6 +15,7 @@ import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import MyIcon from '@/components/elements/my-icon'
+import { isWeb } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { Typography } from '@/theme/typography'
 
@@ -25,6 +27,16 @@ import {
   SIDEBAR_ITEM_PADDING_EXPANDED,
   generateStyles,
 } from './styles'
+
+/** Same reasoning as `HIGHLIGHT_CSS_TRANSITION` in side-bar.tsx: CSS `transition` runs on the
+ *  compositor, so color/opacity keep animating when a heavy screen blocks the JS main thread. */
+function cssTransition(property: string) {
+  return {
+    transitionProperty: property,
+    transitionDuration: `${ANIMATION_DURATION}ms`,
+    transitionTimingFunction: 'ease',
+  } as Record<string, string>
+}
 
 function shouldShowChevron(item: SideBarRowProps['item']): boolean {
   if (!isNil(item.showChevron)) {
@@ -46,6 +58,15 @@ function SideBarItemRow({
   const progress = useSharedValue(isActive ? 1 : 0)
 
   useEffect(() => {
+    if (isWeb) {
+      // Web drives color/opacity via a plain CSS transition instead (see `cssTransition`
+      // below), so `progress` doesn't need to animate here.
+      return
+    }
+    // `cancelAnimation` first: on react-native-web, assigning a new `withTiming` doesn't
+    // reliably stop a still-running previous one (see side-bar.tsx), so a rapid re-toggle of
+    // `isActive` can leave two competing animations racing on this row's color/opacity.
+    cancelAnimation(progress)
     progress.value = withTiming(isActive ? 1 : 0, { duration: ANIMATION_DURATION })
   }, [isActive, progress])
 
@@ -135,10 +156,21 @@ function SideBarItemRow({
       >
         {leadingIcon ? (
           <MyView style={styles.itemRowLeading}>
-            <Animated.View style={iconInactiveStyle}>
+            <Animated.View
+              style={[
+                iconInactiveStyle,
+                isWeb ? [cssTransition('opacity'), { opacity: isActive ? 0 : 1 }] : null,
+              ]}
+            >
               <MyIcon name={leadingIcon} size={22} color={iconColorInactive} />
             </Animated.View>
-            <Animated.View style={[styles.iconLayer, iconActiveStyle]}>
+            <Animated.View
+              style={[
+                styles.iconLayer,
+                iconActiveStyle,
+                isWeb ? [cssTransition('opacity'), { opacity: isActive ? 1 : 0 }] : null,
+              ]}
+            >
               <MyIcon name={leadingIconFocused!} size={22} color={iconColorActive} />
             </Animated.View>
           </MyView>
@@ -153,7 +185,17 @@ function SideBarItemRow({
           <Animated.Text
             numberOfLines={1}
             ellipsizeMode="tail"
-            style={[Typography.body as TextStyle, textAnimatedStyle, styles.itemRowLabel]}
+            style={[
+              Typography.body as TextStyle,
+              textAnimatedStyle,
+              styles.itemRowLabel,
+              isWeb
+                ? [
+                    cssTransition('color'),
+                    { color: isActive ? textColorActive : textColorInactive },
+                  ]
+                : null,
+            ]}
           >
             {item.label}
           </Animated.Text>

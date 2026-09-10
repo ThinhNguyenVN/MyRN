@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef } from 'react'
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { usePathname } from 'expo-router'
 import Animated, {
@@ -12,6 +12,7 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import MyView from '@/components/elements/my-view'
+import { isWeb } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import {
@@ -38,6 +39,17 @@ const HIGHLIGHT_TIMING = {
 
 const HIGHLIGHT_NAV_DELAY_MS = 160
 
+/** On web, Reanimated `withTiming` interpolates on the JS main thread, so it stalls whenever a
+ *  heavy screen (e.g. a big list re-render) blocks that thread. A real CSS `transition` runs on
+ *  the compositor instead. Native already animates on its UI thread, so it keeps `withTiming`. */
+const HIGHLIGHT_CSS_TRANSITION = isWeb
+  ? ({
+      transitionProperty: 'transform',
+      transitionDuration: `${HIGHLIGHT_ANIMATION_DURATION}ms`,
+      transitionTimingFunction: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
+    } as Record<string, string>)
+  : null
+
 function SideBarInner({
   data,
   elevation: elevationProp,
@@ -57,6 +69,7 @@ function SideBarInner({
   const layoutsRef = useRef<Record<number, { y: number; height: number }>>({})
   const activeIndexRef = useRef(0)
   const navigateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const highlightTargetRef = useRef<number | null>(null)
 
   const internalCollapseProgress = useSharedValue(collapsed ? 1 : 0)
   const collapseProgress: SharedValue<number> = collapseProgressProp ?? internalCollapseProgress
@@ -72,6 +85,7 @@ function SideBarInner({
   activeIndexRef.current = activeIndex
 
   const highlightY = useSharedValue(0)
+  const [highlightYWeb, setHighlightYWeb] = useState(0)
 
   useEffect(() => {
     if (collapseProgressProp) {
@@ -111,14 +125,34 @@ function SideBarInner({
     }
   })
 
-  /** Re-asserts the highlight's target on every write path (nav-triggered sync, remeasure,
-   *  optimistic click) instead of gating on an animation-finished flag — `withSpring`'s
-   *  completion callback isn't reliably invoked on react-native-web, so a "still animating"
-   *  guard can get stuck and permanently block the highlight from ever moving again. */
+  /** Every write path (nav-triggered sync, remeasure, optimistic click) goes through here so it
+   *  always `cancelAnimation`s first — on react-native-web, assigning a new `withTiming` to a
+   *  shared value doesn't reliably stop a still-running previous one, so without this the
+   *  optimistic click animation and the later nav-triggered sync race and visibly jitter. Skips
+   *  the write entirely when the target hasn't moved, instead of gating on an animation-finished
+   *  flag — `withSpring`'s completion callback isn't reliably invoked on react-native-web, so a
+   *  "still animating" guard can get stuck and permanently block the highlight from ever moving
+   *  again. */
+  const animateHighlightTo = useCallback(
+    (y: number) => {
+      if (highlightTargetRef.current === y) {
+        return
+      }
+      highlightTargetRef.current = y
+      if (isWeb) {
+        setHighlightYWeb(y)
+        return
+      }
+      cancelAnimation(highlightY)
+      highlightY.value = withTiming(y, HIGHLIGHT_TIMING)
+    },
+    [highlightY],
+  )
+
   const syncHighlightFromLayouts = useCallback(() => {
     const layout = layoutsRef.current?.[activeIndexRef.current]
-    highlightY.value = withTiming(layout?.y ?? 0, HIGHLIGHT_TIMING)
-  }, [highlightY])
+    animateHighlightTo(layout?.y ?? 0)
+  }, [animateHighlightTo])
 
   useEffect(() => {
     syncHighlightFromLayouts()
@@ -140,6 +174,12 @@ function SideBarInner({
       }
       layoutsRef.current = { ...layoutsRef.current, [index]: { y, height } }
       if (index === activeIndexRef.current) {
+        highlightTargetRef.current = y
+        if (isWeb) {
+          setHighlightYWeb(y)
+          return
+        }
+        cancelAnimation(highlightY)
         highlightY.value = y
       }
     },
@@ -158,8 +198,7 @@ function SideBarInner({
 
       const layout = layoutsRef.current?.[index]
       if (layout) {
-        cancelAnimation(highlightY)
-        highlightY.value = withTiming(layout.y, HIGHLIGHT_TIMING)
+        animateHighlightTo(layout.y)
 
         navigateTimeoutRef.current = setTimeout(() => {
           onSelectedProp?.(item, index)
@@ -169,7 +208,7 @@ function SideBarInner({
 
       onSelectedProp?.(item, index)
     },
-    [highlightY, onSelectedProp],
+    [animateHighlightTo, onSelectedProp],
   )
 
   const showHighlight = activeIndex >= 0
@@ -183,6 +222,9 @@ function SideBarInner({
             styles.highlight,
             highlightColor ? { backgroundColor: highlightColor } : null,
             highlightStyle,
+            isWeb
+              ? [HIGHLIGHT_CSS_TRANSITION, { transform: [{ translateY: highlightYWeb }] }]
+              : null,
           ]}
           pointerEvents="none"
         />
