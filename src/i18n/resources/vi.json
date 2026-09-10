@@ -20,6 +20,16 @@
     "home": "Trang chủ",
     "playground": "Playground"
   },
+  "shell": {
+    "back": "Quay lại",
+    "locale": {
+      "label": "Ngôn ngữ",
+      "vi": "Vi",
+      "en": "En",
+      "viA11y": "Tiếng Việt",
+      "enA11y": "English"
+    }
+  },
   "home": {
     "welcome": "Chào mừng đến {{appName}}",
     "envLabel": "Môi trường",

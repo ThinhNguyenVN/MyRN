@@ -28,6 +28,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Fetch failure + retry | `MyErrorState` | Inline error text without retry affordance |
 | Boolean on/off | `MySwitch` | RN `Switch` / ad-hoc thumb |
 | Labeled 2+ value pill (Vi\|En, period, …) | `MySegment` | One-off `locale-switcher` / restyling `MyTabSwitcher` for chrome |
+| App language (Vi\|En) | `AppLocaleSwitch` (`@/i18n/app-locale-switch`) | Feature-local locale switcher / re-init i18n by hand |
 | Boolean / checkbox / radio in `MyForm` | `MyFormCheckbox` | `MyCheckbox` + `Controller` ad-hoc in new screens |
 | Form body scroll (native keyboard) | `MyKeyboardAvoiding.ScrollView` | Raw `ScrollView` / `KeyboardAvoidingView` around form fields |
 | Initial list loading (page-level) | `LoadingPlaceholder` (`components/ui/loading-placeholder`) | Ad-hoc `MySkeleton` wrappers per screen |
@@ -97,6 +98,12 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 - Sliding pill for **2 or more** labeled values (`options`, `value`, `onChange`, `size?: 'compact' \| 'default'`). Use for locale, period, billing, etc. Do not invent a feature-local `*-switcher`.
 - Playground: `…/playground/segment.tsx`
 
+### `AppLocaleSwitch`
+
+- Path: `@/i18n/app-locale-switch`
+- Product-facing Vi\|En control on `MySegment`. Hydrate via `hydrateAppLocale()` in `useAppInit`; persist under `app.locale`. Device language wins until the user picks; `FALLBACK_LOCALE` (this template: `en`) for unsupported tags. Switcher order is fallback-first (`LOCALE_SWITCH_ORDER`).
+- Wired compact on `WebsiteHeader`; reuse on a `MenuListCard` row via `trailing`.
+
 ## Navigation chrome
 
 ### `DrawerMenu`
@@ -158,8 +165,8 @@ Two gotchas are already handled centrally inside `MyBottomSheet` — do not re-s
 ### `WebsiteHeader`
 
 - Path: `@/components/ui/website-header`
-- Desktop page header: title, optional back, notifications + profile actions
-- `right?` slot before notifications; `WebsiteHeaderNav` forwards stack `options.headerRight`
+- Desktop page header: title, optional back, compact `AppLocaleSwitch`, notifications + profile actions
+- `right?` slot before the locale switch; `WebsiteHeaderNav` forwards stack `options.headerRight`
 - Pair with `WebsiteHeaderNav` for stack header options; `useComingSoon` backs unwired actions
 - Profile action: pass `profileMenuItems: ProfileMenuItem[]` (+ optional `avatarUri`) to render a `ProfileMenuButton` popover instead of the plain icon; omit both to keep the old `onProfilePress` icon-only behavior. Product-specific data (e.g. "what goes in the menu") stays in the product — don't hardwire a domain hook into this component.
 - Playground: `…/playground/website-header.tsx`
@@ -435,6 +442,7 @@ import { MediaListRow } from '@/components/ui/media-list-row'
 import { Pagination } from '@/components/ui/pagination'
 import { Stepper } from '@/components/ui/stepper'
 import { WebsiteHeader } from '@/components/ui/website-header'
+import { AppLocaleSwitch } from '@/i18n/app-locale-switch'
 import { FormFooterBar } from '@/components/ui/form-footer-bar'
 import { OrderFormLineEditor } from '@/components/ui/order-form-line'
 import { TableRowMoreMenu } from '@/components/ui/table-row-more-menu'

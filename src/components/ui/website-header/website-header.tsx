@@ -6,6 +6,7 @@ import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { ProfileMenuButton } from '@/components/ui/profile-menu-button'
 import { useComingSoon } from '@/hooks/use-coming-soon'
+import { AppLocaleSwitch } from '@/i18n/app-locale-switch'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
@@ -51,6 +52,7 @@ function WebsiteHeader({
       </MyView>
       <MyView style={styles.actions}>
         {right}
+        <AppLocaleSwitch size="compact" />
         <MyButton.Icon
           icon="notifications-outline"
           type="light"

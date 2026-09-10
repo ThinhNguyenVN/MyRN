@@ -72,6 +72,10 @@ product finds out what changed since it forked.
   with a `theme-exempt` comment instead of silently drifting.
 
 ### Added
+- `i18n`: persist/hydrate app locale (`app.locale` in storage), default from the device,
+  `AppLocaleSwitch` on `MySegment`. Backported from `my-store`. `useAppInit` runs
+  `hydrateAppLocale`; `WebsiteHeader` shows a compact switcher. `FALLBACK_LOCALE` stays
+  `en` in this template (products override, e.g. my-store uses `vi`).
 - `my-segment`: sliding labeled pill for 2+ equal-width values (`options`, `value`,
   `onChange`, `size?: 'compact' | 'default'`). Backported from `my-store` so products stop
   inventing a local `*-switcher` for locale / period / billing. Playground:

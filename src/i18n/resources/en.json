@@ -20,6 +20,16 @@
     "home": "Home",
     "playground": "Playground"
   },
+  "shell": {
+    "back": "Back",
+    "locale": {
+      "label": "Language",
+      "vi": "Vi",
+      "en": "En",
+      "viA11y": "Vietnamese",
+      "enA11y": "English"
+    }
+  },
   "home": {
     "welcome": "Welcome to {{appName}}",
     "envLabel": "Env",
