@@ -98,6 +98,7 @@ Trong feature / screen / hầu hết UI:
 | `Image` (URL) | `MyImage` (fullscreen gallery: `ImagePreview`, không `MyImage`) |
 | Button / press / icon / input / sheet / spinner | `MyButton`, `MyPressable`, `MyIcon`, `MyTextInput`, `MyBottomSheet`, `MySpinner`, `MySurface` |
 | Card / divider / search | `MyCard`, `MyDivider`, `MySearchInput` |
+| Labeled 2+ value pill | `MySegment` |
 | Empty / error / skeleton loading | `MyEmptyState`, `MyErrorState`, `MySkeleton` |
 | Checkbox/radio trong form | `MyFormCheckbox` |
 | Form body scroll (native, field có thể bị bàn phím che) | `MyKeyboardAvoiding.ScrollView` |

@@ -72,6 +72,12 @@ product finds out what changed since it forked.
   with a `theme-exempt` comment instead of silently drifting.
 
 ### Added
+- `my-segment`: sliding labeled pill for 2+ equal-width values (`options`, `value`,
+  `onChange`, `size?: 'compact' | 'default'`). Backported from `my-store` so products stop
+  inventing a local `*-switcher` for locale / period / billing. Playground:
+  `…/playground/segment.tsx`.
+- `menu-list-card`: optional `trailing` on a row (replaces the chevron); `onPress` is
+  optional so a row can host a control without being a button.
 - `text/contrast/{light,dark}` and `icon/contrast/{light,dark}` theme tokens
   (`src/theme/colors.ts`): pick a text/icon color that reads well **on top of one specific
   fill/badge/button**, independent of the app's light/dark theme — a screen in one theme can have

@@ -17,6 +17,7 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string; icon: IconName 
     icon: 'checkbox-outline',
   },
   { labelKey: 'playground.linksSwitch', href: '/playground/switch', icon: 'toggle-outline' },
+  { labelKey: 'playground.linksSegment', href: '/playground/segment', icon: 'options-outline' },
   {
     labelKey: 'playground.linksDropdown',
     href: '/playground/dropdown',
