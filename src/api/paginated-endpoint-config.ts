@@ -17,12 +17,10 @@ type PaginatedArg = {
  * - Desktop (`isMobile` falsy): every page REPLACES the whole cache — matches a 1/2/3-button
  *   pagination UI, and automatically reflects new data when a mutation invalidates the cache while
  *   viewing that page (no need to reset to page 1 — see `use-server-list-confirmed-action.ts`).
- * - Mobile (`isMobile` true): page 1 REPLACES (first mount / pull-to-refresh); a page beyond what's
- *   cached APPENDS (load more); a page that's already cached gets reconciled by `id` (an item
- *   already present is replaced with the fresh copy, a new one is appended) — it never infers
- *   position from `(page-1)*per_page` (a real bug: position-based math breaks when "load more" and
- *   a mutation-triggered invalidate happen close together, causing duplicate items). Matching by
- *   `id` stays correct no matter the arrival order or a mismatched `per_page`.
+ * - Mobile (`isMobile` true): page 1 REPLACES (first mount / pull-to-refresh); every page > 1
+ *   reconciles by `id` then appends unknowns — including a "new" page. Never `push` a whole page:
+ *   unstable `ORDER BY created` OFFSET paging can repeat an id from the previous page (duplicate
+ *   React keys). It never infers position from `(page-1)*per_page`.
  */
 export function paginatedEndpointConfig<
   Item extends { id: string },
@@ -52,25 +50,15 @@ export function paginatedEndpointConfig<
       if (!isMobile || page <= 1) {
         return newData
       }
-      if (page > currentCache.pagination.current_page) {
-        // Brand new page (load more) — append at the end.
-        currentCache.items.push(...newData.items)
-        currentCache.pagination = newData.pagination
-        return
-      }
-      // This page is ALREADY in the cache — either a duplicate fetch (e.g. a FlatList
-      // `onEndReached` firing twice for one scroll threshold) OR a mutation just invalidated it so
-      // it was refetched with FRESH data (e.g. status changed after approve/cancel). Don't try to
-      // tell the two apart — reconcile by `id`: an item already present gets replaced by the fresh
-      // copy (a duplicate fetch has identical content, so this is a no-op; genuinely new data gets
-      // applied correctly), an unfamiliar id (rare, only when the underlying data actually shifted)
-      // gets appended — position is never inferred, so there's no way to compute it wrong and
-      // duplicate an item.
-      const indexById = new Map(currentCache.items.map((item, index) => [item.id, index]))
+      // Every page > 1: upsert by `id`. Do not `push` a whole page — unstable `ORDER BY created`
+      // (many rows share a timestamp) makes OFFSET repeat an id from the previous page.
+      const indexById = new Map(currentCache.items.map((item, index) => [String(item.id), index]))
       for (const freshItem of newData.items) {
-        const existingIndex = indexById.get(freshItem.id)
+        const id = String(freshItem.id)
+        const existingIndex = indexById.get(id)
         if (existingIndex === undefined) {
           currentCache.items.push(freshItem)
+          indexById.set(id, currentCache.items.length - 1)
         } else {
           currentCache.items[existingIndex] = freshItem
         }

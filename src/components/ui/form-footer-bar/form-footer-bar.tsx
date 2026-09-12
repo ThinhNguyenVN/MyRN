@@ -69,7 +69,7 @@ function FormFooterBarInner({
   showAmount,
   totalLabel,
   totalText,
-  leading,
+  right,
   moreTitle,
   moreAccessibilityLabel,
   backLabel,
@@ -120,40 +120,42 @@ function FormFooterBarInner({
       totalLabel={totalLabel}
       totalText={totalText}
       layout={onNext ? 'stacked' : 'compact'}
-      leading={leading}
+      right={right}
     />
   ) : null
 
   if (onNext) {
     return (
       <MyView style={[styles.shell, styles.shellWizard]}>
-        <MyView style={styles.wizardStack}>
-          {amountBar}
-          <MyView style={styles.wizardActions}>
-            <ConditionRenderer when={showBackButton} fallback={null}>
+        <MyView style={styles.inner}>
+          <MyView style={styles.wizardStack}>
+            {amountBar}
+            <MyView style={styles.wizardActions}>
+              <ConditionRenderer when={showBackButton} fallback={null}>
+                <MyView style={styles.wizardButtonGrow}>
+                  <MyButton
+                    text={backLabel}
+                    type="secondary"
+                    size="large"
+                    width="full"
+                    elevation="none"
+                    onPress={onBack}
+                    disabled={busy}
+                  />
+                </MyView>
+              </ConditionRenderer>
               <MyView style={styles.wizardButtonGrow}>
                 <MyButton
-                  text={backLabel}
-                  type="secondary"
+                  text={isLastStep ? saveLabel : nextLabel}
+                  type="primary"
                   size="large"
                   width="full"
                   elevation="none"
-                  onPress={onBack}
+                  onPress={isLastStep ? onSave : onNext}
+                  loading={isLastStep ? busy : false}
                   disabled={busy}
                 />
               </MyView>
-            </ConditionRenderer>
-            <MyView style={styles.wizardButtonGrow}>
-              <MyButton
-                text={isLastStep ? saveLabel : nextLabel}
-                type="primary"
-                size="large"
-                width="full"
-                elevation="none"
-                onPress={isLastStep ? onSave : onNext}
-                loading={isLastStep ? busy : false}
-                disabled={busy}
-              />
             </MyView>
           </MyView>
         </MyView>
@@ -248,9 +250,11 @@ function FormFooterBarInner({
 
   return (
     <MyView style={styles.shell}>
-      <MyView style={styles.row}>
-        <MyView style={styles.actions}>{isMobileSize ? mobileActions : desktopActions}</MyView>
-        <ConditionRenderer when={showAmount}>{amountBar}</ConditionRenderer>
+      <MyView style={styles.inner}>
+        <MyView style={styles.row}>
+          <ConditionRenderer when={showAmount}>{amountBar}</ConditionRenderer>
+          <MyView style={styles.actions}>{isMobileSize ? mobileActions : desktopActions}</MyView>
+        </MyView>
       </MyView>
       <ConditionRenderer when={showMoreMenu}>
         <MyBottomSheet

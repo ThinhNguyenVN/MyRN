@@ -11,6 +11,12 @@ product finds out what changed since it forked.
 
 ## Unreleased
 
+### Changed
+- `FormFooterBar` / `FormFooterAmountBar`: desktop footer inner matches the form column
+  (`FORM_PAGE_MAX_WIDTH` 1280). Amount bar stretches; total stays left; extra control is
+  `right` (was `leading`). Primary/save actions sit on the right. Backported from `my-store`.
+- `side-bar`: narrower rails — flush `280 → 240`, card `260 → 220`. Collapsed width unchanged.
+
 ### Fixed
 - `side-bar`: collapse/expand remasured rows at `y = 0` on web, so the active pill jumped to
   the first item. Highlight Y is now computed from row/section heights (sections use a fixed

@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native'
 
+import { FORM_PAGE_MAX_WIDTH } from '@/constants/dimensions'
 import type { ThemeType } from '@/theme/theme-context'
 
 export function generateStyles(theme: ThemeType) {
@@ -11,7 +12,6 @@ export function generateStyles(theme: ThemeType) {
       borderTopColor: getColor('border/inactive/quaternary'),
       backgroundColor: getColor('fill/background/tertiary'),
       paddingTop: getSpacing('x4'),
-      paddingHorizontal: pagePadX,
       paddingBottom: Math.max(insets.bottom ?? 0, getSpacing('x4')),
       width: '100%',
       zIndex: 2,
@@ -23,20 +23,30 @@ export function generateStyles(theme: ThemeType) {
       bottom: 0,
       zIndex: 30,
     },
+    /** Same column as form `pageColumn` / scroll padding so the bar matches the cards above. */
+    inner: {
+      width: '100%',
+      maxWidth: FORM_PAGE_MAX_WIDTH,
+      alignSelf: 'center',
+      paddingHorizontal: pagePadX,
+    },
     row: {
       width: '100%',
       flexDirection: 'row',
+      flexWrap: 'wrap',
       alignItems: 'center',
-      justifyContent: 'flex-start',
+      justifyContent: 'space-between',
       gap: getSpacing('x3'),
     },
     actions: {
       flexDirection: 'row',
       flexWrap: isMobileSize ? 'nowrap' : 'wrap',
       alignItems: 'center',
+      justifyContent: 'flex-end',
       gap: getSpacing('x2'),
       flexGrow: 0,
       flexShrink: 0,
+      marginLeft: 'auto',
     },
     actionButton: {
       minWidth: isMobileSize ? undefined : 120,

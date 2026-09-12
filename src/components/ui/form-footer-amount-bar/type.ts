@@ -6,6 +6,6 @@ export type FormFooterAmountBarProps = {
   totalLabel: string
   totalText: string
   layout: FormFooterAmountBarLayout
-  /** Next to the total (e.g. approve-on-create switch). */
-  leading?: ReactNode
+  /** Trailing control on the amount bar (e.g. approve-on-create switch). */
+  right?: ReactNode
 }

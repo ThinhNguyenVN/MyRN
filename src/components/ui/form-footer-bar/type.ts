@@ -19,7 +19,7 @@ export type FormFooterBarProps = {
   showAmount: boolean
   totalLabel: string
   totalText: string
-  leading?: ReactNode
+  right?: ReactNode
   moreTitle: string
   moreAccessibilityLabel: string
   backLabel?: string

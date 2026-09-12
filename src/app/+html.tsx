@@ -21,6 +21,12 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
         <ScrollViewStyleReset />
+        {/* Below 320px, keep layout at that width and let the page scroll horizontally
+            instead of squeezing content — overrides ScrollViewStyleReset's `body{overflow:hidden}`
+            for the x-axis only; y-axis stays hidden since RN owns vertical scroll. */}
+        <style
+          dangerouslySetInnerHTML={{ __html: `body{overflow-x:auto}#root{min-width:320px}` }}
+        />
 
         {headNodes}
       </head>
