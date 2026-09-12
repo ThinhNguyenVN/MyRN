@@ -11,7 +11,17 @@ product finds out what changed since it forked.
 
 ## Unreleased
 
+### Changed
+- `FormFooterBar` / `FormFooterAmountBar`: desktop footer inner matches the form column
+  (`FORM_PAGE_MAX_WIDTH` 1280). Amount bar stretches; total stays left; extra control is
+  `right` (was `leading`). Primary/save actions sit on the right. Backported from `my-store`.
+- `side-bar`: narrower rails — flush `280 → 240`, card `260 → 220`. Collapsed width unchanged.
+
 ### Fixed
+- `paginatedEndpointConfig` mobile merge: a "new" page no longer `push`es every row. Overlapping
+  OFFSET pages (unstable `ORDER BY created`) used to duplicate ids and React keys. Every page > 1
+  upserts by `id`. Backported from `my-store`.
+
 - `side-bar`: the active-item highlight (and row color/opacity) stuttered on web when the
   destination screen did a heavy synchronous re-render. Reanimated `withTiming` interpolates on
   the JS main thread there, so it contended with that work; native is unaffected because it

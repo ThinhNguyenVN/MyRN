@@ -334,7 +334,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 ### `FormFooterBar`
 
 - Path: `@/components/ui/form-footer-bar`
-- Sticky footer: actions left, optional amount (`FormFooterAmountBar`) right; mobile overflow via More sheet
+- Sticky footer: amount bar fills the content column (`FORM_PAGE_MAX_WIDTH`), CTA on the right; optional `right` slot on the amount bar (e.g. a switch). Mobile overflow via More sheet
 - Wizard mode when `onNext` is passed (stacked amount + back/next)
 - Playground: `…/playground/form-footer-bar.tsx`
 

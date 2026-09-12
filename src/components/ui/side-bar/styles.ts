@@ -1,8 +1,8 @@
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
-export const SIDEBAR_WIDTH = 260
-export const SIDEBAR_FLUSH_WIDTH = 280
+export const SIDEBAR_WIDTH = 220
+export const SIDEBAR_FLUSH_WIDTH = 240
 export const SIDEBAR_COLLAPSED_WIDTH = 72
 export const SIDEBAR_PADDING = 12
 /** Active pill horizontal inset — expanded uses theme x4 (16px). */

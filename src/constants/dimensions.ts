@@ -26,6 +26,9 @@ export function getPrivateTabBarHeight(safeBottomInset: number, fallback = 16): 
 export const MAX_INPUT_WIDTH = 448
 export const MODAL_MAX_WIDTH = 480
 
+/** Desktop form column + sticky footer inner — keep cards and footer actions on the same edge. */
+export const FORM_PAGE_MAX_WIDTH = 1280
+
 export const isIos = Platform.OS === 'ios'
 export const isAndroid = Platform.OS === 'android'
 export const isWeb = Platform.OS === 'web'

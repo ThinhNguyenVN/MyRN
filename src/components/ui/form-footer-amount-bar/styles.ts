@@ -8,6 +8,7 @@ export function generateStyles(theme: ThemeType) {
     bar: {
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'space-between',
       backgroundColor: getColor('fill/background/secondary'),
       borderRadius: getRadius('large'),
       paddingHorizontal: getSpacing('x4'),
@@ -22,8 +23,11 @@ export function generateStyles(theme: ThemeType) {
       minWidth: 0,
     },
     total: {
+      alignItems: 'flex-start',
+      flexShrink: 0,
+    },
+    right: {
       marginLeft: 'auto',
-      alignItems: 'flex-end',
       flexShrink: 0,
     },
     totalLabel: {
@@ -31,7 +35,7 @@ export function generateStyles(theme: ThemeType) {
     },
     totalValue: {
       color: getColor('fill/active/primary'),
-      textAlign: 'right',
+      textAlign: 'left',
     },
   })
 }

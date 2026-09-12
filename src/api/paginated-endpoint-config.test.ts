@@ -81,6 +81,15 @@ describe('paginatedEndpointConfig', () => {
       expect(current.pagination.current_page).toBe(2)
     })
 
+    it('mobile page > 1: id already on a previous page (OFFSET overlap) — does NOT duplicate', () => {
+      const current = page([1, 2], 1)
+      const returned = config.merge(current, page([2, 3], 2), { arg: { page: 2, isMobile: true } })
+
+      expect(returned).toBeUndefined()
+      expect(current.items.map((item) => item.id)).toEqual(['1', '2', '3'])
+      expect(current.pagination.current_page).toBe(2)
+    })
+
     it('mobile: merging the exact same page again (double fetch) — does NOT duplicate items', () => {
       // Real bug: a FlatList `onEndReached` can fire twice for the same scroll threshold (or
       // refetchOnMountOrArgChange + forceRefetch both trigger) → two requests for the same page →

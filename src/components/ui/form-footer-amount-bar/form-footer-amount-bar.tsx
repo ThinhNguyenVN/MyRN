@@ -12,16 +12,13 @@ function FormFooterAmountBarInner({
   totalLabel,
   totalText,
   layout,
-  leading,
+  right,
 }: FormFooterAmountBarProps) {
   const styles = useThemedStyles(generateStyles)
   const layoutStyle = layout === 'compact' ? styles.compact : styles.stacked
 
   return (
     <MyView style={[styles.bar, layoutStyle]}>
-      <ConditionRenderer when={Boolean(leading)} fallback={null}>
-        {leading}
-      </ConditionRenderer>
       <MyView style={styles.total}>
         <MyText typography="caption" style={styles.totalLabel}>
           {totalLabel}
@@ -30,6 +27,9 @@ function FormFooterAmountBarInner({
           {totalText}
         </MyText>
       </MyView>
+      <ConditionRenderer when={Boolean(right)} fallback={null}>
+        <MyView style={styles.right}>{right}</MyView>
+      </ConditionRenderer>
     </MyView>
   )
 }
