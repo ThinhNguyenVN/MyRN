@@ -18,6 +18,14 @@ product finds out what changed since it forked.
 - `side-bar`: narrower rails — flush `280 → 240`, card `260 → 220`. Collapsed width unchanged.
 
 ### Fixed
+- `MyBottomSheet`: on web always use RN `Modal` instead of BottomSheetModal/vaul. Nested
+  pickers inside another RN Modal (e.g. a fullscreen filter) were portaled behind it and
+  never appeared. Backported from `my-store`.
+- `MyDropdownInput` / `MyTextInput`: clear (X) lives in the field `endIcon` and stops
+  the parent open-press; the trigger hit box matches `MAX_INPUT_WIDTH`. Backported from
+  `my-store`.
+- `MyTextInput` `numberFormat`: focus selects the whole value so the next keystroke
+  replaces it. Backported from `my-store`.
 - `side-bar`: collapse/expand remasured rows at `y = 0` on web, so the active pill jumped to
   the first item. Highlight Y is now computed from row/section heights (sections use a fixed
   expanded height of 40). Backported from `my-store`.

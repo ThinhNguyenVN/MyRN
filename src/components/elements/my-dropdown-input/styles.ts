@@ -1,3 +1,4 @@
+import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
@@ -54,21 +55,17 @@ export function generateStyles(theme: ThemeType) {
       },
       triggerWrap: {
         width: '100%',
+        maxWidth: MAX_INPUT_WIDTH,
+        alignSelf: 'flex-start',
         position: 'relative',
+      },
+      triggerPressable: {
+        width: '100%',
+        maxWidth: MAX_INPUT_WIDTH,
+        alignSelf: 'flex-start',
       },
       triggerInput: {
         marginBottom: 0,
-      },
-      triggerClearHit: {
-        position: 'absolute',
-        right: 0,
-        bottom: 0,
-        width: 44,
-        height: 44,
-        zIndex: 2,
-      },
-      triggerClearHitFill: {
-        flex: 1,
       },
       optionRowInner: {
         width: '100%',
