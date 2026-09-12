@@ -12,6 +12,9 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Changed
+- Expo SDK 57: align to official bundled pair (`expo@~57.0.22`, `react-native-worklets@0.10.1`,
+  `react-native-reanimated@4.5.1`). Drop the worklets `fun.name` patch and stop excluding
+  those packages from `expo install --fix`. Expo Go must be iOS ≥ 57.0.6 / Android ≥ 57.0.3.
 - `MySwitch`: `stacked` puts the label above the track (tight mobile footers).
 - `FormFooterBar` / `FormFooterAmountBar`: desktop footer inner matches the form column
   (`FORM_PAGE_MAX_WIDTH` 1280). Amount bar stretches; total stays left; extra control is
