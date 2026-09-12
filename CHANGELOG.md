@@ -18,6 +18,13 @@ product finds out what changed since it forked.
 - `side-bar`: narrower rails — flush `280 → 240`, card `260 → 220`. Collapsed width unchanged.
 
 ### Fixed
+- `swipeable-item`: web can leave a row stuck mid-animation after a confirmation modal
+  (DOM/transform already correct). Remount the gesture row after each action; close when
+  the action-strip width changes; `touchAction="pan-y"` so vertical list scroll still works.
+- `+html`: Expo `ScrollViewStyleReset` sets `body{overflow:hidden}`, which squeezes the
+  layout below 320px. Allow `overflow-x: auto` and `#root{min-width:320px}` so narrow
+  viewports scroll horizontally instead of crushing content.
+- `menu-list-card`: row `width: '100%'` so labels/trailing slots don't shrink in a card.
 - `paginatedEndpointConfig` mobile merge: a "new" page no longer `push`es every row. Overlapping
   OFFSET pages (unstable `ORDER BY created`) used to duplicate ids and React keys. Every page > 1
   upserts by `id`. Backported from `my-store`.

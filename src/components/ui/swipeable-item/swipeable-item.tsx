@@ -79,6 +79,12 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
     const { width: windowWidth } = useWindowDimensions()
     const swipeableItem = useSwipeableItemOptional()
     const [clipWidth, setClipWidth] = useState(0)
+    /**
+     * Web: after an action opens a confirmation modal, the browser can leave the row stuck
+     * mid-animation even when transform/DOM are already correct. Remounting the row after
+     * each action forces a clean paint.
+     */
+    const [rowRemountKey, setRowRemountKey] = useState(0)
 
     const translateX = useSharedValue(0)
     const underlayOpacity = useSharedValue(1)
@@ -131,6 +137,15 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
         })
       })()
     }, [translateX])
+
+    /**
+     * Action set changed (e.g. cancel removes a button) while the row is open: the old
+     * strip width no longer matches — close instead of relying on wrapAction/close alone.
+     */
+    useEffect(() => {
+      close()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [leftStripPx, rightStripPx])
 
     useImperativeHandle(ref, () => ({ close }), [close])
 
@@ -345,10 +360,26 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
       [rowWidth],
     )
 
+    const remountTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+    useEffect(() => {
+      return () => {
+        if (remountTimeoutRef.current) {
+          clearTimeout(remountTimeoutRef.current)
+        }
+      }
+    }, [])
+
     const wrapAction = useCallback(
       (fn: () => void) => {
         fn()
         close()
+        if (remountTimeoutRef.current) {
+          clearTimeout(remountTimeoutRef.current)
+        }
+        remountTimeoutRef.current = setTimeout(() => {
+          setRowRemountKey((key) => key + 1)
+        }, SETTLE_DURATION_MS)
       },
       [close],
     )
@@ -378,7 +409,7 @@ export const SwipeableItem = forwardRef<SwipeableItemRef, SwipeableItemProps>(
         ) : null}
         <SwipeableRowPressProvider value={rowPressValue}>
           <View style={styles.clip} testID={testID} collapsable={false} onLayout={onLayoutClip}>
-            <GestureDetector gesture={pan}>
+            <GestureDetector key={rowRemountKey} gesture={pan} touchAction="pan-y">
               <Animated.View style={[styles.row, rowStyle]} collapsable={false}>
                 {measured ? (
                   <SwipeableActionStrip

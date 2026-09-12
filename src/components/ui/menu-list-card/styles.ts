@@ -23,6 +23,7 @@ export function generateStyles(theme: ThemeType) {
     row: {
       flexDirection: 'row',
       alignItems: 'center',
+      width: '100%',
       gap: getSpacing('x3'),
       minHeight: 56,
       paddingHorizontal: getSpacing('x5'),
