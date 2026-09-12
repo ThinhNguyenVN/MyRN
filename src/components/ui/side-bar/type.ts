@@ -50,6 +50,5 @@ export interface SideBarRowProps {
   index: number
   isActive: boolean
   onSelected: () => void
-  onMeasureLayout?: (index: number, y: number, height: number) => void
   collapseProgress: SharedValue<number>
 }

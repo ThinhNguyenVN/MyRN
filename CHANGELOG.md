@@ -12,6 +12,9 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Fixed
+- `side-bar`: collapse/expand remasured rows at `y = 0` on web, so the active pill jumped to
+  the first item. Highlight Y is now computed from row/section heights (sections use a fixed
+  expanded height of 40). Backported from `my-store`.
 - `side-bar`: the active-item highlight (and row color/opacity) stuttered on web when the
   destination screen did a heavy synchronous re-render. Reanimated `withTiming` interpolates on
   the JS main thread there, so it contended with that work; native is unaffected because it
