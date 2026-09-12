@@ -29,7 +29,7 @@ function NativeFullscreenModal({
   const { t } = useTranslation()
   const iosPresentation = isIos ? presentation : undefined
   const rootStyle = isAndroid
-    ? [styles.root, styles.rootAndroid]
+    ? styles.root
     : presentation === 'fullScreen'
       ? [styles.root, styles.rootIosFullScreen]
       : [styles.root, styles.rootIosPageSheet]

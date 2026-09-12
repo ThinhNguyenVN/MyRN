@@ -59,7 +59,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
   searchable: searchableProp,
   preferSheet = false,
   preferFullscreen = false,
-  sheetHeight = '90%',
+  sheetHeight,
   style,
 }: MyDropdownInputProps) {
   const styles = useThemedStyles(generateStyles)
@@ -507,8 +507,10 @@ const MyDropdownInput = memo(function MyDropdownInput({
             title={pickerHeading}
             showClose
             pressBackdropToClose
-            snapPoints={[sheetHeight]}
-            enableDynamicSizing
+            visible={open}
+            onClose={closePicker}
+            snapPoints={sheetHeight ? [sheetHeight] : undefined}
+            enableDynamicSizing={!sheetHeight}
             onClosed={closePicker}
             contentContainerStyle={styles.sheetPickerContent}
           >

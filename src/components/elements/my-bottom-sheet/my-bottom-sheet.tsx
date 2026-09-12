@@ -2,6 +2,7 @@ import React, {
   forwardRef,
   memo,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -13,10 +14,22 @@ import {
   Pressable,
   ScrollView,
   View,
+  useWindowDimensions,
   type DimensionValue,
   type StyleProp,
   type ViewStyle,
 } from 'react-native'
+import Constants from 'expo-constants'
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
+import Animated, {
+  Extrapolation,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated'
 
 import { BottomSheetModal, BottomSheetScrollView } from '@expo/ui/community/bottom-sheet'
 
@@ -24,15 +37,136 @@ import MyIcon from '@/components/elements/my-icon'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import MyPressable from '@/components/elements/my-pressable'
-import { isWeb } from '@/constants/dimensions'
+import { isAndroid, isWeb } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 
 import type { MyBottomSheetProps, MyBottomSheetRef } from './type'
-import { generateStyles } from './styles'
+import { ANDROID_MATERIAL_SHEET_MAX_WIDTH, generateStyles } from './styles'
 
 /** Re-export cho các nơi cũ wrap content bằng BottomSheetView/ScrollView. */
 export { BottomSheetView, BottomSheetScrollView } from '@expo/ui/community/bottom-sheet'
+
+function ignorePanelPress() {
+  // Keep the sheet panel from closing when tapping inside (overlay Pressable is the closer).
+}
+
+const isExpoGo = Constants.appOwnership === 'expo'
+const DISMISS_TRANSLATION_Y = 120
+const DISMISS_VELOCITY_Y = 900
+const SHEET_OFFSCREEN_Y = 640
+
+type RnModalSheetProps = {
+  visible: boolean
+  panDownEnabled: boolean
+  pressBackdropToClose: boolean
+  panelStyle: StyleProp<ViewStyle>
+  header: React.ReactNode
+  body: React.ReactNode
+  footer: React.ReactNode
+  styles: ReturnType<typeof generateStyles>
+  onRequestClose: () => void
+}
+
+function RnModalSheetInner({
+  visible,
+  panDownEnabled,
+  pressBackdropToClose,
+  panelStyle,
+  header,
+  body,
+  footer,
+  styles,
+  onRequestClose,
+}: RnModalSheetProps) {
+  const translateY = useSharedValue(0)
+  const backdropOpacity = useSharedValue(1)
+
+  useEffect(() => {
+    if (!visible) {
+      return
+    }
+    translateY.value = 0
+    backdropOpacity.value = 1
+  }, [backdropOpacity, translateY, visible])
+
+  const finishDismiss = useCallback(() => {
+    onRequestClose()
+  }, [onRequestClose])
+
+  const panGesture = useMemo(() => {
+    const pan = Gesture.Pan()
+      .enabled(panDownEnabled)
+      .activeOffsetY(8)
+      .failOffsetX([-24, 24])
+      .onUpdate((event) => {
+        const nextY = Math.max(0, event.translationY)
+        translateY.value = nextY
+        backdropOpacity.value = interpolate(
+          nextY,
+          [0, SHEET_OFFSCREEN_Y * 0.5],
+          [1, 0.35],
+          Extrapolation.CLAMP,
+        )
+      })
+      .onEnd((event) => {
+        const shouldDismiss =
+          event.translationY > DISMISS_TRANSLATION_Y || event.velocityY > DISMISS_VELOCITY_Y
+        if (shouldDismiss) {
+          backdropOpacity.value = withTiming(0, { duration: 180 })
+          translateY.value = withTiming(SHEET_OFFSCREEN_Y, { duration: 200 }, (finished) => {
+            if (finished) {
+              runOnJS(finishDismiss)()
+            }
+          })
+          return
+        }
+        translateY.value = withSpring(0, { damping: 22, stiffness: 220 })
+        backdropOpacity.value = withTiming(1, { duration: 160 })
+      })
+    return pan
+  }, [backdropOpacity, finishDismiss, panDownEnabled, translateY])
+
+  const panelAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }))
+
+  const backdropAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: backdropOpacity.value,
+  }))
+
+  const handleBackdropPress = useCallback(() => {
+    if (pressBackdropToClose) {
+      onRequestClose()
+    }
+  }, [onRequestClose, pressBackdropToClose])
+
+  return (
+    <Modal visible={visible} transparent onRequestClose={onRequestClose} animationType="none">
+      <GestureHandlerRootView style={styles.gestureRoot}>
+        <View style={styles.webSheetOverlay}>
+          <Pressable style={styles.backdropHit} onPress={handleBackdropPress}>
+            <Animated.View style={[styles.backdropFill, backdropAnimatedStyle]} />
+          </Pressable>
+          <Animated.View style={[panelStyle, panelAnimatedStyle]}>
+            <Pressable onPress={ignorePanelPress}>
+              <GestureDetector gesture={panGesture}>
+                <Animated.View style={styles.dragHandleHit}>
+                  {panDownEnabled || isAndroid ? <View style={styles.handle} /> : null}
+                  <View style={styles.dragRegion}>{header}</View>
+                </Animated.View>
+              </GestureDetector>
+              {body}
+              {footer}
+            </Pressable>
+          </Animated.View>
+        </View>
+      </GestureHandlerRootView>
+    </Modal>
+  )
+}
+
+const RnModalSheet = memo(RnModalSheetInner)
 
 const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
   (
@@ -63,12 +197,16 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     const bottomSheetRef = useRef<BottomSheetModal>(null)
     const styles = useThemedStyles(generateStyles)
     const isMobileSize = useIsMobileSize()
+    const { width: windowWidth } = useWindowDimensions()
     /**
-     * Native mobile = BottomSheetModal (kéo, snap). Web always uses RN `Modal`.
-     * Vaul / BottomSheetModal portals behind an existing RN Modal (History filter
-     * `NativeFullscreenModal`), so nested dropdowns and date pickers never appear.
+     * Native mobile (iOS SwiftUI / Android Material3): BottomSheetModal.
+     * Web / Expo Go on wide Android: RN `Modal` — Material3 caps sheet at 640dp and
+     * Expo Go cannot apply our native `sheetMaxWidth` patch, so content gets clipped.
+     * Dev/production builds use the patched full-width Compose sheet instead.
      */
-    const useBottomSheet = isMobileSize && !isWeb
+    const androidExpoGoWideScreen =
+      isExpoGo && isAndroid && windowWidth > ANDROID_MATERIAL_SHEET_MAX_WIDTH
+    const useBottomSheet = isMobileSize && !isWeb && !androidExpoGoWideScreen
     /** Controlled mode: cha truyền visible — state nội bộ chỉ dùng khi không controlled (web desktop modal). */
     const [internalVisible, setInternalVisible] = useState(false)
 
@@ -175,8 +313,6 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       else bottomSheetRef.current?.dismiss()
     }, [useBottomSheet, visibleProp])
 
-    // Lồng trong filter sheet: backdrop trong suốt để outer không tối thêm (chỉ áp dụng cho BottomSheetModal).
-
     if (!useBottomSheet) {
       /** Mobile responsive: neo đáy; có snapPoints → height cố định (footer luôn sát đáy panel). */
       const windowHeight = Dimensions.get('window').height
@@ -195,33 +331,40 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
           style={hasFixedHeight ? styles.webSheetScrollFixed : styles.webSheetScroll}
           contentContainerStyle={[styles.content, contentContainerStyle]}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustContentInsets={false}
+          automaticallyAdjustsScrollIndicatorInsets={false}
+          contentInsetAdjustmentBehavior="never"
         >
           {children}
         </ScrollView>
       ) : (
         <View style={[styles.content, contentContainerStyle]}>{children}</View>
       )
+
       return (
-        <Modal visible={isOpen} transparent onRequestClose={requestClose} animationType="none">
-          <Pressable
-            style={styles.webSheetOverlay}
-            onPress={pressBackdropToClose ? requestClose : undefined}
-          >
-            <Pressable style={panelStyle} onPress={() => {}}>
-              {header ?? headerContent}
-              {body}
-              {footer ? <MyView style={styles.modalFooter}>{footer}</MyView> : null}
-            </Pressable>
-          </Pressable>
-        </Modal>
+        <RnModalSheet
+          visible={isOpen}
+          panDownEnabled={panDownEnabled}
+          pressBackdropToClose={pressBackdropToClose}
+          panelStyle={panelStyle}
+          header={header ?? headerContent}
+          body={body}
+          footer={footer ? <MyView style={styles.modalFooter}>{footer}</MyView> : null}
+          styles={styles}
+          onRequestClose={requestClose}
+        />
       )
     }
 
     const sheetBody = useScrollView ? (
       <>
         <BottomSheetScrollView
+          style={styles.nativeScroll}
           contentContainerStyle={[styles.content, contentContainerStyle]}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustContentInsets={false}
+          automaticallyAdjustsScrollIndicatorInsets={false}
+          contentInsetAdjustmentBehavior="never"
         >
           {children}
         </BottomSheetScrollView>

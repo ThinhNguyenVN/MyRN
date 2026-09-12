@@ -35,7 +35,12 @@ export function generateStyles(theme: ThemeType) {
     },
     rowLabel: {
       flex: 1,
+      minWidth: 0,
       color: getColor('text/active/primary'),
+    },
+    trailing: {
+      flexShrink: 1,
+      maxWidth: '48%',
     },
   })
 }
