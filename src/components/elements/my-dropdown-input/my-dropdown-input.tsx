@@ -371,37 +371,24 @@ const MyDropdownInput = memo(function MyDropdownInput({
         disabled={isPickerDisabled}
         haptic={false}
         animatedType="opacity"
+        style={styles.triggerPressable}
       >
-        <MyView pointerEvents="none">
-          <MyTextInput
-            ref={triggerInputRef}
-            title={title}
-            subTitle={subTitle}
-            value={isWaiting && !hasSelection ? '' : displayText}
-            placeholder={isWaiting && !hasSelection ? waitPlaceholder : resolvedPlaceholder}
-            editable={false}
-            disabled={isPickerDisabled}
-            error={error}
-            errorMessage={errorMessage}
-            required={required}
-            pointerEvents="none"
-            endIcon={showTriggerClear ? triggerClearIcon : triggerChevron}
-            style={styles.triggerInput}
-          />
-        </MyView>
+        <MyTextInput
+          ref={triggerInputRef}
+          title={title}
+          subTitle={subTitle}
+          value={isWaiting && !hasSelection ? '' : displayText}
+          placeholder={isWaiting && !hasSelection ? waitPlaceholder : resolvedPlaceholder}
+          editable={false}
+          disabled={isPickerDisabled}
+          error={error}
+          errorMessage={errorMessage}
+          required={required}
+          endIcon={showTriggerClear ? triggerClearIcon : triggerChevron}
+          onEndIconPress={showTriggerClear ? handleTriggerClear : undefined}
+          style={styles.triggerInput}
+        />
       </MyPressable>
-      {showTriggerClear ? (
-        <MyPressable
-          onPress={handleTriggerClear}
-          haptic={false}
-          animatedType="opacity"
-          accessibilityRole="button"
-          accessibilityLabel={t('components.dropdownClear')}
-          style={styles.triggerClearHit}
-        >
-          <View style={styles.triggerClearHitFill} />
-        </MyPressable>
-      ) : null}
     </View>
   )
 

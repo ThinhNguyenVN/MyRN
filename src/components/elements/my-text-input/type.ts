@@ -49,6 +49,7 @@ export interface MyTextInputProps
    * Format large numbers for display with locale thousands separators
    * (`1.000.000` vi / `1,000,000` en) and drop trailing fraction zeros.
    * Form value stays canonical (`1000000` / `1000000.5`, ASCII `.` decimal).
+   * Focus selects the whole value so the next keystroke replaces it.
    */
   numberFormat?: boolean | FormatDisplayNumberOptions
 }

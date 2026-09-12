@@ -4,6 +4,7 @@ import {
   Platform,
   View,
   TextInput,
+  type GestureResponderEvent,
   type ViewStyle,
   type TextStyle,
 } from 'react-native'
@@ -35,6 +36,14 @@ const INPUT_HEIGHT_LARGE = 100
 const DEFAULT_HEIGHT_BY_SIZE: Record<TextInputSize, number> = {
   small: INPUT_HEIGHT,
   large: INPUT_HEIGHT_LARGE,
+}
+
+function selectAllOnFocusTarget(event: unknown) {
+  if (!event || typeof event !== 'object' || !('target' in event)) {
+    return
+  }
+  const target = (event as { target?: { select?: () => void } }).target
+  target?.select?.()
 }
 
 function resolveNumberFormatOptions(
@@ -138,9 +147,14 @@ const MyTextInput = memo(
     const handleFocus = useCallback(
       (e: unknown) => {
         setIsFocused(true)
+        if (numberFormatOptions) {
+          requestAnimationFrame(() => {
+            selectAllOnFocusTarget(e)
+          })
+        }
         onFocusProp?.(e as Parameters<NonNullable<typeof onFocusProp>>[0])
       },
-      [onFocusProp],
+      [numberFormatOptions, onFocusProp],
     )
     const handleBlur = useCallback(
       (e: unknown) => {
@@ -214,6 +228,16 @@ const MyTextInput = memo(
     const rootStyle = hasContainerStyle
       ? [styles.container, widthStyle, containerStyle, styleProp]
       : [styles.container, widthStyle, styleProp]
+    const passThroughPress = !editable || disabled
+    const endIconInteractive = Boolean(onEndIconPress) && !disabled
+
+    const handleEndIconPress = useCallback(
+      (event: GestureResponderEvent) => {
+        event.stopPropagation()
+        onEndIconPress?.()
+      },
+      [onEndIconPress],
+    )
 
     const resolvedValue = numberFormatOptions
       ? (displayValue ??
@@ -221,7 +245,7 @@ const MyTextInput = memo(
       : value
 
     return (
-      <View style={rootStyle} pointerEvents={editable && !disabled ? 'auto' : 'box-none'}>
+      <View style={rootStyle} pointerEvents={passThroughPress ? 'box-none' : 'auto'}>
         <FormFieldLabel
           title={title}
           subTitle={subTitle}
@@ -229,7 +253,10 @@ const MyTextInput = memo(
           error={!!error}
           style={styles.title}
         />
-        <MyView style={[styles.inputRow, inputRowStateStyle, inputRowStyleProp]}>
+        <MyView
+          pointerEvents={passThroughPress ? 'box-none' : 'auto'}
+          style={[styles.inputRow, inputRowStateStyle, inputRowStyleProp]}
+        >
           {!!startText && (
             <MyText typography="body" color="text/active/secondary">
               {startText}
@@ -248,8 +275,10 @@ const MyTextInput = memo(
           <TextInputComponent
             ref={ref as any}
             {...viewProps}
+            pointerEvents={passThroughPress ? 'none' : 'auto'}
             value={ignoreValue ? undefined : resolvedValue}
             editable={!disabled && editable}
+            selectTextOnFocus={Boolean(numberFormatOptions)}
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChangeText={handleChangeText}
@@ -266,9 +295,12 @@ const MyTextInput = memo(
           />
           {!isNil(endIcon) && (
             <TouchableOpacity
-              onPress={onEndIconPress}
-              disabled={!onEndIconPress || disabled}
-              style={styles.iconWrap}
+              onPress={handleEndIconPress}
+              disabled={!endIconInteractive}
+              style={[
+                styles.iconWrap,
+                endIconInteractive ? styles.iconWrapInteractive : styles.iconWrapPassthrough,
+              ]}
               hitSlop={8}
             >
               {endIcon}

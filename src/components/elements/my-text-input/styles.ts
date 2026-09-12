@@ -72,6 +72,12 @@ export function generateStyles(theme: ThemeType) {
       justifyContent: 'center' as const,
       alignItems: 'center' as const,
     },
+    iconWrapInteractive: {
+      pointerEvents: 'auto' as const,
+    },
+    iconWrapPassthrough: {
+      pointerEvents: 'none' as const,
+    },
 
     titleRow: {
       flexDirection: 'row' as const,

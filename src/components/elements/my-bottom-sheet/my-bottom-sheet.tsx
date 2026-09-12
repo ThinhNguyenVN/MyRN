@@ -24,6 +24,7 @@ import MyIcon from '@/components/elements/my-icon'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import MyPressable from '@/components/elements/my-pressable'
+import { isWeb } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 
@@ -62,8 +63,12 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     const bottomSheetRef = useRef<BottomSheetModal>(null)
     const styles = useThemedStyles(generateStyles)
     const isMobileSize = useIsMobileSize()
-    /** Mobile = bottom sheet thật (kéo, snap) trên mọi platform. Desktop web = modal thường. */
-    const useBottomSheet = isMobileSize
+    /**
+     * Native mobile = BottomSheetModal (kéo, snap). Web always uses RN `Modal`.
+     * Vaul / BottomSheetModal portals behind an existing RN Modal (History filter
+     * `NativeFullscreenModal`), so nested dropdowns and date pickers never appear.
+     */
+    const useBottomSheet = isMobileSize && !isWeb
     /** Controlled mode: cha truyền visible — state nội bộ chỉ dùng khi không controlled (web desktop modal). */
     const [internalVisible, setInternalVisible] = useState(false)
 
