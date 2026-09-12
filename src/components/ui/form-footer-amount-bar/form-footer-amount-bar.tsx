@@ -23,7 +23,7 @@ function FormFooterAmountBarInner({
         <MyText typography="caption" style={styles.totalLabel}>
           {totalLabel}
         </MyText>
-        <MyText typography="h4" style={styles.totalValue}>
+        <MyText typography="h4" style={styles.totalValue} numberOfLines={1}>
           {totalText}
         </MyText>
       </MyView>

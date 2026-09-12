@@ -24,7 +24,8 @@ export function generateStyles(theme: ThemeType) {
     },
     total: {
       alignItems: 'flex-start',
-      flexShrink: 0,
+      flex: 1,
+      minWidth: 0,
     },
     right: {
       marginLeft: 'auto',

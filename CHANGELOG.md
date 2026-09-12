@@ -12,12 +12,15 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Changed
+- `MySwitch`: `stacked` puts the label above the track (tight mobile footers).
 - `FormFooterBar` / `FormFooterAmountBar`: desktop footer inner matches the form column
   (`FORM_PAGE_MAX_WIDTH` 1280). Amount bar stretches; total stays left; extra control is
   `right` (was `leading`). Primary/save actions sit on the right. Backported from `my-store`.
 - `side-bar`: narrower rails — flush `280 → 240`, card `260 → 220`. Collapsed width unchanged.
 
 ### Fixed
+- `FormFooterAmountBar`: long totals shrink/ellipsis instead of shoving `right` off the bar.
+  Backported from `my-store`.
 - `MyBottomSheet`: on web always use RN `Modal` instead of BottomSheetModal/vaul. Nested
   pickers inside another RN Modal (e.g. a fullscreen filter) were portaled behind it and
   never appeared. Backported from `my-store`.

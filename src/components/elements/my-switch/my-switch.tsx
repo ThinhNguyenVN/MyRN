@@ -15,6 +15,7 @@ const MySwitch: React.FC<MySwitchProps> = ({
   disabled = false,
   label,
   isLeftLabel = true,
+  stacked = false,
   labelStyle,
   style,
 }) => {
@@ -37,19 +38,20 @@ const MySwitch: React.FC<MySwitchProps> = ({
   const trackStyle = [styles.track, value && styles.trackOn, disabled && styles.trackDisabled]
 
   const labelNode = !!label ? <MyText style={labelStyle}>{label}</MyText> : null
+  const showLabelBeforeTrack = stacked || isLeftLabel
 
   return (
     <MyPressable
       onPress={handlePress}
       disabled={disabled}
-      style={[styles.row, style]}
+      style={[stacked ? styles.stacked : styles.row, style]}
       animatedType="opacity"
     >
-      {isLeftLabel ? labelNode : null}
+      {showLabelBeforeTrack ? labelNode : null}
       <MyView style={trackStyle}>
         <Animated.View style={[styles.thumb, thumbAnimatedStyle]} />
       </MyView>
-      {!isLeftLabel ? labelNode : null}
+      {!stacked && !isLeftLabel ? labelNode : null}
     </MyPressable>
   )
 }
