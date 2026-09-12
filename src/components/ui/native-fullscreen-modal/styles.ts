@@ -10,9 +10,6 @@ export function generateStyles(theme: ThemeType) {
       flex: 1,
       backgroundColor: getColor('fill/background/primary'),
     },
-    rootAndroid: {
-      paddingTop: insets.top,
-    },
     rootIosFullScreen: {
       paddingTop: insets.top,
       paddingBottom: insets.bottom,
@@ -31,7 +28,7 @@ export function generateStyles(theme: ThemeType) {
       gap: getSpacing('x2'),
       paddingLeft: getSpacing('x4'),
       paddingRight: getSpacing('x2'),
-      paddingVertical: getSpacing('x4'),
+      paddingVertical: getSpacing('x2'),
     },
     title: {
       flex: 1,

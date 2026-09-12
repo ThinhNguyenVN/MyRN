@@ -13,13 +13,20 @@ export function generateStyles(theme: ThemeType) {
     track: {
       flexDirection: 'row',
       alignItems: 'center',
-      flexShrink: 0,
+      alignSelf: 'flex-end',
+      flexGrow: 0,
+      flexShrink: 1,
       padding: TRACK_PADDING,
       borderRadius: Radius.full,
       backgroundColor: getColor('fill/background/secondary'),
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: getColor('border/inactive/secondary'),
       overflow: 'hidden',
+    },
+    trackFill: {
+      alignSelf: 'stretch',
+      width: '100%',
+      flexShrink: 0,
     },
     trackDisabled: {
       opacity: 0.5,
@@ -33,7 +40,8 @@ export function generateStyles(theme: ThemeType) {
       backgroundColor: getColor('fill/active/primary'),
     },
     option: {
-      flex: 1,
+      flexGrow: 0,
+      flexShrink: 1,
       zIndex: 1,
       minWidth: 44,
       height: 36,
@@ -41,6 +49,12 @@ export function generateStyles(theme: ThemeType) {
       alignItems: 'center',
       justifyContent: 'center',
       borderRadius: Radius.full,
+    },
+    optionFill: {
+      flexGrow: 1,
+      flexShrink: 1,
+      flexBasis: 0,
+      minWidth: 0,
     },
     optionCompact: {
       minWidth: 36,
@@ -52,7 +66,7 @@ export function generateStyles(theme: ThemeType) {
     },
     optionLabelActive: {
       color: getColor('brand/white'),
-      fontFamily: FontFamily.medium,
+      fontFamily: FontFamily.semibold,
     },
   })
 }

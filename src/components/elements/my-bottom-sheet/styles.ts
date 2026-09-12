@@ -4,6 +4,8 @@ import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
 const HEADER_HEIGHT = 40
+/** Material3 `ModalBottomSheet` default `sheetMaxWidth` (640.dp). */
+export const ANDROID_MATERIAL_SHEET_MAX_WIDTH = 640
 
 export const generateStyles = (theme: ThemeType) => {
   const { getColor, getSpacing, insets } = theme
@@ -33,6 +35,16 @@ export const generateStyles = (theme: ThemeType) => {
     webSheetOverlay: {
       flex: 1,
       justifyContent: 'flex-end',
+    },
+    gestureRoot: {
+      flex: 1,
+    },
+    backdropHit: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    // theme-exempt: modal backdrop scrim stays the same dark tint in both themes.
+    backdropFill: {
+      flex: 1,
       backgroundColor: 'rgba(0,0,0,0.5)',
     },
     webSheetPanel: {
@@ -42,10 +54,30 @@ export const generateStyles = (theme: ThemeType) => {
       backgroundColor: getColor('fill/background/tertiary'),
       overflow: 'hidden',
     },
+    handle: {
+      alignSelf: 'center',
+      width: 36,
+      height: 4,
+      marginTop: getSpacing('x2'),
+      marginBottom: getSpacing('x1'),
+      borderRadius: Radius.full,
+      backgroundColor: getColor('border/inactive/primary'),
+    },
+    /** Full-width strip (handle + title) — pan-to-dismiss without stealing list scroll. */
+    dragHandleHit: {
+      width: '100%',
+    },
+    /** Larger hit target above the scroll body for pan-to-dismiss. */
+    dragRegion: {
+      minHeight: HEADER_HEIGHT,
+    },
     /** Co theo content nhưng bị giới hạn bởi maxHeight của panel → scroll bên trong. */
     webSheetScroll: {
       flexGrow: 0,
       flexShrink: 1,
+    },
+    nativeScroll: {
+      flexGrow: 0,
     },
     /** Panel height cố định: body chiếm phần còn lại → footer luôn neo đáy. */
     webSheetScrollFixed: {

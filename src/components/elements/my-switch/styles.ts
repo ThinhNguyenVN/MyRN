@@ -17,6 +17,11 @@ export function generateStyles(theme: ThemeType) {
       alignItems: 'center',
       gap: getSpacing('x2'),
     },
+    stacked: {
+      flexDirection: 'column',
+      alignItems: 'flex-end',
+      gap: getSpacing('x1'),
+    },
     track: {
       width: TRACK_WIDTH,
       height: TRACK_HEIGHT,

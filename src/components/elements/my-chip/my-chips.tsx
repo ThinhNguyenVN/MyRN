@@ -2,7 +2,7 @@ import React, { memo, useCallback, useState } from 'react'
 import { TextInput, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 
-import MyChip from '@/components/elements/my-chip'
+import MyChip from './my-chip'
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
 import MyView from '@/components/elements/my-view'

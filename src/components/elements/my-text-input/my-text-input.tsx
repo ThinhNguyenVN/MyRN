@@ -39,11 +39,20 @@ const DEFAULT_HEIGHT_BY_SIZE: Record<TextInputSize, number> = {
 }
 
 function selectAllOnFocusTarget(event: unknown) {
+  if (Platform.OS !== 'web') {
+    return
+  }
   if (!event || typeof event !== 'object' || !('target' in event)) {
     return
   }
-  const target = (event as { target?: { select?: () => void } }).target
-  target?.select?.()
+  const { target } = event
+  if (!target || typeof target !== 'object' || !('select' in target)) {
+    return
+  }
+  const select = target.select
+  if (typeof select === 'function') {
+    select.call(target)
+  }
 }
 
 function resolveNumberFormatOptions(

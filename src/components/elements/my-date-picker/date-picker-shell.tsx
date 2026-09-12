@@ -86,6 +86,8 @@ const DatePickerShell = memo(function DatePickerShell({
           ref={sheetRef}
           title={title}
           showClose
+          visible={open}
+          onClose={closePicker}
           onClosed={closePicker}
           pressBackdropToClose
           footer={footerContent}

@@ -202,7 +202,7 @@ export function generateStyles(theme: ThemeType) {
         gap: getSpacing('x2'),
         paddingLeft: getSpacing('x4'),
         paddingRight: getSpacing('x2'),
-        paddingVertical: getSpacing('x4'),
+        paddingVertical: getSpacing('x2'),
       },
       pickerTitle: {
         flex: 1,

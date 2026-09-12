@@ -26,7 +26,7 @@ function MenuListRowInner({ item, isLast, showChevron, styles }: MenuListRowProp
       <MyText typography="body" style={styles.rowLabel}>
         {item.label}
       </MyText>
-      {item.trailing}
+      {!isNil(item.trailing) ? <MyView style={styles.trailing}>{item.trailing}</MyView> : null}
       {showRowChevron ? (
         <MyIcon name="chevron-forward" size={18} color="icon/inactive/primary" />
       ) : null}

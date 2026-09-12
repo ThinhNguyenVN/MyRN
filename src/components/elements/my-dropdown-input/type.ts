@@ -38,7 +38,8 @@ export interface MyDropdownInputProps {
   preferSheet?: boolean
   /** Native: always use the iOS/Android fullscreen picker (wins over `preferSheet`). */
   preferFullscreen?: boolean
-  /** Chiều cao bottom sheet picker (vd '50%', '90%'). Mặc định '90%'. */
+  /** Optional fixed sheet height (`50%` / `90%`).
+   * Omit on native to wrap content; web mobile defaults to `90%` when omitted. */
   sheetHeight?: string
   subTitle?: string
   error?: boolean

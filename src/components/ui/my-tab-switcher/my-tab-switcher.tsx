@@ -1,47 +1,15 @@
-import { memo, useCallback, useRef, type ReactNode } from 'react'
-import type { AccessibilityState } from 'react-native'
+import { memo, useMemo, useRef, type ReactNode } from 'react'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 
-import MyPressable from '@/components/elements/my-pressable'
-import MyText from '@/components/elements/my-text'
+import MySegment from '@/components/elements/my-segment'
 import MyView from '@/components/elements/my-view'
+import { isAndroid } from '@/constants/dimensions'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import type { MyTabItem, MyTabSwitcherProps } from './type'
+import type { MyTabSwitcherProps } from './type'
 
 const DEFAULT_DURATION = 220
-
-interface TabItemProps<TId extends string> {
-  readonly tab: MyTabItem<TId>
-  readonly isActive: boolean
-  readonly onChange: (id: TId) => void
-  readonly styles: ReturnType<typeof generateStyles>
-}
-
-function TabItemInner<TId extends string>({ tab, isActive, onChange, styles }: TabItemProps<TId>) {
-  const handlePress = useCallback(() => onChange(tab.id), [onChange, tab.id])
-  const accessibilityState: AccessibilityState = { selected: isActive }
-
-  return (
-    <MyPressable
-      style={[styles.tabItem, isActive ? styles.tabItemActive : null]}
-      onPress={handlePress}
-      accessibilityRole="tab"
-      accessibilityState={accessibilityState}
-      accessibilityLabel={tab.label}
-    >
-      <MyText
-        typography="button"
-        style={[styles.tabLabel, isActive ? styles.tabLabelActive : null]}
-      >
-        {tab.label}
-      </MyText>
-    </MyPressable>
-  )
-}
-
-const TabItem = memo(TabItemInner) as <TId extends string>(props: TabItemProps<TId>) => ReactNode
 
 /**
  * Tab switcher tái sử dụng — truyền mảng tabs + renderContent theo id.
@@ -70,25 +38,36 @@ function MyTabSwitcher<TId extends string = string>({
     tabs.findIndex((tab) => tab.id === activeId),
   )
   const prevIndex = prevActiveIndexRef.current
-  if (prevIndex !== activeIndex) {
+  const didChangeTab = prevIndex !== activeIndex
+  if (didChangeTab) {
     prevActiveIndexRef.current = activeIndex
   }
-  /** Chuyển sang tab bên phải → nội dung mới trượt từ phải vào. */
+  /**
+   * Skip entering on first mount — and on Android entirely.
+   * Reanimated SlideIn* uses absolute layout while entering; inside a
+   * ScrollView on Android that pins the tab body to the top of the screen
+   * (Dashboard top-sellers overlaying KPIs on first open).
+   */
   const entering =
-    activeIndex >= prevIndex ? SlideInRight.duration(duration) : SlideInLeft.duration(duration)
+    isAndroid || !didChangeTab
+      ? undefined
+      : activeIndex >= prevIndex
+        ? SlideInRight.duration(duration)
+        : SlideInLeft.duration(duration)
+
+  const segmentOptions = useMemo(
+    () =>
+      tabs.map((tab) => ({
+        value: tab.id,
+        label: tab.label,
+      })),
+    [tabs],
+  )
 
   return (
     <MyView style={[fillParent ? styles.root : styles.rootHug, containerStyle]}>
       <MyView style={[styles.tabBar, tabBarStyle]}>
-        {tabs.map((tab) => (
-          <TabItem
-            key={`tab-switcher-${tab.id}`}
-            tab={tab}
-            isActive={tab.id === activeId}
-            onChange={onChange}
-            styles={styles}
-          />
-        ))}
+        <MySegment fill options={segmentOptions} value={activeId} onChange={onChange} />
       </MyView>
       <Animated.View
         key={`tab-content-${activeId}`}

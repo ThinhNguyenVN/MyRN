@@ -59,7 +59,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
   searchable: searchableProp,
   preferSheet = false,
   preferFullscreen = false,
-  sheetHeight = '90%',
+  sheetHeight,
   style,
 }: MyDropdownInputProps) {
   const styles = useThemedStyles(generateStyles)
@@ -67,6 +67,12 @@ const MyDropdownInput = memo(function MyDropdownInput({
   const isNative = isIos || isAndroid
   /** Web mobile responsive dùng bottom sheet chồng thay vì popover (TriggerModal). */
   const isMobileSize = useIsMobileSize()
+  /**
+   * Native: omit → content-sized sheet.
+   * Web mobile: keep a tall fixed sheet (no NativeFullscreenModal path), matching
+   * pre-dynamic-sizing behavior so searchable/product pickers stay fullscreen-tall.
+   */
+  const resolvedSheetHeight = sheetHeight ?? (isWeb && isMobileSize ? '90%' : undefined)
   const triggerInputRef = useRef<MyTextInputRef>(null)
   const mobileSearchRef = useRef<MyTextInputRef>(null)
   const sheetRef = useRef<MyBottomSheetRef>(null)
@@ -507,8 +513,10 @@ const MyDropdownInput = memo(function MyDropdownInput({
             title={pickerHeading}
             showClose
             pressBackdropToClose
-            snapPoints={[sheetHeight]}
-            enableDynamicSizing
+            visible={open}
+            onClose={closePicker}
+            snapPoints={resolvedSheetHeight ? [resolvedSheetHeight] : undefined}
+            enableDynamicSizing={!resolvedSheetHeight}
             onClosed={closePicker}
             contentContainerStyle={styles.sheetPickerContent}
           >

@@ -14,6 +14,7 @@ function SegmentItemInner<T extends string>({
   option,
   isActive,
   size,
+  fill,
   disabled,
   onSelect,
 }: MySegmentItemProps<T>) {
@@ -30,13 +31,18 @@ function SegmentItemInner<T extends string>({
       haptic={false}
       onPress={handlePress}
       disabled={disabled}
-      style={[styles.option, size === 'compact' ? styles.optionCompact : null]}
+      style={[
+        styles.option,
+        size === 'compact' ? styles.optionCompact : null,
+        fill ? styles.optionFill : null,
+      ]}
       accessibilityRole="radio"
       accessibilityState={{ selected: isActive, disabled }}
       accessibilityLabel={option.accessibilityLabel ?? option.label}
     >
       <MyText
         typography={size === 'compact' ? 'caption' : 'label'}
+        numberOfLines={1}
         style={[styles.optionLabel, isActive ? styles.optionLabelActive : null]}
       >
         {option.label}
@@ -54,6 +60,7 @@ function MySegmentInner<T extends string>({
   value,
   onChange,
   size = 'default',
+  fill = false,
   disabled = false,
   accessibilityLabel,
 }: MySegmentProps<T>) {
@@ -104,16 +111,17 @@ function MySegmentInner<T extends string>({
         option={option}
         isActive={option.value === value}
         size={size}
+        fill={fill}
         disabled={disabled}
         onSelect={onChange}
       />
     ),
-    [disabled, onChange, size, value],
+    [disabled, fill, onChange, size, value],
   )
 
   return (
     <MyView
-      style={[styles.track, disabled ? styles.trackDisabled : null]}
+      style={[styles.track, fill ? styles.trackFill : null, disabled ? styles.trackDisabled : null]}
       onLayout={handleTrackLayout}
       accessibilityRole="radiogroup"
       accessibilityLabel={accessibilityLabel}

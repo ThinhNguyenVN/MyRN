@@ -1,0 +1,28 @@
+diff --git a/node_modules/@expo/ui/android/src/main/java/expo/modules/ui/ModalBottomSheetView.kt b/node_modules/@expo/ui/android/src/main/java/expo/modules/ui/ModalBottomSheetView.kt
+index e90edd3..336e13e 100644
+--- a/node_modules/@expo/ui/android/src/main/java/expo/modules/ui/ModalBottomSheetView.kt
++++ b/node_modules/@expo/ui/android/src/main/java/expo/modules/ui/ModalBottomSheetView.kt
+@@ -146,6 +146,9 @@ fun FunctionalComposableScope.ModalBottomSheetContent(
+     contentColor = resolvedContentColor,
+     scrimColor = resolvedScrimColor,
+     sheetGesturesEnabled = props.sheetGesturesEnabled,
++    // Default Material3 SheetMaxWidth (640.dp) clips RN content on Fold/tablet
++    // because @expo/ui lays the host at full window width.
++    sheetMaxWidth = androidx.compose.ui.unit.Dp.Unspecified,
+     dragHandle = when {
+       dragHandleSlotView != null -> {
+         { with(UIComposableScope()) { with(dragHandleSlotView) { Content() } } }
+diff --git a/node_modules/@expo/ui/src/community/bottom-sheet/BottomSheet.android.tsx b/node_modules/@expo/ui/src/community/bottom-sheet/BottomSheet.android.tsx
+index ac8ae4a..06c5b5b 100644
+--- a/node_modules/@expo/ui/src/community/bottom-sheet/BottomSheet.android.tsx
++++ b/node_modules/@expo/ui/src/community/bottom-sheet/BottomSheet.android.tsx
+@@ -203,7 +203,8 @@ export function BottomSheet(props: BottomSheetProps) {
+               {/* With matchContents, RNHostView lays the hosted view out at its own size, so `width` gives it
+                   the sheet width while its height stays content-sized. Otherwise flexGrow:1 + height:0
+                   (flex-basis 0) fills RNHostView's measured height without inheriting the scrollable
+-                  child's content height, which would block scrolling to the end. */}
++                  child's content height, which would block scrolling to the end.
++                  Sheet is patched to full window width (no Material3 640.dp cap) so this matches. */}
+               <View style={fitToContents ? { width } : { flexGrow: 1, height: 0 }}>
+                 <SheetScrollContextReset>{children}</SheetScrollContextReset>
+               </View>

@@ -7,6 +7,8 @@ export interface MySwitchProps {
   disabled?: boolean
   label?: ReactNode
   isLeftLabel?: boolean
+  /** Label above the track — use in tight footers on mobile. */
+  stacked?: boolean
   labelStyle?: StyleProp<TextStyle>
   style?: StyleProp<ViewStyle>
 }
