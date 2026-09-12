@@ -24,6 +24,7 @@ Typical examples:
 - `MyIcon`
 - `MyTextInput`
 - `MySwitch`
+- `MySegment`
 - `MyCard`, `MyDivider`, `MySearchInput`
 - `MyEmptyState`, `MyErrorState`, `MySkeleton`
 

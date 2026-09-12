@@ -20,6 +20,16 @@
     "home": "Home",
     "playground": "Playground"
   },
+  "shell": {
+    "back": "Back",
+    "locale": {
+      "label": "Language",
+      "vi": "Vi",
+      "en": "En",
+      "viA11y": "Vietnamese",
+      "enA11y": "English"
+    }
+  },
   "home": {
     "welcome": "Welcome to {{appName}}",
     "envLabel": "Env",
@@ -78,6 +88,7 @@
     "linksTag": "Tag",
     "linksCheckbox": "Checkbox",
     "linksSwitch": "Switch",
+    "linksSegment": "Segment",
     "linksDropdown": "Dropdown",
     "linksDatePicker": "Date Picker",
     "linksWheelPicker": "Wheel Picker",
@@ -178,6 +189,13 @@
     "switchLabelOnRight": "Label on right",
     "switchDisabledOff": "Disabled off",
     "switchDisabledOn": "Disabled on",
+    "segmentLabeledTitle": "Labeled values",
+    "segmentManyTitle": "Three values (compact)",
+    "segmentBillingMonth": "Month",
+    "segmentBillingYear": "Year",
+    "segmentRangeDay": "Day",
+    "segmentRangeWeek": "Week",
+    "segmentRangeMonth": "Month",
     "dropdownPlaceholderPrimary": "Select an option...",
     "dropdownSubTitleMobile": "Mobile: bottom sheet + checkbox",
     "dropdownSheetTitle": "Unit (no search, sheet)",
@@ -462,6 +480,7 @@
     "menuListCardTitle": "Account",
     "menuListCardInfo": "Account info",
     "menuListCardPassword": "Change password",
+    "menuListCardPeriod": "Period",
     "profileMenuButtonIntro": "Avatar-triggered popover menu (e.g. desktop header profile action).",
     "profileMenuButtonEditProfile": "Edit profile",
     "profileMenuButtonChangePassword": "Change password",

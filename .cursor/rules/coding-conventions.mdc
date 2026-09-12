@@ -82,6 +82,7 @@ Do **not** suffix the component function/const name with `Component` (e.g. `Orde
 | URL `Image` | `MyImage` (fullscreen gallery → `ImagePreview`) |
 | Press / button / icon / input / sheet / spinner | `MyPressable`, `MyButton`, `MyIcon`, `MyTextInput`, `MyBottomSheet`, `MySpinner`, `MySurface` |
 | Card / divider / search | `MyCard`, `MyDivider`, `MySearchInput` |
+| Labeled 2+ value pill | `MySegment` |
 | Empty / error / skeleton | `MyEmptyState`, `MyErrorState`, `MySkeleton` |
 
 - Form screens with `MyTextInput` / `MyFormTextInput` that the software keyboard can cover: wrap the **field scroll** in `MyKeyboardAvoiding.ScrollView` (not a raw `ScrollView`). Sticky footer forms: `MyKeyboardAvoiding.Toolbar` as last child of the **full-screen root** (not inside the scroll, not portaled). Do **not** wrap header / list-toolbar search (`ExpandableSearch`, top `MySearchInput`). Sheet inputs: `useBottomSheetTextInput`.

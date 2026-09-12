@@ -20,6 +20,16 @@
     "home": "Trang chủ",
     "playground": "Playground"
   },
+  "shell": {
+    "back": "Quay lại",
+    "locale": {
+      "label": "Ngôn ngữ",
+      "vi": "Vi",
+      "en": "En",
+      "viA11y": "Tiếng Việt",
+      "enA11y": "English"
+    }
+  },
   "home": {
     "welcome": "Chào mừng đến {{appName}}",
     "envLabel": "Môi trường",
@@ -78,6 +88,7 @@
     "linksTag": "Tag",
     "linksCheckbox": "Checkbox",
     "linksSwitch": "Switch",
+    "linksSegment": "Segment",
     "linksDropdown": "Dropdown",
     "linksDatePicker": "Date Picker",
     "linksWheelPicker": "Wheel Picker",
@@ -178,6 +189,13 @@
     "switchLabelOnRight": "Nhãn bên phải",
     "switchDisabledOff": "Vô hiệu hóa (tắt)",
     "switchDisabledOn": "Vô hiệu hóa (bật)",
+    "segmentLabeledTitle": "Giá trị có nhãn",
+    "segmentManyTitle": "Ba giá trị (compact)",
+    "segmentBillingMonth": "Tháng",
+    "segmentBillingYear": "Năm",
+    "segmentRangeDay": "Ngày",
+    "segmentRangeWeek": "Tuần",
+    "segmentRangeMonth": "Tháng",
     "dropdownPlaceholderPrimary": "Chọn tùy chọn...",
     "dropdownSubTitleMobile": "Mobile: bottom sheet + checkbox",
     "dropdownSheetTitle": "Đơn vị (không search, sheet)",
@@ -462,6 +480,7 @@
     "menuListCardTitle": "Tài khoản",
     "menuListCardInfo": "Thông tin tài khoản",
     "menuListCardPassword": "Đổi mật khẩu",
+    "menuListCardPeriod": "Kỳ",
     "profileMenuButtonIntro": "Menu popover kích hoạt qua avatar (vd. action profile trên header desktop).",
     "profileMenuButtonEditProfile": "Sửa hồ sơ",
     "profileMenuButtonChangePassword": "Đổi mật khẩu",

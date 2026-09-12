@@ -3,6 +3,7 @@ import * as Font from 'expo-font'
 
 import { useInitAuth } from '@/features/auth/use-init-auth'
 import { Fonts } from '@/configs/themes'
+import { hydrateAppLocale } from '@/i18n'
 
 type AppInitTask = {
   name: string
@@ -24,13 +25,18 @@ export function useAppInit() {
     })
   }, [])
 
+  const initLocale = useCallback(async () => {
+    await hydrateAppLocale()
+  }, [])
+
   const initTasks = useMemo<AppInitTask[]>(
     () => [
       { name: 'auth', run: initAuth },
       { name: 'fonts', run: initFonts },
       { name: 'notifications', run: initNotifications },
+      { name: 'locale', run: initLocale },
     ],
-    [initAuth, initFonts, initNotifications],
+    [initAuth, initFonts, initLocale, initNotifications],
   )
 
   useEffect(() => {
