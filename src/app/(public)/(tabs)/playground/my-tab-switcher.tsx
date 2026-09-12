@@ -43,6 +43,7 @@ export default function MyTabSwitcherScreen() {
         activeId={activeId}
         onChange={handleChange}
         renderContent={renderContent}
+        fillParent={false}
       />
     </MyKeyboardAvoiding.ScrollView>
   )

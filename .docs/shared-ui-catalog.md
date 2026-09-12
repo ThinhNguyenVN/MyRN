@@ -136,7 +136,8 @@ Two gotchas are already handled centrally inside `MyBottomSheet` — do not re-s
 
 - Path: `@/components/ui/my-tab-switcher`
 - In-page pill tab switcher with animated slide between panes (not a route-level tab bar — use `useTabBar` for that)
-- Props: `tabs: MyTabItem<TId>[]` (`id`, `label`), `activeId`, `onChange`, `renderContent(id)`, `duration?` (default 220ms), `containerStyle?`, `tabBarStyle?`
+- Props: `tabs: MyTabItem<TId>[]` (`id`, `label`), `activeId`, `onChange`, `renderContent(id)`, `duration?` (default 220ms), `fillParent?` (default `true`), `containerStyle?`, `tabBarStyle?`
+- `fillParent={false}` when nested in a page `ScrollView` so the switcher hugs content and iOS does not trap the pan
 - Direction-aware: slides content in from the side matching tab order (right tab → slides in from right)
 - Generic over `TId extends string` — pass a union of tab ids for type-safe `activeId`/`onChange`
 - Playground: `…/playground/my-tab-switcher.tsx`
@@ -172,7 +173,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 
 - Path: `@/components/ui/my-list`
 - FlashList/FlatList wrapper with pull-to-refresh arc + optional scroll-to-hide binding (`useScrollToHideScrollBinding`)
-- `PullToRefreshScrollView` — same refresh chrome for non-list `ScrollView` screens
+- `PullToRefreshScrollView` — same refresh chrome for non-list `ScrollView` screens; scroll-to-hide is on for mobile-width layout (native **and** phone/tablet web). Nested flex parents need `minHeight: 0` so the list (not the page) scrolls.
 - Playground: `…/playground/my-list`
 
 ### `ScrollToHide`
@@ -180,6 +181,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Path: `@/components/ui/scroll-to-hide`
 - Hide header/tab bar on scroll: `ScrollToHideProvider` + `ScrollToHideHeader` / `Footer`
 - `useScrollToHideScrollBinding` — lists register without wrapping `ScrollToHideContent`
+- Content slot uses `minHeight: 0` so nested flex children can scroll (needed on web)
 - `ScrollToHideInset` — animated padding when header/footer is `position: absolute`
 
 ### `MySkeleton`

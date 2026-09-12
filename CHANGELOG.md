@@ -117,6 +117,10 @@ product finds out what changed since it forked.
   own test suite is the first component test in this repo that actually exercises this path.
 
 ### Changed
+- `my-tab-switcher`: add `fillParent` (default `true`, reports-style full-height pane). Nested
+  inside a page `ScrollView`, `flex: 1` on both the switcher and its pane lets iOS trap pans in
+  the inner scroll. Pass `fillParent={false}` so the switcher hugs content. Playground demo
+  (already inside a scroll) now uses hug mode.
 - `swipeable-item`: card shadow/border layer logic extracted into `use-card-shell.ts` (the main
   file had grown to 471 lines picking up loose ends across the shadow-fix commits above); the
   swipe-to-delete commit-threshold formula, previously repeated identically 4x across

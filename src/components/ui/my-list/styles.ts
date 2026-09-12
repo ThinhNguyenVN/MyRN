@@ -9,7 +9,7 @@ export const generateStyles = (theme: ThemeType) => {
     contentContainer: {
       paddingBottom: getSpacing('x4'),
     },
-    flex: { flex: 1 },
+    flex: { flex: 1, minHeight: 0 },
     indicatorContainer: {
       position: 'absolute',
       top: 0,

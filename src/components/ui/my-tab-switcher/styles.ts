@@ -10,6 +10,10 @@ export function generateStyles(theme: ThemeType) {
     root: {
       flex: 1,
     },
+    rootHug: {
+      flexGrow: 0,
+      flexShrink: 0,
+    },
     tabBar: {
       flexDirection: 'row',
       gap: getSpacing('x2'),
@@ -37,6 +41,9 @@ export function generateStyles(theme: ThemeType) {
     },
     contentWrap: {
       flex: 1,
+      overflow: 'hidden',
+    },
+    contentWrapHug: {
       overflow: 'hidden',
     },
   })
