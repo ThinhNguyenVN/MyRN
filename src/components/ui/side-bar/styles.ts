@@ -21,6 +21,10 @@ export const SIDEBAR_HIGHLIGHT_WIDTH_EXPANDED =
   SIDEBAR_LIST_WIDTH_EXPANDED - SIDEBAR_HIGHLIGHT_INSET_EXPANDED * 2
 export const SIDEBAR_ITEM_PADDING_COLLAPSED = (SIDEBAR_LIST_WIDTH_COLLAPSED - 22) / 2
 export const ITEM_ROW_HEIGHT = 44
+/** Matches `listContent` `paddingVertical` (`getSpacing('x1')`). */
+export const SIDEBAR_LIST_PADDING_Y = 4
+/** Expanded section row — padding 16+8 + caption line 16. Collapsed height is 0. */
+export const SECTION_ROW_HEIGHT_EXPANDED = 40
 export const ANIMATION_DURATION = 350
 export const HIGHLIGHT_ANIMATION_DURATION = Math.round(ANIMATION_DURATION * 1.25)
 
@@ -87,6 +91,7 @@ export function generateStyles(theme: ThemeType) {
       paddingHorizontal: getSpacing('x3'),
       color: getColor('text/inactive/primary'),
       overflow: 'hidden',
+      justifyContent: 'center',
     },
 
     sectionLayer: {
