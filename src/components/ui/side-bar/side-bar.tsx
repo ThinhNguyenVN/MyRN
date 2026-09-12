@@ -29,6 +29,7 @@ import {
 } from './styles'
 import type { SideBarItem, SideBarProps } from './type'
 import SideBarRow from './sider-bar-item'
+import { computeSidebarHighlightY } from './utils'
 
 /** `withSpring` on react-native-web can get stuck mid-flight (never converges to the target,
  *  and its completion callback never fires) — `withTiming` doesn't have that issue. */
@@ -66,8 +67,6 @@ function SideBarInner({
   const { defaultElevation } = useTheme()
   const elevation = elevationProp ?? (variant === 'flush' ? 'none' : defaultElevation)
   const styles = useThemedStyles(generateStyles)
-  const layoutsRef = useRef<Record<number, { y: number; height: number }>>({})
-  const activeIndexRef = useRef(0)
   const navigateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const highlightTargetRef = useRef<number | null>(null)
 
@@ -82,10 +81,12 @@ function SideBarInner({
   const activeIndex = data.findIndex(
     (item) => item.kind !== 'section' && item.href && pathMatchesHref(item.href),
   )
-  activeIndexRef.current = activeIndex
 
-  const highlightY = useSharedValue(0)
-  const [highlightYWeb, setHighlightYWeb] = useState(0)
+  const highlightYExpanded = useSharedValue(computeSidebarHighlightY(data, activeIndex, false))
+  const highlightYCollapsed = useSharedValue(computeSidebarHighlightY(data, activeIndex, true))
+  const [highlightYWeb, setHighlightYWeb] = useState(() =>
+    computeSidebarHighlightY(data, activeIndex, collapsed),
+  )
 
   useEffect(() => {
     if (collapseProgressProp) {
@@ -118,45 +119,57 @@ function SideBarInner({
     )
 
     return {
-      transform: [{ translateY: highlightY.value }],
+      transform: [
+        {
+          translateY: interpolate(
+            collapseProgress.value,
+            [0, 1],
+            [highlightYExpanded.value, highlightYCollapsed.value],
+          ),
+        },
+      ],
       height: ITEM_ROW_HEIGHT,
       left,
       width,
     }
   })
 
-  /** Every write path (nav-triggered sync, remeasure, optimistic click) goes through here so it
-   *  always `cancelAnimation`s first — on react-native-web, assigning a new `withTiming` to a
-   *  shared value doesn't reliably stop a still-running previous one, so without this the
-   *  optimistic click animation and the later nav-triggered sync race and visibly jitter. Skips
-   *  the write entirely when the target hasn't moved, instead of gating on an animation-finished
-   *  flag — `withSpring`'s completion callback isn't reliably invoked on react-native-web, so a
-   *  "still animating" guard can get stuck and permanently block the highlight from ever moving
-   *  again. */
-  const animateHighlightTo = useCallback(
-    (y: number) => {
-      if (highlightTargetRef.current === y) {
-        return
-      }
-      highlightTargetRef.current = y
+  /** Web pill Y is a CSS `transform` (compositor). Skip no-op writes so collapse/nav do not jitter. */
+  const animateHighlightTo = useCallback((y: number) => {
+    if (highlightTargetRef.current === y) {
+      return
+    }
+    highlightTargetRef.current = y
+    setHighlightYWeb(y)
+  }, [])
+
+  const moveHighlightToIndex = useCallback(
+    (index: number) => {
+      const yExpanded = computeSidebarHighlightY(data, index, false)
+      const yCollapsed = computeSidebarHighlightY(data, index, true)
+      const yNow = collapsed ? yCollapsed : yExpanded
+
       if (isWeb) {
-        setHighlightYWeb(y)
+        highlightYExpanded.value = yExpanded
+        highlightYCollapsed.value = yCollapsed
+        animateHighlightTo(yNow)
         return
       }
-      cancelAnimation(highlightY)
-      highlightY.value = withTiming(y, HIGHLIGHT_TIMING)
+
+      cancelAnimation(highlightYExpanded)
+      cancelAnimation(highlightYCollapsed)
+      highlightYExpanded.value = withTiming(yExpanded, HIGHLIGHT_TIMING)
+      highlightYCollapsed.value = withTiming(yCollapsed, HIGHLIGHT_TIMING)
     },
-    [highlightY],
+    [animateHighlightTo, collapsed, data, highlightYCollapsed, highlightYExpanded],
   )
 
-  const syncHighlightFromLayouts = useCallback(() => {
-    const layout = layoutsRef.current?.[activeIndexRef.current]
-    animateHighlightTo(layout?.y ?? 0)
-  }, [animateHighlightTo])
-
   useEffect(() => {
-    syncHighlightFromLayouts()
-  }, [activeIndex, syncHighlightFromLayouts])
+    if (activeIndex < 0) {
+      return
+    }
+    moveHighlightToIndex(activeIndex)
+  }, [activeIndex, collapsed, moveHighlightToIndex])
 
   useEffect(() => {
     return () => {
@@ -165,26 +178,6 @@ function SideBarInner({
       }
     }
   }, [])
-
-  const handleMeasureLayout = useCallback(
-    (index: number, y: number, height: number) => {
-      const prev = layoutsRef.current[index]
-      if (prev?.y === y && prev?.height === height) {
-        return
-      }
-      layoutsRef.current = { ...layoutsRef.current, [index]: { y, height } }
-      if (index === activeIndexRef.current) {
-        highlightTargetRef.current = y
-        if (isWeb) {
-          setHighlightYWeb(y)
-          return
-        }
-        cancelAnimation(highlightY)
-        highlightY.value = y
-      }
-    },
-    [highlightY],
-  )
 
   const handleSelected = useCallback(
     (item: SideBarItem, index: number) => () => {
@@ -196,19 +189,12 @@ function SideBarInner({
         navigateTimeoutRef.current = null
       }
 
-      const layout = layoutsRef.current?.[index]
-      if (layout) {
-        animateHighlightTo(layout.y)
-
-        navigateTimeoutRef.current = setTimeout(() => {
-          onSelectedProp?.(item, index)
-        }, HIGHLIGHT_NAV_DELAY_MS)
-        return
-      }
-
-      onSelectedProp?.(item, index)
+      moveHighlightToIndex(index)
+      navigateTimeoutRef.current = setTimeout(() => {
+        onSelectedProp?.(item, index)
+      }, HIGHLIGHT_NAV_DELAY_MS)
     },
-    [animateHighlightTo, onSelectedProp],
+    [moveHighlightToIndex, onSelectedProp],
   )
 
   const showHighlight = activeIndex >= 0
@@ -236,7 +222,6 @@ function SideBarInner({
           index={index}
           isActive={index === activeIndex}
           onSelected={handleSelected(item, index)}
-          onMeasureLayout={handleMeasureLayout}
           collapseProgress={collapseProgress}
         />
       ))}

@@ -1,5 +1,5 @@
-import { memo, useCallback, useEffect } from 'react'
-import { View, type LayoutChangeEvent, type TextStyle } from 'react-native'
+import { memo, useEffect } from 'react'
+import { View, type TextStyle } from 'react-native'
 import Animated, {
   cancelAnimation,
   Extrapolation,
@@ -23,6 +23,7 @@ import type { SideBarRowProps } from './type'
 import {
   ANIMATION_DURATION,
   ITEM_ROW_HEIGHT,
+  SECTION_ROW_HEIGHT_EXPANDED,
   SIDEBAR_ITEM_PADDING_COLLAPSED,
   SIDEBAR_ITEM_PADDING_EXPANDED,
   generateStyles,
@@ -45,14 +46,7 @@ function shouldShowChevron(item: SideBarRowProps['item']): boolean {
   return Boolean(item.href) && !item.icon
 }
 
-function SideBarItemRow({
-  item,
-  index,
-  isActive,
-  onSelected,
-  onMeasureLayout,
-  collapseProgress,
-}: SideBarRowProps) {
+function SideBarItemRow({ item, isActive, onSelected, collapseProgress }: SideBarRowProps) {
   const styles = useThemedStyles(generateStyles)
   const { getColor } = useTheme()
   const progress = useSharedValue(isActive ? 1 : 0)
@@ -69,21 +63,6 @@ function SideBarItemRow({
     cancelAnimation(progress)
     progress.value = withTiming(isActive ? 1 : 0, { duration: ANIMATION_DURATION })
   }, [isActive, progress])
-
-  /** `event.nativeEvent.layout` is relative to this row's direct parent (`listContent`), so it
-   *  stays correct regardless of how many scroll-container layers wrap that parent — unlike
-   *  `measureLayout()`, whose cross-node DOM measurement on web breaks once the shared
-   *  container sits inside a `ScrollView`'s own scrolling wrapper. */
-  const measureLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      if (!onMeasureLayout) {
-        return
-      }
-      const { y, height } = event.nativeEvent.layout
-      onMeasureLayout(index, y, height)
-    },
-    [index, onMeasureLayout],
-  )
 
   const textColorInactive = getColor('text/active/primary')
   const textColorActive = getColor('brand/white')
@@ -110,9 +89,7 @@ function SideBarItemRow({
 
   const sectionAnimatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(collapseProgress.value, [0, 0.45], [1, 0], Extrapolation.CLAMP),
-    maxHeight: interpolate(collapseProgress.value, [0, 1], [48, 0]),
-    paddingTop: interpolate(collapseProgress.value, [0, 1], [16, 0]),
-    paddingBottom: interpolate(collapseProgress.value, [0, 1], [8, 0]),
+    height: interpolate(collapseProgress.value, [0, 1], [SECTION_ROW_HEIGHT_EXPANDED, 0]),
   }))
 
   const textAnimatedStyle = useAnimatedStyle(() => ({
@@ -209,15 +186,11 @@ function SideBarItemRow({
     </Animated.View>
   )
 
-  if (onMeasureLayout) {
-    return (
-      <View style={styles.itemLayer} onLayout={measureLayout} collapsable={false}>
-        {content}
-      </View>
-    )
-  }
-
-  return <View style={styles.itemLayer}>{content}</View>
+  return (
+    <View style={styles.itemLayer} collapsable={false}>
+      {content}
+    </View>
+  )
 }
 
 export default memo(SideBarItemRow)
