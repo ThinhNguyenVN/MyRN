@@ -13,8 +13,10 @@
     "test": "jest --runInBand",
     "lint": "eslint src",
     "lint:tokens": "node ./scripts/check-hardcoded-colors.js",
+    "check:types": "tsc --noEmit",
+    "check:boundaries": "node ./scripts/check-architecture-boundaries.js",
     "fix": "eslint src --fix",
-    "check:commit": "yarn lint && yarn lint:tokens && npx dotenv -e .env.test -- yarn test",
+    "check:commit": "yarn check:types && yarn lint && yarn lint:tokens && npx dotenv -e .env.test -- yarn test",
     "prepare": "husky",
     "postinstall": "patch-package"
   },

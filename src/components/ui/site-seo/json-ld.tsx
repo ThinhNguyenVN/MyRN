@@ -8,9 +8,9 @@ export interface JsonLdProps {
 
 /**
  * Renders one `<script type="application/ld+json">` tag via `expo-router/head`.
- * Subject to the same static-export caveat as per-screen `<Head>` overrides documented in
- * `.docs/seo-standard.md` (absent from static HTML unless the route runs under SSR / is
- * mounted outside `AppInitGate` — Googlebot still sees it after hydration either way).
+ * Present in the static-exported HTML for `(public)` web routes (see
+ * `.docs/seo-standard.md` § "The AppInitGate gotcha"); still absent for `(private)`
+ * routes, which keep their own init gate — Googlebot sees it after hydration either way.
  */
 function JsonLdInner({ data }: JsonLdProps) {
   return (

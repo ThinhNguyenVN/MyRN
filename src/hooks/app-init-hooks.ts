@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import * as Font from 'expo-font'
 
 import { useInitAuth } from '@/features/auth/use-init-auth'
@@ -62,4 +62,27 @@ export function useAppInit() {
     isInitialized: !isInitializing,
     initErrors,
   }
+}
+
+export type AppInitState = {
+  isInitialized: boolean
+  initErrors: string[]
+}
+
+/**
+ * Shared init state so nested layouts (e.g. `(private)/_layout.tsx`) can read
+ * `isInitialized` without re-running `useAppInit()`'s async tasks a second
+ * time. `RootLayout` is the single owner: it calls `useAppInit()` once and
+ * provides the result via `AppInitProvider`.
+ */
+const AppInitContext = createContext<AppInitState | null>(null)
+
+export const AppInitProvider = AppInitContext.Provider
+
+export function useAppInitState(): AppInitState {
+  const context = useContext(AppInitContext)
+  if (!context) {
+    throw new Error('useAppInitState must be used within AppInitProvider')
+  }
+  return context
 }

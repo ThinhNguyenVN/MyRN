@@ -34,6 +34,8 @@ This is an **Expo SDK 57 React Native** template app (`myrn`) for iOS, Android, 
 |--------|---------|
 | Install deps | `yarn install` |
 | Lint | `yarn lint` |
+| Type check | `yarn check:types` |
+| Boundary check (`src/app` route-shell rule) | `yarn check:boundaries` |
 | Tests | `npx dotenv -e .env.test -- yarn test` |
 | Start (web) | `yarn start` then `w`, or `npx dotenv -e .env.test -- npx expo start --web --port 8081` |
 
