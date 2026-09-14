@@ -1,33 +1,50 @@
-# Project overview
+# my-rn
 
-Expo SDK 55 React Native app for iOS, Android, and Web.
+**A platform template for building universal React Native + Expo apps — one codebase ships iOS, Android, and Web, and one command turns it into a new product.**
 
-This repository is structured to support:
+Built on Expo SDK 57, React Native 0.86, React 19, and TypeScript. `my-rn` isn't a sample app you delete and rewrite — it's the paved road every product forks from and stays in sync with.
 
-- Expo Router shell structure
-- feature-first module organization
-- shared UI kit composition
-- theme and token usage
-- API integration with Axios + RTK Query
-- app state with Redux Toolkit
+## What makes this different
 
-## Project documentation
+**One command to a real product.**
+```bash
+npx create-myrn-app my-garden
+```
+Clones this platform, strips the template's git history, renames the app identity (`appName` / `slug` / `appId` → iOS bundle identifier + Android package), installs dependencies, and drops you into a working iOS + Android + Web app — not an empty shell. Accepts `--app-id`, `--app-name`, `--slug` to override any of those individually. CLI: [`ThinhNguyenVN/create-myrn-app`](https://github.com/ThinhNguyenVN/create-myrn-app).
 
-The working conventions for this codebase live in `.docs/`:
+Note: the CLI renames the app identity, not EAS project linking (`eas.json` channels / EAS project ID) — verify that by hand before your first build/submit for a new product, so it doesn't push to the template's own EAS project.
 
-- `.docs/README.md`: map of all project docs
-- `.docs/folder-structure.md`: route shell and feature folder rules
-- `.docs/screen-standard.md`: standard screen structure
-- `.docs/ui-theme-standard.md`: UI kit, theme, token, and styling rules
-- `.docs/data-state-standard.md`: Axios, RTK Query, Redux Toolkit, and hook rules
-- `.docs/canonical-references.md`: which parts of the repo are the source of truth
+**Universal by default, not by accident.**
+Expo Router + React Native Web power the whole app — navigation, theming, forms, data fetching, and the shared UI kit all run identically on native and web. Features are written once under `src/features` and ship to three platforms without a platform-specific rewrite.
 
-When there is ambiguity, follow the unified precedence in `.docs/README.md` first.
-Use `.docs/default-behavior-rules.md` as the fallback layer in that precedence.
+**Built for an AI agent to pick up cold.**
+`.docs/` is a machine-readable contract, not prose documentation. A fresh AI session with zero prior context reads `product-kickoff.md`, asks for the handful of inputs it can't invent (product goal, scope, design source, API, whether to replace the starter screens), and then implements against canonical reference features (`auth`, `todo`) instead of guessing at architecture. Scope is tracked in versioned spec files (`specs/*.spec.md`) and OpenSpec changes, so requirements and decisions survive across sessions instead of living only in chat history.
 
-## Branch naming
+**A real production UI kit, not a component demo.**
+Themed `My*` components, design tokens with a single rebrand override point (`brand.config.ts`), a lint rule that blocks hardcoded colors, and a `playground` route that catalogs every component live on-device — so "what should I use for this" always has one answer.
 
-Follow `AGENTS.md` as the canonical source for branch naming rules and examples.
+**Stays in sync instead of drifting.**
+Every product forked from `my-rn` can pull platform updates back in later, and reusable pieces built while shipping a product can be backported to the platform — a documented two-way sync (`.docs/platform-kit-sync.md`), not a one-time copy-paste that quietly rots.
+
+## Quickstart
+
+```bash
+npx create-myrn-app my-garden
+cd my-garden
+yarn start
+```
+
+Dependencies are already installed by the CLI. Already cloned manually instead of via the CLI? Run `yarn create-product` to rename the app identity in place, then `yarn install`.
+
+## Architecture at a glance
+
+- `src/app` — Expo Router route shell only; thin, no business logic.
+- `src/features` — where product code actually lives, one folder per feature (`container + view + styles`).
+- `src/features/auth` and `src/features/todo` — canonical structure references; copy their shape for new features instead of inventing a pattern.
+- Shared UI kit, theme tokens, RTK Query + Redux Toolkit data layer, i18n — all reusable across features and platforms.
+- `src/app/(public)/(tabs)/playground` — component catalog for development only, never production structure.
+
+Full conventions and precedence rules: `.docs/README.md`. Starting a real product: `.docs/product-kickoff.md`.
 
 ## Install
 
@@ -35,14 +52,7 @@ Follow `AGENTS.md` as the canonical source for branch naming rules and examples.
 yarn install
 ```
 
-Notes:
-
-- `yarn install` runs a `postinstall` step that copies `canvaskit.wasm` into `public/`.
-- `mkdir public` may warn if the directory already exists. That warning is harmless.
-
 ## Run the app
-
-Start Metro:
 
 ```bash
 yarn start
@@ -60,33 +70,41 @@ Notes:
 - Only `EXPO_PUBLIC_*` values are available in app runtime.
 - The current Expo CLI does not support `--non-interactive`; use `CI=1` if needed.
 
-## Lint and test
-
-Lint:
+## Quality checks
 
 ```bash
-yarn lint
-```
-
-Tests:
-
-```bash
+yarn check:types      # tsc --noEmit
+yarn lint              # ESLint
+yarn lint:tokens       # blocks hardcoded colors outside the theme system
+yarn check:boundaries  # enforces src/app vs src/features architecture rules
 npx dotenv -e .env.test -- yarn test
 ```
 
-Important:
+`yarn check:commit` runs all of the above except `check:boundaries` in one pass.
 
-- Do not run `yarn test` without env vars.
-- `axios-instance.test.ts` depends on `EXPO_PUBLIC_API_BASE_URL` being set via `.env.test`.
+Important: do not run `yarn test` without env vars — `axios-instance.test.ts` depends on `EXPO_PUBLIC_API_BASE_URL` from `.env.test`.
 
 ## Development references
 
-- `src/features/auth`: canonical auth flow reference
-- `src/features/todo`: canonical CRUD and form reference
-- `src/app/(public)/(tabs)/playground`: component usage catalog only, not a production structure reference
+- `src/features/auth`: canonical auth flow reference.
+- `src/features/todo`: canonical CRUD and form reference — always calls the public DummyJSON API (`https://dummyjson.com`, demo login `emilys` / `emilyspass`), independent of a product's real `API_BASE_URL`.
+- `src/app/(public)/(tabs)/playground`: component usage catalog only, not a production structure reference. Expo Router may warn about a few colocated utility files under `playground/` missing default exports — expected, not a bug.
 
-## Runtime notes
+## Branch naming
 
-- Backend is the public DummyJSON API at `https://dummyjson.com`.
-- Demo credentials: `emilys` / `emilyspass`.
-- Expo Router may warn about files under `playground/` missing default exports; those warnings are expected for some colocated utility files.
+Follow `AGENTS.md` as the canonical source for branch naming rules and examples.
+
+## Project documentation
+
+The working conventions for this codebase live in `.docs/`:
+
+- `.docs/README.md` — map of all project docs and reading order by task.
+- `.docs/product-kickoff.md` — start here when turning this template into a real product.
+- `.docs/folder-structure.md` — route shell and feature folder rules.
+- `.docs/screen-standard.md` — standard screen structure.
+- `.docs/ui-theme-standard.md` — UI kit, theme, token, and styling rules.
+- `.docs/data-state-standard.md` — Axios, RTK Query, Redux Toolkit, and hook rules.
+- `.docs/canonical-references.md` — which parts of the repo are the source of truth.
+- `.docs/platform-kit-sync.md` — how platform and product stay in sync over time.
+
+When there is ambiguity, follow the unified precedence in `.docs/README.md` first. Use `.docs/default-behavior-rules.md` as the fallback layer in that precedence.
