@@ -1,6 +1,3 @@
-export { default } from './my-bottom-sheet'
-export type { MyBottomSheetProps, MyBottomSheetRef } from './type'
-
 /** Re-exports so features never import `@expo/ui` directly. */
 export {
   BottomSheetView,

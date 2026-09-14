@@ -12,6 +12,26 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Changed
+- `MySpinner`: replaced `@shopify/react-native-skia` (`Canvas`/`Path`) with `react-native-svg`
+  (`Circle` + `strokeDasharray`/`strokeDashoffset`, animated via `react-native-reanimated`'s
+  `useAnimatedProps`) — same technique already used in `refresh-indicator.tsx`. Removes
+  `@shopify/react-native-skia` and `canvaskit-wasm` from the project entirely: no more ~8MB
+  `canvaskit.wasm` shipped to `public/` on every web build, and the `postinstall` script no
+  longer copies it. `MySpinner` is used inside `MyButton`/`MyButtonIcon`'s loading state, so this
+  affects nearly every screen. Also removed `index.web.tsx`'s `ActivityIndicator` fallback (added
+  earlier to dodge a Skia WASM load-failure crash on web) — web now renders the same branded ring
+  spinner as native instead of the plain system indicator.
+- `MyBottomSheet`: split into `my-bottom-sheet.native.tsx`/`my-bottom-sheet.web.tsx` (and
+  `index.native.tsx`/`index.web.tsx`). The web branch never actually rendered `@expo/ui`'s
+  `BottomSheetModal` (`useBottomSheet` is gated `!isWeb`), but importing anything from
+  `@expo/ui/community/bottom-sheet` — including the plain `BottomSheetView`/`BottomSheetScrollView`
+  re-exports used elsewhere — pulled in its `vaul` + `@radix-ui/*` web polyfill (~90KB minified)
+  since Metro doesn't tree-shake per-export within a module. The web files no longer import
+  `@expo/ui` at all (re-export `View`/`ScrollView`/`FlatList`/`TextInput` from `react-native`
+  instead); native behavior (including the tablet/Expo-Go-wide-screen fallback to the same RN
+  `Modal` implementation) is unchanged — verified via `tsc --noEmit` (clean) and a real
+  `expo export -p web` before/after (bundle: 4272.9KB → 4165.5KB minified, 1112.8KB → 1086.3KB
+  gzip). Full audit in `expo-ssr-gap-analysis.md` (project doc), "Phát hiện #5".
 - Expo SDK 57: align to official bundled pair (`expo@~57.0.22`, `react-native-worklets@0.10.1`,
   `react-native-reanimated@4.5.1`). Drop the worklets `fun.name` patch and stop excluding
   those packages from `expo install --fix`. Expo Go must be iOS ≥ 57.0.6 / Android ≥ 57.0.3.
@@ -22,6 +42,19 @@ product finds out what changed since it forked.
 - `side-bar`: narrower rails — flush `280 → 240`, card `260 → 220`. Collapsed width unchanged.
 
 ### Fixed
+- `StyleSheet.absoluteFillObject` was removed from this React Native version's types (0.86 ships
+  only `StyleSheet.absoluteFill`, now the same plain spreadable object shape `{ position:
+  'absolute', top: 0, left: 0, right: 0, bottom: 0 }`). Four call sites still spread the old name
+  (`my-bottom-sheet`'s `backdropHit`, `hero-background`'s
+  `heroBackgroundBaseImage`/`heroBackgroundOverlay`, `floating-contact`'s `pulseRing`) — since
+  spreading `undefined` is a silent no-op in JS, this wasn't a type-only issue: those four styles
+  were actually missing their absolute-fill positioning at runtime the whole time (no `tsc` gate
+  in CI to catch it — see the platform review note on adding one). Renamed all four to
+  `StyleSheet.absoluteFill`. Also `my-segment`'s active option label referenced
+  `FontFamily.semibold`, which was never a real key (`FontFamily` only has
+  `thin`/`regular`/`medium`/`bold`, matching the four bundled Roboto weights — no semibold font
+  asset exists) — changed to `FontFamily.medium`, matching the weight `tabbar` already uses for
+  its own active label.
 - `FormFooterAmountBar`: long totals shrink/ellipsis instead of shoving `right` off the bar.
   Backported from `my-store`.
 - `MyBottomSheet`: on web always use RN `Modal` instead of BottomSheetModal/vaul. Nested
@@ -95,6 +128,17 @@ product finds out what changed since it forked.
   with a `theme-exempt` comment instead of silently drifting.
 
 ### Added
+- Product SEO building blocks for e-commerce products built on this template:
+  `buildProductJsonLd`/`buildBreadcrumbJsonLd` (`src/utils/product-json-ld.ts`, pure schema.org
+  JSON-LD builders), `<JsonLd>` render component, `useCanonicalUrl`/`<FilterPageSeo>` (canonical
+  + noindex for filterable list pages), and `getOptimizedImageUrl`/`IMAGE_CDN_PROVIDER`
+  (`src/configs/image-cdn.config.ts`, single override point like `brand.config.ts`, pass-through
+  no-op by default). `scripts/generate-seo-files.js` now also accepts an optional product-root
+  `seo.sitemap.source.js` exporting `getSitemapEntries()` to build the sitemap from a real
+  catalog instead of the static `seo.config.json.sitemapRoutes` list — falls back to the static
+  list when that file doesn't exist. These are platform-agnostic building blocks only; no product
+  data or catalog logic lives in MyRN itself. Full usage checklist in `.docs/seo-standard.md` §
+  "Applying SEO to a real e-commerce product".
 - `i18n`: persist/hydrate app locale (`app.locale` in storage), default from the device,
   `AppLocaleSwitch` on `MySegment`. Backported from `my-store`. `useAppInit` runs
   `hydrateAppLocale`; `WebsiteHeader` shows a compact switcher. `FALLBACK_LOCALE` stays

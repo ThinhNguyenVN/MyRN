@@ -57,14 +57,14 @@ module.exports = defineConfig([
       'no-multiple-empty-lines': ['warn', { max: 1, maxEOF: 1 }],
       'comma-dangle': ['warn', 'always-multiline'],
       'arrow-spacing': ['warn', { before: true, after: true }],
-      eqeqeq: ['warn', 'always'],
-      'prefer-const': 'warn',
-      curly: ['warn', 'all'],
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      eqeqeq: ['error', 'always'],
+      'prefer-const': 'error',
+      curly: ['error', 'all'],
+      'no-console': ['error', { allow: ['warn', 'error'] }],
       'no-debugger': 'error',
       // Prefer stable prefixed list keys — bare key={item.id} is easy to collide across lists.
       'no-restricted-syntax': [
-        'warn',
+        'error',
         {
           selector:
             "JSXAttribute[name.name='key'] > JSXExpressionContainer > MemberExpression[property.name='id']",

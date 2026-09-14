@@ -18,7 +18,8 @@ import { ScrollToHideProvider } from '@/components/ui/scroll-to-hide'
 import { SiteSeo } from '@/components/ui/site-seo'
 import { Provider } from 'react-redux'
 
-import { useAppInit } from '@/hooks/app-init-hooks'
+import { AppInitProvider, useAppInit } from '@/hooks/app-init-hooks'
+import { isWeb } from '@/constants/dimensions'
 import { useHydratedColorScheme } from '@/hooks/color-scheme-hooks'
 import { store } from '@/store/store'
 
@@ -49,7 +50,15 @@ export default function RootLayout() {
         <PortalProvider shouldAddRootHost={false}>
           <MyThemeProvider value={colorScheme}>
             <Provider store={store}>
-              <AppInitGate>
+              {/* `useAppInit()` dispatches Redux actions (via `useInitAuth`), so it MUST run
+                  in a component rendered *inside* `<Provider>` — never in `RootLayout` itself,
+                  which renders `<Provider>` as a child and is therefore not a descendant of it.
+                  Calling a `useDispatch()`-consuming hook above `<Provider>` in the tree makes
+                  `expo export`'s static server render silently suspend the entire route tree
+                  (an empty `<title>` and a permanently-pending Suspense boundary in the
+                  generated HTML, with no thrown error) — see `.docs/seo-standard.md` for the
+                  full writeup. `AppInitBridge` exists solely to keep this hook correctly nested. */}
+              <AppInitBridge>
                 <ScrollToHideProvider>
                   <ConfirmationRoot ref={confirmationRef} />
                   <ToastRoot ref={toastRef} />
@@ -62,7 +71,7 @@ export default function RootLayout() {
                   </View>
                   <StatusBar style="auto" />
                 </ScrollToHideProvider>
-              </AppInitGate>
+              </AppInitBridge>
             </Provider>
           </MyThemeProvider>
         </PortalProvider>
@@ -71,8 +80,9 @@ export default function RootLayout() {
   )
 }
 
-function AppInitGate({ children }: { children: React.ReactNode }) {
-  const { isInitialized } = useAppInit()
+/** Runs `useAppInit()` inside `<Provider>` (see comment above) and gates web/native. */
+function AppInitBridge({ children }: { children: React.ReactNode }) {
+  const { isInitialized, initErrors } = useAppInit()
 
   useEffect(() => {
     if (isInitialized) {
@@ -80,7 +90,32 @@ function AppInitGate({ children }: { children: React.ReactNode }) {
     }
   }, [isInitialized])
 
-  if (!isInitialized) return null
+  return (
+    <AppInitProvider value={{ isInitialized, initErrors }}>
+      <AppInitGate isInitialized={isInitialized}>{children}</AppInitGate>
+    </AppInitProvider>
+  )
+}
+
+/**
+ * Web: never block on `isInitialized` — `useEffect` (where `isInitialized`
+ * flips to `true`) never runs during `expo export`'s static prerender pass,
+ * so blocking here would make the whole route tree (content + per-screen SEO
+ * tags) missing from the generated HTML. Content renders immediately; auth/
+ * fonts/locale resolve progressively after hydration. `(private)/_layout.tsx`
+ * has its own `isInitialized` check (via `useAppInitState`) so protected
+ * routes still wait for auth restore before deciding to redirect — this only
+ * relaxes the gate for `(public)` content.
+ * Native: unchanged, still waits so there's no flash before splash hides.
+ */
+function AppInitGate({
+  isInitialized,
+  children,
+}: {
+  isInitialized: boolean
+  children: React.ReactNode
+}) {
+  if (!isInitialized && !isWeb) return null
 
   return <>{children}</>
 }

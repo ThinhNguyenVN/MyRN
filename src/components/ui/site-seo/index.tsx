@@ -1,2 +1,6 @@
 export { SiteSeo } from './site-seo'
+export { JsonLd } from './json-ld'
+export type { JsonLdProps } from './json-ld'
+export { FilterPageSeo } from './filter-page-seo'
+export type { FilterPageSeoProps } from './filter-page-seo'
 export type { SeoConfig, SeoOrganizationConfig } from './type'

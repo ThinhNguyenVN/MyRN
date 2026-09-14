@@ -1,13 +1,14 @@
-import React, { memo, useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
+import { Circle, Svg } from 'react-native-svg'
 import Animated, {
   Easing,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withSequence,
   withTiming,
 } from 'react-native-reanimated'
-import { Canvas, Path, Skia } from '@shopify/react-native-skia'
 
 import { useTheme } from '@/theme/theme-context'
 import type { ColorToken } from '@/theme/colors'
@@ -47,26 +48,13 @@ function getSpinnerColors(color: SpinnerColor, getColor: (t: ColorToken) => stri
   return { track: getColor(track), stroke: getColor(stroke) }
 }
 
-/** Chỉ mount Canvas sau onLayout để tránh Skia render trước khi layout sẵn sàng. */
-const CanvasSafe: React.FC<{ size: number; children: React.ReactNode }> = memo(
-  ({ size, children }) => {
-    const [ready, setReady] = React.useState(false)
-    const hasLayoutRef = React.useRef(false)
-    const onLayout = React.useCallback(() => {
-      if (hasLayoutRef.current) return
-      hasLayoutRef.current = true
-      setReady(true)
-    }, [])
-    const sizeStyle = useMemo(() => ({ width: size, height: size }), [size])
-    return (
-      <MyView style={sizeStyle} onLayout={onLayout}>
-        {ready ? children : null}
-      </MyView>
-    )
-  },
-)
-CanvasSafe.displayName = 'CanvasSafe'
+const AnimatedCircle = Animated.createAnimatedComponent(Circle)
 
+/**
+ * Vòng loading vẽ bằng react-native-svg (strokeDasharray/strokeDashoffset) thay vì
+ * @shopify/react-native-skia. Chạy giống hệt trên iOS/Android/Web, không cần tải
+ * canvaskit.wasm (~8MB) trên web — xem CHANGELOG.md để biết lý do đổi.
+ */
 const MySpinner: React.FC<MySpinnerProps> = ({
   color = 'dark',
   size: sizeProp = 'default',
@@ -80,20 +68,13 @@ const MySpinner: React.FC<MySpinnerProps> = ({
     [color, getColor],
   )
 
-  const mountedRef = React.useRef(true)
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
 
-  const path = useMemo(() => {
-    const p = Skia.Path.Make()
-    const r = (size - strokeWidth) / 2
-    p.addCircle(size / 2, size / 2, r)
-    return p
-  }, [size, strokeWidth])
-
-  const process = useSharedValue(0)
+  const process = useSharedValue(0.1)
   const rotation = useSharedValue(0)
 
   const startAnimation = useCallback(() => {
-    if (!mountedRef.current) return
     process.value = withRepeat(
       withSequence(withTiming(0.7, { duration: 1000 }), withTiming(0.1, { duration: 2000 })),
       -1,
@@ -107,57 +88,50 @@ const MySpinner: React.FC<MySpinnerProps> = ({
   }, [process, rotation])
 
   useEffect(() => {
-    mountedRef.current = true
     startAnimation()
     return () => {
-      mountedRef.current = false
-      process.value = 0
+      process.value = 0.1
       rotation.value = 0
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startAnimation])
 
-  const animatedStyle = useAnimatedStyle(
-    () => ({
-      transform: [{ rotate: `${rotation.value}deg` }],
-    }),
-    [],
-  )
-  const sizeBoxStyle = useMemo(
-    () => ({ borderRadius: size / 2, width: size, height: size }),
-    [size],
-  )
-  const canvasSizeStyle = useMemo(() => ({ width: size, height: size }), [size])
+  const rotateStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }))
+
+  const arcProps = useAnimatedProps(() => ({
+    strokeDashoffset: circumference * (1 - process.value),
+  }))
+
+  const boxStyle = useMemo(() => ({ width: size, height: size }), [size])
 
   if (size <= 0) return null
 
   return (
     <MyView {...rest} style={style}>
-      <Animated.View style={[styles.spinner, sizeBoxStyle, animatedStyle]}>
-        <CanvasSafe size={size}>
-          <Canvas style={canvasSizeStyle}>
-            <Path
-              path={path}
-              strokeWidth={strokeWidth}
-              style="stroke"
-              color={track}
-              strokeJoin="round"
-              strokeCap="round"
-              start={0}
-              end={1}
-            />
-            <Path
-              path={path}
-              strokeWidth={strokeWidth}
-              style="stroke"
-              color={stroke}
-              strokeJoin="round"
-              strokeCap="round"
-              start={0}
-              end={process}
-            />
-          </Canvas>
-        </CanvasSafe>
+      <Animated.View style={[styles.spinner, boxStyle, rotateStyle]}>
+        <Svg width={size} height={size}>
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={track}
+            strokeWidth={strokeWidth}
+            fill="none"
+          />
+          <AnimatedCircle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={stroke}
+            strokeWidth={strokeWidth}
+            fill="none"
+            strokeLinecap="round"
+            strokeDasharray={`${circumference} ${circumference}`}
+            animatedProps={arcProps}
+          />
+        </Svg>
       </Animated.View>
     </MyView>
   )
@@ -165,4 +139,4 @@ const MySpinner: React.FC<MySpinnerProps> = ({
 
 MySpinner.displayName = 'MySpinner'
 
-export default memo(MySpinner)
+export default React.memo(MySpinner)

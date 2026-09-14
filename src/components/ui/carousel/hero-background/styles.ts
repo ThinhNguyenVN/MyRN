@@ -9,13 +9,13 @@ export const generateStyles = (_theme: ThemeType) => {
       overflow: 'hidden',
     },
     heroBackgroundBaseImage: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       width: '100%',
       height: '100%',
     },
     // theme-exempt: darkening scrim over the hero photo, independent of light/dark theme.
     heroBackgroundOverlay: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       backgroundColor: 'rgba(0, 0, 0, 0.45)',
     },
   })

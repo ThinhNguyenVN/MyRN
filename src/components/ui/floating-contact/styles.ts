@@ -39,7 +39,7 @@ export const generateStyles = (theme: ThemeType) => {
       borderRadius: 30,
     },
     pulseRing: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       borderRadius: 30,
     },
   })
