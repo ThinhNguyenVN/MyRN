@@ -67,6 +67,27 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Generate Expo Router types
+        # `.expo/types/router.d.ts` is gitignored and only ever written by the Metro dev server
+        # started via `expo start` (NOT `expo export`, which skips this side effect entirely).
+        # Without it, `useSegments()` & friends fall back to untyped `string` routes and `tsc`
+        # fails with false-positive tuple-index errors (e.g. "Tuple type '[string]' of length '1'
+        # has no element at index '1'") that never reproduce locally once a dev server has run once.
+        # So: boot the dev server just long enough for it to write the types file, then kill it.
+        run: |
+          npx expo start --port 8321 > /tmp/expo-start.log 2>&1 &
+          EXPO_PID=$!
+          for i in $(seq 1 60); do
+            if [ -f .expo/types/router.d.ts ]; then break; fi
+            sleep 1
+          done
+          kill "$EXPO_PID" 2>/dev/null || true
+          if [ ! -f .expo/types/router.d.ts ]; then
+            echo "::error::.expo/types/router.d.ts was not generated in time"
+            cat /tmp/expo-start.log
+            exit 1
+          fi
+
       - name: Run type check
         run: yarn check:types
 
