@@ -19,14 +19,16 @@ const DEMO_ITEMS: DemoItem[] = [
   {
     slug: 'reference-item-one',
     name: 'Reference Item One',
-    description: 'First demo item proving generateStaticParams() produces real, crawlable HTML per slug.',
+    description:
+      'First demo item proving generateStaticParams() produces real, crawlable HTML per slug.',
     price: 19.99,
     imageUrl: 'https://example.com/reference-item-one.jpg',
   },
   {
     slug: 'reference-item-two',
     name: 'Reference Item Two',
-    description: 'Second demo item — confirms multiple params each get their own generated HTML file.',
+    description:
+      'Second demo item — confirms multiple params each get their own generated HTML file.',
     price: 29.99,
     imageUrl: 'https://example.com/reference-item-two.jpg',
   },

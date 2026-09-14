@@ -50,7 +50,10 @@ export function buildCanonicalUrl({
 
   const keptQuery = allowedParams
     .filter((key) => searchParams[key] !== undefined)
-    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(firstValue(searchParams[key]) ?? '')}`)
+    .map(
+      (key) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(firstValue(searchParams[key]) ?? '')}`,
+    )
     .join('&')
 
   const canonicalUrl = `${cleanBase}${cleanPath}${keptQuery ? `?${keptQuery}` : ''}`

@@ -32,12 +32,15 @@ Do not confuse these:
 | Layer | Path | Purpose |
 |-------|------|---------|
 | Conventions | `.docs/` | How to implement in this repo |
+| Product roadmap | `specs/<product>-overview.spec.md` | Feature list + status for the whole product, once per product with 2+ main features (`specs/_overview-template.spec.md`) |
 | Product scope | `specs/<feature-or-domain>.spec.md` | Durable product AC / assumptions (`specs/_template.spec.md`) |
 | Change process | `openspec/changes/<change>/` | Propose → design → tasks → delta specs for one change |
 | Platform baseline | `openspec/specs/` | Already-shipped capabilities — **not** a rebuild backlog (`openspec/specs/README.md`) |
 
 Rules:
 
+- For a product with 2+ main features, write `specs/<product>-overview.spec.md` first
+  (`product-kickoff.md` rule 2) before any per-feature spec/change.
 - For product features, always keep `specs/<name>.spec.md` updated.
 - Use OpenSpec changes when the team wants propose/apply workflow; delta specs sync into `openspec/specs/` on archive.
 - Do not invent a third parallel spec system.
@@ -63,6 +66,7 @@ Rules:
 - `prompt-template-feature.md`: reusable prompt template for implementing one feature or a small set of screens.
 - `prompt-template-scope-lock.md`: reusable prompt template for a planning or scope-confirmation pass before coding.
 - `../specs/_template.spec.md`: reusable spec artifact template for durable scope, assumptions, and traceability.
+- `../specs/_overview-template.spec.md`: product-level feature roadmap template — once per product, 2+ main features (`product-kickoff.md` rule 2).
 
 ## Suggested AI reading order by task
 
@@ -130,7 +134,7 @@ Read:
 
 Build in this order:
 
-1. Confirm inputs + scope-lock / `specs/<name>.spec.md`
+1. Confirm inputs; if 2+ main features, write `specs/<product>-overview.spec.md` first (`product-kickoff.md` rule 2); then scope-lock / `specs/<name>.spec.md` per feature
 2. Keep shell/providers; only adjust routes/groups the product needs
 3. First vertical slice under `src/features`
 4. Thin routes under `src/app`; replace starter home/tabs when in scope

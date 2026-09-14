@@ -1,6 +1,3 @@
-export { default } from './my-bottom-sheet'
-export type { MyBottomSheetProps, MyBottomSheetRef } from './type'
-
 /**
  * Web: `BottomSheetView`/`BottomSheetScrollView`/`BottomSheetFlatList`/`BottomSheetTextInput`
  * từ `@expo/ui/community/bottom-sheet` chỉ là re-export thẳng `View`/`ScrollView`/`FlatList`/

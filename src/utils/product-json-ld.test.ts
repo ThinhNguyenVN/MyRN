@@ -62,7 +62,7 @@ describe('buildBreadcrumbJsonLd', () => {
     ])
 
     expect(result['@type']).toBe('BreadcrumbList')
-    const items = result.itemListElement as Array<Record<string, unknown>>
+    const items = result.itemListElement as Record<string, unknown>[]
     expect(items).toHaveLength(3)
     expect(items[0]).toMatchObject({ '@type': 'ListItem', position: 1, name: 'Trang chủ' })
     expect(items[2]).toMatchObject({ position: 3, name: 'Áo thun basic' })

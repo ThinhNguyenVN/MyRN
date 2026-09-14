@@ -260,9 +260,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     const hasFixedHeight = Boolean(snapPoints?.length)
     const panelStyle: StyleProp<ViewStyle> = [
       styles.webSheetPanel,
-      hasFixedHeight
-        ? { height: Math.round((windowHeight * maxHeightPct) / 100) }
-        : { maxHeight },
+      hasFixedHeight ? { height: Math.round((windowHeight * maxHeightPct) / 100) } : { maxHeight },
     ]
     const isOpen = visibleProp ?? internalVisible
     const body = useScrollView ? (
