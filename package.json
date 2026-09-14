@@ -16,7 +16,7 @@
     "fix": "eslint src --fix",
     "check:commit": "yarn lint && yarn lint:tokens && npx dotenv -e .env.test -- yarn test",
     "prepare": "husky",
-    "postinstall": "patch-package && mkdir public; cp $(node -p \"require.resolve('canvaskit-wasm/bin/full/canvaskit.wasm', { paths: [require.resolve('@shopify/react-native-skia')] })\") public/canvaskit.wasm"
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@expo/ui": "~57.0.18",
@@ -25,7 +25,6 @@
     "@hookform/resolvers": "3.9.1",
     "@reduxjs/toolkit": "2.11.2",
     "@shopify/flash-list": "2.0.2",
-    "@shopify/react-native-skia": "2.6.2",
     "axios": "1.13.6",
     "expo": "~57.0.22",
     "expo-constants": "~57.0.18",

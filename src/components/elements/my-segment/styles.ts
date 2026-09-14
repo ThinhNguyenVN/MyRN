@@ -66,7 +66,7 @@ export function generateStyles(theme: ThemeType) {
     },
     optionLabelActive: {
       color: getColor('brand/white'),
-      fontFamily: FontFamily.semibold,
+      fontFamily: FontFamily.medium,
     },
   })
 }

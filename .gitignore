@@ -38,6 +38,10 @@ yarn-error.*
 
 app-example
 
+# Product-specific dynamic sitemap source (see .docs/seo-standard.md) — not part of the
+# platform template itself.
+seo.sitemap.source.js
+
 # generated native folders
 /ios
 /android

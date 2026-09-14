@@ -135,6 +135,72 @@ it needs no OG/meta at all). Do not flip `indexable: true` just because the prod
 happens to be a web app — only do it for a public, marketing-facing site, and confirm
 with the human first if unsure.
 
+## Applying SEO to a real e-commerce product (checklist)
+
+MyRN itself has no catalog, no real domain, no real product images — it's a platform, not a
+product. What MyRN ships is a set of **generic, product-agnostic building blocks** for the SEO
+work every e-commerce product built on this template will need. This section is the checklist
+for wiring them up once a real product exists. Do not build catalog-specific logic into MyRN
+itself — that belongs in the product's `src/features/<domain>`.
+
+Read this whenever asked to "add SEO" / "apply SEO" to a product screen (PDP, category listing,
+search results) — not just when the word "SEO" appears, since the request is usually phrased as
+"make this product page rank well" or "add structured data".
+
+### What already exists (platform-level, use as-is)
+
+| Piece | File | Purpose |
+|---|---|---|
+| `buildProductJsonLd(input)`, `buildBreadcrumbJsonLd(items)` | `src/utils/product-json-ld.ts` | Pure functions: product data in, schema.org `Product`/`Offer`/`AggregateRating`/`BreadcrumbList` JSON-LD out. |
+| `<JsonLd data={...} />` | `src/components/ui/site-seo/json-ld.tsx` | Renders one `<script type="application/ld+json">` via `expo-router/head`. |
+| `useCanonicalUrl(allowedParams?)`, `<FilterPageSeo allowedParams={...} />` | `src/hooks/use-canonical-url.ts`, `src/components/ui/site-seo/filter-page-seo.tsx` | Canonical URL + `noindex` for filterable/faceted list pages (category with color/size/sort query params, search results). |
+| `getOptimizedImageUrl(url, opts)` | `src/utils/image-cdn.ts` | Resize/format hook point for product images. Pass-through no-op until a provider is configured. |
+| `IMAGE_CDN_PROVIDER` | `src/configs/image-cdn.config.ts` | Single override point (same pattern as `brand.config.ts`) — set this once when a product picks a real image CDN. |
+| Dynamic sitemap source | `scripts/generate-seo-files.js` (reads optional `seo.sitemap.source.js`) | Lets a product feed real catalog routes into the sitemap instead of the static `seo.config.json.sitemapRoutes` list. |
+
+### Checklist: turning these on for a real product
+
+1. **Product JSON-LD**: in the PDP screen's view, map the product API response into
+   `ProductJsonLdInput` and render `<JsonLd data={buildProductJsonLd(input)} />`. For a category/
+   listing page with breadcrumbs, render `<JsonLd data={buildBreadcrumbJsonLd(items)} />` too.
+   Do this in the screen's `view`, not in `src/utils` — the utils stay data-agnostic.
+2. **Canonical + noindex for filters**: in any list/category/search screen reachable with filter
+   query params, render `<FilterPageSeo allowedParams={['page']} />` (adjust `allowedParams` to
+   whatever your pagination/sort param actually is — everything else present is treated as a
+   filter and triggers `noindex`).
+3. **Dynamic sitemap**: create `seo.sitemap.source.js` at the repo root (product-specific, not
+   committed to MyRN) exporting `getSitemapEntries()` that calls the product's real catalog API
+   and returns `{ loc, lastmod? }` entries. Run `yarn seo:generate` (or wire it into the web
+   deploy pipeline) — it will use this file automatically when present, falling back to the
+   static `sitemapRoutes` list otherwise. For a catalog past roughly 50k URLs, split into
+   multiple sitemap files + a sitemap index — not implemented here, out of scope until a product
+   actually needs it.
+4. **Image optimization**: pick an image CDN/provider (Cloudinary, imgix, Bunny, Cloudflare
+   Images, or the backend's own resizing endpoint if it has one) and implement
+   `IMAGE_CDN_PROVIDER` in `src/configs/image-cdn.config.ts` (an example Cloudinary shape is
+   already commented there). Then route product image URLs through
+   `getOptimizedImageUrl(url, { width })` wherever they render (product cards, PDP gallery,
+   `MyImage` usages for catalog images) instead of using the raw URL directly.
+5. **Base meta/OG/sitemap config**: still follow "How to enable SEO for a real product" above
+   (`seo.config.json`, real `og-image.jpg`, confirm the domain with the human) — the checklist
+   here is additive on top of that, specific to product *content* (JSON-LD, dynamic routes,
+   images), not the site-wide defaults.
+6. **Verify with a real export**, same rule as the rest of this doc: run `expo export
+   --platform web`, inspect the emitted HTML/`sitemap.xml`/`robots.txt` directly. Do not report
+   this as done from reading the component code alone.
+7. Update `specs/<name>.spec.md` with the SEO scope/AC, same as any other product feature
+   (`.docs/product-kickoff.md`).
+
+### What NOT to do
+
+- Do not hardcode a product's catalog shape into `src/utils/product-json-ld.ts` — if a field is
+  missing for your product, extend `ProductJsonLdInput`'s optional fields, don't fork the file.
+- Do not add `seo.sitemap.source.js` to MyRN itself — it's a product-root file, gitignored or
+  product-repo-only.
+- Do not skip `FilterPageSeo` on a filterable list page "because it's not launched yet" — a
+  crawlable staging/preview site with unindexed filter combinations already live is exactly the
+  duplicate-content problem this exists to prevent.
+
 ## Known follow-up (not implemented here): SSR for real content
 
 Static export (`web.output: "static"`) pre-renders each route to its own HTML file, but

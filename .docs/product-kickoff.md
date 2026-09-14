@@ -82,6 +82,18 @@ OpenSpec change artifacts in this repo are written in **Vietnamese** (`openspec/
 - Re-implementing items already covered by `openspec/specs/`
 - Skipping scope-lock on large/ambiguous builds
 
+## Before shipping web to production
+
+- **Delete (or exclude) the `playground` route group** (`src/app/(public)/(tabs)/playground`) before
+  building the production web bundle. `web.output: "static"` ships one shared JS bundle for the whole
+  app with no route code-splitting, so all ~47 playground/demo screens ride along inside the real
+  product's bundle if left in — measured at 4.27MB minified / ~1.06MB gzip including them (see
+  `expo-ssr-gap-analysis.md`, "Audit lib native-first cho web bundle"). Keeping `playground` during
+  development is correct (rule 2 above); removing it is a pre-launch step, not a kickoff step.
+- Re-run the bundle audit after removing it (`npx dotenv -e .env.test -- npx expo export -p web
+  --source-maps`, see the same doc for the analysis method) to confirm the real production size before
+  go-live.
+
 ## Next reads
 
 | Need | Doc |

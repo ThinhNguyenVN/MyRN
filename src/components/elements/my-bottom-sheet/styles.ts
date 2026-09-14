@@ -40,7 +40,7 @@ export const generateStyles = (theme: ThemeType) => {
       flex: 1,
     },
     backdropHit: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     // theme-exempt: modal backdrop scrim stays the same dark tint in both themes.
     backdropFill: {
