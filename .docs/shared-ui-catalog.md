@@ -52,6 +52,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Testimonial / review carousel | `TestimonialsCarousel` (`components/ui/carousel`) | One-off card + `useState` index per landing feature |
 | Sliding dot indicator (any carousel) | `CarouselDots` (`components/ui/carousel`) | Inline `onPress={() => setIndex(i)}` per dot (violates `no-inline-render-handlers`) |
 | Floating contact buttons (call/email/chat stack) | `FloatingContact` (`components/ui/floating-contact`) | Ad-hoc absolute `View` + per-button `Animated` pulse |
+| Conversational / AI command-center UI (chat screen, streaming, options/confirmation/form/result messages) | `MyChat` (`components/ui/chat`) | Ad-hoc chat screen per product, forking `MyList` for an inverted/streaming list, or a one-off `ChatMessage` shape per feature |
 
 ## Layout surfaces
 
@@ -413,6 +414,21 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Each item carries its own `onPress` — wire real actions (`Linking.openURL('tel:...')`, `mailto:`, chat deep link) at the call site; this component has no default behavior
 - Playground: `…/playground/hero-landing-kit.tsx`
 
+## Conversational UI (chat kit)
+
+### `MyChat`
+
+- Path: `@/components/ui/chat`
+- Composition layer: `MyChat` = `MyChatList` (or `MyChatEmptyState` when there are no messages yet) + `MyChatComposer`, wrapped in `KeyboardAvoidingView` (`react-native-keyboard-controller`, native only — web renders plain, no software keyboard to avoid).
+- Props: `adapter: ChatAdapter`, `onAction: (action: MessageAction) => void`, `renderCustomMessage?: (message: CustomMessage) => ReactElement | null`, `initialMessages?`, `emptyStateTitle`, `emptyStateSubtitle?`, `suggestions?: { id, label }[]` (each suggestion sends its `label` as if the user typed it).
+- **Provider-agnostic**: `MyChat` and its `useConversation` engine know nothing about Gemini/OpenAI/MCP — only `ChatMessage` / `ConversationEvent` / `ChatAdapter`. Do not import a specific AI provider's types here.
+- `ChatMessage` is a discriminated union by `kind`: `text | image | options | confirmation | form | result | custom`. Built-in kinds always render through the kit; `kind: 'custom'` is the only escape hatch for business UI (via `renderCustomMessage`), and falls back to an "unsupported message" card when the app doesn't recognize `customType` — do not try to override a built-in kind's rendering.
+- Interaction lifecycle is one-way: `OptionsMessage`/`ConfirmationMessage`/`FormMessage` go from pending (buttons active) to resolved (read-only "✓ ...") and stay resolved — do not add a way to "un-resolve" one, the resolved state is meant to be permanent history.
+- `MessageAction` (`navigate | external_link | custom`): `external_link` opens via `expo-web-browser` automatically. `navigate`/`custom` are always forwarded to the app's `onAction` — `MyChat` never imports `expo-router`/`@react-navigation`.
+- Adapters: `MockChatAdapter` (scripted, no network — use for demos/tests) and `createHttpChatAdapter({ url, headers? })` (generic NDJSON-over-HTTP streaming; web uses `fetch` + `ReadableStream`, native uses `XMLHttpRequest` progressive-read since RN's `fetch` doesn't reliably stream response bodies on native). Both satisfy the same `ChatAdapter` interface — swapping one for the other (e.g. a real backend later) never touches `MyChat`/`useConversation`.
+- Composer auto-grows with the number of lines typed (up to a max height, then scrolls internally) via `MyChatComposerInput` — a chat-kit `TextInput`, not `MyTextInput`. The `+` button reuses `pickImage`/`pickImageFromCamera` from `components/ui/image-picker` (native: bottom sheet Take Photo/Choose from Library; web: opens the file picker directly) — do not reimplement image picking here.
+- Playground: `…/playground/chat.tsx` — full scripted "Tạo sản phẩm" workflow (streaming → options → form → confirmation → result + actions) plus a smoke path for `external_link`/`navigate` actions.
+
 ### Shared form hooks
 
 - `useFormWizardSteps` (`src/hooks/use-form-wizard-steps.ts`) — create/edit step index + `trigger` per step
@@ -452,6 +468,7 @@ import { NativeFullscreenModal } from '@/components/ui/native-fullscreen-modal'
 import DrawerMenu from '@/components/ui/drawer-menu'
 import SideBar from '@/components/ui/side-bar'
 import MyTabSwitcher from '@/components/ui/my-tab-switcher'
+import { MyChat, MockChatAdapter, createHttpChatAdapter, useConversation } from '@/components/ui/chat'
 ```
 
 ## Anti-patterns

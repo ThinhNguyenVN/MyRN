@@ -111,6 +111,10 @@
     "linksSurface": "Surface",
     "linksMyTabSwitcher": "Tab switcher",
     "linksHeroLandingKit": "Hero landing kit",
+    "linksChat": "Chat",
+    "chatEmptyTitle": "How can I help?",
+    "chatEmptySubtitle": "Type a request, or try one of these.",
+    "chatCustomActionToast": "Would open the product detail screen (custom action).",
     "heroLandingKitIntro": "Hero carousel + background crossfade + testimonials + floating contact — the generic landing-page kit synced from a product build.",
     "heroLandingKitTitle": "What our customers say",
     "dividerIntro": "Horizontal and vertical separators using border tokens.",
@@ -550,6 +554,24 @@
     "websiteHeader": {
       "notifications": "Notifications",
       "profile": "Profile"
+    },
+    "chat": {
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "formSubmit": "Continue",
+      "attach": "Add attachment",
+      "composerPlaceholder": "Ask or ask me to do something...",
+      "send": "Send",
+      "attachTitle": "Add photo",
+      "attachCamera": "Take Photo",
+      "attachLibrary": "Choose from Library",
+      "unknownMessage": "This message type isn't supported yet.",
+      "errorGeneric": "Something went wrong.",
+      "retry": "Retry",
+      "expand": "Expand composer",
+      "collapse": "Collapse composer"
     }
   }
 }

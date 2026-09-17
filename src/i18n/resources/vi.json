@@ -111,6 +111,10 @@
     "linksSurface": "Surface",
     "linksMyTabSwitcher": "Tab switcher",
     "linksHeroLandingKit": "Bộ kit landing hero",
+    "linksChat": "Chat",
+    "chatEmptyTitle": "Tôi có thể giúp gì?",
+    "chatEmptySubtitle": "Nhập yêu cầu, hoặc chọn một gợi ý dưới đây.",
+    "chatCustomActionToast": "Sẽ mở màn hình chi tiết sản phẩm (custom action).",
     "heroLandingKitIntro": "Hero carousel + crossfade ảnh nền + đánh giá khách hàng + nút liên hệ nổi — bộ kit landing page generic đồng bộ từ 1 product thật.",
     "heroLandingKitTitle": "Khách hàng nói gì về chúng tôi",
     "dividerIntro": "Đường phân tách ngang/dọc dùng border token.",
@@ -550,6 +554,24 @@
     "websiteHeader": {
       "notifications": "Thông báo",
       "profile": "Hồ sơ"
+    },
+    "chat": {
+      "cancel": "Hủy",
+      "confirm": "Xác nhận",
+      "confirmed": "Đã xác nhận",
+      "cancelled": "Đã hủy",
+      "formSubmit": "Tiếp tục",
+      "attach": "Thêm tệp đính kèm",
+      "composerPlaceholder": "Hỏi hoặc yêu cầu thực hiện...",
+      "send": "Gửi",
+      "attachTitle": "Thêm ảnh",
+      "attachCamera": "Chụp ảnh",
+      "attachLibrary": "Chọn từ thư viện",
+      "unknownMessage": "Loại tin nhắn này chưa được hỗ trợ.",
+      "errorGeneric": "Đã có lỗi xảy ra.",
+      "retry": "Thử lại",
+      "expand": "Mở rộng ô nhập",
+      "collapse": "Thu nhỏ ô nhập"
     }
   }
 }

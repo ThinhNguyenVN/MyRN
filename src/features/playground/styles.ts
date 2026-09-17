@@ -40,6 +40,10 @@ export const generateStyles = (theme: ThemeType) => {
       gap: getSpacing('x4'),
       backgroundColor: getColor('fill/background/primary'),
     },
+    chatScreen: {
+      flex: 1,
+      backgroundColor: getColor('fill/background/secondary'),
+    },
 
     // ─── Section titles & labels ───────────────────────────────────────────
     sectionTitle: {

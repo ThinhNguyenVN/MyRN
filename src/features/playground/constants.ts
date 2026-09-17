@@ -164,4 +164,9 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string; icon: IconName 
     href: '/playground/hero-landing-kit',
     icon: 'rocket-outline',
   },
+  {
+    labelKey: 'playground.linksChat',
+    href: '/playground/chat',
+    icon: 'chatbubbles-outline',
+  },
 ]
