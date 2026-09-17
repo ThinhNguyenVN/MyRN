@@ -66,11 +66,8 @@ function MyChat({
     [pinListToBottom, sendImage],
   )
 
-  // Keyboard approach (keep these together — they fight if mixed):
-  // 1. List + composer share UI-thread translateY so open/close stay in sync (no sink-then-jump).
-  // 2. After the keyboard is fully open, MyChatList adds top content inset = keyboard height
-  //    and bumps scroll offset by the same amount so the first messages are reachable.
-  // 3. That inset is removed at keyboard-close *start* (not after animation) so JS never lags.
+  // List + composer share UI-thread translateY so open/close stay in sync.
+  // Do not add post-open list inset/offset — that snaps after the keyboard animation.
   const { height } = useReanimatedKeyboardAnimation()
   const keyboardLiftStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: isWeb ? 0 : height.value }],

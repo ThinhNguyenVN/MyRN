@@ -13,12 +13,8 @@ export type MyChatComposerInputProps = Pick<
   | 'onScroll'
   | 'scrollEnabled'
   | 'multiline'
-  | 'editable'
   | 'placeholder'
   | 'blurOnSubmit'
-  | 'returnKeyType'
-  | 'autoCorrect'
-  | 'autoCapitalize'
 > & {
   /** When true, pin height so the field scrolls instead of growing (expanded / past max). */
   lockHeight: boolean
@@ -62,7 +58,6 @@ function MyChatComposerInput({
         blurOnSubmit={blurOnSubmit ?? !multiline}
         scrollEnabled={scrollEnabled}
         placeholderTextColor={getColor('text/inactive/primary')}
-        textAlignVertical="top"
         underlineColorAndroid="transparent"
         style={inputStyle}
       />

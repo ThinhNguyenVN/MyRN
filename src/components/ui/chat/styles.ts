@@ -21,9 +21,6 @@ export const generateStyles = (theme: ThemeType) => {
       flex: 1,
       overflow: 'visible',
     },
-    contentArea: {
-      flex: 1,
-    },
     list: {
       flex: 1,
     },
@@ -113,7 +110,6 @@ export const generateStyles = (theme: ThemeType) => {
       gap: getSpacing('x4'),
       backgroundColor: getColor('fill/background/primary'),
     },
-    cardPrompt: {},
     optionsRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
@@ -145,11 +141,6 @@ export const generateStyles = (theme: ThemeType) => {
     resultActionsColumn: {
       gap: getSpacing('x3'),
     },
-    actionButtonContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: getSpacing('x2'),
-    },
 
     unknownCard: {
       maxWidth: MAX_BUBBLE_WIDTH,
@@ -166,9 +157,6 @@ export const generateStyles = (theme: ThemeType) => {
     },
     composerBody: {
       gap: getSpacing('x2'),
-    },
-    composerInputArea: {
-      position: 'relative',
     },
     composerInputWrap: {
       flexDirection: 'row',

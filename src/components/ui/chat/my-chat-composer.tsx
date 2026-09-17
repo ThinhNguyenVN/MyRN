@@ -339,12 +339,10 @@ function MyChatComposer({ onSend, onSendImage, disabled = false }: MyChatCompose
   }, [runPick])
 
   return (
-    <MyView style={styles.composerRoot} elevation={'soft/up/small'} radius="large">
+    <MyView style={styles.composerRoot} radius="large">
       <Animated.View style={[styles.composerBody, animatedComposerPaddingStyle]}>
         <GestureDetector gesture={collapsePanGesture}>
-          <Animated.View
-            style={[styles.composerInputArea, isHeightLocked ? animatedInputAreaStyle : null]}
-          >
+          <Animated.View style={isHeightLocked ? animatedInputAreaStyle : undefined}>
             <MyChatComposerInput
               value={text}
               onChangeText={handleChangeText}
@@ -357,7 +355,6 @@ function MyChatComposer({ onSend, onSendImage, disabled = false }: MyChatCompose
               minHeight={MIN_COMPOSER_HEIGHT}
               contentHeight={contentHeight}
               lockedHeight={composerMaxHeight}
-              editable
               placeholder={t('components.chat.composerPlaceholder')}
             />
           </Animated.View>

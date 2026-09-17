@@ -1,10 +1,6 @@
-import React, { memo, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { memo, useCallback, useLayoutEffect, useRef } from 'react'
 import { FlashList, type FlashListRef, type ListRenderItemInfo } from '@shopify/flash-list'
-import { StyleSheet } from 'react-native'
-import { useKeyboardHandler } from 'react-native-keyboard-controller'
-import { runOnJS } from 'react-native-reanimated'
 
-import { isWeb } from '@/constants/dimensions'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import type { RenderCustomMessage } from './chat-adapter'
@@ -40,55 +36,6 @@ function MyChatList({
   const styles = useThemedStyles(generateStyles)
   const listRef = useRef<FlashListRef<ChatMessage>>(null)
   const lastScrollTokenRef = useRef(0)
-  const previousTopInsetRef = useRef(0)
-  const [topScrollInset, setTopScrollInset] = useState(0)
-
-  const applyTopScrollInset = useCallback((next: number) => {
-    setTopScrollInset((current) => (current === next ? current : next))
-  }, [])
-
-  useKeyboardHandler(
-    {
-      onStart: (event) => {
-        'worklet'
-        if (isWeb) {
-          return
-        }
-        // Destination is closed: drop inset before translateY animates back.
-        if (event.progress === 0) {
-          runOnJS(applyTopScrollInset)(0)
-        }
-      },
-      onEnd: (event) => {
-        'worklet'
-        if (isWeb) {
-          return
-        }
-        runOnJS(applyTopScrollInset)(event.progress === 1 ? event.height : 0)
-      },
-    },
-    [applyTopScrollInset],
-  )
-
-  const listContentStyle = useMemo(() => {
-    const basePaddingTop = StyleSheet.flatten(styles.listContent).paddingTop
-    const paddingTop = (typeof basePaddingTop === 'number' ? basePaddingTop : 0) + topScrollInset
-    return [styles.listContent, { paddingTop }]
-  }, [styles.listContent, topScrollInset])
-
-  useLayoutEffect(() => {
-    const previous = previousTopInsetRef.current
-    previousTopInsetRef.current = topScrollInset
-    const delta = topScrollInset - previous
-    const list = listRef.current
-    if (!list || delta === 0) {
-      return
-    }
-    list.scrollToOffset({
-      offset: Math.max(0, list.getAbsoluteLastScrollOffset() + delta),
-      animated: false,
-    })
-  }, [topScrollInset])
 
   useLayoutEffect(() => {
     if (scrollToEndToken === 0 || scrollToEndToken === lastScrollTokenRef.current) {
@@ -123,7 +70,7 @@ function MyChatList({
       keyExtractor={keyExtractor}
       renderItem={renderItem}
       style={styles.list}
-      contentContainerStyle={listContentStyle}
+      contentContainerStyle={styles.listContent}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
       maintainVisibleContentPosition={{
