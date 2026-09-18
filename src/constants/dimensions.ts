@@ -29,6 +29,9 @@ export const MODAL_MAX_WIDTH = 500
 /** Desktop form column + sticky footer inner — keep cards and footer actions on the same edge. */
 export const FORM_PAGE_MAX_WIDTH = 1280
 
+/** Centered MyChat column on large web windows. */
+export const MAX_CHAT_WIDTH = 900
+
 export const isIos = Platform.OS === 'ios'
 export const isAndroid = Platform.OS === 'android'
 export const isWeb = Platform.OS === 'web'

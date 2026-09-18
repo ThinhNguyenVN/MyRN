@@ -1,7 +1,8 @@
-import React, { memo, useCallback, useLayoutEffect, useRef } from 'react'
+import React, { memo, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import { FlashList, type FlashListRef, type ListRenderItemInfo } from '@shopify/flash-list'
 
-import { useThemedStyles } from '@/theme/theme-context'
+import MyView from '@/components/elements/my-view'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import type { RenderCustomMessage } from './chat-adapter'
 import MyChatBubble from './my-chat-bubble'
@@ -17,6 +18,8 @@ export interface MyChatListProps {
   onAction: (action: MessageAction) => void
   renderCustomMessage?: RenderCustomMessage
   scrollToEndToken?: number
+  columnGutter: number
+  composerHeight: number
 }
 
 function keyExtractor(item: ChatMessage): string {
@@ -32,10 +35,23 @@ function MyChatList({
   onAction,
   renderCustomMessage,
   scrollToEndToken = 0,
+  columnGutter,
+  composerHeight,
 }: MyChatListProps) {
   const styles = useThemedStyles(generateStyles)
+  const { getSpacing } = useTheme()
   const listRef = useRef<FlashListRef<ChatMessage>>(null)
   const lastScrollTokenRef = useRef(0)
+  const itemStyle = useMemo(
+    () => [styles.listItem, { paddingHorizontal: columnGutter }],
+    [columnGutter, styles.listItem],
+  )
+  const listContentStyle = useMemo(() => {
+    if (composerHeight <= 0) {
+      return styles.listContent
+    }
+    return [styles.listContent, { paddingBottom: composerHeight + getSpacing('x4') }]
+  }, [composerHeight, getSpacing, styles.listContent])
 
   useLayoutEffect(() => {
     if (scrollToEndToken === 0 || scrollToEndToken === lastScrollTokenRef.current) {
@@ -50,17 +66,19 @@ function MyChatList({
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ChatMessage>) => (
-      <MyChatBubble
-        message={item}
-        onSelectOption={onSelectOption}
-        onConfirm={onConfirm}
-        onSubmitForm={onSubmitForm}
-        onRetry={onRetry}
-        onAction={onAction}
-        renderCustomMessage={renderCustomMessage}
-      />
+      <MyView style={itemStyle}>
+        <MyChatBubble
+          message={item}
+          onSelectOption={onSelectOption}
+          onConfirm={onConfirm}
+          onSubmitForm={onSubmitForm}
+          onRetry={onRetry}
+          onAction={onAction}
+          renderCustomMessage={renderCustomMessage}
+        />
+      </MyView>
     ),
-    [onSelectOption, onConfirm, onSubmitForm, onRetry, onAction, renderCustomMessage],
+    [itemStyle, onSelectOption, onConfirm, onSubmitForm, onRetry, onAction, renderCustomMessage],
   )
 
   return (
@@ -70,7 +88,7 @@ function MyChatList({
       keyExtractor={keyExtractor}
       renderItem={renderItem}
       style={styles.list}
-      contentContainerStyle={styles.listContent}
+      contentContainerStyle={listContentStyle}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
       maintainVisibleContentPosition={{

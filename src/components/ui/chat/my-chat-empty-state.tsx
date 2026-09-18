@@ -1,11 +1,11 @@
-import React, { memo } from 'react'
+import React, { memo, useMemo } from 'react'
 import { Keyboard, Pressable } from 'react-native'
 
 import MyChip from '@/components/elements/my-chip'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { ConditionRenderer } from '@/components/ui/condition-renderer'
-import { useThemedStyles } from '@/theme/theme-context'
+import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
 
@@ -23,13 +23,29 @@ export interface MyChatEmptyStateProps {
   title: string
   subtitle?: string
   suggestions?: ChatSuggestion[]
+  columnGutter: number
+  composerHeight: number
 }
 
-function MyChatEmptyState({ title, subtitle, suggestions }: MyChatEmptyStateProps) {
+function MyChatEmptyState({
+  title,
+  subtitle,
+  suggestions,
+  columnGutter,
+  composerHeight,
+}: MyChatEmptyStateProps) {
   const styles = useThemedStyles(generateStyles)
+  const { getSpacing } = useTheme()
+  const emptyStyle = useMemo(() => {
+    const next = [styles.emptyState, { paddingHorizontal: columnGutter }]
+    if (composerHeight <= 0) {
+      return next
+    }
+    return [...next, { paddingBottom: composerHeight + getSpacing('x4') }]
+  }, [columnGutter, composerHeight, getSpacing, styles.emptyState])
 
   return (
-    <Pressable style={styles.emptyState} onPress={dismissKeyboard}>
+    <Pressable style={emptyStyle} onPress={dismissKeyboard}>
       <MyView>
         <MyText typography="subtitle" style={styles.emptyTitle}>
           {title}

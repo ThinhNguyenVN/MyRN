@@ -1,15 +1,24 @@
 import { StyleSheet, type TextStyle } from 'react-native'
 
-import { isWeb } from '@/constants/dimensions'
+import { isWeb, MAX_CHAT_WIDTH } from '@/constants/dimensions'
 import type { ThemeType } from '@/theme/theme-context'
 
-const MAX_BUBBLE_WIDTH = '82%'
+export const MIN_COMPOSER_HEIGHT = 24
+export const COMPOSER_ACTIONS_HEIGHT = 40
+export const COMPOSER_INPUT_LINE_HEIGHT = 22
+
+const MAX_BUBBLE_WIDTH = '100%'
 
 export const generateStyles = (theme: ThemeType) => {
-  const { getSpacing, getColor, insets } = theme
+  const { getSpacing, getColor, insets, isMobileSize } = theme
 
-  const composerBaselineHeight =
-    getSpacing('x5') + getSpacing('x3') + (insets.bottom ?? 0) + 24 + getSpacing('x2') + 40
+  const composerBaselineHeight = isMobileSize
+    ? getSpacing('x4') +
+      MIN_COMPOSER_HEIGHT +
+      getSpacing('x2') +
+      COMPOSER_ACTIONS_HEIGHT +
+      (insets.bottom ?? getSpacing('x4'))
+    : getSpacing('x4') + COMPOSER_ACTIONS_HEIGHT + getSpacing('x4') + getSpacing('x4')
 
   return StyleSheet.create({
     root: {
@@ -17,44 +26,62 @@ export const generateStyles = (theme: ThemeType) => {
       overflow: 'visible',
       backgroundColor: getColor('fill/background/secondary'),
     },
+    column: {
+      flex: 1,
+      width: '100%',
+      overflow: 'visible',
+    },
     listWrapper: {
       flex: 1,
+      width: '100%',
       overflow: 'visible',
     },
     list: {
       flex: 1,
+      width: '100%',
     },
     listContent: {
-      paddingHorizontal: getSpacing('x6'),
       paddingTop: getSpacing('x6'),
       paddingBottom: composerBaselineHeight + getSpacing('x4'),
-      gap: getSpacing('x6'),
+      gap: getSpacing('x4'),
+    },
+    listItem: {
+      width: '100%',
+      alignSelf: 'stretch',
+      gap: getSpacing('x4'),
     },
     composerFloatingWrapper: {
       position: 'absolute',
       left: 0,
       right: 0,
       bottom: 0,
+      width: '100%',
+      alignItems: 'center',
     },
     messageRowUser: {
+      width: '100%',
       flexDirection: 'row',
       justifyContent: 'flex-end',
     },
     messageRowAssistant: {
+      width: '100%',
       flexDirection: 'row',
       justifyContent: 'flex-start',
     },
     userBubble: {
       maxWidth: MAX_BUBBLE_WIDTH,
+      flexShrink: 1,
       paddingHorizontal: getSpacing('x6'),
       paddingVertical: getSpacing('x4'),
       backgroundColor: getColor('fill/active/primary'),
     },
     userBubbleText: {
       color: getColor('brand/white'),
+      maxWidth: '100%',
     },
     assistantContent: {
       maxWidth: MAX_BUBBLE_WIDTH,
+      flexShrink: 1,
       gap: getSpacing('x2'),
     },
     imageBubbleImage: {
@@ -92,7 +119,7 @@ export const generateStyles = (theme: ThemeType) => {
       justifyContent: 'center',
       gap: getSpacing('x6'),
       paddingHorizontal: getSpacing('x8'),
-      paddingBottom: composerBaselineHeight,
+      paddingBottom: composerBaselineHeight + getSpacing('x4'),
     },
     emptyTitle: {
       textAlign: 'center',
@@ -106,6 +133,7 @@ export const generateStyles = (theme: ThemeType) => {
 
     interactiveCard: {
       maxWidth: MAX_BUBBLE_WIDTH,
+      flexShrink: 1,
       padding: getSpacing('x6'),
       gap: getSpacing('x4'),
       backgroundColor: getColor('fill/background/primary'),
@@ -149,30 +177,49 @@ export const generateStyles = (theme: ThemeType) => {
     },
 
     composerRoot: {
-      paddingHorizontal: getSpacing('x6'),
-      paddingTop: getSpacing('x5'),
+      width: '100%',
+      ...(!isMobileSize ? { maxWidth: MAX_CHAT_WIDTH } : null),
+      padding: getSpacing('x4'),
       backgroundColor: getColor('fill/background/primary'),
       borderTopLeftRadius: theme.getRadius('large'),
       borderTopRightRadius: theme.getRadius('large'),
+      marginBottom: !isMobileSize ? getSpacing('x4') : 0,
     },
     composerBody: {
       gap: getSpacing('x2'),
+    },
+    composerWebRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      gap: getSpacing('x2'),
+    },
+    composerWebInputSlot: {
+      flex: 1,
+      minWidth: 0,
     },
     composerInputWrap: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       width: '100%',
+      minHeight: isMobileSize ? undefined : COMPOSER_ACTIONS_HEIGHT,
     },
     composerInput: {
       flex: 1,
       minWidth: 100,
       fontSize: 16,
+      lineHeight: COMPOSER_INPUT_LINE_HEIGHT,
       padding: 0,
       margin: 0,
       color: getColor('text/active/primary'),
-      textAlignVertical: 'top',
-      ...(isWeb ? ({ outlineStyle: 'none', outlineWidth: 0 } as unknown as TextStyle) : null),
+      textAlignVertical: isWeb ? 'center' : 'top',
+      ...(isWeb
+        ? ({
+            outlineStyle: 'none',
+            outlineWidth: 0,
+            resize: 'none',
+          } as unknown as TextStyle)
+        : null),
     },
     composerActionsRow: {
       flexDirection: 'row',
@@ -185,14 +232,14 @@ export const generateStyles = (theme: ThemeType) => {
       padding: getSpacing('x1'),
     },
     expandButton: {
-      width: 40,
-      height: 40,
+      width: COMPOSER_ACTIONS_HEIGHT,
+      height: COMPOSER_ACTIONS_HEIGHT,
       alignItems: 'center',
       justifyContent: 'center',
     },
     sendButtonBase: {
-      width: 40,
-      height: 40,
+      width: COMPOSER_ACTIONS_HEIGHT,
+      height: COMPOSER_ACTIONS_HEIGHT,
       borderRadius: theme.getRadius('full'),
       alignItems: 'center',
       justifyContent: 'center',
