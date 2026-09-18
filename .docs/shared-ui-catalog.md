@@ -194,7 +194,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 ### `MyList`
 
 - Path: `@/components/ui/my-list`
-- FlashList/FlatList wrapper with pull-to-refresh arc + optional scroll-to-hide binding (`useScrollToHideScrollBinding`)
+- FlashList/FlatList wrapper with pull-to-refresh arc + optional scroll-to-hide binding (`useScrollToHideScrollBinding`). Chat transcripts use `MyChatList` instead (bottom-anchored, no pull-to-refresh).
 - `PullToRefreshScrollView` — same refresh chrome for non-list `ScrollView` screens; scroll-to-hide is on for mobile-width layout (native **and** phone/tablet web). Nested flex parents need `minHeight: 0` so the list (not the page) scrolls.
 - Playground: `…/playground/my-list`
 
@@ -419,14 +419,15 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 ### `MyChat`
 
 - Path: `@/components/ui/chat`
-- Composition layer: `MyChat` = `MyChatList` (or `MyChatEmptyState` when there are no messages yet) + `MyChatComposer`, wrapped in `KeyboardAvoidingView` (`react-native-keyboard-controller`, native only — web renders plain, no software keyboard to avoid).
+- Composition layer: `MyChat` = `MyChatList` (or `MyChatEmptyState` when there are no messages yet) + overlay `MyChatComposer`. Native keyboard: list + composer share `translateY` from `react-native-keyboard-controller` (`useReanimatedKeyboardAnimation`). Web: no keyboard lift. Do not wrap in `KeyboardAvoidingView` `behavior="padding"`.
 - Props: `adapter: ChatAdapter`, `onAction: (action: MessageAction) => void`, `renderCustomMessage?: (message: CustomMessage) => ReactElement | null`, `initialMessages?`, `emptyStateTitle`, `emptyStateSubtitle?`, `suggestions?: { id, label }[]` (each suggestion sends its `label` as if the user typed it).
 - **Provider-agnostic**: `MyChat` and its `useConversation` engine know nothing about Gemini/OpenAI/MCP — only `ChatMessage` / `ConversationEvent` / `ChatAdapter`. Do not import a specific AI provider's types here.
 - `ChatMessage` is a discriminated union by `kind`: `text | image | options | confirmation | form | result | custom`. Built-in kinds always render through the kit; `kind: 'custom'` is the only escape hatch for business UI (via `renderCustomMessage`), and falls back to an "unsupported message" card when the app doesn't recognize `customType` — do not try to override a built-in kind's rendering.
 - Interaction lifecycle is one-way: `OptionsMessage`/`ConfirmationMessage`/`FormMessage` go from pending (buttons active) to resolved (read-only "✓ ...") and stay resolved — do not add a way to "un-resolve" one, the resolved state is meant to be permanent history.
 - `MessageAction` (`navigate | external_link | custom`): `external_link` opens via `expo-web-browser` automatically. `navigate`/`custom` are always forwarded to the app's `onAction` — `MyChat` never imports `expo-router`/`@react-navigation`.
 - Adapters: `MockChatAdapter` (scripted, no network — use for demos/tests) and `createHttpChatAdapter({ url, headers? })` (generic NDJSON-over-HTTP streaming; web uses `fetch` + `ReadableStream`, native uses `XMLHttpRequest` progressive-read since RN's `fetch` doesn't reliably stream response bodies on native). Both satisfy the same `ChatAdapter` interface — swapping one for the other (e.g. a real backend later) never touches `MyChat`/`useConversation`.
-- Composer auto-grows with the number of lines typed (up to a max height, then scrolls internally) via `MyChatComposerInput` — a chat-kit `TextInput`, not `MyTextInput`. The `+` button reuses `pickImage`/`pickImageFromCamera` from `components/ui/image-picker` (native: bottom sheet Take Photo/Choose from Library; web: opens the file picker directly) — do not reimplement image picking here.
+- Composer auto-grows via `MyChatComposerInput` (chat-kit `TextInput`, not `MyTextInput`) up to a viewport max, then scrolls internally. Native: expand/collapse + send must return to the default one-line height. Web: max column `MAX_CHAT_WIDTH` (900), attach/input/send on one row, no expand; empty placeholder is vertically centered with the action buttons. The `+` button reuses `pickImage`/`pickImageFromCamera` from `components/ui/image-picker` (native: bottom sheet Take Photo/Choose from Library; web: opens the file picker directly) — do not reimplement image picking here. **Image-send UX is a follow-up:** current AC is local `ImageMessage` URI only; smoke and extra requirements (preview, upload, multi-image) are deferred.
+- `MyChatList` is FlashList v2 with `startRenderingFromBottom` (not `inverted`, not `MyList`). Space messages with `ItemSeparatorComponent` — `gap` on `contentContainerStyle` is ignored because cells are absolutely positioned.
 - Playground: `…/playground/chat.tsx` — full scripted "Tạo sản phẩm" workflow (streaming → options → form → confirmation → result + actions) plus a smoke path for `external_link`/`navigate` actions.
 
 ### Shared form hooks

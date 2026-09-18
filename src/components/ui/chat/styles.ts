@@ -43,12 +43,13 @@ export const generateStyles = (theme: ThemeType) => {
     listContent: {
       paddingTop: getSpacing('x6'),
       paddingBottom: composerBaselineHeight + getSpacing('x4'),
-      gap: getSpacing('x4'),
     },
     listItem: {
       width: '100%',
       alignSelf: 'stretch',
-      gap: getSpacing('x4'),
+    },
+    listItemSeparator: {
+      height: getSpacing('x4'),
     },
     composerFloatingWrapper: {
       position: 'absolute',

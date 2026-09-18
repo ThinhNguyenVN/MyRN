@@ -35,7 +35,7 @@
 
 ## 6. Chat UI — list & bubble shell
 
-- [x] 6.1 `my-chat-list.tsx`: `FlashList` v2 với `maintainVisibleContentPosition: { startRenderingFromBottom, autoscrollToBottomThreshold }` (không dùng `inverted` — prop này không còn trong FlashList v2), không remount item khi content streaming update
+- [x] 6.1 `my-chat-list.tsx`: `FlashList` v2 với `maintainVisibleContentPosition: { startRenderingFromBottom, autoscrollToBottomThreshold }` (không dùng `inverted`), `ItemSeparatorComponent` cho khoảng cách item (không `gap` trên `contentContainerStyle`)
 - [x] 6.2 `my-chat-bubble.tsx`: dispatch render theo `message.kind`
 - [x] 6.3 `my-chat-typing.tsx`: hiển thị khi `status: 'pending'` và text rỗng
 - [x] 6.4 `my-chat-empty-state.tsx`: dùng `MyEmptyState`/pattern tương tự, hỗ trợ suggestion chips do app truyền vào
@@ -53,11 +53,11 @@
 
 ## 8. Chat UI — composer & attachment
 
-- [x] 8.1 `my-chat-composer.tsx`: `MyTextInput` (`multiline`) + nút gửi → gọi `chat.send`, clear input sau khi gửi
+- [x] 8.1 `my-chat-composer.tsx`: `MyChatComposerInput` (`multiline`) + nút gửi → gọi `chat.send`, clear input + reset layout height sau khi gửi
 - [x] 8.2 Nút `+` gọi `pickImage`/`pickImageFromCamera` (đã có trong `components/ui/image-picker`) → `chat.sendImage(imageUri)`, không tự cài lại logic picker
-- [x] 8.3 Auto-grow: theo dõi `onContentSizeChange`, animate height (Reanimated) từ 1 dòng tới `maxComposerHeight` (~5–6 dòng), quá `maxComposerHeight` thì `scrollEnabled` nội bộ input — logic nằm trong `my-chat-composer.tsx`, không sửa `MyTextInput` (Decision 8a)
+- [x] 8.3 Auto-grow: `MyChatComposerInput` + `hooks.ts`; native `onContentSizeChange`, web `scrollHeight`; trần viewport; expand/collapse native; logic không sửa `MyTextInput` (Decision 8a/8f)
 - [x] 8.4 Nút gửi: hình tròn luôn hiển thị (không ẩn/mờ), đổi fill/icon color giữa trạng thái disabled (rỗng) và active (có text) theo `text.length > 0` — đối chiếu screenshot Gemini thật, không thêm mic/voice
-- [x] 8.5 Bọc chat screen bằng `KeyboardAvoidingView` (`react-native-keyboard-controller`, `behavior="padding"`) trong `my-chat.tsx`, không dùng `KeyboardStickyView` cho Phase 1–4 (Decision 8b)
+- [x] 8.5 Keyboard native: `translateY` chung list+composer từ keyboard-controller; web không lift (Decision 8f)
 - [x] 8.6 `my-chat.tsx`: compose `MyChatList` + `MyChatComposer` + `MyChatEmptyState`, nhận `adapter`, `onAction`, `renderCustomMessage?`
 
 ## 9. Chat UI — actions & custom renderer
@@ -78,14 +78,14 @@
 ## 11. Docs & catalog
 
 - [x] 11.1 Cập nhật `.docs/shared-ui-catalog.md`: thêm entry `MyChat` + sub-component vào decision table và import cheat sheet
-- [x] 11.2 Ghi chú trong catalog: khi nào dùng `MyChatList` (chat, inverted) vs `MyList` (pull-to-refresh)
+- [x] 11.2 Ghi chú trong catalog: khi nào dùng `MyChatList` (chat, `startRenderingFromBottom` + separator) vs `MyList` (pull-to-refresh)
 
 ## 12. Testing & quality gate
 
 - [ ] 12.1 Smoke playground: chạy hết kịch bản "Tạo sản phẩm" trên iOS Simulator/web, xác nhận không giật scroll khi streaming
 - [ ] 12.2 Smoke playground: `external_link` mở browser thật; `navigate` điều hướng đúng route
-- [ ] 12.3 Smoke playground: gửi ảnh qua `+` (native + web)
+- [ ] 12.3 Smoke playground: gửi ảnh qua `+` (native + web) — **deferred:** test + có thể bổ sung AC ở session sau; không chặn merge Phase 1–4
 - [ ] 12.4 Verify trên iOS Simulator thật (không chỉ code review): auto-grow composer lớn/nhỏ đúng theo dòng, `KeyboardAvoidingView` không che composer/message cuối khi mở bàn phím, hoạt động đúng cùng `statusBarTranslucent navigationBarTranslucent` đã set ở root layout (Decision 8)
 - [x] 12.5 `yarn lint` + `npx dotenv -e .env.test -- yarn test` pass
 - [x] 12.6 Review diff: không implement trong `index.ts`; không `!= null`; không inline JSX handler; styles trong `styles.ts`; không dependency mới trong `package.json`
-- [ ] 12.7 Sync OpenSpec → archive sau khi merge PR
+- [x] 12.7 Sync OpenSpec delta → `openspec/specs/` và archive change

@@ -26,6 +26,11 @@ function keyExtractor(item: ChatMessage): string {
   return `chat-message-${item.id}`
 }
 
+function ChatListItemSeparator() {
+  const styles = useThemedStyles(generateStyles)
+  return <MyView style={styles.listItemSeparator} />
+}
+
 function MyChatList({
   messages,
   onSelectOption,
@@ -42,10 +47,6 @@ function MyChatList({
   const { getSpacing } = useTheme()
   const listRef = useRef<FlashListRef<ChatMessage>>(null)
   const lastScrollTokenRef = useRef(0)
-  const itemStyle = useMemo(
-    () => [styles.listItem, { paddingHorizontal: columnGutter }],
-    [columnGutter, styles.listItem],
-  )
   const listContentStyle = useMemo(() => {
     if (composerHeight <= 0) {
       return styles.listContent
@@ -66,7 +67,7 @@ function MyChatList({
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ChatMessage>) => (
-      <MyView style={itemStyle}>
+      <MyView style={styles.listItem} paddingHorizontal={columnGutter}>
         <MyChatBubble
           message={item}
           onSelectOption={onSelectOption}
@@ -78,7 +79,16 @@ function MyChatList({
         />
       </MyView>
     ),
-    [itemStyle, onSelectOption, onConfirm, onSubmitForm, onRetry, onAction, renderCustomMessage],
+    [
+      onSelectOption,
+      onConfirm,
+      onSubmitForm,
+      onRetry,
+      onAction,
+      renderCustomMessage,
+      columnGutter,
+      styles.listItem,
+    ],
   )
 
   return (
@@ -87,6 +97,7 @@ function MyChatList({
       data={messages}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
+      ItemSeparatorComponent={ChatListItemSeparator}
       style={styles.list}
       contentContainerStyle={listContentStyle}
       keyboardShouldPersistTaps="handled"

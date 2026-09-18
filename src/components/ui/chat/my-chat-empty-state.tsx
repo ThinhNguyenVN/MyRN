@@ -1,7 +1,8 @@
 import React, { memo, useMemo } from 'react'
-import { Keyboard, Pressable } from 'react-native'
+import { Keyboard } from 'react-native'
 
 import MyChip from '@/components/elements/my-chip'
+import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { ConditionRenderer } from '@/components/ui/condition-renderer'
@@ -45,7 +46,13 @@ function MyChatEmptyState({
   }, [columnGutter, composerHeight, getSpacing, styles.emptyState])
 
   return (
-    <Pressable style={emptyStyle} onPress={dismissKeyboard}>
+    <MyPressable
+      onPress={dismissKeyboard}
+      style={emptyStyle}
+      scaleValue={1}
+      haptic={false}
+      preventMultiPress={false}
+    >
       <MyView>
         <MyText typography="subtitle" style={styles.emptyTitle}>
           {title}
@@ -70,7 +77,7 @@ function MyChatEmptyState({
           ))}
         </MyView>
       </ConditionRenderer>
-    </Pressable>
+    </MyPressable>
   )
 }
 

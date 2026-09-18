@@ -1,14 +1,17 @@
-## ADDED Requirements
+# mychat-chat-ui Specification
 
+## Purpose
+Shared kit `MyChat`: list từ đáy, composer overlay, renderer theo `ChatMessage.kind`, không gắn Gemini/MCP.
+## Requirements
 ### Requirement: MyChat compose list + composer + empty state
-Project SHALL cung cấp `MyChat` (`src/components/ui/chat`) nhận `adapter: ChatAdapter`, `onAction: (action: MessageAction) => void`, `renderCustomMessage?: (message: CustomMessage) => ReactElement | null`, và render `MyChatList` + `MyChatComposer`, chuyển sang `MyChatEmptyState` khi chưa có message nào. `MyChat` MUST được dùng 100% component `My*`/token theme hiện có (`MyView`, `MyText`, `MySurface`, `MyButton`, `MyTextInput`...), MUST NOT hardcode màu/spacing ngoài theme token.
+`MyChat` (`src/components/ui/chat`) SHALL nhận `adapter: ChatAdapter`, `onAction: (action: MessageAction) => void`, `renderCustomMessage?: (message: CustomMessage) => ReactElement | null`, và render `MyChatList` + `MyChatComposer`, chuyển sang `MyChatEmptyState` khi chưa có message nào. `MyChat` MUST dùng component `My*`/token theme hiện có (`MyView`, `MyText`, `MySurface`, `MyButton`, …). Input composer MUST dùng `MyChatComposerInput` (kit `TextInput`), MUST NOT thêm auto-grow generic vào `MyTextInput` dùng chung. MUST NOT hardcode màu/spacing ngoài theme token. Trên layout không mobile (`useIsMobileSize() === false`), cột chat MUST căn giữa và không rộng hơn `MAX_CHAT_WIDTH` (900).
 
 #### Scenario: Empty state khi chưa có message
 - **WHEN** `MyChat` mount với `messages` rỗng
 - **THEN** `MyChatEmptyState` MUST hiển thị (có thể kèm suggestion chips do app truyền vào), không hiển thị `MyChatList` rỗng
 
 ### Requirement: MyChatList render từ đáy, auto-scroll, streaming-safe
-`MyChatList` (build trực tiếp trên `FlashList` v2, không phải wrapper của `MyList`; dùng `maintainVisibleContentPosition: { startRenderingFromBottom: true, autoscrollToBottomThreshold }` — FlashList v2 không còn prop `inverted`) SHALL render message mới nhất ở dưới cùng, tự động scroll xuống khi có message mới trong khi user đang ở đáy danh sách, và cập nhật nội dung message đang streaming tại chỗ mà không remount item.
+`MyChatList` (build trực tiếp trên `FlashList` v2, không phải wrapper của `MyList`; dùng `maintainVisibleContentPosition: { startRenderingFromBottom: true, autoscrollToBottomThreshold }` — FlashList v2 không còn prop `inverted`) SHALL render message mới nhất ở dưới cùng, tự động scroll xuống khi có message mới trong khi user đang ở đáy danh sách, và cập nhật nội dung message đang streaming tại chỗ mà không remount item. Khoảng cách giữa các message MUST dùng `ItemSeparatorComponent` (FlashList v2 không áp `gap` trên `contentContainerStyle` vì cell `position: absolute`).
 
 #### Scenario: Auto-scroll khi có message mới
 - **WHEN** một `ChatMessage` mới được thêm vào cuối danh sách và user đang ở đáy list
@@ -60,7 +63,9 @@ Project SHALL cung cấp `MyChat` (`src/components/ui/chat`) nhận `adapter: Ch
 - **THEN** `MyChat` MUST render `MyChatUnknownMessage` fallback, MUST NOT throw lỗi runtime
 
 ### Requirement: Composer hỗ trợ text và attachment ảnh thật
-`MyChatComposer` SHALL cung cấp input text (dựa trên `MyTextInput`) + nút gửi, và nút `+` mở picker ảnh dùng `pickImage`/`pickImageFromCamera` đã có sẵn trong `components/ui/image-picker` (native: bottom sheet Take Photo/Choose from Library; web: file picker). `MyChatComposer` MUST NOT tự cài đặt lại logic chọn ảnh.
+`MyChatComposer` SHALL cung cấp input text (`MyChatComposerInput`) + nút gửi, và nút `+` mở picker ảnh dùng `pickImage`/`pickImageFromCamera` đã có sẵn trong `components/ui/image-picker` (native: bottom sheet Take Photo/Choose from Library; web: file picker). `MyChatComposer` MUST NOT tự cài đặt lại logic chọn ảnh. Native MUST có hàng action riêng (attach / expand-collapse / send). Web MUST xếp attach + input + send trên một hàng, MUST NOT hiện nút expand.
+
+**Follow-up (không chặn merge Phase 1–4):** smoke gửi ảnh qua `+` (native + web) chưa chạy trong session archive. Wiring `sendImage` + `ImageMessage` local URI vẫn là AC hiện tại; session sau có thể bổ sung requirement (preview, upload, đa ảnh, v.v.) sau khi test thật.
 
 #### Scenario: Gửi text
 - **WHEN** user nhập text và nhấn nút gửi (hoặc submit trên bàn phím)
@@ -71,23 +76,32 @@ Project SHALL cung cấp `MyChat` (`src/components/ui/chat`) nhận `adapter: Ch
 - **THEN** `chat.sendImage(imageUri)` MUST được gọi, tạo một `ImageMessage` role `user` trong `chat.messages`
 
 ### Requirement: Composer tự lớn/nhỏ theo số dòng text (auto-grow)
-`MyChatComposer` SHALL hiển thị input 1 dòng theo mặc định và tự tăng chiều cao khi user gõ nhiều dòng, tới một `maxComposerHeight` (tương đương ~5–6 dòng) thì input MUST tự scroll nội dung bên trong thay vì tiếp tục phình cao. Logic auto-grow này MUST nằm trong `MyChatComposer` (`components/ui/chat`), MUST NOT thêm prop auto-grow generic vào `MyTextInput` dùng chung toàn app.
+`MyChatComposer` SHALL hiển thị input 1 dòng theo mặc định và tự tăng chiều cao khi user gõ nhiều dòng, tới `composerMaxHeight` (viewport trừ header, footer composer, keyboard, gap) thì input MUST tự scroll nội dung bên trong. Native MUST cho phép expand gần full viewport rồi collapse; sau collapse + gửi, chiều cao MUST về đúng 1 dòng mặc định. Logic auto-grow MUST nằm trong `components/ui/chat`, MUST NOT thêm prop auto-grow generic vào `MyTextInput`.
 
 #### Scenario: Input lớn dần theo số dòng
-- **WHEN** user gõ text xuống dòng thứ 2, thứ 3 (chưa vượt `maxComposerHeight`)
+- **WHEN** user gõ text xuống dòng thứ 2, thứ 3 (chưa vượt `composerMaxHeight`)
 - **THEN** chiều cao input MUST tăng tương ứng để hiển thị đủ số dòng, không cắt chữ
 
 #### Scenario: Vượt max height thì scroll nội tại
-- **WHEN** nội dung input vượt `maxComposerHeight`
-- **THEN** chiều cao input MUST dừng lại ở `maxComposerHeight`, phần nội dung dư MUST cuộn được bên trong input, MUST NOT tiếp tục đẩy `MyChatComposer` cao hơn
+- **WHEN** nội dung input vượt `composerMaxHeight`
+- **THEN** chiều cao input MUST dừng lại ở `composerMaxHeight`, phần nội dung dư MUST cuộn được bên trong input, MUST NOT tiếp tục đẩy `MyChatComposer` cao hơn
 
 #### Scenario: Xoá hết text thì thu nhỏ lại
 - **WHEN** user xoá hết nội dung nhiều dòng đã gõ
 - **THEN** chiều cao input MUST thu về lại đúng chiều cao 1 dòng ban đầu
 
+#### Scenario: Gửi sau expand/collapse về 1 dòng
+- **WHEN** user expand composer, gõ thêm, collapse, rồi gửi
+- **THEN** composer MUST trở về chiều cao 1 dòng mặc định (không giữ height lúc expand)
+
+#### Scenario: FlashList cách bubble bằng separator
+- **WHEN** `MyChatList` render từ 2 message trở lên
+- **THEN** giữa các item MUST có khoảng `ItemSeparatorComponent` theo token spacing (không dựa vào `gap` trên `contentContainerStyle`)
+
 ### Requirement: Composer không bị che bởi bàn phím
-Chat screen (`MyChatList` + `MyChatComposer`) SHALL được bọc bởi `KeyboardAvoidingView` (bản của `react-native-keyboard-controller`, resize-based, `behavior="padding"`) để khi bàn phím mở, `MyChatComposer` MUST luôn hiển thị ngay phía trên bàn phím và `MyChatList` MUST co lại theo layout, không bị bàn phím che nội dung cuối danh sách.
+Native: list + composer overlay SHALL dùng cùng `translateY` từ `useReanimatedKeyboardAnimation().height` (keyboard-controller) để nhấc theo bàn phím — MUST NOT resize viewport list bằng `paddingBottom` theo keyboard từng frame, MUST NOT dùng `KeyboardAvoidingView` `behavior="padding"`. Web: không nhấc theo software keyboard. Composer overlay `position: absolute` đáy; `MyChatList`/`MyChatEmptyState` MUST `paddingBottom` theo chiều cao composer đã `onLayout` để message cuối không bị che.
 
 #### Scenario: Mở bàn phím không che composer
-- **WHEN** user tap vào input để mở bàn phím
-- **THEN** `MyChatComposer` MUST hiển thị đầy đủ ngay phía trên bàn phím, message cuối cùng trong `MyChatList` MUST vẫn nhìn thấy được (không bị composer hoặc bàn phím che mất)
+- **WHEN** user tap vào input để mở bàn phím (native)
+- **THEN** `MyChatComposer` MUST nằm ngay phía trên bàn phím, message cuối cùng trong `MyChatList` MUST vẫn nhìn thấy được (không bị composer hoặc bàn phím che mất)
+
