@@ -159,15 +159,17 @@ Hai vấn đề user báo sau vòng 8d:
 
 **Bắt buộc khi implement:** hành vi keyboard-avoiding + auto-grow + animation + composer-overlay trên MUST được verify trên thiết bị/simulator thật (không chỉ code review/lý luận) trước khi coi task hoàn thành — root layout đã set `statusBarTranslucent navigationBarTranslucent` trên `KeyboardProvider`. Agent hiện tại không có tool tương tác trực tiếp với iOS Simulator (không có idb/Appium); mọi fix trong 8b–8e dựa trên root-cause analysis + đối chiếu screenshot/feedback thật do user cung cấp, không phải agent tự mắt xác nhận trên device — user cần tự test lại và báo lại nếu vẫn còn vấn đề.
 
-### 8f. Hành vi đã ship (đối chiếu code cuối branch)
+### 8f. Hành vi đã ship (đối chiếu code cuối branch) — **lỗi thời**
 
-Các vòng 8b–8e mô tả lịch sử thử `KeyboardAvoidingView` / padding list. **Code hiện tại:**
+Các vòng 8b–8e mô tả lịch sử thử `KeyboardAvoidingView` / padding list. **8f từng ghi “list + composer cùng `translateY`” — đã regress:** `translateY` list đẩy viewport FlashList khỏi màn → không kéo tới tin đầu. `overflow: hidden` trên wrapper đó càng cắt scroll. **Không implement lại 8f.** Spec sống: `openspec/specs/mychat-chat-ui/spec.md` + catalog `MyChat`.
 
-- Keyboard native: list + composer overlay cùng `translateY` từ `useReanimatedKeyboardAnimation().height`. Không `KeyboardAvoidingView`, không `paddingBottom` list theo keyboard từng frame.
-- Composer overlay `position: absolute`; list/`empty` `paddingBottom` theo `onLayout` chiều cao composer.
-- Auto-grow: `MyChatComposerInput` (không phải `MyTextInput`). Native grow bằng `minHeight` + `onContentSizeChange`; web đo `scrollHeight`. Trần = viewport trừ chrome/keyboard. Expand/collapse chỉ native; clip height bằng `Animated.View` chỉ khi expand/collapse/scroll lock — lúc idle không giữ Reanimated height (tránh kẹt max sau send).
-- Web: cột max 900px; composer một hàng, không expand; placeholder/text căn giữa hàng action.
-- `MyChatList`: FlashList v2 `startRenderingFromBottom`; khoảng item = `ItemSeparatorComponent` (`x4`), không `gap` trên `contentContainerStyle`.
+### 8g. Mô hình đã chốt (sau refactor)
+
+- Keyboard native: **composer** `translateY(height)`; **list** `marginBottom: -height` (co viewport, UI thread). Web: cả hai = 0. Không KAV `padding`. Không `paddingTop`/`contentOffset` JS sau khi phím xong. Không `overflow: hidden` trên cột/`listWrapper`. Được phép một `scrollToEnd` trên `useGenericKeyboardHandler` `onEnd` nếu đang ở đáy.
+- Composer overlay `position: absolute`; list/`empty` `paddingBottom` theo `onLayout` composer (ngưỡng ~8px, không từng frame expand).
+- Auto-grow: native `TextInput` tự giãn (`scrollEnabled` false). Kit = sàn (`expandedMinHeight`, `0` = không ép) + trần `composerMaxHeight`. Đo chỉ để overflow + height textarea web. Cấm ghi `height` từ `contentSize` native / remount reset.
+- Trục: `isMobile` = chrome composer (2 hàng + expand); `isMobileSize` = cột 900 + gutter. Wide: mép bubble = composer; scrollbar sát window.
+- `MyChatList`: FlashList v2 `startRenderingFromBottom`; khoảng item = `ItemSeparatorComponent` (`x4`).
 
 ### 9. Conventions bắt buộc khi implement
 

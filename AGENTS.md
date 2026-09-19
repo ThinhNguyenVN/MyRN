@@ -47,3 +47,4 @@ This is an **Expo SDK 57 React Native** template app (`myrn`) for iOS, Android, 
 - **DummyJSON demo login:** `emilys` / `emilyspass`.
 - **Playground bundler warnings:** some co-located non-route files under `playground/` warn “missing default export” — ignore for demos.
 - **SEO is off by default:** `seo.config.json` ships with `enabled: false` — zero effect on mobile-only/admin products until a task explicitly turns it on. See `.docs/seo-standard.md` before touching anything SEO-related; it documents a real gotcha (`AppInitGate` hides `<head>` tags from static export unless mounted above it) that already broke this once.
+- **MyChat list/composer:** do not re-apply list `translateY` with the keyboard, `overflow: hidden` on the lifting wrapper, or native `height` from `contentSize`. Living model: `openspec/specs/mychat-chat-ui/spec.md` + catalog `MyChat`. Archive Decision 8f is stale (8g).

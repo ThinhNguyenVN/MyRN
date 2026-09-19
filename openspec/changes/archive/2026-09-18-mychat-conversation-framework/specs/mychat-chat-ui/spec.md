@@ -1,3 +1,5 @@
+> **Superseded for keyboard / grow / column width.** Delta dưới đây là snapshot lúc archive. Mô hình đã chốt: `openspec/specs/mychat-chat-ui/spec.md` (8g). Đặc biệt: **không** `translateY` cả list.
+
 ## ADDED Requirements
 
 ### Requirement: MyChat compose list + composer + empty state
