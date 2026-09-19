@@ -6,20 +6,22 @@ import {
   type NativeSyntheticEvent,
 } from 'react-native'
 import { FlashList, type FlashListRef, type ListRenderItemInfo } from '@shopify/flash-list'
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  type SharedValue,
+} from 'react-native-reanimated'
 
 import MyView from '@/components/elements/my-view'
+import { isAndroid } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import type { RenderCustomMessage } from './chat-adapter'
-import { useKeyboardScrollAnchor } from './hooks'
+import { BOTTOM_ANCHOR_THRESHOLD, KEYBOARD_CLOSE_SCROLL_SLACK, TAP_SLOP } from './constants'
 import MyChatBubble from './my-chat-bubble'
 import { generateStyles } from './styles'
 import type { ChatFormValues, ChatMessage, MessageAction } from './types'
-
-/** Distance (px) from the real bottom still considered "at bottom" for keyboard anchoring. */
-const BOTTOM_ANCHOR_THRESHOLD = 24
-/** Touch travel (px) under which a gesture still counts as a tap, not a scroll. */
-const TAP_SLOP = 8
+import { useKeyboardScrollAnchor } from './use-keyboard-scroll-anchor'
 
 export interface MyChatListProps {
   messages: ChatMessage[]
@@ -34,6 +36,13 @@ export interface MyChatListProps {
   composerHeight: number
   /** Focus state of the composer input, so we only dismiss the keyboard it owns. */
   isComposerFocusedRef?: { current: boolean }
+  /**
+   * Keyboard height shared value, owned by MyChat's single screen-lifetime
+   * `useReanimatedKeyboardAnimation()`. Passed in rather than read again here: that hook
+   * also calls `useResizeMode()`, whose unmount resets Android's soft-input mode
+   * globally, and this component unmounts whenever `hasMessages` flips.
+   */
+  keyboardHeight: SharedValue<number>
 }
 
 function keyExtractor(item: ChatMessage): string {
@@ -57,6 +66,7 @@ function MyChatList({
   columnGutter,
   composerHeight,
   isComposerFocusedRef,
+  keyboardHeight,
 }: MyChatListProps) {
   const styles = useThemedStyles(generateStyles)
   const { getSpacing } = useTheme()
@@ -64,6 +74,9 @@ function MyChatList({
   const lastScrollTokenRef = useRef(0)
   const isAtBottomRef = useRef(true)
   const keyboardMotionLockRef = useRef(false)
+  /** Android: keyboard space (px) currently reserved by the list's layout. */
+  const keyboardSpace = useSharedValue(0)
+  const reservedKeyboardSpaceRef = useRef(0)
   const touchStartYRef = useRef(0)
   const didScrollDuringTouchRef = useRef(false)
   const itemStyle = useMemo(
@@ -104,11 +117,85 @@ function MyChatList({
     }
     pinToEnd()
     requestAnimationFrame(() => {
-      requestAnimationFrame(pinToEnd)
+      requestAnimationFrame(() => {
+        pinToEnd()
+        if (!isAndroid) {
+          return
+        }
+        const settledOffset = listRef.current?.getAbsoluteLastScrollOffset() ?? 0
+        listRef.current?.scrollToOffset({
+          offset: settledOffset + KEYBOARD_CLOSE_SCROLL_SLACK,
+          animated: false,
+        })
+      })
     })
   }, [])
 
-  useKeyboardScrollAnchor(handleScrollToEndForKeyboard, isAtBottomRef, keyboardMotionLockRef)
+  /**
+   * Android: move the scroll by exactly the change in reserved keyboard space, at the
+   * START of the transition, while the counter-transform hides it. At the bottom we pin
+   * to the true end (which is what reaches the last bit of bottom padding — the reason a
+   * pin is needed at all); elsewhere we shift by the delta so the viewport is preserved
+   * mid-list too. Either way the shift is ~the same amount the transform cancels, so
+   * nothing appears to move until the keyboard itself starts moving.
+   */
+  // This component mounts when `hasMessages` flips — which, in the most common flow,
+  // happens while the keyboard is already open (sending the first message). There is no
+  // transition to hook in that case, so seed the reserved space from the current keyboard
+  // height instead of waiting for the next open/close. Layout effect, so the first paint
+  // already has it.
+  useLayoutEffect(() => {
+    if (!isAndroid) {
+      return
+    }
+    const openHeight = Math.max(0, -keyboardHeight.value)
+    keyboardSpace.value = openHeight
+    reservedKeyboardSpaceRef.current = openHeight
+  }, [keyboardHeight, keyboardSpace])
+
+  const shiftScrollForKeyboard = useCallback(
+    (destinationKeyboardHeight: number) => {
+      const delta = destinationKeyboardHeight - reservedKeyboardSpaceRef.current
+      reservedKeyboardSpaceRef.current = destinationKeyboardHeight
+      if (delta === 0) {
+        return
+      }
+      if (isAtBottomRef.current) {
+        handleScrollToEndForKeyboard()
+        return
+      }
+      const current = listRef.current?.getAbsoluteLastScrollOffset() ?? 0
+      listRef.current?.scrollToOffset({ offset: current + delta, animated: false })
+    },
+    [handleScrollToEndForKeyboard],
+  )
+
+  useKeyboardScrollAnchor(
+    handleScrollToEndForKeyboard,
+    isAtBottomRef,
+    keyboardMotionLockRef,
+    keyboardSpace,
+    shiftScrollForKeyboard,
+  )
+
+  /**
+   * Android only. `marginBottom` is the real, steady-state viewport change — committed
+   * ONCE per transition (in the worklet that starts it), never per frame: animating it
+   * per frame was the jank, because every frame was a Yoga re-layout plus a FlashList
+   * re-measure. `translateY` is the mask: it starts out cancelling both the layout commit
+   * and the scroll shift, then unwinds to 0 as the keyboard moves — paint-only, so the
+   * per-frame cost is a composite, not a layout. `keyboardHeight` is negative while the
+   * keyboard is open, so `keyboardSpace + keyboardHeight` is 0 at both rest states.
+   */
+  const keyboardShiftStyle = useAnimatedStyle(() => {
+    if (!isAndroid) {
+      return {}
+    }
+    return {
+      marginBottom: keyboardSpace.value,
+      transform: [{ translateY: keyboardSpace.value + keyboardHeight.value }],
+    }
+  })
 
   const handleTouchStart = useCallback((event: GestureResponderEvent) => {
     touchStartYRef.current = event.nativeEvent.pageY
@@ -144,25 +231,27 @@ function MyChatList({
   )
 
   return (
-    <FlashList
-      ref={listRef}
-      data={messages}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
-      ItemSeparatorComponent={ChatListItemSeparator}
-      style={styles.list}
-      contentContainerStyle={listContentStyle}
-      keyboardShouldPersistTaps="handled"
-      keyboardDismissMode="interactive"
-      onScroll={handleScroll}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      maintainVisibleContentPosition={{
-        startRenderingFromBottom: true,
-        autoscrollToBottomThreshold: 0.2,
-        animateAutoScrollToBottom: false,
-      }}
-    />
+    <Animated.View style={[styles.keyboardShiftWrapper, keyboardShiftStyle]}>
+      <FlashList
+        ref={listRef}
+        data={messages}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        ItemSeparatorComponent={ChatListItemSeparator}
+        style={styles.list}
+        contentContainerStyle={listContentStyle}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+        onScroll={handleScroll}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        maintainVisibleContentPosition={{
+          startRenderingFromBottom: true,
+          autoscrollToBottomThreshold: 0.2,
+          animateAutoScrollToBottom: false,
+        }}
+      />
+    </Animated.View>
   )
 }
 

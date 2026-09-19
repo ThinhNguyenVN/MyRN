@@ -6,13 +6,8 @@ import {
   type TextInputScrollEvent,
 } from 'react-native'
 import { Gesture } from 'react-native-gesture-handler'
+import { useKeyboardState, useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
 import {
-  useGenericKeyboardHandler,
-  useKeyboardState,
-  useReanimatedKeyboardAnimation,
-} from 'react-native-keyboard-controller'
-import {
-  Easing,
   Extrapolation,
   cancelAnimation,
   interpolate,
@@ -25,19 +20,16 @@ import {
 import { isWeb, NAVIGATION_BAR_HEIGHT } from '@/constants/dimensions'
 import { useTheme } from '@/theme/theme-context'
 
-import { COMPOSER_ACTIONS_HEIGHT, MIN_COMPOSER_HEIGHT } from './styles'
-
-export { COMPOSER_ACTIONS_HEIGHT, MIN_COMPOSER_HEIGHT }
-
-const INPUT_MAX_VIEWPORT_GAP = 20
-const COMPOSER_RESIZE_ANIMATION_MS = 180
-const COMPOSER_RESIZE_EASING = Easing.out(Easing.cubic)
-const COLLAPSE_PULL_THRESHOLD = 56
-const COLLAPSE_PULL_VELOCITY = 900
-const COLLAPSE_RESIZE_CONFIG = {
-  duration: COMPOSER_RESIZE_ANIMATION_MS,
-  easing: COMPOSER_RESIZE_EASING,
-}
+import {
+  COLLAPSE_PULL_THRESHOLD,
+  COLLAPSE_PULL_VELOCITY,
+  COLLAPSE_RESIZE_CONFIG,
+  COMPOSER_ACTIONS_HEIGHT,
+  COMPOSER_RESIZE_ANIMATION_MS,
+  COMPOSER_RESIZE_EASING,
+  INPUT_MAX_VIEWPORT_GAP,
+  MIN_COMPOSER_HEIGHT,
+} from './constants'
 
 export function useComposerInputLayout() {
   const { getSpacing, insets, isMobile } = useTheme()
@@ -217,6 +209,7 @@ export function useComposerInputLayout() {
             stateManager.fail()
           }
         })
+
         .onUpdate((e) => {
           'worklet'
           if (isExpandedSV.value !== 1) {
@@ -279,65 +272,4 @@ export function useComposerInputLayout() {
     handleToggleExpand,
     resetComposerLayout,
   }
-}
-
-/**
- * Keyboard list correction without changing `marginBottom` / composer lift.
- * Close: pin on `onStart` (rides with the slide) and again on `onEnd` if FlashList
- * had not finished contentSize. Open: pin on `onEnd`. Freeze at-bottom while the
- * keyboard is moving — `onScroll` in that window uses a stale viewport.
- */
-export function useKeyboardScrollAnchor(
-  scrollToEnd: () => void,
-  isAtBottomRef: { current: boolean },
-  motionLockRef: { current: boolean },
-) {
-  const pinThisCloseRef = useRef(false)
-
-  const handleStart = useCallback(
-    (isClosing: boolean) => {
-      motionLockRef.current = true
-      if (!isClosing || !isAtBottomRef.current) {
-        return
-      }
-      pinThisCloseRef.current = true
-      scrollToEnd()
-    },
-    [isAtBottomRef, motionLockRef, scrollToEnd],
-  )
-
-  const handleEnd = useCallback(
-    (isOpen: boolean) => {
-      if (isOpen) {
-        if (isAtBottomRef.current) {
-          scrollToEnd()
-        }
-      } else if (pinThisCloseRef.current) {
-        pinThisCloseRef.current = false
-        scrollToEnd()
-      }
-      motionLockRef.current = false
-    },
-    [isAtBottomRef, motionLockRef, scrollToEnd],
-  )
-
-  useGenericKeyboardHandler(
-    {
-      onStart: (event) => {
-        'worklet'
-        if (isWeb) {
-          return
-        }
-        runOnJS(handleStart)(event.height <= 0)
-      },
-      onEnd: (event) => {
-        'worklet'
-        if (isWeb) {
-          return
-        }
-        runOnJS(handleEnd)(event.height > 0)
-      },
-    },
-    [handleEnd, handleStart],
-  )
 }

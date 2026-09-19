@@ -4,7 +4,8 @@ import { TextInput, View, type TextInputProps, type TextStyle } from 'react-nati
 import { isWeb } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
-import { COMPOSER_INPUT_LINE_HEIGHT, generateStyles } from './styles'
+import { COMPOSER_INPUT_LINE_HEIGHT } from './constants'
+import { generateStyles } from './styles'
 
 type WebTextArea = {
   scrollHeight: number

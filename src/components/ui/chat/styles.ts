@@ -3,9 +3,11 @@ import { StyleSheet, type TextStyle } from 'react-native'
 import { isWeb, MAX_CHAT_WIDTH } from '@/constants/dimensions'
 import type { ThemeType } from '@/theme/theme-context'
 
-export const MIN_COMPOSER_HEIGHT = 24
-export const COMPOSER_ACTIONS_HEIGHT = 40
-export const COMPOSER_INPUT_LINE_HEIGHT = 22
+import {
+  COMPOSER_ACTIONS_HEIGHT,
+  COMPOSER_INPUT_LINE_HEIGHT,
+  MIN_COMPOSER_HEIGHT,
+} from './constants'
 
 export function getChatColumnGutter(
   columnWidth: number,
@@ -59,6 +61,13 @@ export const generateStyles = (theme: ThemeType) => {
     list: {
       flex: 1,
       width: '100%',
+    },
+    // Android keyboard shift: clips the list while the counter-transform is unwinding so
+    // the shifted content cannot draw over the header.
+    keyboardShiftWrapper: {
+      flex: 1,
+      width: '100%',
+      overflow: 'hidden',
     },
     listContent: {
       paddingTop: getSpacing('x6'),

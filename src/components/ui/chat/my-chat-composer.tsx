@@ -14,9 +14,10 @@ import { pickImage, pickImageFromCamera } from '@/components/ui/image-picker'
 import { isWeb } from '@/constants/dimensions'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import { COMPOSER_ACTIONS_HEIGHT, MIN_COMPOSER_HEIGHT, useComposerInputLayout } from './hooks'
+import { COMPOSER_ACTIONS_HEIGHT, MIN_COMPOSER_HEIGHT } from './constants'
 import MyChatComposerInput from './my-chat-composer-input'
 import { generateStyles } from './styles'
+import { useComposerInputLayout } from './use-composer-input-layout'
 
 export interface MyChatComposerProps {
   onSend: (text: string) => void

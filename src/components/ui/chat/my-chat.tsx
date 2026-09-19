@@ -5,10 +5,11 @@ import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller
 
 import MyView from '@/components/elements/my-view'
 import { ConditionRenderer } from '@/components/ui/condition-renderer'
-import { isWeb } from '@/constants/dimensions'
+import { isAndroid, isWeb } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import type { ChatAdapter, RenderCustomMessage } from './chat-adapter'
+import { COMPOSER_HEIGHT_COMMIT_THRESHOLD } from './constants'
 import type { ChatSuggestion } from './my-chat-empty-state'
 import MyChatEmptyState from './my-chat-empty-state'
 import MyChatComposer from './my-chat-composer'
@@ -16,12 +17,6 @@ import MyChatList from './my-chat-list'
 import { generateStyles, getChatColumnGutter } from './styles'
 import { useConversation } from './use-conversation'
 import type { ChatMessage, MessageAction } from './types'
-
-/**
- * Minimum composer height change (px) worth re-rendering the list for. Keeps the
- * expand/collapse animation from relaying out FlashList on every frame.
- */
-const COMPOSER_HEIGHT_COMMIT_THRESHOLD = 8
 
 export interface ChatSuggestionInput {
   id: string
@@ -98,9 +93,19 @@ function MyChat({
   // FlashList viewport off-screen so offset 0 cannot show the first messages.
   // Shrink the list on the UI thread instead (same `height` shared value, no post-open snap).
   const { height } = useReanimatedKeyboardAnimation()
-  const listKeyboardStyle = useAnimatedStyle(() => ({
-    marginBottom: isWeb ? 0 : -height.value,
-  }))
+  const listKeyboardStyle = useAnimatedStyle(() => {
+    if (isWeb) {
+      return { marginBottom: 0 }
+    }
+    // Android + FlashList: MyChatList reserves the keyboard space itself, committing the
+    // layout once per transition and masking it with a transform, because animating this
+    // wrapper's `marginBottom` per frame was the Android jank. The empty state has no
+    // list of its own, so it still relies on this wrapper shrinking around it.
+    if (isAndroid && hasMessages) {
+      return { marginBottom: 0 }
+    }
+    return { marginBottom: -height.value }
+  })
   const composerKeyboardStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: isWeb ? 0 : height.value }],
   }))
@@ -143,6 +148,7 @@ function MyChat({
               columnGutter={columnGutter}
               composerHeight={composerHeight}
               isComposerFocusedRef={isComposerFocusedRef}
+              keyboardHeight={height}
             />
           </ConditionRenderer>
         </Animated.View>
