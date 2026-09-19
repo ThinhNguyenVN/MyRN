@@ -4,7 +4,14 @@
 Shared kit `MyChat`: list từ đáy, composer overlay, renderer theo `ChatMessage.kind`, không gắn Gemini/MCP.
 ## Requirements
 ### Requirement: MyChat compose list + composer + empty state
-`MyChat` (`src/components/ui/chat`) SHALL nhận `adapter: ChatAdapter`, `onAction: (action: MessageAction) => void`, `renderCustomMessage?: (message: CustomMessage) => ReactElement | null`, và render `MyChatList` + `MyChatComposer`, chuyển sang `MyChatEmptyState` khi chưa có message nào. `MyChat` MUST dùng component `My*`/token theme hiện có (`MyView`, `MyText`, `MySurface`, `MyButton`, …). Input composer MUST dùng `MyChatComposerInput` (kit `TextInput`), MUST NOT thêm auto-grow generic vào `MyTextInput` dùng chung. MUST NOT hardcode màu/spacing ngoài theme token. Trên layout không mobile (`useIsMobileSize() === false`), cột chat MUST căn giữa và không rộng hơn `MAX_CHAT_WIDTH` (900).
+`MyChat` (`src/components/ui/chat`) SHALL nhận `adapter: ChatAdapter`, `onAction: (action: MessageAction) => void`, `renderCustomMessage?: (message: CustomMessage) => ReactElement | null`, và render `MyChatList` + `MyChatComposer`, chuyển sang `MyChatEmptyState` khi chưa có message nào. `MyChat` MUST dùng component `My*`/token theme hiện có (`MyView`, `MyText`, `MySurface`, `MyButton`, …). Input composer MUST dùng `MyChatComposerInput` (kit `TextInput`), MUST NOT thêm auto-grow generic vào `MyTextInput` dùng chung. MUST NOT hardcode màu/spacing ngoài theme token.
+
+Hai trục layout MUST tách, không trộn `if (isWeb)` cho cả hai:
+
+- **`isMobile`** (`Platform !== web` **và** hẹp): chrome composer — 2 hàng, nút expand/collapse, grow native.
+- **`isMobileSize`** (hẹp, mọi platform): bề ngang cột — gutter / `MAX_CHAT_WIDTH` (900).
+
+Khi `isMobileSize === false`, bề ngang *nội dung* (bubble + composer) MUST căn giữa và không rộng hơn 900. Thanh cuộn list MUST sát mép cửa sổ (không kẹp scrollbar trong cột 900). Căn cột MUST bằng `paddingHorizontal` theo width cột đã đo — MUST NOT `overflow: hidden` / `maxWidth` trên wrapper đang animate theo bàn phím.
 
 #### Scenario: Empty state khi chưa có message
 - **WHEN** `MyChat` mount với `messages` rỗng
@@ -63,7 +70,7 @@ Shared kit `MyChat`: list từ đáy, composer overlay, renderer theo `ChatMessa
 - **THEN** `MyChat` MUST render `MyChatUnknownMessage` fallback, MUST NOT throw lỗi runtime
 
 ### Requirement: Composer hỗ trợ text và attachment ảnh thật
-`MyChatComposer` SHALL cung cấp input text (`MyChatComposerInput`) + nút gửi, và nút `+` mở picker ảnh dùng `pickImage`/`pickImageFromCamera` đã có sẵn trong `components/ui/image-picker` (native: bottom sheet Take Photo/Choose from Library; web: file picker). `MyChatComposer` MUST NOT tự cài đặt lại logic chọn ảnh. Native MUST có hàng action riêng (attach / expand-collapse / send). Web MUST xếp attach + input + send trên một hàng, MUST NOT hiện nút expand.
+`MyChatComposer` SHALL cung cấp input text (`MyChatComposerInput`) + nút gửi, và nút `+` mở picker ảnh dùng `pickImage`/`pickImageFromCamera` đã có sẵn trong `components/ui/image-picker` (native: bottom sheet Take Photo/Choose from Library; web: file picker). `MyChatComposer` MUST NOT tự cài đặt lại logic chọn ảnh. Khi `isMobile`: hàng action riêng (attach / expand-collapse / send). Khi không `isMobile` (web, hoặc native rộng): attach + input + send trên một hàng, MUST NOT hiện nút expand.
 
 **Follow-up (không chặn merge Phase 1–4):** smoke gửi ảnh qua `+` (native + web) chưa chạy trong session archive. Wiring `sendImage` + `ImageMessage` local URI vẫn là AC hiện tại; session sau có thể bổ sung requirement (preview, upload, đa ảnh, v.v.) sau khi test thật.
 
@@ -76,7 +83,9 @@ Shared kit `MyChat`: list từ đáy, composer overlay, renderer theo `ChatMessa
 - **THEN** `chat.sendImage(imageUri)` MUST được gọi, tạo một `ImageMessage` role `user` trong `chat.messages`
 
 ### Requirement: Composer tự lớn/nhỏ theo số dòng text (auto-grow)
-`MyChatComposer` SHALL hiển thị input 1 dòng theo mặc định và tự tăng chiều cao khi user gõ nhiều dòng, tới `composerMaxHeight` (viewport trừ header, footer composer, keyboard, gap) thì input MUST tự scroll nội dung bên trong. Native MUST cho phép expand gần full viewport rồi collapse; sau collapse + gửi, chiều cao MUST về đúng 1 dòng mặc định. Logic auto-grow MUST nằm trong `components/ui/chat`, MUST NOT thêm prop auto-grow generic vào `MyTextInput`.
+`MyChatComposer` SHALL hiển thị input 1 dòng theo mặc định và tự tăng chiều cao khi user gõ nhiều dòng, tới `composerMaxHeight` (viewport trừ header, footer composer, keyboard, gap) thì input MUST tự scroll nội dung bên trong. Khi `isMobile` MUST cho phép expand gần full viewport rồi collapse (nút + kéo xuống khi scroll input đang ở đầu); sau collapse + gửi, chiều cao MUST về đúng 1 dòng mặc định. Logic auto-grow MUST nằm trong `components/ui/chat`, MUST NOT thêm prop auto-grow generic vào `MyTextInput`.
+
+**Mô hình height (cấm regress):** native MUST để `TextInput` tự giãn khi `scrollEnabled` false. Kit chỉ giữ **sàn** (`minHeight` / `expandedMinHeight`, `0` = không ép) và **trần** (`maxHeight` = `composerMaxHeight`). `onContentSizeChange` / `scrollHeight` MUST chỉ dùng để biết overflow (bật scroll) và để set height textarea **web**. MUST NOT ghi `height` animated từ số đo native; MUST NOT state máy `isRemeasuring` / remount input để “reset” height. Expand nâng sàn lên trần; collapse hạ sàn về `0` (rơi đúng height chữ). `onLayout` chiều cao composer đưa vào list `paddingBottom` MUST có ngưỡng (không commit từng frame lúc animate expand).
 
 #### Scenario: Input lớn dần theo số dòng
 - **WHEN** user gõ text xuống dòng thứ 2, thứ 3 (chưa vượt `composerMaxHeight`)
@@ -94,14 +103,43 @@ Shared kit `MyChat`: list từ đáy, composer overlay, renderer theo `ChatMessa
 - **WHEN** user expand composer, gõ thêm, collapse, rồi gửi
 - **THEN** composer MUST trở về chiều cao 1 dòng mặc định (không giữ height lúc expand)
 
+#### Scenario: Expand / collapse (isMobile)
+- **WHEN** user tap expand
+- **THEN** ô MUST lên gần trần viewport (cùng công thức `composerMaxHeight`), list MUST NOT bị đẩy vì composer overlay
+- **WHEN** user tap collapse hoặc kéo xuống từ lúc input đang ở đầu nội dung
+- **THEN** ô MUST thu về height chữ hiện tại, có animation; kéo giữa nội dung dài MUST chỉ cuộn chữ
+- **WHEN** kéo collapse chưa đủ rồi thả
+- **THEN** ô MUST nảy về height expand, không kẹt nửa chừng
+
 #### Scenario: FlashList cách bubble bằng separator
 - **WHEN** `MyChatList` render từ 2 message trở lên
 - **THEN** giữa các item MUST có khoảng `ItemSeparatorComponent` theo token spacing (không dựa vào `gap` trên `contentContainerStyle`)
 
-### Requirement: Composer không bị che bởi bàn phím
-Native: list + composer overlay SHALL dùng cùng `translateY` từ `useReanimatedKeyboardAnimation().height` (keyboard-controller) để nhấc theo bàn phím — MUST NOT resize viewport list bằng `paddingBottom` theo keyboard từng frame, MUST NOT dùng `KeyboardAvoidingView` `behavior="padding"`. Web: không nhấc theo software keyboard. Composer overlay `position: absolute` đáy; `MyChatList`/`MyChatEmptyState` MUST `paddingBottom` theo chiều cao composer đã `onLayout` để message cuối không bị che.
+### Requirement: Composer không bị che bởi bàn phím; list vẫn cuộn hết
+Composer overlay `position: absolute` đáy. `MyChatList` / `MyChatEmptyState` MUST `paddingBottom` theo chiều cao composer đã `onLayout` (+ token `x4`) để message cuối không bị che. Web: không nhấc theo software keyboard.
+
+**Mô hình keyboard native (cấm regress — `translateY` cả list đã làm mất khả năng kéo tới tin đầu):**
+
+- Composer: `translateY` theo `useReanimatedKeyboardAnimation().height` (cùng nhịp phím).
+- List: **không** `translateY`. Co viewport trên UI thread (`marginBottom: -height.value`) để FlashList còn nằm trên màn — `offset 0` vẫn là tin đầu.
+- MUST NOT `KeyboardAvoidingView` `behavior="padding"`.
+- MUST NOT `paddingTop` / `contentOffset` list **sau khi** phím mở xong (JS thread → giật).
+- MUST NOT `overflow: hidden` trên cột / `listWrapper` đang lift hoặc co theo phím.
+- Nếu user đang ở đáy khi phím xong: được phép **một** `scrollToEnd({ animated: false })` trên `useGenericKeyboardHandler` `onEnd` (không dùng `useKeyboardHandler` — tránh đánh Android resize khi list mount/unmount). Không neo lại message giữa list từng frame.
 
 #### Scenario: Mở bàn phím không che composer
 - **WHEN** user tap vào input để mở bàn phím (native)
 - **THEN** `MyChatComposer` MUST nằm ngay phía trên bàn phím, message cuối cùng trong `MyChatList` MUST vẫn nhìn thấy được (không bị composer hoặc bàn phím che mất)
+
+#### Scenario: Mở phím vẫn kéo hết transcript
+- **WHEN** list dài và bàn phím đang mở (native)
+- **THEN** user MUST kéo được tới message đầu, nội dung MUST NOT bị cắt vì viewport list bị đẩy khỏi màn hình
+
+#### Scenario: Đóng phím không thụt rồi nhảy
+- **WHEN** user đóng bàn phím (native)
+- **THEN** list MUST NOT thụt một đoạn ≈ chiều cao phím rồi mới nhảy lên; mở/đóng MUST cùng nhịp phím, không giật thêm một nhịp sau khi phím đã ổn
+
+#### Scenario: Web mép bubble = composer, scrollbar sát cửa sổ
+- **WHEN** `isMobileSize === false`
+- **THEN** mép trái/phải bubble MUST thẳng hàng mép composer (`MAX_CHAT_WIDTH`); thanh cuộn list MUST sát mép cửa sổ
 

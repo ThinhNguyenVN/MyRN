@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { type LayoutChangeEvent } from 'react-native'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
@@ -16,6 +16,12 @@ import MyChatList from './my-chat-list'
 import { generateStyles, getChatColumnGutter } from './styles'
 import { useConversation } from './use-conversation'
 import type { ChatMessage, MessageAction } from './types'
+
+/**
+ * Minimum composer height change (px) worth re-rendering the list for. Keeps the
+ * expand/collapse animation from relaying out FlashList on every frame.
+ */
+const COMPOSER_HEIGHT_COMMIT_THRESHOLD = 8
 
 export interface ChatSuggestionInput {
   id: string
@@ -49,6 +55,7 @@ function MyChat({
   const [scrollToEndToken, setScrollToEndToken] = useState(0)
   const [columnWidth, setColumnWidth] = useState(0)
   const [composerHeight, setComposerHeight] = useState(0)
+  const isComposerFocusedRef = useRef(false)
   const columnGutter = getChatColumnGutter(columnWidth, isMobileSize, getSpacing('x6'))
 
   const handleColumnLayout = useCallback((event: LayoutChangeEvent) => {
@@ -57,8 +64,14 @@ function MyChat({
   }, [])
 
   const handleComposerLayout = useCallback((event: LayoutChangeEvent) => {
-    const next = event.nativeEvent.layout.height
-    setComposerHeight((current) => (current === next ? current : next))
+    const next = Math.round(event.nativeEvent.layout.height)
+    setComposerHeight((current) =>
+      Math.abs(current - next) < COMPOSER_HEIGHT_COMMIT_THRESHOLD ? current : next,
+    )
+  }, [])
+
+  const handleComposerFocusChange = useCallback((focused: boolean) => {
+    isComposerFocusedRef.current = focused
   }, [])
 
   const pinListToBottom = useCallback(() => {
@@ -129,6 +142,7 @@ function MyChat({
               scrollToEndToken={scrollToEndToken}
               columnGutter={columnGutter}
               composerHeight={composerHeight}
+              isComposerFocusedRef={isComposerFocusedRef}
             />
           </ConditionRenderer>
         </Animated.View>
@@ -141,6 +155,7 @@ function MyChat({
             onSend={handleSend}
             onSendImage={handleSendImage}
             disabled={chat.isSending}
+            onFocusChange={handleComposerFocusChange}
           />
         </Animated.View>
       </MyView>

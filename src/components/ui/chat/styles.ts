@@ -24,15 +24,21 @@ export function getChatColumnGutter(
 const MAX_BUBBLE_WIDTH = '100%'
 
 export const generateStyles = (theme: ThemeType) => {
-  const { getSpacing, getColor, insets, isMobileSize } = theme
+  const { getSpacing, getColor, insets, isMobileSize, isMobile } = theme
 
-  const composerBaselineHeight = isMobileSize
-    ? getSpacing('x4') +
-      MIN_COMPOSER_HEIGHT +
-      getSpacing('x2') +
-      COMPOSER_ACTIONS_HEIGHT +
-      (insets.bottom ?? getSpacing('x4'))
-    : getSpacing('x4') + COMPOSER_ACTIONS_HEIGHT + getSpacing('x4') + getSpacing('x4')
+  // Two independent axes, kept explicit on purpose:
+  // - `isMobile` (native AND narrow) drives the composer's own layout: two rows with an
+  //   expand affordance, animated input height, input min-height.
+  // - `isMobileSize` (narrow, any platform) drives column sizing: max width and the
+  //   bottom gap of the centered column.
+  // Mixing the two is what made mobile web inherit a native-only expand button.
+  const composerRowsHeight = isMobile
+    ? MIN_COMPOSER_HEIGHT + getSpacing('x2') + COMPOSER_ACTIONS_HEIGHT
+    : COMPOSER_ACTIONS_HEIGHT
+  const composerBottomGap = isMobileSize
+    ? (insets.bottom ?? getSpacing('x4'))
+    : getSpacing('x4') * 2
+  const composerBaselineHeight = getSpacing('x4') + composerRowsHeight + composerBottomGap
 
   return StyleSheet.create({
     root: {
@@ -214,10 +220,15 @@ export const generateStyles = (theme: ThemeType) => {
     },
     composerInputWrap: {
       flexDirection: 'row',
-      alignItems: 'center',
+      // Native stretches so the field fills the (possibly expanded) input area and the
+      // whole area stays tappable; web centers the single-row input against the buttons.
+      alignItems: isWeb ? 'center' : 'stretch',
       justifyContent: 'center',
       width: '100%',
-      minHeight: isMobileSize ? undefined : COMPOSER_ACTIONS_HEIGHT,
+      minHeight: isMobile ? undefined : COMPOSER_ACTIONS_HEIGHT,
+      // Grow into the animated floor when expanded, but keep an intrinsic (content)
+      // basis so the area still sizes itself to the text when it is not expanded.
+      ...(isWeb ? null : { flexGrow: 1, flexBasis: 'auto' as const }),
     },
     composerInput: {
       flex: 1,

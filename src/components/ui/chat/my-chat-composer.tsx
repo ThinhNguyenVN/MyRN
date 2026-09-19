@@ -22,43 +22,45 @@ export interface MyChatComposerProps {
   onSend: (text: string) => void
   onSendImage: (imageUri: string) => void
   disabled?: boolean
+  /** Reports composer focus so the transcript only dismisses the keyboard it owns. */
+  onFocusChange?: (focused: boolean) => void
 }
 
-function MyChatComposer({ onSend, onSendImage, disabled = false }: MyChatComposerProps) {
+function MyChatComposer({
+  onSend,
+  onSendImage,
+  disabled = false,
+  onFocusChange,
+}: MyChatComposerProps) {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
   const [text, setText] = useState('')
   const attachSheetRef = useRef<MyBottomSheetRef>(null)
   const hasText = text.trim().length > 0
   const {
-    isMobileSize,
+    isMobileComposer,
     isExpanded,
-    isInputScrollable,
-    isHeightLocked,
-    isClipHeight,
-    isRemeasuring,
+    isOverflowing,
     contentHeight,
     composerMaxHeight,
     animatedComposerPaddingStyle,
     animatedInputAreaStyle,
     expandIconAnimatedStyle,
     collapsePanGesture,
-    applyTextLayout,
     applyMeasuredHeight,
     handleContentSizeChange,
     handleInputScroll,
     handleToggleExpand,
     resetComposerLayout,
-    inputResetKey,
   } = useComposerInputLayout()
 
-  const handleChangeText = useCallback(
-    (next: string) => {
-      applyTextLayout(next, text.length)
-      setText(next)
-    },
-    [applyTextLayout, text.length],
-  )
+  const handleFocus = useCallback(() => {
+    onFocusChange?.(true)
+  }, [onFocusChange])
+
+  const handleBlur = useCallback(() => {
+    onFocusChange?.(false)
+  }, [onFocusChange])
 
   const handleSend = useCallback(() => {
     if (!text.trim() || disabled) {
@@ -101,35 +103,34 @@ function MyChatComposer({ onSend, onSendImage, disabled = false }: MyChatCompose
 
   const composerInputField = (
     <MyChatComposerInput
-      key={`chat-composer-input-${inputResetKey}`}
       value={text}
-      onChangeText={handleChangeText}
+      onChangeText={setText}
       onContentSizeChange={isWeb ? undefined : handleContentSizeChange}
       onMeasuredHeight={isWeb ? applyMeasuredHeight : undefined}
       onScroll={isWeb ? undefined : handleInputScroll}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       multiline
       blurOnSubmit={false}
-      scrollEnabled={isExpanded || isInputScrollable}
-      lockHeight={isHeightLocked && !isRemeasuring}
-      minHeight={isMobileSize ? MIN_COMPOSER_HEIGHT : COMPOSER_ACTIONS_HEIGHT}
+      scrollEnabled={isExpanded || isOverflowing}
+      lockHeight={isOverflowing}
+      minHeight={isMobileComposer ? MIN_COMPOSER_HEIGHT : COMPOSER_ACTIONS_HEIGHT}
       contentHeight={contentHeight}
       lockedHeight={composerMaxHeight}
       placeholder={t('components.chat.composerPlaceholder')}
     />
   )
 
-  const composerInput = (
-    <ConditionRenderer when={isMobileSize} fallback={composerInputField}>
-      <GestureDetector gesture={collapsePanGesture}>
-        <View collapsable={false}>
-          <ConditionRenderer when={isClipHeight} fallback={composerInputField}>
-            <Animated.View collapsable={false} style={animatedInputAreaStyle}>
-              {composerInputField}
-            </Animated.View>
-          </ConditionRenderer>
-        </View>
-      </GestureDetector>
-    </ConditionRenderer>
+  const composerInput = isMobileComposer ? (
+    <GestureDetector gesture={collapsePanGesture}>
+      <View collapsable={false}>
+        <Animated.View collapsable={false} style={animatedInputAreaStyle}>
+          {composerInputField}
+        </Animated.View>
+      </View>
+    </GestureDetector>
+  ) : (
+    composerInputField
   )
 
   const attachButton = (
@@ -186,7 +187,7 @@ function MyChatComposer({ onSend, onSendImage, disabled = false }: MyChatCompose
     <MyView style={styles.composerRoot} radius="large">
       <Animated.View style={[styles.composerBody, animatedComposerPaddingStyle]}>
         <ConditionRenderer
-          when={!isMobileSize}
+          when={!isMobileComposer}
           fallback={
             <>
               {composerInput}
@@ -202,7 +203,7 @@ function MyChatComposer({ onSend, onSendImage, disabled = false }: MyChatCompose
         </ConditionRenderer>
       </Animated.View>
 
-      <ConditionRenderer when={isMobileSize}>
+      <ConditionRenderer when={!isWeb}>
         <MyBottomSheet
           ref={attachSheetRef}
           title={t('components.chat.attachTitle')}

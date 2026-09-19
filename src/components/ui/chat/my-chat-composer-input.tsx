@@ -21,11 +21,15 @@ export type MyChatComposerInputProps = Pick<
   | 'multiline'
   | 'placeholder'
   | 'blurOnSubmit'
+  | 'onFocus'
+  | 'onBlur'
 > & {
-  /** When true, pin height so the field scrolls instead of growing (expanded / past max). */
+  /** Web only: pin the textarea height so it scrolls instead of growing past the ceiling. */
   lockHeight: boolean
   minHeight: number
+  /** Web only: measured content height of the textarea. */
   contentHeight: number
+  /** Ceiling: the field stops growing here and scrolls internally instead. */
   lockedHeight: number
   onMeasuredHeight?: (height: number) => void
 }
@@ -47,6 +51,12 @@ function MyChatComposerInput({
   const grownHeight = Math.max(minHeight, Math.min(contentHeight, lockedHeight))
   const isEmpty = (inputProps.value ?? '').length === 0
   const wrapSizeStyle = useMemo(() => {
+    if (!isWeb) {
+      // Native: a multiline TextInput grows on its own while `scrollEnabled` is false,
+      // so nothing here sets a height — we only state the floor and the ceiling. That
+      // is what keeps typing visible even if a measurement is late or never arrives.
+      return { minHeight, maxHeight: lockedHeight }
+    }
     if (lockHeight) {
       return { height: lockedHeight, maxHeight: lockedHeight }
     }
@@ -60,20 +70,17 @@ function MyChatComposerInput({
     [styles.composerInputWrap, wrapSizeStyle],
   )
   const inputStyle = useMemo(() => {
+    if (!isWeb) {
+      return styles.composerInput as TextStyle
+    }
     if (lockHeight) {
       return [styles.composerInput, { height: lockedHeight }] as TextStyle[]
     }
     if (isEmpty) {
-      return [
-        styles.composerInput,
-        { height: isWeb ? COMPOSER_INPUT_LINE_HEIGHT : minHeight },
-      ] as TextStyle[]
+      return [styles.composerInput, { height: COMPOSER_INPUT_LINE_HEIGHT }] as TextStyle[]
     }
-    if (isWeb) {
-      return [styles.composerInput, { height: grownHeight }] as TextStyle[]
-    }
-    return [styles.composerInput, { minHeight: grownHeight }] as TextStyle[]
-  }, [grownHeight, isEmpty, lockHeight, lockedHeight, minHeight, styles.composerInput])
+    return [styles.composerInput, { height: grownHeight }] as TextStyle[]
+  }, [grownHeight, isEmpty, lockHeight, lockedHeight, styles.composerInput])
 
   useLayoutEffect(() => {
     if (!isWeb || lockHeight || isEmpty || !onMeasuredHeight) {

@@ -6,7 +6,11 @@ import {
   type TextInputScrollEvent,
 } from 'react-native'
 import { Gesture } from 'react-native-gesture-handler'
-import { useKeyboardState, useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
+import {
+  useGenericKeyboardHandler,
+  useKeyboardState,
+  useReanimatedKeyboardAnimation,
+} from 'react-native-keyboard-controller'
 import {
   Easing,
   Extrapolation,
@@ -25,14 +29,6 @@ import { COMPOSER_ACTIONS_HEIGHT, MIN_COMPOSER_HEIGHT } from './styles'
 
 export { COMPOSER_ACTIONS_HEIGHT, MIN_COMPOSER_HEIGHT }
 
-const COMPOSER_LAYOUT_DEFAULTS = {
-  isExpanded: false,
-  isInputScrollable: false,
-  contentHeight: MIN_COMPOSER_HEIGHT,
-  isRemeasuring: false,
-  isCollapsing: false,
-}
-
 const INPUT_MAX_VIEWPORT_GAP = 20
 const COMPOSER_RESIZE_ANIMATION_MS = 180
 const COMPOSER_RESIZE_EASING = Easing.out(Easing.cubic)
@@ -44,31 +40,30 @@ const COLLAPSE_RESIZE_CONFIG = {
 }
 
 export function useComposerInputLayout() {
-  const { getSpacing, insets, isMobileSize } = useTheme()
+  const { getSpacing, insets, isMobile } = useTheme()
   const { height: windowHeight } = useWindowDimensions()
   const { progress } = useReanimatedKeyboardAnimation()
   const keyboardHeight = useKeyboardState((state) => (state.isVisible ? state.height : 0))
   const keyboardOpenPadding = 0
   const keyboardClosedPadding = insets.bottom ? getSpacing('x4') : keyboardOpenPadding
 
-  const [isExpanded, setIsExpanded] = useState(COMPOSER_LAYOUT_DEFAULTS.isExpanded)
-  const [isInputScrollable, setIsInputScrollable] = useState(
-    COMPOSER_LAYOUT_DEFAULTS.isInputScrollable,
-  )
-  const [contentHeight, setContentHeight] = useState(COMPOSER_LAYOUT_DEFAULTS.contentHeight)
-  const [isRemeasuring, setIsRemeasuring] = useState(COMPOSER_LAYOUT_DEFAULTS.isRemeasuring)
-  const [isCollapsing, setIsCollapsing] = useState(COMPOSER_LAYOUT_DEFAULTS.isCollapsing)
-  const [inputResetKey, setInputResetKey] = useState(0)
+  const [isExpanded, setIsExpanded] = useState(false)
+  /** Content is taller than the ceiling: the field scrolls internally instead of growing. */
+  const [isOverflowing, setIsOverflowing] = useState(false)
+  /** Web only: a textarea has no intrinsic auto-grow, so its height is measured. */
+  const [contentHeight, setContentHeight] = useState(MIN_COMPOSER_HEIGHT)
 
-  const naturalContentHeightRef = useRef(MIN_COMPOSER_HEIGHT)
   const isExpandedRef = useRef(isExpanded)
   isExpandedRef.current = isExpanded
-  const isCollapsingRef = useRef(false)
-  const isResettingRef = useRef(false)
-  const isHeightLocked = isExpanded || isInputScrollable
-  const isClipHeight = isHeightLocked || isCollapsing
 
-  const animatedInputHeight = useSharedValue(MIN_COMPOSER_HEIGHT)
+  /**
+   * Height FLOOR of the input area (px). `0` means "not driven": the field keeps its
+   * natural content height, which native grows on its own while `scrollEnabled` is
+   * false. Nothing measured ever sets the height, so a stale or missing measurement
+   * can no longer clip text. Expanding raises the floor to the ceiling; collapsing
+   * animates it back to 0, which lands exactly on the current text height.
+   */
+  const expandedMinHeight = useSharedValue(0)
   const expandIconRotation = useSharedValue(0)
   const isExpandedSV = useSharedValue(0)
   const composerMaxHeightSV = useSharedValue(MIN_COMPOSER_HEIGHT)
@@ -77,7 +72,7 @@ export function useComposerInputLayout() {
 
   const headerHeight = (insets.top ?? 0) + NAVIGATION_BAR_HEIGHT
   const composerFooterHeight =
-    (isMobileSize ? COMPOSER_ACTIONS_HEIGHT + getSpacing('x2') : 0) +
+    (isMobile ? COMPOSER_ACTIONS_HEIGHT + getSpacing('x2') : 0) +
     (keyboardHeight > 0 ? keyboardOpenPadding : keyboardClosedPadding)
   const composerMaxHeight = Math.max(
     MIN_COMPOSER_HEIGHT,
@@ -96,9 +91,11 @@ export function useComposerInputLayout() {
   }))
 
   const animatedInputAreaStyle = useAnimatedStyle(() => ({
-    height: animatedInputHeight.value,
+    minHeight: expandedMinHeight.value,
+    maxHeight: composerMaxHeightSV.value,
     overflow: 'hidden' as const,
   }))
+
   const expandIconAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${expandIconRotation.value}deg` }],
   }))
@@ -113,85 +110,31 @@ export function useComposerInputLayout() {
     [expandIconRotation],
   )
 
-  const setAnimatedInputHeight = useCallback(
-    (next: number, animate: boolean, onFinished?: () => void) => {
-      const clamped = Math.min(Math.max(next, MIN_COMPOSER_HEIGHT), composerMaxHeight)
+  const setExpandedMinHeight = useCallback(
+    (next: number, animate: boolean) => {
+      const clamped = Math.min(Math.max(next, 0), composerMaxHeight)
       if (!animate) {
-        animatedInputHeight.value = clamped
+        expandedMinHeight.value = clamped
         return
       }
-      animatedInputHeight.value = withTiming(
-        clamped,
-        {
-          duration: COMPOSER_RESIZE_ANIMATION_MS,
-          easing: COMPOSER_RESIZE_EASING,
-        },
-        (finished) => {
-          if (finished && onFinished) {
-            runOnJS(onFinished)()
-          }
-        },
-      )
+      expandedMinHeight.value = withTiming(clamped, {
+        duration: COMPOSER_RESIZE_ANIMATION_MS,
+        easing: COMPOSER_RESIZE_EASING,
+      })
     },
-    [animatedInputHeight, composerMaxHeight],
+    [composerMaxHeight, expandedMinHeight],
   )
 
+  /** Measurement drives ONLY internal scrolling (and the web textarea's height). */
   const applyMeasuredHeight = useCallback(
     (nextHeightRaw: number) => {
       const nextHeight = Math.max(MIN_COMPOSER_HEIGHT, Math.ceil(nextHeightRaw))
-      if (isExpandedRef.current) {
-        if (nextHeight > composerMaxHeight + 1) {
-          naturalContentHeightRef.current = nextHeight
-        }
-        return
-      }
-      if (isResettingRef.current) {
-        return
-      }
-      if (
-        isCollapsingRef.current &&
-        nextHeight <= MIN_COMPOSER_HEIGHT + 1 &&
-        naturalContentHeightRef.current > MIN_COMPOSER_HEIGHT + 1
-      ) {
-        return
-      }
-      naturalContentHeightRef.current = nextHeight
-      setContentHeight(nextHeight)
-      setIsRemeasuring(false)
-      setIsInputScrollable(nextHeight > composerMaxHeight)
-      if (isCollapsingRef.current) {
-        isCollapsingRef.current = false
-        setAnimatedInputHeight(nextHeight, true, () => {
-          setIsCollapsing(false)
-        })
-        return
-      }
-      setAnimatedInputHeight(nextHeight, false)
-    },
-    [composerMaxHeight, setAnimatedInputHeight],
-  )
-
-  const applyTextLayout = useCallback(
-    (next: string, previousLength: number) => {
-      const didShrink = next.length < previousLength
-      if (isExpandedRef.current) {
-        return
-      }
-      if (didShrink && !isWeb) {
-        setIsInputScrollable(false)
-        setIsRemeasuring(true)
-        setContentHeight(MIN_COMPOSER_HEIGHT)
-        setAnimatedInputHeight(MIN_COMPOSER_HEIGHT, false)
-      }
-      if (next.length === 0) {
-        naturalContentHeightRef.current = MIN_COMPOSER_HEIGHT
-        setIsRemeasuring(false)
-      }
-      if (next.length > 0) {
-        isResettingRef.current = false
+      setIsOverflowing(nextHeight > composerMaxHeight)
+      if (isWeb) {
+        setContentHeight(nextHeight)
       }
     },
-    [setAnimatedInputHeight],
+    [composerMaxHeight],
   )
 
   const handleContentSizeChange = useCallback(
@@ -204,28 +147,10 @@ export function useComposerInputLayout() {
   useEffect(() => {
     composerMaxHeightSV.value = composerMaxHeight
     if (isExpandedRef.current) {
-      setAnimatedInputHeight(composerMaxHeight, false)
-      return
+      // Keyboard opened/closed while expanded: re-clamp the floor to the new ceiling.
+      setExpandedMinHeight(composerMaxHeight, true)
     }
-    if (isCollapsingRef.current) {
-      return
-    }
-    setIsInputScrollable(naturalContentHeightRef.current > composerMaxHeight)
-    setAnimatedInputHeight(naturalContentHeightRef.current, false)
-  }, [composerMaxHeight, composerMaxHeightSV, setAnimatedInputHeight])
-
-  useEffect(() => {
-    if (!isCollapsing) {
-      return
-    }
-    const timeoutId = setTimeout(() => {
-      if (!isCollapsingRef.current) {
-        return
-      }
-      applyMeasuredHeight(Math.max(naturalContentHeightRef.current, MIN_COMPOSER_HEIGHT))
-    }, 80)
-    return () => clearTimeout(timeoutId)
-  }, [applyMeasuredHeight, isCollapsing])
+  }, [composerMaxHeight, composerMaxHeightSV, setExpandedMinHeight])
 
   useEffect(() => {
     isExpandedSV.value = isExpanded ? 1 : 0
@@ -238,24 +163,22 @@ export function useComposerInputLayout() {
     if (!isExpandedRef.current) {
       return
     }
+    isExpandedRef.current = false
     animateExpandIcon(false)
-    isCollapsingRef.current = true
-    setIsCollapsing(true)
     setIsExpanded(false)
-    setIsInputScrollable(false)
-    setIsRemeasuring(true)
-    setContentHeight(MIN_COMPOSER_HEIGHT)
-  }, [animateExpandIcon])
+    setExpandedMinHeight(0, true)
+  }, [animateExpandIcon, setExpandedMinHeight])
 
   const handleToggleExpand = useCallback(() => {
     if (isExpanded) {
       collapseComposer()
       return
     }
+    isExpandedRef.current = true
     animateExpandIcon(true)
     setIsExpanded(true)
-    setAnimatedInputHeight(composerMaxHeight, true)
-  }, [animateExpandIcon, collapseComposer, composerMaxHeight, isExpanded, setAnimatedInputHeight])
+    setExpandedMinHeight(composerMaxHeight, true)
+  }, [animateExpandIcon, collapseComposer, composerMaxHeight, isExpanded, setExpandedMinHeight])
 
   const handleInputScroll = useCallback(
     (event: TextInputScrollEvent) => {
@@ -299,72 +222,105 @@ export function useComposerInputLayout() {
           if (isExpandedSV.value !== 1) {
             return
           }
-          const next = Math.min(
+          expandedMinHeight.value = Math.min(
             composerMaxHeightSV.value,
-            Math.max(MIN_COMPOSER_HEIGHT, composerMaxHeightSV.value - Math.max(0, e.translationY)),
+            Math.max(0, composerMaxHeightSV.value - Math.max(0, e.translationY)),
           )
-          animatedInputHeight.value = next
         })
         .onEnd((e) => {
           'worklet'
           if (isExpandedSV.value !== 1) {
             return
           }
-          const pulled = composerMaxHeightSV.value - animatedInputHeight.value
+          const pulled = composerMaxHeightSV.value - expandedMinHeight.value
           if (pulled >= COLLAPSE_PULL_THRESHOLD || e.velocityY > COLLAPSE_PULL_VELOCITY) {
             runOnJS(collapseComposer)()
             return
           }
-          animatedInputHeight.value = withTiming(composerMaxHeightSV.value, COLLAPSE_RESIZE_CONFIG)
+          expandedMinHeight.value = withTiming(composerMaxHeightSV.value, COLLAPSE_RESIZE_CONFIG)
         }),
     [
-      animatedInputHeight,
       collapseComposer,
       collapsePrevTouchY,
-      isExpanded,
       composerMaxHeightSV,
+      expandedMinHeight,
       inputScrollY,
+      isExpanded,
       isExpandedSV,
     ],
   )
 
+  /** After sending: the text is cleared, so the field falls back to one line by itself. */
   const resetComposerLayout = useCallback(() => {
-    isResettingRef.current = true
-    isCollapsingRef.current = false
     isExpandedRef.current = false
-    naturalContentHeightRef.current = COMPOSER_LAYOUT_DEFAULTS.contentHeight
-    setIsExpanded(COMPOSER_LAYOUT_DEFAULTS.isExpanded)
-    setIsInputScrollable(COMPOSER_LAYOUT_DEFAULTS.isInputScrollable)
-    setContentHeight(COMPOSER_LAYOUT_DEFAULTS.contentHeight)
-    setIsRemeasuring(COMPOSER_LAYOUT_DEFAULTS.isRemeasuring)
-    setIsCollapsing(COMPOSER_LAYOUT_DEFAULTS.isCollapsing)
-    cancelAnimation(animatedInputHeight)
-    animatedInputHeight.value = COMPOSER_LAYOUT_DEFAULTS.contentHeight
+    setIsExpanded(false)
+    setIsOverflowing(false)
+    setContentHeight(MIN_COMPOSER_HEIGHT)
+    cancelAnimation(expandedMinHeight)
+    expandedMinHeight.value = 0
     expandIconRotation.value = 0
     isExpandedSV.value = 0
     inputScrollY.value = 0
-    setInputResetKey((current) => current + 1)
-  }, [animatedInputHeight, expandIconRotation, inputScrollY, isExpandedSV])
+  }, [expandIconRotation, expandedMinHeight, inputScrollY, isExpandedSV])
 
   return {
-    isMobileSize,
+    isMobileComposer: isMobile,
     isExpanded,
-    isInputScrollable,
-    isHeightLocked,
-    isClipHeight,
-    isRemeasuring,
+    isOverflowing,
     contentHeight,
     composerMaxHeight,
     animatedComposerPaddingStyle,
     animatedInputAreaStyle,
     expandIconAnimatedStyle,
     collapsePanGesture,
-    applyTextLayout,
     applyMeasuredHeight,
     handleContentSizeChange,
     handleInputScroll,
     handleToggleExpand,
     resetComposerLayout,
-    inputResetKey,
   }
+}
+
+/**
+ * Keeps the chat list anchored to the bottom message when the keyboard opens/closes,
+ * without doing any per-frame JS work: `useGenericKeyboardHandler`'s `onEnd` fires
+ * exactly once per keyboard transition (worklet, UI thread), and we bridge to JS only on
+ * that single edge via `runOnJS`. We deliberately use the *generic* variant (not
+ * `useKeyboardHandler`) because it does not toggle Android's resize-mode window setting
+ * on mount/unmount — MyChatList mounts/unmounts whenever `hasMessages` flips (empty state
+ * vs list), while the composer's own `useReanimatedKeyboardAnimation` already owns that
+ * setting for the lifetime of the screen; using the non-generic hook here would fight it.
+ * If the user was already pinned to the bottom before the
+ * transition started, we issue one `scrollToEnd({ animated: false })` right as the
+ * transition settles — this replaces FlashList's own, unpredictably-timed internal
+ * re-layout snap (the "extra jump after the keyboard is already up" symptom) with a
+ * single deterministic correction tied to the keyboard's own finish event.
+ *
+ * Known limitation: if the user was scrolled away from the bottom when the keyboard
+ * moved, we intentionally do nothing — re-anchoring an arbitrary mid-list message
+ * would require driving FlashList's scroll offset in lockstep with the keyboard
+ * animation every frame, which FlashList v2 has no cheap (non-bridge) API for today.
+ */
+export function useKeyboardScrollAnchor(
+  scrollToEnd: () => void,
+  isAtBottomRef: { current: boolean },
+) {
+  const handleTransitionEnd = useCallback(() => {
+    if (isAtBottomRef.current) {
+      scrollToEnd()
+    }
+  }, [isAtBottomRef, scrollToEnd])
+
+  useGenericKeyboardHandler(
+    {
+      onEnd: () => {
+        'worklet'
+        if (isWeb) {
+          return
+        }
+        runOnJS(handleTransitionEnd)()
+      },
+    },
+    [handleTransitionEnd],
+  )
 }
