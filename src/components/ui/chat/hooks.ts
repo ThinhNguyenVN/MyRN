@@ -282,45 +282,62 @@ export function useComposerInputLayout() {
 }
 
 /**
- * Keeps the chat list anchored to the bottom message when the keyboard opens/closes,
- * without doing any per-frame JS work: `useGenericKeyboardHandler`'s `onEnd` fires
- * exactly once per keyboard transition (worklet, UI thread), and we bridge to JS only on
- * that single edge via `runOnJS`. We deliberately use the *generic* variant (not
- * `useKeyboardHandler`) because it does not toggle Android's resize-mode window setting
- * on mount/unmount — MyChatList mounts/unmounts whenever `hasMessages` flips (empty state
- * vs list), while the composer's own `useReanimatedKeyboardAnimation` already owns that
- * setting for the lifetime of the screen; using the non-generic hook here would fight it.
- * If the user was already pinned to the bottom before the
- * transition started, we issue one `scrollToEnd({ animated: false })` right as the
- * transition settles — this replaces FlashList's own, unpredictably-timed internal
- * re-layout snap (the "extra jump after the keyboard is already up" symptom) with a
- * single deterministic correction tied to the keyboard's own finish event.
- *
- * Known limitation: if the user was scrolled away from the bottom when the keyboard
- * moved, we intentionally do nothing — re-anchoring an arbitrary mid-list message
- * would require driving FlashList's scroll offset in lockstep with the keyboard
- * animation every frame, which FlashList v2 has no cheap (non-bridge) API for today.
+ * Keyboard list correction without changing `marginBottom` / composer lift.
+ * Close: pin on `onStart` (rides with the slide) and again on `onEnd` if FlashList
+ * had not finished contentSize. Open: pin on `onEnd`. Freeze at-bottom while the
+ * keyboard is moving — `onScroll` in that window uses a stale viewport.
  */
 export function useKeyboardScrollAnchor(
   scrollToEnd: () => void,
   isAtBottomRef: { current: boolean },
+  motionLockRef: { current: boolean },
 ) {
-  const handleTransitionEnd = useCallback(() => {
-    if (isAtBottomRef.current) {
+  const pinThisCloseRef = useRef(false)
+
+  const handleStart = useCallback(
+    (isClosing: boolean) => {
+      motionLockRef.current = true
+      if (!isClosing || !isAtBottomRef.current) {
+        return
+      }
+      pinThisCloseRef.current = true
       scrollToEnd()
-    }
-  }, [isAtBottomRef, scrollToEnd])
+    },
+    [isAtBottomRef, motionLockRef, scrollToEnd],
+  )
+
+  const handleEnd = useCallback(
+    (isOpen: boolean) => {
+      if (isOpen) {
+        if (isAtBottomRef.current) {
+          scrollToEnd()
+        }
+      } else if (pinThisCloseRef.current) {
+        pinThisCloseRef.current = false
+        scrollToEnd()
+      }
+      motionLockRef.current = false
+    },
+    [isAtBottomRef, motionLockRef, scrollToEnd],
+  )
 
   useGenericKeyboardHandler(
     {
-      onEnd: () => {
+      onStart: (event) => {
         'worklet'
         if (isWeb) {
           return
         }
-        runOnJS(handleTransitionEnd)()
+        runOnJS(handleStart)(event.height <= 0)
+      },
+      onEnd: (event) => {
+        'worklet'
+        if (isWeb) {
+          return
+        }
+        runOnJS(handleEnd)(event.height > 0)
       },
     },
-    [handleTransitionEnd],
+    [handleEnd, handleStart],
   )
 }

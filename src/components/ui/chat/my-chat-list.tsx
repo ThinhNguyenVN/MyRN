@@ -63,6 +63,7 @@ function MyChatList({
   const listRef = useRef<FlashListRef<ChatMessage>>(null)
   const lastScrollTokenRef = useRef(0)
   const isAtBottomRef = useRef(true)
+  const keyboardMotionLockRef = useRef(false)
   const touchStartYRef = useRef(0)
   const didScrollDuringTouchRef = useRef(false)
   const itemStyle = useMemo(
@@ -88,22 +89,26 @@ function MyChatList({
   }, [messages.length, scrollToEndToken])
 
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    didScrollDuringTouchRef.current = true
+    if (keyboardMotionLockRef.current) {
+      return
+    }
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent
     const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height)
     isAtBottomRef.current = distanceFromBottom <= BOTTOM_ANCHOR_THRESHOLD
-    didScrollDuringTouchRef.current = true
   }, [])
 
   const handleScrollToEndForKeyboard = useCallback(() => {
-    // Animated (not a hard snap): the keyboard transition itself already settled by
-    // the time `onEnd` fires, so an instant scrollToEnd here reads as an abrupt extra
-    // jump right after the smooth marginBottom animation. Easing this correction in
-    // makes it read as a continuation of that same motion instead of a second, jarring
-    // one.
-    listRef.current?.scrollToEnd({ animated: true })
+    const pinToEnd = () => {
+      listRef.current?.scrollToEnd({ animated: false })
+    }
+    pinToEnd()
+    requestAnimationFrame(() => {
+      requestAnimationFrame(pinToEnd)
+    })
   }, [])
 
-  useKeyboardScrollAnchor(handleScrollToEndForKeyboard, isAtBottomRef)
+  useKeyboardScrollAnchor(handleScrollToEndForKeyboard, isAtBottomRef, keyboardMotionLockRef)
 
   const handleTouchStart = useCallback((event: GestureResponderEvent) => {
     touchStartYRef.current = event.nativeEvent.pageY
