@@ -2,7 +2,6 @@ import React, { memo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import MyPressable from '@/components/elements/my-pressable'
-import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { ConditionRenderer } from '@/components/ui/condition-renderer'
@@ -30,11 +29,11 @@ function MyChatTextMessage({ message, onRetry }: MyChatTextMessageProps) {
 
   if (isUser) {
     return (
-      <MySurface radius="large" style={styles.userBubble}>
+      <MyView style={styles.userBubble}>
         <MyText typography="body" style={styles.userBubbleText}>
           {message.text}
         </MyText>
-      </MySurface>
+      </MyView>
     )
   }
 

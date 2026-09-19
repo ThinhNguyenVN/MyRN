@@ -103,6 +103,11 @@ export const generateStyles = (theme: ThemeType) => {
       paddingHorizontal: getSpacing('x6'),
       paddingVertical: getSpacing('x4'),
       backgroundColor: getColor('fill/active/primary'),
+      borderTopLeftRadius: theme.getRadius('large'),
+      borderTopRightRadius: theme.getRadius('small'),
+      borderBottomLeftRadius: theme.getRadius('large'),
+      borderBottomRightRadius: theme.getRadius('large'),
+      overflow: 'hidden',
     },
     userBubbleText: {
       color: getColor('brand/white'),
