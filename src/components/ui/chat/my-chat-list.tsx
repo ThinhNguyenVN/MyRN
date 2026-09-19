@@ -47,6 +47,10 @@ function MyChatList({
   const { getSpacing } = useTheme()
   const listRef = useRef<FlashListRef<ChatMessage>>(null)
   const lastScrollTokenRef = useRef(0)
+  const itemStyle = useMemo(
+    () => [styles.listItem, { paddingHorizontal: columnGutter }],
+    [columnGutter, styles.listItem],
+  )
   const listContentStyle = useMemo(() => {
     if (composerHeight <= 0) {
       return styles.listContent
@@ -67,7 +71,7 @@ function MyChatList({
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ChatMessage>) => (
-      <MyView style={styles.listItem} paddingHorizontal={columnGutter}>
+      <MyView style={itemStyle}>
         <MyChatBubble
           message={item}
           onSelectOption={onSelectOption}
@@ -79,16 +83,7 @@ function MyChatList({
         />
       </MyView>
     ),
-    [
-      onSelectOption,
-      onConfirm,
-      onSubmitForm,
-      onRetry,
-      onAction,
-      renderCustomMessage,
-      columnGutter,
-      styles.listItem,
-    ],
+    [onSelectOption, onConfirm, onSubmitForm, onRetry, onAction, renderCustomMessage, itemStyle],
   )
 
   return (

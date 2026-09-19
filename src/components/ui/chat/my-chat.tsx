@@ -9,12 +9,11 @@ import { isWeb } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import type { ChatAdapter, RenderCustomMessage } from './chat-adapter'
-import { getChatColumnGutter } from './hooks'
 import type { ChatSuggestion } from './my-chat-empty-state'
 import MyChatEmptyState from './my-chat-empty-state'
 import MyChatComposer from './my-chat-composer'
 import MyChatList from './my-chat-list'
-import { generateStyles } from './styles'
+import { generateStyles, getChatColumnGutter } from './styles'
 import { useConversation } from './use-conversation'
 import type { ChatMessage, MessageAction } from './types'
 
@@ -48,13 +47,13 @@ function MyChat({
   const { send, sendImage } = chat
   const hasMessages = chat.messages.length > 0
   const [scrollToEndToken, setScrollToEndToken] = useState(0)
-  const [viewportWidth, setViewportWidth] = useState(0)
+  const [columnWidth, setColumnWidth] = useState(0)
   const [composerHeight, setComposerHeight] = useState(0)
-  const columnGutter = getChatColumnGutter(viewportWidth, isMobileSize, getSpacing('x6'))
+  const columnGutter = getChatColumnGutter(columnWidth, isMobileSize, getSpacing('x6'))
 
-  const handleRootLayout = useCallback((event: LayoutChangeEvent) => {
+  const handleColumnLayout = useCallback((event: LayoutChangeEvent) => {
     const next = event.nativeEvent.layout.width
-    setViewportWidth((current) => (current === next ? current : next))
+    setColumnWidth((current) => (current === next ? current : next))
   }, [])
 
   const handleComposerLayout = useCallback((event: LayoutChangeEvent) => {
@@ -82,10 +81,14 @@ function MyChat({
     [pinListToBottom, sendImage],
   )
 
-  // List + composer share UI-thread translateY so open/close stay in sync.
-  // Do not add post-open list inset/offset — that snaps after the keyboard animation.
+  // Composer lifts with the keyboard. The list must NOT translateY — that moves the
+  // FlashList viewport off-screen so offset 0 cannot show the first messages.
+  // Shrink the list on the UI thread instead (same `height` shared value, no post-open snap).
   const { height } = useReanimatedKeyboardAnimation()
-  const keyboardLiftStyle = useAnimatedStyle(() => ({
+  const listKeyboardStyle = useAnimatedStyle(() => ({
+    marginBottom: isWeb ? 0 : -height.value,
+  }))
+  const composerKeyboardStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: isWeb ? 0 : height.value }],
   }))
 
@@ -100,9 +103,9 @@ function MyChat({
   )
 
   return (
-    <MyView style={styles.root} onLayout={handleRootLayout}>
-      <MyView style={styles.column}>
-        <Animated.View style={[styles.listWrapper, keyboardLiftStyle]}>
+    <MyView style={styles.root}>
+      <MyView style={styles.column} onLayout={handleColumnLayout}>
+        <Animated.View style={[styles.listWrapper, listKeyboardStyle]}>
           <ConditionRenderer
             when={hasMessages}
             fallback={
@@ -131,7 +134,7 @@ function MyChat({
         </Animated.View>
 
         <Animated.View
-          style={[styles.composerFloatingWrapper, keyboardLiftStyle]}
+          style={[styles.composerFloatingWrapper, composerKeyboardStyle]}
           onLayout={handleComposerLayout}
         >
           <MyChatComposer

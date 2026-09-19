@@ -18,7 +18,7 @@ import {
   withTiming,
 } from 'react-native-reanimated'
 
-import { isWeb, MAX_CHAT_WIDTH, NAVIGATION_BAR_HEIGHT } from '@/constants/dimensions'
+import { isWeb, NAVIGATION_BAR_HEIGHT } from '@/constants/dimensions'
 import { useTheme } from '@/theme/theme-context'
 
 import { COMPOSER_ACTIONS_HEIGHT, MIN_COMPOSER_HEIGHT } from './styles'
@@ -31,20 +31,6 @@ const COMPOSER_LAYOUT_DEFAULTS = {
   contentHeight: MIN_COMPOSER_HEIGHT,
   isRemeasuring: false,
   isCollapsing: false,
-}
-
-export function getChatColumnGutter(
-  containerWidth: number,
-  isMobileSize: boolean,
-  spacingX6: number,
-): number {
-  if (isMobileSize) {
-    return spacingX6
-  }
-  if (containerWidth <= 0) {
-    return 0
-  }
-  return Math.max(0, (containerWidth - MAX_CHAT_WIDTH) / 2)
 }
 
 const INPUT_MAX_VIEWPORT_GAP = 20

@@ -7,6 +7,20 @@ export const MIN_COMPOSER_HEIGHT = 24
 export const COMPOSER_ACTIONS_HEIGHT = 40
 export const COMPOSER_INPUT_LINE_HEIGHT = 22
 
+export function getChatColumnGutter(
+  columnWidth: number,
+  isMobileSize: boolean,
+  spacingX6: number,
+): number {
+  if (isMobileSize) {
+    return spacingX6
+  }
+  if (columnWidth <= MAX_CHAT_WIDTH) {
+    return 0
+  }
+  return (columnWidth - MAX_CHAT_WIDTH) / 2
+}
+
 const MAX_BUBBLE_WIDTH = '100%'
 
 export const generateStyles = (theme: ThemeType) => {
@@ -46,7 +60,6 @@ export const generateStyles = (theme: ThemeType) => {
     },
     listItem: {
       width: '100%',
-      alignSelf: 'stretch',
     },
     listItemSeparator: {
       height: getSpacing('x4'),
@@ -116,10 +129,11 @@ export const generateStyles = (theme: ThemeType) => {
 
     emptyState: {
       flex: 1,
+      width: '100%',
       alignItems: 'center',
       justifyContent: 'center',
       gap: getSpacing('x6'),
-      paddingHorizontal: getSpacing('x8'),
+      paddingHorizontal: getSpacing('x6'),
       paddingBottom: composerBaselineHeight + getSpacing('x4'),
     },
     emptyTitle: {
