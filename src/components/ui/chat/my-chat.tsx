@@ -51,7 +51,7 @@ function MyChat({
   const [columnWidth, setColumnWidth] = useState(0)
   const [composerHeight, setComposerHeight] = useState(0)
   const isComposerFocusedRef = useRef(false)
-  const columnGutter = getChatColumnGutter(columnWidth, isMobileSize, getSpacing('x6'))
+  const columnGutter = getChatColumnGutter(columnWidth, isMobileSize, getSpacing('x4'))
 
   const handleColumnLayout = useCallback((event: LayoutChangeEvent) => {
     const next = event.nativeEvent.layout.width

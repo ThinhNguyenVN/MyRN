@@ -12,10 +12,10 @@ import {
 export function getChatColumnGutter(
   columnWidth: number,
   isMobileSize: boolean,
-  spacingX6: number,
+  spacing: number,
 ): number {
   if (isMobileSize) {
-    return spacingX6
+    return spacing
   }
   if (columnWidth <= MAX_CHAT_WIDTH) {
     return 0

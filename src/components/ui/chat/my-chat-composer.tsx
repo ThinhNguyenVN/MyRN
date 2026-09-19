@@ -111,8 +111,8 @@ function MyChatComposer({
       onScroll={isWeb ? undefined : handleInputScroll}
       onFocus={handleFocus}
       onBlur={handleBlur}
+      onEnterSend={handleSend}
       multiline
-      blurOnSubmit={false}
       scrollEnabled={isExpanded || isOverflowing}
       lockHeight={isOverflowing}
       minHeight={isMobileComposer ? MIN_COMPOSER_HEIGHT : COMPOSER_ACTIONS_HEIGHT}

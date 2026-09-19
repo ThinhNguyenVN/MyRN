@@ -1,5 +1,12 @@
-import React, { memo, useLayoutEffect, useMemo, useRef } from 'react'
-import { TextInput, View, type TextInputProps, type TextStyle } from 'react-native'
+import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import {
+  TextInput,
+  View,
+  type NativeSyntheticEvent,
+  type TextInputProps,
+  type TextInputSubmitEditingEventData,
+  type TextStyle,
+} from 'react-native'
 
 import { isWeb } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
@@ -10,6 +17,8 @@ import { generateStyles } from './styles'
 type WebTextArea = {
   scrollHeight: number
   style: { height: string }
+  addEventListener?: (type: string, listener: (event: KeyboardEvent) => void) => void
+  removeEventListener?: (type: string, listener: (event: KeyboardEvent) => void) => void
 }
 
 export type MyChatComposerInputProps = Pick<
@@ -21,7 +30,6 @@ export type MyChatComposerInputProps = Pick<
   | 'scrollEnabled'
   | 'multiline'
   | 'placeholder'
-  | 'blurOnSubmit'
   | 'onFocus'
   | 'onBlur'
 > & {
@@ -33,6 +41,11 @@ export type MyChatComposerInputProps = Pick<
   /** Ceiling: the field stops growing here and scrolls internally instead. */
   lockedHeight: number
   onMeasuredHeight?: (height: number) => void
+  /**
+   * Enter / Return sends. Newline via Ctrl/Cmd+Enter or Shift+Enter (web / hardware keyboards).
+   * Native soft keyboard: Return sends (multiline still grows from pasted / modifier newlines).
+   */
+  onEnterSend?: () => void
 }
 
 function MyChatComposerInput({
@@ -41,16 +54,64 @@ function MyChatComposerInput({
   contentHeight,
   lockedHeight,
   multiline = true,
-  blurOnSubmit,
   scrollEnabled,
   onMeasuredHeight,
+  onEnterSend,
   ...inputProps
 }: MyChatComposerInputProps) {
   const styles = useThemedStyles(generateStyles)
   const { getColor } = useTheme()
   const inputRef = useRef<TextInput>(null)
+  const onEnterSendRef = useRef(onEnterSend)
   const grownHeight = Math.max(minHeight, Math.min(contentHeight, lockedHeight))
   const isEmpty = (inputProps.value ?? '').length === 0
+
+  useEffect(() => {
+    onEnterSendRef.current = onEnterSend
+  }, [onEnterSend])
+
+  // RN Web's TextInput overwrites `onKeyDown` with its own submit handler, so a prop
+  // never runs. Attach to the DOM node instead. Keep `blurOnSubmit={false}` on web so
+  // RN Web does not also treat Enter as submit (Ctrl/Cmd/Shift+Enter must stay newline).
+  useEffect(() => {
+    if (!isWeb || !onEnterSend) {
+      return
+    }
+    const node = inputRef.current as unknown as WebTextArea | null
+    const addListener = node?.addEventListener
+    const removeListener = node?.removeEventListener
+    if (!addListener || !removeListener) {
+      return
+    }
+
+    const handleDomKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Enter') {
+        return
+      }
+      if (event.isComposing || event.keyCode === 229) {
+        return
+      }
+      if (event.ctrlKey || event.metaKey || event.shiftKey) {
+        return
+      }
+      event.preventDefault()
+      event.stopPropagation()
+      onEnterSendRef.current?.()
+    }
+
+    addListener.call(node, 'keydown', handleDomKeyDown)
+    return () => {
+      removeListener.call(node, 'keydown', handleDomKeyDown)
+    }
+  }, [onEnterSend])
+
+  const handleSubmitEditing = useCallback(
+    (_event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
+      onEnterSend?.()
+    },
+    [onEnterSend],
+  )
+
   const wrapSizeStyle = useMemo(() => {
     if (!isWeb) {
       // Native: a multiline TextInput grows on its own while `scrollEnabled` is false,
@@ -105,7 +166,13 @@ function MyChatComposerInput({
         ref={inputRef}
         {...inputProps}
         multiline={multiline}
-        blurOnSubmit={blurOnSubmit ?? !multiline}
+        // Web: blurOnSubmit false — RN Web overwrites onKeyDown; DOM listener owns Enter/send.
+        // Native: submitBehavior submit — Return sends without dismissing the keyboard.
+        blurOnSubmit={false}
+        submitBehavior={isWeb || !onEnterSend ? undefined : 'submit'}
+        onSubmitEditing={!isWeb && onEnterSend ? handleSubmitEditing : undefined}
+        returnKeyType="send"
+        enterKeyHint="send"
         scrollEnabled={scrollEnabled}
         placeholderTextColor={getColor('text/inactive/primary')}
         underlineColorAndroid="transparent"
