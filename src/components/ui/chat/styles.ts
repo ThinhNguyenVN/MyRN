@@ -120,13 +120,16 @@ export const generateStyles = (theme: ThemeType) => {
     },
     typingRow: {
       flexDirection: 'row',
+      alignItems: 'center',
       gap: getSpacing('x2'),
-      paddingVertical: getSpacing('x2'),
+      // Match one body line so the list doesn't jump when streaming starts.
+      minHeight: COMPOSER_INPUT_LINE_HEIGHT,
+      paddingVertical: getSpacing('x1'),
     },
     typingDot: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
+      width: 7,
+      height: 7,
+      borderRadius: 3.5,
       backgroundColor: getColor('icon/inactive/primary'),
     },
     errorRow: {

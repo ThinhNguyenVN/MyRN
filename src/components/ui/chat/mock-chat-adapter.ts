@@ -3,6 +3,8 @@ import { generateMessageId } from './generate-message-id'
 import type { ChatFormValues, ChatMessage, ChatSummaryField, ConversationEvent } from './types'
 
 const CHUNK_DELAY_MS = 120
+/** Hold pending/empty state so playground can preview `MyChatTyping` before chunks arrive. */
+const THINKING_DELAY_MS = 2500
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -13,6 +15,7 @@ async function streamChunks(
   chunks: string[],
   handlers: ChatStreamHandlers,
 ): Promise<void> {
+  await sleep(THINKING_DELAY_MS)
   for (const chunk of chunks) {
     await sleep(CHUNK_DELAY_MS)
     handlers.onTextChunk(messageId, chunk)

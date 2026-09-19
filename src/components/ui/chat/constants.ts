@@ -5,6 +5,15 @@ export const MIN_COMPOSER_HEIGHT = 24
 export const COMPOSER_ACTIONS_HEIGHT = 40
 export const COMPOSER_INPUT_LINE_HEIGHT = 22
 
+/** Assistant thinking indicator — calm staggered pulse (not a “person typing” bounce). */
+export const TYPING_DOT_STAGGER_MS = 140
+export const TYPING_DOT_HALF_CYCLE_MS = 420
+export const TYPING_DOT_EASING = Easing.inOut(Easing.ease)
+export const TYPING_DOT_OPACITY_MIN = 0.28
+export const TYPING_DOT_OPACITY_MAX = 1
+export const TYPING_DOT_SCALE_MIN = 0.82
+export const TYPING_DOT_SCALE_MAX = 1
+
 /** Composer expand/collapse resize animation. */
 export const COMPOSER_RESIZE_ANIMATION_MS = 180
 export const COMPOSER_RESIZE_EASING = Easing.out(Easing.cubic)

@@ -27,14 +27,25 @@ function collectHandlers() {
   return { calls, messages, handlers }
 }
 
+async function runMockSend(...args: Parameters<typeof MockChatAdapter.send>): Promise<void> {
+  const sendPromise = MockChatAdapter.send(...args)
+  await jest.runAllTimersAsync()
+  await sendPromise
+}
+
 describe('MockChatAdapter', () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
   it('streams text then emits an options message for a product-creation intent', async () => {
     const { calls, messages, handlers } = collectHandlers()
 
-    await MockChatAdapter.send(
-      { event: { type: 'send_text', text: 'Tạo sản phẩm' }, history: [] },
-      handlers,
-    )
+    await runMockSend({ event: { type: 'send_text', text: 'Tạo sản phẩm' }, history: [] }, handlers)
 
     expect(calls[0]).toBe('start')
     expect(calls[calls.length - 2]).toBe('message:options')
@@ -45,10 +56,7 @@ describe('MockChatAdapter', () => {
   it('streams a plain echo response for unrelated text, without a structured message', async () => {
     const { calls, handlers } = collectHandlers()
 
-    await MockChatAdapter.send(
-      { event: { type: 'send_text', text: 'xin chào' }, history: [] },
-      handlers,
-    )
+    await runMockSend({ event: { type: 'send_text', text: 'xin chào' }, history: [] }, handlers)
 
     expect(calls[0]).toBe('start')
     expect(calls[calls.length - 1]).toBe('done')
@@ -58,7 +66,7 @@ describe('MockChatAdapter', () => {
   it('responds to select_option with a form message', async () => {
     const { messages, handlers } = collectHandlers()
 
-    await MockChatAdapter.send(
+    await runMockSend(
       { event: { type: 'select_option', messageId: 'opt1', optionId: 'phone' }, history: [] },
       handlers,
     )
@@ -70,7 +78,7 @@ describe('MockChatAdapter', () => {
   it('responds to submit_form with a confirmation message reflecting the values', async () => {
     const { messages, handlers } = collectHandlers()
 
-    await MockChatAdapter.send(
+    await runMockSend(
       {
         event: {
           type: 'submit_form',
@@ -101,7 +109,7 @@ describe('MockChatAdapter', () => {
       submittedValues: { name: 'iPhone 17 Pro', price: 30000000, stock: 10 },
     }
 
-    await MockChatAdapter.send(
+    await runMockSend(
       {
         event: { type: 'confirm', messageId: 'conf1', confirmed: true },
         history: [formInHistory],
@@ -120,7 +128,7 @@ describe('MockChatAdapter', () => {
   it('responds to confirm(false) without emitting a result message', async () => {
     const { calls, handlers } = collectHandlers()
 
-    await MockChatAdapter.send(
+    await runMockSend(
       { event: { type: 'confirm', messageId: 'conf1', confirmed: false }, history: [] },
       handlers,
     )

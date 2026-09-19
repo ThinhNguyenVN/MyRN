@@ -570,6 +570,7 @@
       "unknownMessage": "This message type isn't supported yet.",
       "errorGeneric": "Something went wrong.",
       "retry": "Retry",
+      "typing": "Assistant is responding",
       "expand": "Expand composer",
       "collapse": "Collapse composer"
     }
