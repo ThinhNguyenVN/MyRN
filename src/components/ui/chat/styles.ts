@@ -1,6 +1,6 @@
 import { StyleSheet, type TextStyle } from 'react-native'
 
-import { isWeb, MAX_CHAT_WIDTH } from '@/constants/dimensions'
+import { isMobileSize, isWeb, MAX_CHAT_WIDTH } from '@/constants/dimensions'
 import type { ThemeType } from '@/theme/theme-context'
 
 import {
@@ -24,6 +24,7 @@ export function getChatColumnGutter(
 }
 
 const MAX_BUBBLE_WIDTH = '100%'
+const MIN_BUBBLE_WIDTH = isMobileSize ? '70%' : '50%'
 
 export const generateStyles = (theme: ThemeType) => {
   const { getSpacing, getColor, insets, isMobileSize, isMobile } = theme
@@ -170,12 +171,14 @@ export const generateStyles = (theme: ThemeType) => {
     },
 
     interactiveCard: {
+      minWidth: MIN_BUBBLE_WIDTH,
       maxWidth: MAX_BUBBLE_WIDTH,
       flexShrink: 1,
       padding: getSpacing('x6'),
       gap: getSpacing('x4'),
       backgroundColor: getColor('fill/background/primary'),
     },
+
     optionsRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
