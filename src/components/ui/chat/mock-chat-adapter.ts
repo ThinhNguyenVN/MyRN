@@ -128,7 +128,7 @@ async function handleSendText(text: string, handlers: ChatStreamHandlers): Promi
   handlers.onDone(id)
 }
 
-async function handleSendImage(handlers: ChatStreamHandlers): Promise<void> {
+async function handleSendImages(handlers: ChatStreamHandlers): Promise<void> {
   const id = generateMessageId('assistant')
   handlers.onMessageStart(pendingTextMessage(id))
   await streamChunks(id, ['Đã', ' nhận ảnh,', ' cảm ơn bạn!'], handlers)
@@ -184,8 +184,8 @@ function dispatchEvent(
   switch (event.type) {
     case 'send_text':
       return handleSendText(event.text, handlers)
-    case 'send_image':
-      return handleSendImage(handlers)
+    case 'send_images':
+      return handleSendImages(handlers)
     case 'select_option':
       return handleSelectOption(handlers)
     case 'submit_form':

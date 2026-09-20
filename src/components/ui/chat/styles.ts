@@ -1,9 +1,11 @@
 import { StyleSheet, type TextStyle } from 'react-native'
 
 import { isMobileSize, isWeb, MAX_CHAT_WIDTH } from '@/constants/dimensions'
+import { Spacing } from '@/theme/spacing'
 import type { ThemeType } from '@/theme/theme-context'
 
 import {
+  ATTACHMENT_THUMBNAIL_SIZE,
   COMPOSER_ACTIONS_HEIGHT,
   COMPOSER_INPUT_LINE_HEIGHT,
   MIN_COMPOSER_HEIGHT,
@@ -25,6 +27,24 @@ export function getChatColumnGutter(
 
 const MAX_BUBBLE_WIDTH = '100%'
 const MIN_BUBBLE_WIDTH = isMobileSize ? '70%' : '50%'
+/** Single-image photo card side, in px. */
+const PHOTO_CARD_SIZE = 220
+/** Fixed thumbnail side for each photo in a multi-image row, in px. */
+const PHOTO_THUMB_SIZE = 100
+/** Photos per row before wrapping — a fixed pixel row width (not `maxWidth`-driven shrink-wrap,
+ *  which left a trailing gap: the card stretched to its cross-axis rather than hugging content). */
+const PHOTO_GRID_COLUMNS = 3
+
+/**
+ * Pixel width for a photo grid holding `imageCount` images — exactly wide enough for
+ * `min(imageCount, PHOTO_GRID_COLUMNS)` thumbnails, so a message with fewer photos than
+ * `PHOTO_GRID_COLUMNS` (e.g. 2) gets a card sized to just those photos, not a reserved
+ * 3-wide slot with empty space trailing off to the right.
+ */
+export function getPhotoGridWidth(imageCount: number): number {
+  const columns = Math.max(1, Math.min(imageCount, PHOTO_GRID_COLUMNS))
+  return columns * PHOTO_THUMB_SIZE + (columns - 1) * Spacing.x1
+}
 
 export const generateStyles = (theme: ThemeType) => {
   const { getSpacing, getColor, insets, isMobileSize, isMobile } = theme
@@ -99,10 +119,12 @@ export const generateStyles = (theme: ThemeType) => {
       justifyContent: 'flex-start',
     },
     userBubble: {
+      minWidth: MIN_BUBBLE_WIDTH,
       maxWidth: MAX_BUBBLE_WIDTH,
       flexShrink: 1,
-      paddingHorizontal: getSpacing('x6'),
-      paddingVertical: getSpacing('x4'),
+      padding: getSpacing('x3'),
+      // No effect on single-child bubbles (plain text) — only spaces image from caption.
+      gap: getSpacing('x2'),
       backgroundColor: getColor('fill/active/primary'),
       borderTopLeftRadius: theme.getRadius('large'),
       borderTopRightRadius: theme.getRadius('small'),
@@ -119,10 +141,42 @@ export const generateStyles = (theme: ThemeType) => {
       flexShrink: 1,
       gap: getSpacing('x2'),
     },
-    imageBubbleImage: {
-      width: 200,
-      height: 200,
-      borderRadius: theme.getRadius('medium'),
+    // Photos render on a neutral card (own background + soft shadow via MySurface's default
+    // elevation), never tinted with the brand fill — a solid color field behind a grid of
+    // photos (especially a light/white one) reads as dated, not as a "sent" indicator like it
+    // does for plain text. The sent/received signal lives in the caption pill below instead.
+    userImageColumn: {
+      maxWidth: MAX_BUBBLE_WIDTH,
+      width: '100%',
+      alignItems: 'flex-end',
+      gap: getSpacing('x1'),
+    },
+    photoCard: {
+      // MySurface fills the cross-axis space it's given rather than hugging its content, so
+      // without this the card stretched to `userImageColumn`'s full width regardless of how
+      // narrow the actual photo grid was — explicit alignSelf forces it back to content width.
+      alignSelf: 'flex-end',
+      maxWidth: MAX_BUBBLE_WIDTH,
+      overflow: 'hidden',
+      backgroundColor: getColor('fill/background/primary'),
+    },
+    photoSingle: {
+      width: PHOTO_CARD_SIZE,
+      height: PHOTO_CARD_SIZE,
+    },
+    photoGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      // No fixed/max width here — the caller sets an exact pixel `width` per message via
+      // `getPhotoGridWidth(message.imageUris.length)` so a 2-photo message gets a card sized
+      // to exactly 2 thumbnails, not a reserved PHOTO_GRID_COLUMNS-wide slot with a gap
+      // trailing off to the right. `maxWidth`/shrink-wrap here left the card stretched to the
+      // bubble's cross-axis width instead (MySurface fills the space it's given).
+      gap: getSpacing('x1'),
+    },
+    photoGridCell: {
+      width: PHOTO_THUMB_SIZE,
+      height: PHOTO_THUMB_SIZE,
     },
     typingRow: {
       flexDirection: 'row',
@@ -298,6 +352,50 @@ export const generateStyles = (theme: ThemeType) => {
     },
     sourceSheetBody: {
       gap: getSpacing('x3'),
+    },
+
+    attachmentPreviewRow: {
+      // Fixed, not flexGrow, so it never fights the animated composerBody for space.
+      flexGrow: 0,
+      marginBottom: getSpacing('x2'),
+    },
+    attachmentPreviewContent: {
+      flexDirection: 'row',
+      gap: getSpacing('x2'),
+    },
+    attachmentThumbWrap: {
+      width: ATTACHMENT_THUMBNAIL_SIZE,
+      height: ATTACHMENT_THUMBNAIL_SIZE,
+    },
+    attachmentThumb: {
+      width: ATTACHMENT_THUMBNAIL_SIZE,
+      height: ATTACHMENT_THUMBNAIL_SIZE,
+      borderRadius: theme.getRadius('medium'),
+    },
+    attachmentRemoveBadge: {
+      position: 'absolute',
+      // Inset (not overhanging the corner) so it can never get clipped by the preview
+      // ScrollView's bounds, on any platform.
+      top: 3,
+      right: 3,
+      width: 18,
+      height: 18,
+      borderRadius: theme.getRadius('full'),
+      alignItems: 'center',
+      justifyContent: 'center',
+      // theme-exempt: dark translucent photo-chrome, same in both themes (like a native
+      // photo picker's remove badge) — not a themed surface color.
+      backgroundColor: 'rgba(17, 17, 17, 0.55)',
+    },
+    attachmentAddTile: {
+      width: ATTACHMENT_THUMBNAIL_SIZE,
+      height: ATTACHMENT_THUMBNAIL_SIZE,
+      borderRadius: theme.getRadius('medium'),
+      borderWidth: 1,
+      borderColor: getColor('border/inactive/tertiary'),
+      backgroundColor: getColor('fill/background/secondary'),
+      alignItems: 'center',
+      justifyContent: 'center',
     },
   })
 }

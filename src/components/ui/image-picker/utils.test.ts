@@ -6,6 +6,7 @@ import {
   ImagePickError,
   pickedImageFromFile,
   pickImageFromCamera,
+  pickImages,
 } from './utils'
 import type { PickedImage } from './type'
 
@@ -103,6 +104,52 @@ describe('pickImageFromCamera', () => {
     launchCameraAsync.mockResolvedValue({ canceled: true, assets: null })
 
     await expect(pickImageFromCamera()).rejects.toMatchObject({ code: 'cancelled' })
+  })
+})
+
+describe('pickImages', () => {
+  const requestMediaLibraryPermissionsAsync =
+    ImagePicker.requestMediaLibraryPermissionsAsync as jest.Mock
+  const launchImageLibraryAsync = ImagePicker.launchImageLibraryAsync as jest.Mock
+
+  beforeEach(() => {
+    requestMediaLibraryPermissionsAsync.mockReset().mockResolvedValue({ granted: true })
+    launchImageLibraryAsync.mockReset()
+  })
+
+  it('skips an unsupported asset instead of failing the whole batch', async () => {
+    launchImageLibraryAsync.mockResolvedValue({
+      canceled: false,
+      assets: [
+        { uri: 'file:///tmp/a.jpg', mimeType: 'image/jpeg', fileSize: 100 },
+        { uri: 'file:///tmp/b.gif2', mimeType: 'application/octet-stream', fileSize: 100 },
+        { uri: 'file:///tmp/c.jpg', mimeType: 'image/jpeg', fileSize: 100 },
+      ],
+    })
+
+    const { images, skippedCount } = await pickImages({ selectionLimit: 5 })
+
+    expect(images).toHaveLength(2)
+    expect(images.map((image) => image.uri)).toEqual(['file:///tmp/a.jpg', 'file:///tmp/c.jpg'])
+    expect(skippedCount).toBe(1)
+  })
+
+  it('returns an empty result (not a throw) when every asset is unsupported', async () => {
+    launchImageLibraryAsync.mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file:///tmp/a.bin', mimeType: 'application/octet-stream', fileSize: 100 }],
+    })
+
+    const { images, skippedCount } = await pickImages({ selectionLimit: 5 })
+
+    expect(images).toHaveLength(0)
+    expect(skippedCount).toBe(1)
+  })
+
+  it('throws cancelled when the user backs out with no assets at all', async () => {
+    launchImageLibraryAsync.mockResolvedValue({ canceled: true, assets: null })
+
+    await expect(pickImages()).rejects.toMatchObject({ code: 'cancelled' })
   })
 })
 

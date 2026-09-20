@@ -5,6 +5,23 @@ export type PickedImage = {
   size: number
   /** Web: native `File` from expo-image-picker for FormData.append */
   file?: File
+  /**
+   * Stable identity for the picked asset — the library `assetId` when available, else the
+   * original (pre-resize) `uri`. Survives {@link resizeImageIfNeeded} (which changes `uri`),
+   * so callers can dedupe re-picks of the same photo. Not set by {@link pickedImageFromFile}
+   * (web drag-and-drop has no stable asset id).
+   */
+  sourceId?: string
+  /** Original asset dimensions, when the source provides them (picker library/camera assets do; web drag-and-drop does not). Needed by {@link resizeImageIfNeeded} to preserve aspect ratio. */
+  width?: number
+  height?: number
+  /**
+   * `true` when `uri` points to a resized copy this module wrote to the cache directory
+   * (see {@link resizeImageIfNeeded}) — safe to delete with {@link deletePickedImageIfTemp}
+   * once the image is no longer needed. `false`/`undefined` means `uri` is the original
+   * library/camera asset URI and MUST NOT be deleted.
+   */
+  resizedTempUri?: boolean
 }
 
 export type ImagePickErrorCode =
@@ -19,6 +36,17 @@ export type PickImageOptions = {
   maxBytes?: number
   allowsEditing?: boolean
   quality?: number
+}
+
+export type PickImagesOptions = PickImageOptions & {
+  /** Max assets the native/web picker lets the user select in this one call. */
+  selectionLimit?: number
+}
+
+export type PickImagesResult = {
+  images: PickedImage[]
+  /** Assets the user picked that failed validation (unsupported type / too large) and were skipped instead of failing the whole pick. */
+  skippedCount: number
 }
 
 export type BuildImageFormDataOptions = {
