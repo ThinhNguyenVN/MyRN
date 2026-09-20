@@ -1,3 +1,5 @@
+import { File as ExpoFile } from 'expo-file-system'
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
 import * as ImagePicker from 'expo-image-picker'
 import { isNil } from 'lodash'
 
@@ -8,10 +10,15 @@ import type {
   ImagePickErrorCode,
   PickedImage,
   PickImageOptions,
+  PickImagesOptions,
+  PickImagesResult,
 } from './type'
 
 /** Default client-side guard — server limits may differ per API. */
 export const IMAGE_PICK_MAX_BYTES = 5 * 1024 * 1024
+
+/** Chat attachment preview/bubble target — see {@link resizeImageIfNeeded}. */
+export const IMAGE_RESIZE_MAX_EDGE = 900
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'])
 
@@ -65,13 +72,51 @@ function assetToPickedImage(asset: ImagePicker.ImagePickerAsset, maxBytes: numbe
   const size = asset.fileSize ?? 0
   assertValidImage(mimeType, size, maxBytes)
 
+  // Web: `asset.uri` is a fresh `blob:` object URL per pick, even for the exact same file
+  // re-selected in a later dialog — never a stable identity. The underlying `File`'s own
+  // name/size/lastModified are, so prefer those when present; native falls back to the
+  // library `assetId` (stable across re-picks), then the asset uri as a last resort.
+  const sourceId = asset.file
+    ? `${asset.file.name}:${asset.file.size}:${asset.file.lastModified}`
+    : asset.assetId || asset.uri
+
   return {
     uri: asset.uri,
     name: asset.fileName || guessName(asset.uri, mimeType),
     mimeType,
     size,
     file: asset.file,
+    sourceId,
+    width: asset.width || undefined,
+    height: asset.height || undefined,
   }
+}
+
+/**
+ * Converts every picked asset, but a single unsupported/oversized asset must not sink the
+ * whole batch (e.g. one HEIC/GIF mixed into a 5-photo multi-select) — skip just that one and
+ * keep going. Callers surface `skippedCount` to the user instead of silently losing everything.
+ */
+function assetsToPickedImages(
+  assets: ImagePicker.ImagePickerAsset[],
+  maxBytes: number,
+): PickImagesResult {
+  const images: PickedImage[] = []
+  let skippedCount = 0
+
+  for (const asset of assets) {
+    try {
+      images.push(assetToPickedImage(asset, maxBytes))
+    } catch (error) {
+      if (error instanceof ImagePickError) {
+        skippedCount += 1
+        continue
+      }
+      throw error
+    }
+  }
+
+  return { images, skippedCount }
 }
 
 /** Shared `pickImage`/`pickImageFromCamera` flow: request permission, launch, validate. */
@@ -148,6 +193,95 @@ export async function pickImageFromCamera(options: PickImageOptions = {}): Promi
     ImagePicker.launchCameraAsync,
     options,
   )
+}
+
+/**
+ * Opens the system / browser image library with multi-select enabled via `expo-image-picker`.
+ * Same validation as {@link pickImage}, but a single unsupported/oversized asset in the batch
+ * is skipped rather than failing the whole pick (see {@link assetsToPickedImages}) — callers
+ * should tell the user when `skippedCount > 0`. Callers that must cap the total (e.g. MyChat's
+ * 5-image limit) should pass `selectionLimit` and still defensively trim `images` — some
+ * Android builds ignore `selectionLimit`.
+ */
+export async function pickImages(options: PickImagesOptions = {}): Promise<PickImagesResult> {
+  if (!isWeb) {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (!permission.granted) {
+      throw new ImagePickError('permission_denied')
+    }
+  }
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ['images'],
+    allowsMultipleSelection: true,
+    selectionLimit: options.selectionLimit,
+    quality: options.quality ?? 0.9,
+  })
+
+  if (result.canceled || !result.assets || result.assets.length === 0) {
+    throw new ImagePickError('cancelled')
+  }
+
+  const maxBytes = options.maxBytes ?? IMAGE_PICK_MAX_BYTES
+  return assetsToPickedImages(result.assets, maxBytes)
+}
+
+/**
+ * Resizes `image` down to `maxEdge` on its longest side, preserving aspect ratio, when it's
+ * larger than that. Images already at or under `maxEdge` are returned unchanged (never
+ * upscaled). The resized copy is written to the cache directory — callers that discard a
+ * resized image without using it should call {@link deletePickedImageIfTemp} to avoid leaving
+ * it behind.
+ *
+ * Deliberately NOT wired into `pickImage`/`pickImageFromCamera`/`pickImages` — those are shared
+ * by non-chat consumers (product photo / avatar forms) that should keep their original
+ * resolution. Call this explicitly where a smaller display copy is actually wanted.
+ */
+export async function resizeImageIfNeeded(
+  image: PickedImage,
+  maxEdge: number = IMAGE_RESIZE_MAX_EDGE,
+): Promise<PickedImage> {
+  const { width, height } = image
+  if (!width || !height || Math.max(width, height) <= maxEdge) {
+    return image
+  }
+
+  const resizeAction =
+    width >= height ? { resize: { width: maxEdge } } : { resize: { height: maxEdge } }
+  const result = await manipulateAsync(image.uri, [resizeAction], {
+    compress: 0.8,
+    format: SaveFormat.JPEG,
+  })
+
+  return {
+    ...image,
+    uri: result.uri,
+    mimeType: 'image/jpeg',
+    size: 0,
+    file: undefined,
+    width: result.width,
+    height: result.height,
+    resizedTempUri: true,
+  }
+}
+
+/**
+ * Deletes the cache file behind `image` when it was created by {@link resizeImageIfNeeded}
+ * (`resizedTempUri: true`). No-op for original library/camera/browser URIs — those are never
+ * deleted here. Safe to call multiple times or on an already-deleted file.
+ */
+export function deletePickedImageIfTemp(image: PickedImage): void {
+  if (!image.resizedTempUri) {
+    return
+  }
+  try {
+    const file = new ExpoFile(image.uri)
+    if (file.exists) {
+      file.delete()
+    }
+  } catch {
+    // Best-effort cleanup — ignore failures (already gone, unsupported URI scheme, etc.).
+  }
 }
 
 /**

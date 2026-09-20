@@ -13,15 +13,26 @@ product finds out what changed since it forked.
 
 ### Added
 - `MyChat` (`src/components/ui/chat`): conversation kit — FlashList from the bottom, typed
-  `ChatMessage` kinds, `useConversation` + `ChatAdapter` (`MockChatAdapter` /
-  `createHttpChatAdapter`), overlay composer with auto-grow / native expand, web column max
-  900px. Playground: `playground/chat`.
+  `ChatMessage` kinds (`text` / `image` / `options` / `confirmation` / `form` / `result` /
+  `custom`), `useConversation` + `ChatAdapter` (`MockChatAdapter` /
+  `createHttpChatAdapter` NDJSON streaming), overlay composer with auto-grow / native expand,
+  web column max 900px. Playground: `playground/chat` (scripted “Tạo sản phẩm” flow). OpenSpec:
+  `mychat-conversation-engine` / `mychat-chat-ui` / `mychat-chat-adapter` /
+  `mychat-playground-workflow` (archived change `2026-09-18-mychat-conversation-framework`).
 
 ### Changed
 - `MyChat` keyboard / grow model (do not revert): list shrinks with `marginBottom` from
   keyboard-controller `height` (no list `translateY`); composer still `translateY`. Native
   input grows itself (floor + ceiling only). Column 900 uses item gutter, not overflow on
   the keyboard wrapper. Spec: `openspec/specs/mychat-chat-ui` + catalog `MyChat`.
+- `MyChat` composer: Enter / Return sends; web Ctrl/Cmd/Shift+Enter keeps newline; native uses
+  `submitBehavior="submit"` so Return sends without dismissing the keyboard.
+- `MyChatTyping`: calm staggered opacity/scale pulse (Reanimated) for pending empty assistant
+  text; mock adapter holds a short thinking delay so playground can preview it.
+- `MyChat` interactive cards (`form` / `confirmation` / `options` / `result`): `minWidth`
+  `70%` mobile / `50%` desktop so cards do not collapse to the `MyTextInput` 500px kit cap.
+- `MyChat` user text bubble: asymmetric corner radii (smaller top-trailing) for a clearer
+  “sent” affordance.
 - `MySpinner`: replaced `@shopify/react-native-skia` (`Canvas`/`Path`) with `react-native-svg`
   (`Circle` + `strokeDasharray`/`strokeDashoffset`, animated via `react-native-reanimated`'s
   `useAnimatedProps`) — same technique already used in `refresh-indicator.tsx`. Removes
@@ -235,3 +246,32 @@ product finds out what changed since it forked.
   to a plain `ScrollView`, but that dropped a `padding: 16` the component supplied around its own
   content with nothing replacing it, leaving those two screens edge-to-edge with no inset — it
   was restored and both screens use it again.
+
+### Added
+- `MyChat` composer: multi-image attachments — pick up to 5 photos at once (`pickImages` in
+  `components/ui/image-picker`: native `selectionLimit`, web multi-select `<input>`), staged in a
+  preview strip (remove / add more before sending). Each photo shows immediately at its original
+  resolution while resize (900px longest edge, preserves aspect ratio, `expo-image-manipulator`)
+  runs in the background and swaps in in place; Send is disabled until every staged photo has
+  resized. Re-picking an already-staged photo is silently deduped (`PickedImage.sourceId`:
+  library `assetId`, or `file.name:size:lastModified` on web — a re-picked file's `uri` is never
+  stable) and picking past the 5-image cap is trimmed, both with a toast instead of failing
+  outright. `pickImages()` also skips individual unsupported/oversized files instead of failing
+  the whole batch (`PickImagesResult { images, skippedCount }`) — previously one bad file dropped
+  everything picked alongside it. New deps: `expo-image-manipulator`, `expo-file-system` (the
+  latter only to delete resized temp files that end up unused, e.g. removed from the preview
+  before sending). OpenSpec: archived change `2026-09-20-mychat-multi-image-attachments`.
+
+### Changed
+- `MyChat` `ImageMessage`: `imageUri: string` → `imageUris: string[]` (1-5 images per message);
+  `useConversation().sendImage(uri, caption?)` → `sendImages(uris, caption?)`; `ConversationEvent`
+  case `send_image` → `send_images`. No production consumer besides the playground demo, updated
+  in the same change.
+- `MyChatImageMessage`: photos render on a neutral card (own background + soft shadow via
+  `MySurface`, matching `interactiveCard`/`unknownCard`) instead of the brand-tinted "sent"
+  bubble — a solid brand-color fill behind a photo (especially a light/white one) read as dated,
+  not as a "sent" indicator like it does for plain text. The sent/received signal (brand fill +
+  asymmetric corner) now lives in a separate caption pill below the photo(s) when the message has
+  one. Multi-photo layout: fixed-width row, up to 3 photos per row and sized down to fit fewer,
+  independent of the chat column's width (a `maxWidth`/shrink-wrap-based grid left a stretched
+  card with empty trailing space, worst on narrow/mobile columns).

@@ -14,7 +14,7 @@ export interface UseConversationResult {
   messages: ChatMessage[]
   isSending: boolean
   send: (text: string) => void
-  sendImage: (imageUri: string, caption?: string) => void
+  sendImages: (imageUris: string[], caption?: string) => void
   selectOption: (messageId: string, optionId: string) => void
   confirm: (messageId: string, confirmed: boolean) => void
   submitForm: (messageId: string, values: ChatFormValues) => void
@@ -32,14 +32,14 @@ function userTextMessage(text: string): ChatMessage {
   }
 }
 
-function userImageMessage(imageUri: string, caption?: string): ChatMessage {
+function userImageMessage(imageUris: string[], caption?: string): ChatMessage {
   return {
     id: generateMessageId('user'),
     role: 'user',
     createdAt: Date.now(),
     status: 'complete',
     kind: 'image',
-    imageUri,
+    imageUris,
     caption,
   }
 }
@@ -113,15 +113,15 @@ export function useConversation({
     [runRequest],
   )
 
-  const sendImage = useCallback(
-    (imageUri: string, caption?: string) => {
-      if (!imageUri || stateRef.current.isSending) {
+  const sendImages = useCallback(
+    (imageUris: string[], caption?: string) => {
+      if (imageUris.length === 0 || stateRef.current.isSending) {
         return
       }
-      const message = userImageMessage(imageUri, caption)
+      const message = userImageMessage(imageUris, caption)
       dispatch({ type: 'append_message', message })
       runRequest({
-        event: { type: 'send_image', imageUri, caption },
+        event: { type: 'send_images', imageUris, caption },
         history: [...stateRef.current.messages, message],
       })
     },
@@ -175,7 +175,7 @@ export function useConversation({
     messages: state.messages,
     isSending: state.isSending,
     send,
-    sendImage,
+    sendImages,
     selectOption,
     confirm,
     submitForm,

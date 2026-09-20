@@ -5,6 +5,12 @@ export const MIN_COMPOSER_HEIGHT = 24
 export const COMPOSER_ACTIONS_HEIGHT = 40
 export const COMPOSER_INPUT_LINE_HEIGHT = 22
 
+/** Max images stageable in the composer for a single send. */
+export const MAX_CHAT_ATTACHMENTS = 5
+export const ATTACHMENT_THUMBNAIL_SIZE = 64
+/** How many images `resizeImageIfNeeded` runs concurrently while staging a picked batch. */
+export const ATTACHMENT_RESIZE_BATCH_SIZE = 3
+
 /** Assistant thinking indicator — calm staggered pulse (not a “person typing” bounce). */
 export const TYPING_DOT_STAGGER_MS = 140
 export const TYPING_DOT_HALF_CYCLE_MS = 420

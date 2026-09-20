@@ -45,7 +45,7 @@ function MyChat({
   const styles = useThemedStyles(generateStyles)
   const { getSpacing, isMobileSize } = useTheme()
   const chat = useConversation({ adapter, initialMessages })
-  const { send, sendImage } = chat
+  const { send, sendImages } = chat
   const hasMessages = chat.messages.length > 0
   const [scrollToEndToken, setScrollToEndToken] = useState(0)
   const [columnWidth, setColumnWidth] = useState(0)
@@ -81,12 +81,12 @@ function MyChat({
     [pinListToBottom, send],
   )
 
-  const handleSendImage = useCallback(
-    (imageUri: string) => {
-      sendImage(imageUri)
+  const handleSendImages = useCallback(
+    (imageUris: string[], caption?: string) => {
+      sendImages(imageUris, caption)
       pinListToBottom()
     },
-    [pinListToBottom, sendImage],
+    [pinListToBottom, sendImages],
   )
 
   // Composer lifts with the keyboard. The list must NOT translateY — that moves the
@@ -159,7 +159,7 @@ function MyChat({
         >
           <MyChatComposer
             onSend={handleSend}
-            onSendImage={handleSendImage}
+            onSendImages={handleSendImages}
             disabled={chat.isSending}
             onFocusChange={handleComposerFocusChange}
           />

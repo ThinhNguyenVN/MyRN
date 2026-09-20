@@ -10,6 +10,8 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@expo/vector-icons$': '<rootDir>/src/test/expo-vector-icons-mock.js',
     '^expo-haptics$': '<rootDir>/src/test/expo-haptics-mock.js',
+    '^expo-file-system$': '<rootDir>/src/test/expo-file-system-mock.js',
+    '^expo-image-manipulator$': '<rootDir>/src/test/expo-image-manipulator-mock.js',
     '\\.(ttf|otf|woff|woff2|png|jpg|jpeg|gif|webp|svg)$': '<rootDir>/src/test/file-mock.js',
   },
   transformIgnorePatterns: [

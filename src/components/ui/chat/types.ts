@@ -21,7 +21,8 @@ export interface TextMessage extends ChatMessageBase {
 
 export interface ImageMessage extends ChatMessageBase {
   kind: 'image'
-  imageUri: string
+  /** 1-5 images sent together in this one message. */
+  imageUris: string[]
   caption?: string
 }
 
@@ -104,7 +105,7 @@ export type ChatMessage =
 
 export type ConversationEvent =
   | { type: 'send_text'; text: string }
-  | { type: 'send_image'; imageUri: string; caption?: string }
+  | { type: 'send_images'; imageUris: string[]; caption?: string }
   | { type: 'select_option'; messageId: string; optionId: string }
   | { type: 'confirm'; messageId: string; confirmed: boolean }
   | { type: 'submit_form'; messageId: string; values: ChatFormValues }
