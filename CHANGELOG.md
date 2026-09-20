@@ -11,7 +11,17 @@ product finds out what changed since it forked.
 
 ## Unreleased
 
+### Added
+- `MyChat` (`src/components/ui/chat`): conversation kit — FlashList from the bottom, typed
+  `ChatMessage` kinds, `useConversation` + `ChatAdapter` (`MockChatAdapter` /
+  `createHttpChatAdapter`), overlay composer with auto-grow / native expand, web column max
+  900px. Playground: `playground/chat`.
+
 ### Changed
+- `MyChat` keyboard / grow model (do not revert): list shrinks with `marginBottom` from
+  keyboard-controller `height` (no list `translateY`); composer still `translateY`. Native
+  input grows itself (floor + ceiling only). Column 900 uses item gutter, not overflow on
+  the keyboard wrapper. Spec: `openspec/specs/mychat-chat-ui` + catalog `MyChat`.
 - `MySpinner`: replaced `@shopify/react-native-skia` (`Canvas`/`Path`) with `react-native-svg`
   (`Circle` + `strokeDasharray`/`strokeDashoffset`, animated via `react-native-reanimated`'s
   `useAnimatedProps`) — same technique already used in `refresh-indicator.tsx`. Removes

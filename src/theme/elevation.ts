@@ -19,7 +19,7 @@ export const ElevationBlur = {
 
 // Shadow opacity by strength
 export const ElevationOpacity = {
-  soft: 0.22,
+  soft: 0.14,
   hard: 0.3,
 } as const
 

@@ -26,6 +26,10 @@ Only open a capability here when you are **changing that capability** (e.g. edit
 | `my-form-checkbox` | `MyFormCheckbox` adapter |
 | `drawer-menu` | Edge drawer (`side: left\|right`) — see `.docs/shared-ui-catalog.md` + playground |
 | `todo-structure-reference` | `todo` is a permanent canonical RTK Query CRUD reference; always calls `DUMMYJSON_BASE_URL`, independent of product `API_BASE_URL` |
+| `mychat-conversation-engine` | In-memory `useConversation` + `ChatMessage` kinds — not a product screen |
+| `mychat-chat-ui` | `MyChat` kit (FlashList from bottom, overlay composer) — see `.docs/shared-ui-catalog.md` |
+| `mychat-chat-adapter` | `ChatAdapter` + mock/HTTP NDJSON streaming — not Gemini/MCP |
+| `mychat-playground-workflow` | Playground `chat` scripted demo of the kit |
 | `product-ui-kit-test-coverage` | Kit QA expectations (tests/smoke) — process, not a product screen |
 | `picker-facade-test-coverage` | Picker helper test/smoke expectations — process, not a product screen |
 
