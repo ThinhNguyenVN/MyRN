@@ -21,6 +21,9 @@ product finds out what changed since it forked.
   `mychat-playground-workflow` (archived change `2026-09-18-mychat-conversation-framework`).
 
 ### Changed
+- `MyChat` user text bubble: drop the 50%/70% `minWidth` so a short message hugs its text.
+  `alignSelf: 'flex-end'` keeps the bubble content-sized (including image captions); long
+  text still wraps at `maxWidth`.
 - `MyChat` keyboard / grow model (do not revert): list shrinks with `marginBottom` from
   keyboard-controller `height` (no list `translateY`); composer still `translateY`. Native
   input grows itself (floor + ceiling only). Column 900 uses item gutter, not overflow on

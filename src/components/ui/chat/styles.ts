@@ -119,8 +119,9 @@ export const generateStyles = (theme: ThemeType) => {
       justifyContent: 'flex-start',
     },
     userBubble: {
-      minWidth: MIN_BUBBLE_WIDTH,
+      alignSelf: 'flex-end',
       maxWidth: MAX_BUBBLE_WIDTH,
+      flexGrow: 0,
       flexShrink: 1,
       padding: getSpacing('x3'),
       // No effect on single-child bubbles (plain text) — only spaces image from caption.
