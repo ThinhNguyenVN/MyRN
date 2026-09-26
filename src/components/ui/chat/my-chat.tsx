@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { type LayoutChangeEvent } from 'react-native'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
@@ -28,6 +28,10 @@ export interface MyChatProps {
   onAction: (action: MessageAction) => void
   renderCustomMessage?: RenderCustomMessage
   initialMessages?: ChatMessage[]
+  /** Fires whenever `messages` changes (append, chunk, error, retry...). Lets a caller lift and
+   *  persist the conversation (e.g. into app state) so it survives this component unmounting —
+   *  `MyChat` itself keeps no state outside its own lifetime. */
+  onMessagesChange?: (messages: ChatMessage[]) => void
   emptyStateTitle: string
   emptyStateSubtitle?: string
   suggestions?: ChatSuggestionInput[]
@@ -38,6 +42,7 @@ function MyChat({
   onAction,
   renderCustomMessage,
   initialMessages,
+  onMessagesChange,
   emptyStateTitle,
   emptyStateSubtitle,
   suggestions,
@@ -45,6 +50,11 @@ function MyChat({
   const styles = useThemedStyles(generateStyles)
   const { getSpacing, isMobileSize } = useTheme()
   const chat = useConversation({ adapter, initialMessages })
+
+  useEffect(() => {
+    onMessagesChange?.(chat.messages)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when messages themselves change, not on every caller re-render that hands in a new onMessagesChange identity
+  }, [chat.messages])
   const { send, sendImages } = chat
   const hasMessages = chat.messages.length > 0
   const [scrollToEndToken, setScrollToEndToken] = useState(0)
