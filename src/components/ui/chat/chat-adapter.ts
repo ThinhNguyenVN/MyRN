@@ -1,6 +1,12 @@
 import type { ReactElement } from 'react'
 
-import type { ChatMessage, ChatMessageError, ConversationEvent, CustomMessage } from './types'
+import type {
+  CardLockState,
+  ChatMessage,
+  ChatMessageError,
+  ConversationEvent,
+  CustomMessage,
+} from './types'
 
 export interface ChatRequest {
   event: ConversationEvent
@@ -11,6 +17,7 @@ export interface ChatStreamHandlers {
   onMessageStart: (message: ChatMessage) => void
   onTextChunk: (messageId: string, delta: string) => void
   onMessage: (message: ChatMessage) => void
+  onCardState: (messageId: string, state: CardLockState) => void
   onError: (messageId: string, error: ChatMessageError) => void
   onDone: (messageId: string) => void
 }

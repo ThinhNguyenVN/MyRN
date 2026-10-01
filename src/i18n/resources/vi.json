@@ -560,6 +560,8 @@
       "confirm": "Xác nhận",
       "confirmed": "Đã xác nhận",
       "cancelled": "Đã hủy",
+      "cardExpired": "Đã hết hạn",
+      "cardSuperseded": "Đã được thay bằng thẻ mới",
       "formSubmit": "Tiếp tục",
       "attach": "Thêm tệp đính kèm",
       "composerPlaceholder": "Hỏi hoặc yêu cầu thực hiện...",

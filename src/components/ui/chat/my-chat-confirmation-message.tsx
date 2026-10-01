@@ -9,6 +9,8 @@ import MyView from '@/components/elements/my-view'
 import { ConditionRenderer } from '@/components/ui/condition-renderer'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
+import MyChatCardLockRow from './my-chat-card-lock-row'
+import MyChatSummaryList from './my-chat-summary-list'
 import { generateStyles } from './styles'
 import type { ConfirmationMessage } from './types'
 
@@ -21,7 +23,9 @@ function MyChatConfirmationMessage({ message, onConfirm }: MyChatConfirmationMes
   const styles = useThemedStyles(generateStyles)
   const { getColor } = useTheme()
   const { t } = useTranslation()
-  const isResolved = message.resolution !== undefined
+  const isLocked = message.lockState !== undefined
+  const isResolved = message.resolution !== undefined && !isLocked
+  const isPending = message.resolution === undefined && !isLocked
 
   const handleConfirm = useCallback(() => {
     onConfirm(message.id, true)
@@ -36,19 +40,14 @@ function MyChatConfirmationMessage({ message, onConfirm }: MyChatConfirmationMes
       <MyText typography="body">{message.prompt}</MyText>
 
       <ConditionRenderer when={Boolean(message.summary?.length)}>
-        <MyView style={styles.summaryList}>
-          {message.summary?.map((field) => (
-            <MyView key={`chat-confirmation-field-${field.label}`} style={styles.summaryRow}>
-              <MyText typography="caption" color="text/active/secondary">
-                {field.label}
-              </MyText>
-              <MyText typography="label">{field.value}</MyText>
-            </MyView>
-          ))}
-        </MyView>
+        <MyChatSummaryList
+          keyPrefix="chat-confirmation-field"
+          summary={message.summary ?? []}
+          changedFields={message.changedFields}
+        />
       </ConditionRenderer>
 
-      <ConditionRenderer when={!isResolved}>
+      <ConditionRenderer when={isPending}>
         <MyView style={styles.confirmationButtonsRow}>
           <MyButton
             text={message.cancelLabel ?? t('components.chat.cancel')}
@@ -67,6 +66,8 @@ function MyChatConfirmationMessage({ message, onConfirm }: MyChatConfirmationMes
           />
         </MyView>
       </ConditionRenderer>
+
+      {message.lockState ? <MyChatCardLockRow lockState={message.lockState} /> : null}
 
       <ConditionRenderer when={isResolved}>
         <MyView style={styles.resolvedRow}>

@@ -1,0 +1,25 @@
+{
+  "event": {
+    "type": "select_option",
+    "messageId": "card-1",
+    "optionId": "9"
+  },
+  "history": [
+    {
+      "id": "card-1",
+      "role": "assistant",
+      "kind": "options",
+      "prompt": "Bạn chọn sản phẩm nào?",
+      "options": [
+        {
+          "id": "9",
+          "label": "iPhone 17 (đen)"
+        },
+        {
+          "id": "3",
+          "label": "iPhone 17 (trắng)"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"options","status":"complete","createdAt":0,"prompt":"Bạn chọn sản phẩm nào?","options":[{"id":"9","label":"iPhone 17 (đen)"},{"id":"3","label":"iPhone 17 (trắng)"}]}}
+{"type":"done","messageId":"<id>"}

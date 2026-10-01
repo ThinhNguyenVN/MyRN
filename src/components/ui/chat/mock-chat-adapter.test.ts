@@ -17,6 +17,9 @@ function collectHandlers() {
       calls.push(`message:${message.kind}`)
       messages.push(message)
     },
+    onCardState: (id, state) => {
+      calls.push(`card_state:${id}:${state}`)
+    },
     onError: () => {
       calls.push('error')
     },
@@ -135,5 +138,26 @@ describe('MockChatAdapter', () => {
 
     expect(calls.some((call) => call === 'message:result')).toBe(false)
     expect(calls[calls.length - 1]).toBe('done')
+  })
+
+  it('locks open cards and sends a confirmation with changedFields for the expiry intent', async () => {
+    const { calls, messages, handlers } = collectHandlers()
+    const openCard: ChatMessage = {
+      id: 'open-card',
+      role: 'assistant',
+      createdAt: 0,
+      status: 'complete',
+      kind: 'confirmation',
+      prompt: 'Tạo?',
+    }
+
+    await runMockSend(
+      { event: { type: 'send_text', text: 'thẻ hết hạn' }, history: [openCard] },
+      handlers,
+    )
+
+    expect(calls).toContain('card_state:open-card:expired')
+    const confirmation = messages.find((message) => message.kind === 'confirmation')
+    expect(confirmation?.kind === 'confirmation' && confirmation.changedFields).toEqual(['Giá'])
   })
 })

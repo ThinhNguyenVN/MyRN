@@ -1,0 +1,15 @@
+{
+  "event": {
+    "type": "confirm",
+    "messageId": "card-2",
+    "confirmed": true
+  },
+  "history": [
+    {
+      "id": "card-2",
+      "role": "assistant",
+      "kind": "confirmation",
+      "prompt": "Tạo sản phẩm iPhone 18?"
+    }
+  ]
+}

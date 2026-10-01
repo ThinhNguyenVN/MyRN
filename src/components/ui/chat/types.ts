@@ -31,12 +31,19 @@ export interface ChatOption {
   label: string
 }
 
+/** Khóa do server báo qua `card_state`; độc lập với `resolution`/`selectedOptionId` do user bấm. */
+export type CardLockState = 'expired' | 'cancelled' | 'superseded'
+
+export const CARD_LOCK_STATES: readonly CardLockState[] = ['expired', 'cancelled', 'superseded']
+
 export interface OptionsMessage extends ChatMessageBase {
   kind: 'options'
   prompt: string
   options: ChatOption[]
   allowCustomInput?: boolean
   selectedOptionId?: string
+  lockState?: CardLockState
+  changedFields?: string[]
 }
 
 export interface ChatSummaryField {
@@ -54,6 +61,8 @@ export interface ConfirmationMessage extends ChatMessageBase {
   cancelLabel?: string
   destructive?: boolean
   resolution?: ConfirmationResolution
+  lockState?: CardLockState
+  changedFields?: string[]
 }
 
 export type ChatFormFieldType = 'text' | 'number' | 'select'

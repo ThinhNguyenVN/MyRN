@@ -75,6 +75,9 @@ export function useConversation({
           currentMessageId = message.id
           dispatch({ type: 'set_message', message })
         },
+        onCardState: (messageId, state) => {
+          dispatch({ type: 'set_card_lock', messageId, state })
+        },
         onError: (messageId, error) => {
           dispatch({ type: 'set_error', messageId, error })
         },

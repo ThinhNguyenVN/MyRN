@@ -19,6 +19,15 @@ product finds out what changed since it forked.
   web column max 900px. Playground: `playground/chat` (scripted “Tạo sản phẩm” flow). OpenSpec:
   `mychat-conversation-engine` / `mychat-chat-ui` / `mychat-chat-adapter` /
   `mychat-playground-workflow` (archived change `2026-09-18-mychat-conversation-framework`).
+- `MyChat` chat contract v2 (client side of gateway M7): `createHttpChatAdapter` accepts
+  `contractVersion` (sends `X-Chat-Contract`) and `getLocale` (sends `X-Locale`, read on every
+  send); new `card_state` event → `ChatStreamHandlers.onCardState` → `lockState`
+  (`expired | cancelled | superseded`) on `options`/`confirmation`, which removes the buttons and
+  shows a label (`components.chat.cardExpired | cardSuperseded`, `cancelled`); optional
+  `changedFields` highlights summary rows on a confirmation card. `contract/` is a copy of the
+  gateway fixtures, parsed by `http-chat-adapter.contract.test.ts`. A product that forked earlier
+  must add `onCardState` to any custom `ChatStreamHandlers` and, to opt in, pass
+  `contractVersion: 2` + `getLocale`. OpenSpec change `chat-contract-v2-clients`.
 
 ### Changed
 - `MyChat` user text bubble: drop the 50%/70% `minWidth` so a short message hugs its text.

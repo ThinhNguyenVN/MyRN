@@ -2,11 +2,15 @@ import { isWeb } from '@/constants/dimensions'
 
 import type { ChatAdapter, ChatRequest, ChatStreamHandlers } from './chat-adapter'
 import { generateMessageId } from './generate-message-id'
-import type { ChatMessage } from './types'
+import { CARD_LOCK_STATES, type CardLockState, type ChatMessage } from './types'
 
 export interface HttpChatAdapterOptions {
   url: string
   headers?: Record<string, string>
+  /** Gửi `X-Chat-Contract`; bỏ trống = contract v1. */
+  contractVersion?: number
+  /** Gọi mỗi lần `send()`; trả chuỗi không rỗng thì gửi `X-Locale`. */
+  getLocale?: () => string | undefined
 }
 
 type NdjsonEvent =
@@ -14,6 +18,7 @@ type NdjsonEvent =
   | { type: 'message'; message: ChatMessage }
   | { type: 'error'; messageId: string; error: { message: string } }
   | { type: 'done'; messageId: string }
+  | { type: 'card_state'; messageId: string; state: string }
 
 /** Wire format: 1 dòng NDJSON = 1 event. Không phải chuẩn SSE — xem design.md Decision 4. */
 export function parseNdjsonLine(line: string): NdjsonEvent | null {
@@ -49,6 +54,11 @@ function dispatchNdjsonEvent(
     case 'done':
       onMessageIdSeen(event.messageId)
       handlers.onDone(event.messageId)
+      return
+    case 'card_state':
+      if (CARD_LOCK_STATES.includes(event.state as CardLockState)) {
+        handlers.onCardState(event.messageId, event.state as CardLockState)
+      }
       return
     default:
       return
@@ -153,6 +163,21 @@ function sendNative(
   })
 }
 
+function buildHeaders(options: HttpChatAdapterOptions): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  }
+  if (options.contractVersion !== undefined) {
+    headers['X-Chat-Contract'] = String(options.contractVersion)
+  }
+  const locale = options.getLocale?.()
+  if (locale) {
+    headers['X-Locale'] = locale
+  }
+  return headers
+}
+
 /**
  * Generic HTTP streaming adapter — chưa có backend thật để trỏ vào (Phase 5).
  * Không biết Gemini/OpenAI/MCP; chỉ nói NDJSON-over-HTTP với `ChatRequest`/`ChatStreamHandlers`.
@@ -167,7 +192,7 @@ export function createHttpChatAdapter(options: HttpChatAdapterOptions): ChatAdap
 
       const requestInit: RequestInit = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...options.headers },
+        headers: buildHeaders(options),
         body: JSON.stringify(request),
       }
 
