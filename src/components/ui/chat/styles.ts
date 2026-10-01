@@ -267,6 +267,9 @@ export const generateStyles = (theme: ThemeType) => {
       flexDirection: 'row',
       gap: getSpacing('x3'),
     },
+    formSubmitRow: {
+      flexDirection: 'row',
+    },
     formFieldsGap: {
       gap: getSpacing('x4'),
     },

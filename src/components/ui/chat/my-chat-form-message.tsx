@@ -129,14 +129,16 @@ function MyChatFormMessage({ message, onSubmitForm }: MyChatFormMessageProps) {
           />
         ))}
       </MyView>
-      <MyButton
-        text={message.submitLabel ?? t('components.chat.formSubmit')}
-        type="primary"
-        width="full"
-        elevation="none"
-        disabled={!canSubmit}
-        onPress={handleSubmit}
-      />
+      <MyView style={styles.formSubmitRow}>
+        <MyButton
+          text={message.submitLabel ?? t('components.chat.formSubmit')}
+          type="primary"
+          width="full"
+          elevation="none"
+          disabled={!canSubmit}
+          onPress={handleSubmit}
+        />
+      </MyView>
     </MySurface>
   )
 }
