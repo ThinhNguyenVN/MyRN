@@ -1,0 +1,3 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"confirmation","status":"complete","createdAt":0,"prompt":"Tạo sản phẩm iPhone 18?","summary":[{"label":"Tên","value":"iPhone 18"},{"label":"Giá","value":"40.000.000"}],"destructive":false}}
+{"type":"done","messageId":"<id>"}

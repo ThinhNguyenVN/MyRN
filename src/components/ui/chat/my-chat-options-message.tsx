@@ -8,6 +8,7 @@ import MyView from '@/components/elements/my-view'
 import { ConditionRenderer } from '@/components/ui/condition-renderer'
 import { useThemedStyles } from '@/theme/theme-context'
 
+import MyChatCardLockRow from './my-chat-card-lock-row'
 import { generateStyles } from './styles'
 import type { ChatOption, OptionsMessage } from './types'
 
@@ -32,7 +33,9 @@ export interface MyChatOptionsMessageProps {
 
 function MyChatOptionsMessage({ message, onSelectOption }: MyChatOptionsMessageProps) {
   const styles = useThemedStyles(generateStyles)
-  const isResolved = message.selectedOptionId !== undefined
+  const isLocked = message.lockState !== undefined
+  const isResolved = message.selectedOptionId !== undefined && !isLocked
+  const isPending = message.selectedOptionId === undefined && !isLocked
   const selectedLabel = message.options.find(
     (option) => option.id === message.selectedOptionId,
   )?.label
@@ -41,7 +44,7 @@ function MyChatOptionsMessage({ message, onSelectOption }: MyChatOptionsMessageP
     <MySurface radius="large" style={styles.interactiveCard}>
       <MyText typography="body">{message.prompt}</MyText>
 
-      <ConditionRenderer when={!isResolved}>
+      <ConditionRenderer when={isPending}>
         <MyView style={styles.optionsRow}>
           {message.options.map((option) => (
             <OptionChip
@@ -53,6 +56,8 @@ function MyChatOptionsMessage({ message, onSelectOption }: MyChatOptionsMessageP
           ))}
         </MyView>
       </ConditionRenderer>
+
+      {message.lockState ? <MyChatCardLockRow lockState={message.lockState} /> : null}
 
       <ConditionRenderer when={isResolved}>
         <MyView style={styles.resolvedRow}>

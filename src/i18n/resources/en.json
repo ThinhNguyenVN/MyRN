@@ -560,6 +560,8 @@
       "confirm": "Confirm",
       "confirmed": "Confirmed",
       "cancelled": "Cancelled",
+      "cardExpired": "Expired",
+      "cardSuperseded": "Replaced by a newer card",
       "formSubmit": "Continue",
       "attach": "Add attachment",
       "composerPlaceholder": "Ask or ask me to do something...",

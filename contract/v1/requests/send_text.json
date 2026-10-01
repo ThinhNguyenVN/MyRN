@@ -1,0 +1,14 @@
+{
+  "event": {
+    "type": "send_text",
+    "text": "iphone 17 còn bao nhiêu"
+  },
+  "history": [
+    {
+      "id": "u1",
+      "role": "user",
+      "kind": "text",
+      "text": "iphone 17 còn bao nhiêu"
+    }
+  ]
+}

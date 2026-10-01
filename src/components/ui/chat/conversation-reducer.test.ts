@@ -163,4 +163,41 @@ describe('conversationReducer', () => {
     expect(reset.error).toBeUndefined()
     expect(reset.text).toBe('')
   })
+
+  it('locks an unresolved confirmation and keeps its status', () => {
+    const state = initialConversationState([confirmationMessage()])
+    const next = conversationReducer(state, {
+      type: 'set_card_lock',
+      messageId: 'conf1',
+      state: 'expired',
+    })
+    const locked = next.messages[0] as ConfirmationMessage
+    expect(locked.lockState).toBe('expired')
+    expect(locked.status).toBe('complete')
+    expect(locked.resolution).toBeUndefined()
+  })
+
+  it('locks a card the user already resolved without clearing the resolution', () => {
+    const state = initialConversationState([optionsMessage({ selectedOptionId: 'a' })])
+    const next = conversationReducer(state, {
+      type: 'set_card_lock',
+      messageId: 'opt1',
+      state: 'superseded',
+    })
+    const locked = next.messages[0] as OptionsMessage
+    expect(locked.lockState).toBe('superseded')
+    expect(locked.selectedOptionId).toBe('a')
+  })
+
+  it('ignores a card lock for an unknown id or a non-card message', () => {
+    const state = initialConversationState([textMessage({ status: 'complete' })])
+    expect(
+      conversationReducer(state, { type: 'set_card_lock', messageId: 'nope', state: 'expired' })
+        .messages,
+    ).toEqual(state.messages)
+    expect(
+      conversationReducer(state, { type: 'set_card_lock', messageId: 'm1', state: 'expired' })
+        .messages,
+    ).toEqual(state.messages)
+  })
 })

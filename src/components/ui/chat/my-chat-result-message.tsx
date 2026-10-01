@@ -2,11 +2,11 @@ import React, { memo } from 'react'
 
 import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
-import MyView from '@/components/elements/my-view'
 import { ConditionRenderer } from '@/components/ui/condition-renderer'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import MyChatActionRow from './my-chat-action-row'
+import MyChatSummaryList from './my-chat-summary-list'
 import { generateStyles } from './styles'
 import type { MessageAction, ResultMessage } from './types'
 
@@ -23,16 +23,7 @@ function MyChatResultMessage({ message, onAction }: MyChatResultMessageProps) {
       <MyText typography="label">{message.title}</MyText>
 
       <ConditionRenderer when={Boolean(message.summary?.length)}>
-        <MyView style={styles.summaryList}>
-          {message.summary?.map((field) => (
-            <MyView key={`chat-result-field-${field.label}`} style={styles.summaryRow}>
-              <MyText typography="caption" color="text/active/secondary">
-                {field.label}
-              </MyText>
-              <MyText typography="label">{field.value}</MyText>
-            </MyView>
-          ))}
-        </MyView>
+        <MyChatSummaryList keyPrefix="chat-result-field" summary={message.summary ?? []} />
       </ConditionRenderer>
 
       <ConditionRenderer when={Boolean(message.actions?.length)}>

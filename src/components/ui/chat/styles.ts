@@ -249,12 +249,26 @@ export const generateStyles = (theme: ThemeType) => {
       justifyContent: 'space-between',
       gap: getSpacing('x4'),
     },
+    summaryLabelGroup: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: getSpacing('x2'),
+    },
+    changedDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: getColor('fill/info/primary'),
+    },
     summaryList: {
       gap: getSpacing('x2'),
     },
     confirmationButtonsRow: {
       flexDirection: 'row',
       gap: getSpacing('x3'),
+    },
+    formSubmitRow: {
+      flexDirection: 'row',
     },
     formFieldsGap: {
       gap: getSpacing('x4'),

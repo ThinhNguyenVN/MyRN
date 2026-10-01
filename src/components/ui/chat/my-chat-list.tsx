@@ -17,7 +17,12 @@ import { isAndroid } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import type { RenderCustomMessage } from './chat-adapter'
-import { BOTTOM_ANCHOR_THRESHOLD, KEYBOARD_CLOSE_SCROLL_SLACK, TAP_SLOP } from './constants'
+import {
+  BOTTOM_ANCHOR_THRESHOLD,
+  KEYBOARD_CLOSE_SCROLL_SLACK,
+  SETTLE_PIN_DELAY_MS,
+  TAP_SLOP,
+} from './constants'
 import MyChatBubble from './my-chat-bubble'
 import { generateStyles } from './styles'
 import type { ChatFormValues, ChatMessage, MessageAction } from './types'
@@ -73,6 +78,7 @@ function MyChatList({
   const listRef = useRef<FlashListRef<ChatMessage>>(null)
   const lastScrollTokenRef = useRef(0)
   const isAtBottomRef = useRef(true)
+  const scrollMetricsRef = useRef({ offset: 0, content: 0, view: 0 })
   const keyboardMotionLockRef = useRef(false)
   /** Android: keyboard space (px) currently reserved by the list's layout. */
   const keyboardSpace = useSharedValue(0)
@@ -90,23 +96,67 @@ function MyChatList({
     return [styles.listContent, { paddingBottom: composerHeight + getSpacing('x4') }]
   }, [composerHeight, getSpacing, styles.listContent])
 
+  /**
+   * FlashList's `scrollToEnd` targets the end it has estimated so far; a freshly mounted or
+   * freshly appended short item (typing indicator, reply card) is measured a frame or two
+   * later, so the first pin can stop short of the real end and leave the last item under the
+   * composer until the content changes again. Pin, then once layout has settled compare with
+   * the content size the list itself reported and top up the difference.
+   */
+  const pinToEndAfterLayout = useCallback(() => {
+    listRef.current?.scrollToEnd({ animated: false })
+    let inner = 0
+    let settle: ReturnType<typeof setTimeout> | undefined
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => {
+        listRef.current?.scrollToEnd({ animated: false })
+        settle = setTimeout(() => {
+          const { offset, content, view } = scrollMetricsRef.current
+          const end = content - view
+          if (end > 0 && end - offset > 1) {
+            listRef.current?.scrollToOffset({ offset: end, animated: false })
+          }
+        }, SETTLE_PIN_DELAY_MS)
+      })
+    })
+    return () => {
+      cancelAnimationFrame(outer)
+      cancelAnimationFrame(inner)
+      clearTimeout(settle)
+    }
+  }, [])
+
   useLayoutEffect(() => {
     if (scrollToEndToken === 0 || scrollToEndToken === lastScrollTokenRef.current) {
       return
     }
     lastScrollTokenRef.current = scrollToEndToken
-    if (messages.length <= 1) {
+    return pinToEndAfterLayout()
+  }, [messages.length, pinToEndAfterLayout, scrollToEndToken])
+
+  // Starts at 0 so the list mounting with its first items (a suggestion chip sends without
+  // going through `scrollToEndToken`) counts as growth and gets pinned too.
+  const previousLengthRef = useRef(0)
+  useLayoutEffect(() => {
+    const grew = messages.length > previousLengthRef.current
+    previousLengthRef.current = messages.length
+    if (!grew || !isAtBottomRef.current) {
       return
     }
-    listRef.current?.scrollToEnd({ animated: false })
-  }, [messages.length, scrollToEndToken])
+    return pinToEndAfterLayout()
+  }, [messages.length, pinToEndAfterLayout])
 
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     didScrollDuringTouchRef.current = true
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent
+    scrollMetricsRef.current = {
+      offset: contentOffset.y,
+      content: contentSize.height,
+      view: layoutMeasurement.height,
+    }
     if (keyboardMotionLockRef.current) {
       return
     }
-    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent
     const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height)
     isAtBottomRef.current = distanceFromBottom <= BOTTOM_ANCHOR_THRESHOLD
   }, [])

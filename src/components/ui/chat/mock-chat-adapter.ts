@@ -1,6 +1,12 @@
 import type { ChatAdapter, ChatRequest, ChatStreamHandlers } from './chat-adapter'
 import { generateMessageId } from './generate-message-id'
-import type { ChatFormValues, ChatMessage, ChatSummaryField, ConversationEvent } from './types'
+import type {
+  ChatFormValues,
+  ChatMessage,
+  ChatSummaryField,
+  ConfirmationMessage,
+  ConversationEvent,
+} from './types'
 
 const CHUNK_DELAY_MS = 120
 /** Hold pending/empty state so playground can preview `MyChatTyping` before chunks arrive. */
@@ -114,7 +120,45 @@ function buildResultMessage(values: ChatFormValues): ChatMessage {
   }
 }
 
-async function handleSendText(text: string, handlers: ChatStreamHandlers): Promise<void> {
+function isCardLockIntent(text: string): boolean {
+  const normalized = text.trim().toLowerCase()
+  return normalized.includes('hết hạn') || normalized.includes('het han')
+}
+
+/** Mô phỏng contract v2: khóa các thẻ còn mở trong history và gửi thẻ mới có `changedFields`. */
+async function handleCardLock(history: ChatMessage[], handlers: ChatStreamHandlers): Promise<void> {
+  const id = generateMessageId('assistant')
+  handlers.onMessageStart(pendingTextMessage(id))
+  await streamChunks(id, ['Thẻ', ' cũ đã hết hạn,', ' đây là thẻ mới.'], handlers)
+
+  for (const message of history) {
+    const isOpenCard =
+      (message.kind === 'options' && message.selectedOptionId === undefined) ||
+      (message.kind === 'confirmation' && message.resolution === undefined)
+    if (isOpenCard && message.lockState === undefined) {
+      handlers.onCardState(message.id, 'expired')
+    }
+  }
+
+  handlers.onMessage({
+    ...(buildConfirmationMessage({
+      name: 'Áo thun',
+      price: 150000,
+      stock: 20,
+    }) as ConfirmationMessage),
+    changedFields: ['Giá'],
+  })
+  handlers.onDone(id)
+}
+
+async function handleSendText(
+  text: string,
+  history: ChatMessage[],
+  handlers: ChatStreamHandlers,
+): Promise<void> {
+  if (isCardLockIntent(text)) {
+    return handleCardLock(history, handlers)
+  }
   const id = generateMessageId('assistant')
   handlers.onMessageStart(pendingTextMessage(id))
 
@@ -183,7 +227,7 @@ function dispatchEvent(
 ): Promise<void> {
   switch (event.type) {
     case 'send_text':
-      return handleSendText(event.text, handlers)
+      return handleSendText(event.text, history, handlers)
     case 'send_images':
       return handleSendImages(handlers)
     case 'select_option':

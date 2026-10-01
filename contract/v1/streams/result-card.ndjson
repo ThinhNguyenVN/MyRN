@@ -1,0 +1,3 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"result","status":"complete","createdAt":0,"title":"Tồn kho: iPhone 17","summary":[{"label":"Tổng tồn","value":"12"}],"actions":[{"type":"navigate","label":"Xem kho","href":"/inventory/17"}]}}
+{"type":"done","messageId":"<id>"}

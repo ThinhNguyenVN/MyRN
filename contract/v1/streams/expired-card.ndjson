@@ -1,0 +1,2 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"complete","createdAt":0,"text":"Yêu cầu này đã hết hạn hoặc đã được xử lý, bạn nhắn lại giúp mình nhé."}}
+{"type":"done","messageId":"<id>"}

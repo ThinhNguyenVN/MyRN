@@ -1,4 +1,4 @@
-import type { ChatFormValues, ChatMessage, ChatMessageError } from './types'
+import type { CardLockState, ChatFormValues, ChatMessage, ChatMessageError } from './types'
 
 export interface ConversationState {
   messages: ChatMessage[]
@@ -21,6 +21,7 @@ export type ConversationAction =
   | { type: 'set_message'; message: ChatMessage }
   | { type: 'set_error'; messageId: string; error: ChatMessageError }
   | { type: 'set_done'; messageId: string }
+  | { type: 'set_card_lock'; messageId: string; state: CardLockState }
   | { type: 'set_sending'; isSending: boolean }
   | { type: 'reset_for_retry'; messageId: string }
 
@@ -111,6 +112,16 @@ export function conversationReducer(
           message.status === 'error' ? message : { ...message, status: 'complete' },
         ),
         isSending: false,
+      }
+
+    case 'set_card_lock':
+      return {
+        ...state,
+        messages: mapMessage(state.messages, action.messageId, (message) =>
+          message.kind === 'options' || message.kind === 'confirmation'
+            ? { ...message, lockState: action.state }
+            : message,
+        ),
       }
 
     case 'set_sending':

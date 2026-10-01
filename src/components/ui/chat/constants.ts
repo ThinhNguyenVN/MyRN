@@ -44,6 +44,9 @@ export const COMPOSER_HEIGHT_COMMIT_THRESHOLD = 8
 /** Distance (px) from the real bottom still considered "at bottom" for keyboard anchoring. */
 export const BOTTOM_ANCHOR_THRESHOLD = 24
 
+/** Wait (ms) after the layout frames before topping up a pin that stopped short of the end. */
+export const SETTLE_PIN_DELAY_MS = 120
+
 /** Touch travel (px) under which a gesture still counts as a tap, not a scroll. */
 export const TAP_SLOP = 8
 
