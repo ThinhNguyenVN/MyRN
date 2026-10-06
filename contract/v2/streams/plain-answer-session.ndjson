@@ -1,0 +1,4 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"chunk","messageId":"<id>","delta":"Xin "}
+{"type":"chunk","messageId":"<id>","delta":"chào"}
+{"type":"done","messageId":"<id>","sessionId":"<id>"}

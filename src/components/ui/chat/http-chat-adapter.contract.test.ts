@@ -4,6 +4,12 @@ import { join } from 'path'
 import type { ChatStreamHandlers } from './chat-adapter'
 import { consumeNdjsonBuffer } from './http-chat-adapter'
 
+jest.mock('@/utils/storage', () => ({
+  storageGetItem: jest.fn(),
+  storageSetItem: jest.fn(),
+  storageRemoveItem: jest.fn(),
+}))
+
 const CONTRACT_DIR = join(__dirname, '../../../../contract')
 
 interface Recorded {

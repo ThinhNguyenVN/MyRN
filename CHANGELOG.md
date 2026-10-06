@@ -12,6 +12,12 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Added
+- `createHttpChatAdapter` optional `session: { appId, userId }`: the first send uses
+  `X-Chat-Session: new`, later sends reuse the id from `done.sessionId`, stored per app and user
+  (localStorage on web, the kit storage helper on native). `clearSession()` calls
+  `DELETE /session`; `clearAllSessions()` calls `DELETE /sessions`. A `done` line may include
+  `sessionId`; handlers that only read `messageId` are unchanged. Contract copy adds
+  `plain-answer-session.ndjson` (v1 and v2).
 - `MyChat` (`src/components/ui/chat`): conversation kit — FlashList from the bottom, typed
   `ChatMessage` kinds (`text` / `image` / `options` / `confirmation` / `form` / `result` /
   `custom`), `useConversation` + `ChatAdapter` (`MockChatAdapter` /

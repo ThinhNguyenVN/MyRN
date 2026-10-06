@@ -25,6 +25,10 @@ export interface ChatStreamHandlers {
 export interface ChatAdapter {
   send: (request: ChatRequest, handlers: ChatStreamHandlers) => Promise<void>
   cancel?: (messageId: string) => void
+  /** Xóa session server đang lưu cho app và user của adapter này (`DELETE /session`). */
+  clearSession?: () => Promise<void>
+  /** Xóa mọi session server của app và user này (`DELETE /sessions`). */
+  clearAllSessions?: () => Promise<void>
 }
 
 /** Return `null` when the app doesn't recognize `message.customType` — MyChat falls back to `MyChatUnknownMessage`. */
