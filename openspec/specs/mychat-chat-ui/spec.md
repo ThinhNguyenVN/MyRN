@@ -29,7 +29,7 @@ Khi `isMobileSize === false`, bề ngang *nội dung* (bubble + composer) MUST c
 - **THEN** item tương ứng trong `MyChatList` MUST cập nhật nội dung tại chỗ (không unmount/remount), không gây nhảy vị trí scroll của các item phía trên
 
 ### Requirement: Render built-in theo từng ChatMessage.kind
-`MyChatBubble` SHALL dispatch render theo `message.kind` cho toàn bộ built-in kinds: `text`, `image`, `options`, `confirmation`, `form`, `result`. Mỗi renderer built-in MUST tuân thủ interaction lifecycle của `mychat-conversation-engine` (pending → resolved hiển thị khác pending).
+`MyChatBubble` SHALL dispatch render theo `message.kind` cho toàn bộ built-in kinds: `text`, `image`, `options`, `confirmation`, `form`, `result`. Mỗi renderer built-in MUST tuân thủ interaction lifecycle của `mychat-conversation-engine` (pending → resolved hiển thị khác pending). Với `options` và `confirmation`, `lockState` (khóa do server báo) MUST được ưu tiên hơn `selectedOptionId`/`resolution` khi chọn cách hiển thị.
 
 #### Scenario: OptionsMessage hiển thị options rồi resolved state
 - **WHEN** render một `OptionsMessage` chưa `selectedOptionId`
@@ -46,6 +46,28 @@ Khi `isMobileSize === false`, bề ngang *nội dung* (bubble + composer) MUST c
 #### Scenario: TextMessage lỗi có retry
 - **WHEN** một `TextMessage` có `status: 'error'`
 - **THEN** UI MUST hiển thị nội dung lỗi (`error.message`) kèm affordance retry gọi `chat.retry(messageId)`
+
+### Requirement: Thẻ `options`/`confirmation` bị server khóa MUST gỡ nút và hiện nhãn trạng thái
+Khi `lockState` có giá trị, `MyChatOptionsMessage` và `MyChatConfirmationMessage` SHALL gỡ các nút/chip tương tác và hiển thị một dòng trạng thái (icon + nhãn) cùng kiểu dòng đã resolve, thay cho trạng thái resolve cục bộ. Nhãn MUST lấy từ i18n của client: `components.chat.cardExpired` (`expired`), `components.chat.cancelled` (`cancelled`), `components.chat.cardSuperseded` (`superseded`), có bản `vi` và `en`. Nội dung thẻ (prompt, summary, danh sách option) MUST vẫn hiển thị.
+
+#### Scenario: Thẻ xác nhận hết hạn
+- **WHEN** render `ConfirmationMessage` có `lockState: 'expired'` (kể cả khi `resolution` đã được set)
+- **THEN** UI MUST hiển thị nhãn "Đã hết hạn" (hoặc bản dịch `en`) và MUST NOT hiển thị nút Xác nhận/Hủy hay nhãn "Đã xác nhận"
+
+#### Scenario: Thẻ chọn bị thay
+- **WHEN** render `OptionsMessage` có `lockState: 'superseded'`
+- **THEN** UI MUST hiển thị nhãn "Đã được thay bằng thẻ mới" và MUST NOT hiển thị chip option nhấn được
+
+### Requirement: Dòng `summary` có trong `changedFields` MUST được làm nổi
+`MyChatConfirmationMessage` SHALL làm nổi dòng `summary` có `label` bằng đúng một phần tử của `changedFields`: một chấm tròn nhỏ màu `fill/info/primary` cạnh nhãn và giá trị dùng màu `text/info/primary`. Thẻ không có `changedFields` hoặc `changedFields` rỗng MUST hiển thị y như trước. `changedFields` chứa nhãn không có trong `summary` MUST bị bỏ qua. Làm nổi MUST NOT đổi nền dòng. Với `OptionsMessage`, `changedFields` được nhận vào kiểu nhưng MUST NOT ảnh hưởng hiển thị (thẻ options không có `summary`).
+
+#### Scenario: Thẻ sửa một trường
+- **WHEN** render `ConfirmationMessage` có `summary` gồm "Tên" và "Giá" và `changedFields: ['Giá']`
+- **THEN** dòng "Giá" MUST có chấm và giá trị màu `info`, dòng "Tên" MUST hiển thị như thường
+
+#### Scenario: Không có changedFields
+- **WHEN** render `ConfirmationMessage` không có `changedFields`
+- **THEN** mọi dòng `summary` MUST hiển thị như thường
 
 ### Requirement: MessageAction render và điều hướng qua onAction
 `MyChatActionRow` SHALL render danh sách `MessageAction[]` thành button/link. Với `type: 'external_link'`, `MyChat` MUST tự mở URL bằng `expo-web-browser` mà không cần app xử lý. Với `type: 'navigate'` và `type: 'custom'`, `MyChat` MUST luôn gọi `onAction(action)` do app truyền vào, MUST NOT tự thực hiện điều hướng cho 2 loại này.

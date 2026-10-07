@@ -1,8 +1,15 @@
 import { isWeb } from '@/constants/dimensions'
+import { storageGetItem, storageRemoveItem, storageSetItem } from '@/utils/storage'
 
 import type { ChatAdapter, ChatRequest, ChatStreamHandlers } from './chat-adapter'
 import { generateMessageId } from './generate-message-id'
 import { CARD_LOCK_STATES, type CardLockState, type ChatMessage } from './types'
+
+/** App và user để key id session. Không có thì adapter không gửi `X-Chat-Session`. */
+export interface ChatSessionScope {
+  appId: string
+  userId: string
+}
 
 export interface HttpChatAdapterOptions {
   url: string
@@ -11,13 +18,20 @@ export interface HttpChatAdapterOptions {
   contractVersion?: number
   /** Gọi mỗi lần `send()`; trả chuỗi không rỗng thì gửi `X-Locale`. */
   getLocale?: () => string | undefined
+  /**
+   * Giữ session ở gateway cho đúng app và user. Lượt đầu gửi `X-Chat-Session: new`,
+   * các lượt sau gửi id đọc từ `done.sessionId`.
+   */
+  session?: ChatSessionScope
 }
+
+const SESSION_HEADER = 'X-Chat-Session'
 
 type NdjsonEvent =
   | { type: 'chunk'; messageId: string; delta: string }
   | { type: 'message'; message: ChatMessage }
   | { type: 'error'; messageId: string; error: { message: string } }
-  | { type: 'done'; messageId: string }
+  | { type: 'done'; messageId: string; sessionId?: string }
   | { type: 'card_state'; messageId: string; state: string }
 
 /** Wire format: 1 dòng NDJSON = 1 event. Không phải chuẩn SSE — xem design.md Decision 4. */
@@ -37,6 +51,7 @@ function dispatchNdjsonEvent(
   event: NdjsonEvent,
   handlers: ChatStreamHandlers,
   onMessageIdSeen: (messageId: string) => void,
+  onSessionId?: (sessionId: string) => void,
 ): void {
   switch (event.type) {
     case 'chunk':
@@ -53,6 +68,9 @@ function dispatchNdjsonEvent(
       return
     case 'done':
       onMessageIdSeen(event.messageId)
+      if (typeof event.sessionId === 'string' && event.sessionId.trim()) {
+        onSessionId?.(event.sessionId.trim())
+      }
       handlers.onDone(event.messageId)
       return
     case 'card_state':
@@ -70,13 +88,14 @@ export function consumeNdjsonBuffer(
   buffer: string,
   handlers: ChatStreamHandlers,
   onMessageIdSeen: (messageId: string) => void,
+  onSessionId?: (sessionId: string) => void,
 ): string {
   const lines = buffer.split('\n')
   const remainder = lines.pop() ?? ''
   for (const line of lines) {
     const event = parseNdjsonLine(line)
     if (event) {
-      dispatchNdjsonEvent(event, handlers, onMessageIdSeen)
+      dispatchNdjsonEvent(event, handlers, onMessageIdSeen, onSessionId)
     }
   }
   return remainder
@@ -86,10 +105,11 @@ function flushRemainder(
   remainder: string,
   handlers: ChatStreamHandlers,
   onMessageIdSeen: (messageId: string) => void,
+  onSessionId?: (sessionId: string) => void,
 ): void {
   const event = parseNdjsonLine(remainder)
   if (event) {
-    dispatchNdjsonEvent(event, handlers, onMessageIdSeen)
+    dispatchNdjsonEvent(event, handlers, onMessageIdSeen, onSessionId)
   }
 }
 
@@ -98,6 +118,7 @@ async function sendWeb(
   requestInit: RequestInit,
   handlers: ChatStreamHandlers,
   onMessageIdSeen: (messageId: string) => void,
+  onSessionId?: (sessionId: string) => void,
 ): Promise<void> {
   const response = await fetch(url, requestInit)
   if (!response.ok || !response.body) {
@@ -114,10 +135,10 @@ async function sendWeb(
       break
     }
     buffer += decoder.decode(value, { stream: true })
-    buffer = consumeNdjsonBuffer(buffer, handlers, onMessageIdSeen)
+    buffer = consumeNdjsonBuffer(buffer, handlers, onMessageIdSeen, onSessionId)
   }
 
-  flushRemainder(buffer, handlers, onMessageIdSeen)
+  flushRemainder(buffer, handlers, onMessageIdSeen, onSessionId)
 }
 
 /**
@@ -129,6 +150,7 @@ function sendNative(
   requestInit: RequestInit,
   handlers: ChatStreamHandlers,
   onMessageIdSeen: (messageId: string) => void,
+  onSessionId?: (sessionId: string) => void,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
@@ -146,7 +168,7 @@ function sendNative(
       const nextChunk = xhr.responseText.slice(processedLength)
       processedLength = xhr.responseText.length
       buffer += nextChunk
-      buffer = consumeNdjsonBuffer(buffer, handlers, onMessageIdSeen)
+      buffer = consumeNdjsonBuffer(buffer, handlers, onMessageIdSeen, onSessionId)
     }
 
     xhr.onload = () => {
@@ -154,13 +176,53 @@ function sendNative(
         reject(new Error(`HTTP ${xhr.status}`))
         return
       }
-      flushRemainder(buffer, handlers, onMessageIdSeen)
+      flushRemainder(buffer, handlers, onMessageIdSeen, onSessionId)
       resolve()
     }
 
     xhr.onerror = () => reject(new Error('Network error'))
     xhr.send(requestInit.body as string)
   })
+}
+
+/** SecureStore chỉ nhận `[A-Za-z0-9._-]`; localStorage không kén nhưng dùng cùng một key. */
+function sessionStorageKey(scope: ChatSessionScope): string {
+  const safe = (value: string) => value.replace(/[^A-Za-z0-9._-]/g, '_')
+  return `chat.session.${safe(scope.appId)}.${safe(scope.userId)}`
+}
+
+/** `POST /chat` nằm ở gốc gateway; `DELETE /session` cùng gốc, không nằm dưới `/chat`. */
+function gatewayRoot(chatUrl: string): string {
+  return chatUrl.replace(/\/chat\/?$/, '')
+}
+
+async function forgetServerSession(
+  options: HttpChatAdapterOptions,
+  path: 'session' | 'sessions',
+): Promise<void> {
+  const scope = options.session
+  if (!scope) return
+
+  const key = sessionStorageKey(scope)
+  let deleteError: unknown
+  try {
+    const headers = buildHeaders(options)
+    if (path === 'session') {
+      const stored = (await storageGetItem(key))?.trim()
+      if (stored) headers[SESSION_HEADER] = stored
+    }
+    const response = await fetch(`${gatewayRoot(options.url)}/${path}`, {
+      method: 'DELETE',
+      headers,
+    })
+    if (!response.ok) {
+      deleteError = new Error(`HTTP ${response.status}`)
+    }
+  } catch (caughtError) {
+    deleteError = caughtError
+  }
+  await storageRemoveItem(key)
+  if (deleteError) throw deleteError
 }
 
 function buildHeaders(options: HttpChatAdapterOptions): Record<string, string> {
@@ -190,17 +252,33 @@ export function createHttpChatAdapter(options: HttpChatAdapterOptions): ChatAdap
         lastKnownMessageId = messageId
       }
 
-      const requestInit: RequestInit = {
-        method: 'POST',
-        headers: buildHeaders(options),
-        body: JSON.stringify(request),
-      }
-
+      const headers = buildHeaders(options)
+      const scope = options.session
+      let persist: Promise<void> = Promise.resolve()
+      const onSessionId = scope
+        ? (sessionId: string) => {
+            persist = persist.then(() =>
+              storageSetItem(sessionStorageKey(scope), sessionId).then(
+                () => undefined,
+                () => undefined,
+              ),
+            )
+          }
+        : undefined
       try {
+        if (scope) {
+          const stored = (await storageGetItem(sessionStorageKey(scope)))?.trim()
+          headers[SESSION_HEADER] = stored || 'new'
+        }
+        const requestInit: RequestInit = {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(request),
+        }
         if (isWeb) {
-          await sendWeb(options.url, requestInit, handlers, onMessageIdSeen)
+          await sendWeb(options.url, requestInit, handlers, onMessageIdSeen, onSessionId)
         } else {
-          await sendNative(options.url, requestInit, handlers, onMessageIdSeen)
+          await sendNative(options.url, requestInit, handlers, onMessageIdSeen, onSessionId)
         }
       } catch (caughtError) {
         const message = caughtError instanceof Error ? caughtError.message : 'Network error'
@@ -217,7 +295,11 @@ export function createHttpChatAdapter(options: HttpChatAdapterOptions): ChatAdap
         }
         handlers.onError(messageId, { message })
         handlers.onDone(messageId)
+      } finally {
+        await persist
       }
     },
+    clearSession: () => forgetServerSession(options, 'session'),
+    clearAllSessions: () => forgetServerSession(options, 'sessions'),
   }
 }

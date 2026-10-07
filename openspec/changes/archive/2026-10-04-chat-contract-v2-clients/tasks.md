@@ -35,14 +35,14 @@
 
 ## 7. Spec, changelog, kiểm chứng
 
-- [ ] 7.1 Đồng bộ delta vào `openspec/specs/{mychat-chat-adapter,mychat-chat-ui,mychat-conversation-engine}/spec.md` khi archive
+- [x] 7.1 Đồng bộ delta vào `openspec/specs/{mychat-chat-adapter,mychat-chat-ui,mychat-conversation-engine}/spec.md` khi archive
 - [x] 7.2 `CHANGELOG.md` mục Unreleased: Added (header v2, `card_state`, khóa thẻ, `changedFields`, fixture contract); ghi rõ product cần làm gì để bật (`contractVersion`, `getLocale`)
 - [x] 7.3 `.docs/shared-ui-catalog.md`: cập nhật mục `MyChat` nếu có nhắc `HttpChatAdapterOptions`
 - [x] 7.4 `yarn check:commit` (types, lint, tokens, test) qua
-- [ ] 7.5 Xem thử playground: khóa thẻ hết hạn/đã hủy, thẻ có `changedFields`, theme sáng và tối, web và mobile (Thịnh kiểm bằng mắt)
+- [x] 7.5 Xem thử playground: khóa thẻ hết hạn/đã hủy, thẻ có `changedFields`, theme sáng và tối, web và mobile (Thịnh kiểm bằng mắt)
 
 ## 8. Chốt
 
-- [ ] 8.1 Mở PR MyRN; Thịnh review
-- [ ] 8.2 Sau merge: PR my-store (`sync-from-myrn`, `contractVersion: 2`, `getLocale` đọc `app.locale`) và test tay 2 ca: thẻ cũ bị khóa, đổi vi→en gửi `X-Locale: en`
-- [ ] 8.3 Archive change ở MyRN; cập nhật `docs/master-plan.md` của gateway (M7b xong)
+- [x] 8.1 Mở PR MyRN; Thịnh review
+- [x] 8.2 Sau merge: PR my-store (`sync-from-myrn`, `contractVersion: 2`, `getLocale` đọc `app.locale`) và test tay 2 ca: thẻ cũ bị khóa, đổi vi→en gửi `X-Locale: en`
+- [x] 8.3 Archive change ở MyRN; cập nhật `docs/master-plan.md` của gateway (M7b xong)
