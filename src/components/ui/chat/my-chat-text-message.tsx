@@ -1,5 +1,6 @@
 import React, { memo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import type { TextMessage } from '@thinhnguyenvn/chat-core'
 
 import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
@@ -9,7 +10,6 @@ import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
 import MyChatTyping from './my-chat-typing'
-import type { TextMessage } from './types'
 
 export interface MyChatTextMessageProps {
   message: TextMessage

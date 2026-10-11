@@ -11,7 +11,7 @@ module.exports = defineConfig([
   require('eslint-config-expo/flat'),
 
   // Ignore routes
-  { ignores: ['dist/*'] },
+  { ignores: ['dist/*', 'packages/*/dist/*'] },
 
   // Main rules
   {
@@ -70,6 +70,21 @@ module.exports = defineConfig([
             "JSXAttribute[name.name='key'] > JSXExpressionContainer > MemberExpression[property.name='id']",
           message:
             'Use a stable prefixed list key (e.g. key={`private-tab-${item.id}`}), not bare key={item.id}.',
+        },
+      ],
+    },
+  },
+
+  // Published packages must not depend on my-rn (`@/…` only exists in this app).
+  {
+    files: ['packages/**/*.{js,jsx,ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            { group: ['@/*', '@root/*'], message: 'Packages cannot import my-rn code (`@/…`).' },
+          ],
         },
       ],
     },

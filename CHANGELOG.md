@@ -11,6 +11,24 @@ product finds out what changed since it forked.
 
 ## Unreleased
 
+### Changed
+- **MyChat core is now the package `@thinhnguyenvn/chat-core`** (`packages/chat-core/`, yarn
+  workspace, `0.1.0`, published on npm by hand). Moved out of `src/components/ui/chat/`: types,
+  `conversationReducer`, `useConversation`, `ChatAdapter`, `createHttpChatAdapter`,
+  `MockChatAdapter`, `generateMessageId`, their tests, and the gateway `contract/` fixtures (repo
+  root → `packages/chat-core/contract/`). `@/components/ui/chat` re-exports the same API (plus
+  `ChatSessionStorage`), so screens keep their imports. `RenderCustomMessage` moved to the UI
+  (`ui/chat/types.ts`). Behaviour and wire contract unchanged. Root `jest.config.js` `roots`,
+  `tsconfig.json` `paths` and `metro.config.js` resolve the package to its source in MyRN;
+  `yarn lint` also lints `packages/`; `check:commit` runs the package `typecheck`;
+  `yarn create-product` removes `packages/` and pins the published version.
+- **BREAKING:** `createHttpChatAdapter` `session` is now `{ appId, userId, storage }`; the app
+  passes the storage for the chat session id (same key `chat.session.<app>.<user>`, so stored ids
+  survive the upgrade). **Product to do:** add the dependency `@thinhnguyenvn/chat-core`, delete
+  the copied core files + their tests + `contract/`, and pass `storage` wrapping
+  `@/utils/storage` (`{ getItem: storageGetItem, setItem: storageSetItem, removeItem:
+  storageRemoveItem }`) wherever `session` is set.
+
 ### Added
 - `createHttpChatAdapter` optional `session: { appId, userId }`: the first send uses
   `X-Chat-Session: new`, later sends reuse the id from `done.sessionId`, stored per app and user

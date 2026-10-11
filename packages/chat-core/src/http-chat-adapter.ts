@@ -1,14 +1,20 @@
-import { isWeb } from '@/constants/dimensions'
-import { storageGetItem, storageRemoveItem, storageSetItem } from '@/utils/storage'
-
 import type { ChatAdapter, ChatRequest, ChatStreamHandlers } from './chat-adapter'
 import { generateMessageId } from './generate-message-id'
+import { isWeb } from './platform'
 import { CARD_LOCK_STATES, type CardLockState, type ChatMessage } from './types'
+
+/** Nơi app lưu id session (SecureStore, localStorage, AsyncStorage…); package không tự chọn. */
+export interface ChatSessionStorage {
+  getItem(key: string): Promise<string | null>
+  setItem(key: string, value: string): Promise<void>
+  removeItem(key: string): Promise<void>
+}
 
 /** App và user để key id session. Không có thì adapter không gửi `X-Chat-Session`. */
 export interface ChatSessionScope {
   appId: string
   userId: string
+  storage: ChatSessionStorage
 }
 
 export interface HttpChatAdapterOptions {
@@ -208,7 +214,7 @@ async function forgetServerSession(
   try {
     const headers = buildHeaders(options)
     if (path === 'session') {
-      const stored = (await storageGetItem(key))?.trim()
+      const stored = (await scope.storage.getItem(key))?.trim()
       if (stored) headers[SESSION_HEADER] = stored
     }
     const response = await fetch(`${gatewayRoot(options.url)}/${path}`, {
@@ -221,7 +227,7 @@ async function forgetServerSession(
   } catch (caughtError) {
     deleteError = caughtError
   }
-  await storageRemoveItem(key)
+  await scope.storage.removeItem(key)
   if (deleteError) throw deleteError
 }
 
@@ -258,7 +264,7 @@ export function createHttpChatAdapter(options: HttpChatAdapterOptions): ChatAdap
       const onSessionId = scope
         ? (sessionId: string) => {
             persist = persist.then(() =>
-              storageSetItem(sessionStorageKey(scope), sessionId).then(
+              scope.storage.setItem(sessionStorageKey(scope), sessionId).then(
                 () => undefined,
                 () => undefined,
               ),
@@ -267,7 +273,7 @@ export function createHttpChatAdapter(options: HttpChatAdapterOptions): ChatAdap
         : undefined
       try {
         if (scope) {
-          const stored = (await storageGetItem(sessionStorageKey(scope)))?.trim()
+          const stored = (await scope.storage.getItem(sessionStorageKey(scope)))?.trim()
           headers[SESSION_HEADER] = stored || 'new'
         }
         const requestInit: RequestInit = {

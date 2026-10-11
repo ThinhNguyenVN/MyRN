@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { useTranslation } from 'react-i18next'
+import type { CardLockState } from '@thinhnguyenvn/chat-core'
 
 import MyIcon from '@/components/elements/my-icon'
 import MyText from '@/components/elements/my-text'
@@ -7,7 +8,6 @@ import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import type { CardLockState } from './types'
 
 const LOCK_LABEL_KEYS: Record<CardLockState, string> = {
   expired: 'components.chat.cardExpired',

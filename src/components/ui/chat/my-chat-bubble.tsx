@@ -1,9 +1,10 @@
 import React, { memo } from 'react'
+import type { ChatFormValues, ChatMessage, MessageAction } from '@thinhnguyenvn/chat-core'
 
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
-import type { RenderCustomMessage } from './chat-adapter'
+import type { RenderCustomMessage } from './types'
 import MyChatConfirmationMessage from './my-chat-confirmation-message'
 import MyChatFormMessage from './my-chat-form-message'
 import MyChatImageMessage from './my-chat-image-message'
@@ -12,7 +13,6 @@ import MyChatResultMessage from './my-chat-result-message'
 import MyChatTextMessage from './my-chat-text-message'
 import MyChatUnknownMessage from './my-chat-unknown-message'
 import { generateStyles } from './styles'
-import type { ChatFormValues, ChatMessage, MessageAction } from './types'
 
 export interface MyChatBubbleProps {
   message: ChatMessage

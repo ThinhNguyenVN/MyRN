@@ -1,3 +1,4 @@
+const fs = require('fs')
 const path = require('path')
 const { getDefaultConfig } = require('expo/metro-config')
 
@@ -18,11 +19,17 @@ config.transformer.getTransformOptions = async () => ({
 
 // Trỏ react-native-linear-gradient → shim dùng expo-linear-gradient (cho react-native-reanimated-skeleton)
 const shimPath = path.resolve(__dirname, 'src/shim-react-native-linear-gradient.ts')
+// Workspace package: MyRN runs its source; a product without `packages/` uses the published `dist/`.
+const chatCorePath = path.resolve(__dirname, 'packages/chat-core/src/index.ts')
+const hasChatCoreSource = fs.existsSync(chatCorePath)
 const originalResolveRequest = config.resolver.resolveRequest
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === 'react-native-linear-gradient') {
     return { type: 'sourceFile', filePath: shimPath }
+  }
+  if (hasChatCoreSource && moduleName === '@thinhnguyenvn/chat-core') {
+    return { type: 'sourceFile', filePath: chatCorePath }
   }
   if (originalResolveRequest) {
     return originalResolveRequest(context, moduleName, platform)

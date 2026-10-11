@@ -1,4 +1,5 @@
 import React, { memo } from 'react'
+import type { MessageAction, ResultMessage } from '@thinhnguyenvn/chat-core'
 
 import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
@@ -8,7 +9,6 @@ import { useThemedStyles } from '@/theme/theme-context'
 import MyChatActionRow from './my-chat-action-row'
 import MyChatSummaryList from './my-chat-summary-list'
 import { generateStyles } from './styles'
-import type { MessageAction, ResultMessage } from './types'
 
 export interface MyChatResultMessageProps {
   message: ResultMessage

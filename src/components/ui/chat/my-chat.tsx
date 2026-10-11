@@ -2,21 +2,25 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { type LayoutChangeEvent } from 'react-native'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
+import {
+  type ChatAdapter,
+  type ChatMessage,
+  type MessageAction,
+  useConversation,
+} from '@thinhnguyenvn/chat-core'
 
 import MyView from '@/components/elements/my-view'
 import { ConditionRenderer } from '@/components/ui/condition-renderer'
 import { isAndroid, isWeb } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
-import type { ChatAdapter, RenderCustomMessage } from './chat-adapter'
+import type { RenderCustomMessage } from './types'
 import { COMPOSER_HEIGHT_COMMIT_THRESHOLD } from './constants'
 import type { ChatSuggestion } from './my-chat-empty-state'
 import MyChatEmptyState from './my-chat-empty-state'
 import MyChatComposer from './my-chat-composer'
 import MyChatList from './my-chat-list'
 import { generateStyles, getChatColumnGutter } from './styles'
-import { useConversation } from './use-conversation'
-import type { ChatMessage, MessageAction } from './types'
 
 export interface ChatSuggestionInput {
   id: string

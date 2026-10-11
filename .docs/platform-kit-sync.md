@@ -11,6 +11,8 @@ Use this when a **product clone** (e.g. `my-store`) invents or improves reusable
 
 **Long-term source of truth for shared kit = this repo (MyRN).** Products may ship kit improvements first, then **backport** here.
 
+**Exception — packages.** Code under `packages/*` (today `@thinhnguyenvn/chat-core`, the MyChat core) is **not** copied by hand. Products depend on the published npm version; to pick up a change, MyRN bumps and publishes the package (Thịnh publishes by hand) and the product raises the dependency version. A product never keeps its own copy of the core files or of `contract/`. The `MyChat*` UI in `src/components/ui/chat/` is still synced by hand like the rest of the kit. `yarn create-product` removes `packages/` and pins the published versions.
+
 ## Principle
 
 If a new UI piece is useful beyond one product, it belongs in MyRN.
@@ -57,7 +59,7 @@ If a new UI piece is useful beyond one product, it belongs in MyRN.
 3. **Port** generic code to the same paths; remove product imports.
 4. **API:** props-driven; no product strings inside the facade.
 5. **Playground:** add/update a demo route.
-6. **Docs:** update `shared-ui-catalog.md` (+ conventions if needed) and add a `CHANGELOG.md` entry under `Unreleased` — products pull this repo via a manual backport, not a package/submodule, so the changelog is the only way a forked product finds out what changed in `components/elements`/`components/ui` since it forked.
+6. **Docs:** update `shared-ui-catalog.md` (+ conventions if needed) and add a `CHANGELOG.md` entry under `Unreleased` — products pull this repo via a manual backport (except `packages/*`, which ship on npm with their own `CHANGELOG.md`), so the changelog is the only way a forked product finds out what changed in `components/elements`/`components/ui` since it forked.
 7. **OpenSpec (optional):** kit-focused change only — not product step archives.
 8. **PR this repo;** note the product PR that originated the kit.
 9. **Forward sync:** products pull MyRN when upgrading platform / starting new work.

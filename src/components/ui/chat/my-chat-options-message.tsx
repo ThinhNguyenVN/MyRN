@@ -1,4 +1,5 @@
 import React, { memo, useCallback } from 'react'
+import type { ChatOption, OptionsMessage } from '@thinhnguyenvn/chat-core'
 
 import MyChip from '@/components/elements/my-chip'
 import MyIcon from '@/components/elements/my-icon'
@@ -10,7 +11,6 @@ import { useThemedStyles } from '@/theme/theme-context'
 
 import MyChatCardLockRow from './my-chat-card-lock-row'
 import { generateStyles } from './styles'
-import type { ChatOption, OptionsMessage } from './types'
 
 interface OptionChipProps {
   messageId: string

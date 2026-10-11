@@ -1,18 +1,8 @@
-import { storageGetItem, storageRemoveItem, storageSetItem } from '@/utils/storage'
-
 import { consumeNdjsonBuffer, createHttpChatAdapter, parseNdjsonLine } from './http-chat-adapter'
 import type { ChatStreamHandlers } from './chat-adapter'
+import type { ChatSessionStorage } from './http-chat-adapter'
 
-jest.mock('@/constants/dimensions', () => ({
-  ...jest.requireActual('@/constants/dimensions'),
-  isWeb: true,
-}))
-
-jest.mock('@/utils/storage', () => ({
-  storageGetItem: jest.fn(async () => null),
-  storageSetItem: jest.fn(async () => undefined),
-  storageRemoveItem: jest.fn(async () => undefined),
-}))
+jest.mock('./platform', () => ({ isWeb: true }))
 
 function collectHandlers() {
   const calls: string[] = []
@@ -173,8 +163,17 @@ describe('createHttpChatAdapter headers', () => {
 describe('server session', () => {
   const request = { event: { type: 'send_text' as const, text: 'hi' }, history: [] }
   const sessionId = '11111111-1111-4111-8111-111111111111'
-  const scope = { appId: 'my-store', userId: 'user-1' }
   let stored: Map<string, string>
+  const storage: ChatSessionStorage = {
+    getItem: jest.fn(async (key: string) => stored.get(key) ?? null),
+    setItem: jest.fn(async (key: string, value: string) => {
+      stored.set(key, value)
+    }),
+    removeItem: jest.fn(async (key: string) => {
+      stored.delete(key)
+    }),
+  }
+  const scope = { appId: 'my-store', userId: 'user-1', storage }
   let sent: { url: string; method: string; headers: Record<string, string> }[]
 
   function ndjsonBody(text: string) {
@@ -194,13 +193,7 @@ describe('server session', () => {
   beforeEach(() => {
     stored = new Map()
     sent = []
-    jest.mocked(storageGetItem).mockImplementation(async (key: string) => stored.get(key) ?? null)
-    jest.mocked(storageSetItem).mockImplementation(async (key: string, value: string) => {
-      stored.set(key, value)
-    })
-    jest.mocked(storageRemoveItem).mockImplementation(async (key: string) => {
-      stored.delete(key)
-    })
+    jest.clearAllMocks()
     global.fetch = jest.fn(async (url: unknown, init?: RequestInit) => {
       sent.push({
         url: String(url),
@@ -237,7 +230,7 @@ describe('server session', () => {
 
     const second = createHttpChatAdapter({
       url: 'http://x/chat',
-      session: { appId: 'my-store', userId: 'user-2' },
+      session: { appId: 'my-store', userId: 'user-2', storage },
     })
     await second.send(request, collectHandlers().handlers)
 
@@ -276,6 +269,24 @@ describe('server session', () => {
     await expect(adapter.clearAllSessions?.()).rejects.toThrow('offline')
     expect(calls).toEqual(['DELETE http://localhost:3300/sessions'])
     expect(stored.has('chat.session.my-store.user-1')).toBe(false)
+  })
+
+  it('reads an id stored under the pre-package key', async () => {
+    stored.set('chat.session.my-store.user-1', sessionId)
+    const adapter = createHttpChatAdapter({ url: 'http://x/chat', session: scope })
+
+    await adapter.send(request, collectHandlers().handlers)
+
+    expect(storage.getItem).toHaveBeenCalledWith('chat.session.my-store.user-1')
+    expect(sent[0]?.headers['X-Chat-Session']).toBe(sessionId)
+  })
+
+  it('writes a new id through storage.setItem', async () => {
+    const adapter = createHttpChatAdapter({ url: 'http://x/chat', session: scope })
+
+    await adapter.send(request, collectHandlers().handlers)
+
+    expect(storage.setItem).toHaveBeenCalledWith('chat.session.my-store.user-1', sessionId)
   })
 
   it('does not call the gateway when session is off', async () => {
