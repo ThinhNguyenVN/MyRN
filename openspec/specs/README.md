@@ -29,6 +29,7 @@ Only open a capability here when you are **changing that capability** (e.g. edit
 | `mychat-conversation-engine` | In-memory `useConversation` + `ChatMessage` kinds — not a product screen |
 | `mychat-chat-ui` | `MyChat` kit (FlashList from bottom, overlay composer) — see `.docs/shared-ui-catalog.md` |
 | `mychat-chat-adapter` | `ChatAdapter` + mock/HTTP NDJSON streaming — not Gemini/MCP |
+| `mychat-chat-core` | Core MyChat lives in published npm package `@thinhnguyenvn/chat-core`; UI re-exports it from `@/components/ui/chat` |
 | `mychat-playground-workflow` | Playground `chat` scripted demo of the kit |
 | `product-ui-kit-test-coverage` | Kit QA expectations (tests/smoke) — process, not a product screen |
 | `picker-facade-test-coverage` | Picker helper test/smoke expectations — process, not a product screen |
