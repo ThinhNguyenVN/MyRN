@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import type { ChatFormField, ChatFormValues, FormMessage } from '@thinhnguyenvn/chat-core'
 
 import MyButton from '@/components/elements/my-button'
 import type { DropdownOption } from '@/components/elements/my-dropdown-input'
@@ -12,7 +13,6 @@ import { ConditionRenderer } from '@/components/ui/condition-renderer'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import type { ChatFormField, ChatFormValues, FormMessage } from './types'
 
 interface ChatFormFieldInputProps {
   field: ChatFormField

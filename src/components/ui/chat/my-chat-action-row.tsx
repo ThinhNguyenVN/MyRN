@@ -1,5 +1,6 @@
 import React, { memo, useCallback } from 'react'
 import * as WebBrowser from 'expo-web-browser'
+import type { MessageAction } from '@thinhnguyenvn/chat-core'
 
 import MyButton from '@/components/elements/my-button'
 import MyIcon from '@/components/elements/my-icon'
@@ -9,7 +10,6 @@ import type { IconName } from '@/types/icon'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import type { MessageAction } from './types'
 
 interface ChatActionButtonProps {
   action: MessageAction

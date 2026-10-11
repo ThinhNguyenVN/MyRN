@@ -1,5 +1,6 @@
 import React, { memo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import type { ConfirmationMessage } from '@thinhnguyenvn/chat-core'
 
 import MyButton from '@/components/elements/my-button'
 import MyIcon from '@/components/elements/my-icon'
@@ -12,7 +13,6 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 import MyChatCardLockRow from './my-chat-card-lock-row'
 import MyChatSummaryList from './my-chat-summary-list'
 import { generateStyles } from './styles'
-import type { ConfirmationMessage } from './types'
 
 export interface MyChatConfirmationMessageProps {
   message: ConfirmationMessage

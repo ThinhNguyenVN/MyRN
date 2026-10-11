@@ -1,10 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react-native'
 import * as WebBrowser from 'expo-web-browser'
+import type { MessageAction } from '@thinhnguyenvn/chat-core'
 
 import { renderWithTheme } from '@/test/render-with-theme'
 
 import MyChatActionRow from './my-chat-action-row'
-import type { MessageAction } from './types'
 
 jest.mock('expo-web-browser', () => ({
   openBrowserAsync: jest.fn(() => Promise.resolve()),

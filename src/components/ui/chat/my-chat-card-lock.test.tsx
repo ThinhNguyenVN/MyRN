@@ -1,10 +1,10 @@
 import { screen } from '@testing-library/react-native'
+import type { ConfirmationMessage, OptionsMessage } from '@thinhnguyenvn/chat-core'
 
 import { renderWithTheme } from '@/test/render-with-theme'
 
 import MyChatConfirmationMessage from './my-chat-confirmation-message'
 import MyChatOptionsMessage from './my-chat-options-message'
-import type { ConfirmationMessage, OptionsMessage } from './types'
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),

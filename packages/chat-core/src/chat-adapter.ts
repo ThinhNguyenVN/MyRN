@@ -1,12 +1,4 @@
-import type { ReactElement } from 'react'
-
-import type {
-  CardLockState,
-  ChatMessage,
-  ChatMessageError,
-  ConversationEvent,
-  CustomMessage,
-} from './types'
+import type { CardLockState, ChatMessage, ChatMessageError, ConversationEvent } from './types'
 
 export interface ChatRequest {
   event: ConversationEvent
@@ -30,6 +22,3 @@ export interface ChatAdapter {
   /** Xóa mọi session server của app và user này (`DELETE /sessions`). */
   clearAllSessions?: () => Promise<void>
 }
-
-/** Return `null` when the app doesn't recognize `message.customType` — MyChat falls back to `MyChatUnknownMessage`. */
-export type RenderCustomMessage = (message: CustomMessage) => ReactElement | null

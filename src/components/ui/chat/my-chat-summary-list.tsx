@@ -1,11 +1,11 @@
 import React, { memo } from 'react'
+import type { ChatSummaryField } from '@thinhnguyenvn/chat-core'
 
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
-import type { ChatSummaryField } from './types'
 
 export interface MyChatSummaryListProps {
   keyPrefix: string

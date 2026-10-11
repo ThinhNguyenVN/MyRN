@@ -15,22 +15,22 @@ export { default as MyChatActionRow } from './my-chat-action-row'
 export type { MyChatActionRowProps } from './my-chat-action-row'
 export { default as MyChatUnknownMessage } from './my-chat-unknown-message'
 
+export type { RenderCustomMessage } from './types'
+
+export {
+  MockChatAdapter,
+  createHttpChatAdapter,
+  useConversation,
+  generateMessageId,
+} from '@thinhnguyenvn/chat-core'
 export type {
   ChatAdapter,
   ChatRequest,
   ChatStreamHandlers,
-  RenderCustomMessage,
-} from './chat-adapter'
-export { MockChatAdapter } from './mock-chat-adapter'
-export { createHttpChatAdapter } from './http-chat-adapter'
-export type { HttpChatAdapterOptions } from './http-chat-adapter'
-
-export { useConversation } from './use-conversation'
-export type { UseConversationOptions, UseConversationResult } from './use-conversation'
-
-export { generateMessageId } from './generate-message-id'
-
-export type {
+  HttpChatAdapterOptions,
+  ChatSessionStorage,
+  UseConversationOptions,
+  UseConversationResult,
   ChatMessage,
   ChatMessageRole,
   ChatMessageStatus,
@@ -50,4 +50,4 @@ export type {
   ResultMessage,
   CustomMessage,
   ConversationEvent,
-} from './types'
+} from '@thinhnguyenvn/chat-core'

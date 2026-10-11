@@ -1,4 +1,5 @@
 import React, { memo } from 'react'
+import type { ImageMessage } from '@thinhnguyenvn/chat-core'
 
 import MyImage from '@/components/elements/my-image'
 import MySurface from '@/components/elements/my-surface'
@@ -8,7 +9,6 @@ import { ConditionRenderer } from '@/components/ui/condition-renderer'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles, getPhotoGridWidth } from './styles'
-import type { ImageMessage } from './types'
 
 export interface MyChatImageMessageProps {
   message: ImageMessage

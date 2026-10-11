@@ -2,9 +2,10 @@
 
 Examples of what a client sends to `POST /chat` and what the gateway streams back, by contract
 version. They are the **source of truth** for the wire shapes: the gateway is the side that emits
-events, so it defines and checks them; MyRN **copies** this folder and parses it with its own
-`consumeNdjsonBuffer` (the contract is kept by hand, there is no shared package; spec
-`ndjson-chat-contract`).
+events, so it defines and checks them; MyRN **copies** this folder into
+`packages/chat-core/contract/` and parses it with the package's `consumeNdjsonBuffer` (spec
+`ndjson-chat-contract`). Products use the published `@thinhnguyenvn/chat-core` package and keep
+no copy of their own.
 
 | Folder         | What it holds                                                                    |
 | -------------- | -------------------------------------------------------------------------------- |
@@ -28,8 +29,8 @@ One JSON object per line. In the files, ids the gateway generates are written `<
 ## Changing a fixture
 
 A change to the shape of an event changes its fixture in the same PR; the gateway tests fail if
-the gateway emits something other than the fixture. Then copy the folder to MyRN and make its
-parse test pass there too. `superseded` and `changedFields` have no stream here yet: the gateway
+the gateway emits something other than the fixture. Then copy the folder to MyRN
+`packages/chat-core/contract/` and make its parse test pass there too. `superseded` and `changedFields` have no stream here yet: the gateway
 starts sending them with the change that replaces a card (M9).
 
 ## Session
@@ -58,6 +59,7 @@ header it still summarizes `history`.
 
 ## Copy in MyRN
 
-This folder is a copy of `my-agent-platform/contract/` plus the session streams from the local
+`packages/chat-core/contract/` (moved from the MyRN repo root on 2026-10-11, change
+`chat-core-extraction`). This folder is a copy of `my-agent-platform/contract/` plus the session streams from the local
 `server-session` change (2026-10-06, not committed yet; the previous copy was commit `8785125`).
 Do not edit it here: change the gateway fixture, then copy the folder again and update this line.

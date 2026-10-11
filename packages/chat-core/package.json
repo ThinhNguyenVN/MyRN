@@ -1,0 +1,27 @@
+{
+  "name": "@thinhnguyenvn/chat-core",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Chat state, reducer and NDJSON-over-HTTP adapter for the MyChat UI (React / React Native).",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "contract",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "yarn build"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.72"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

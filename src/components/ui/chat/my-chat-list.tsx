@@ -11,21 +11,21 @@ import Animated, {
   useSharedValue,
   type SharedValue,
 } from 'react-native-reanimated'
+import type { ChatFormValues, ChatMessage, MessageAction } from '@thinhnguyenvn/chat-core'
 
 import MyView from '@/components/elements/my-view'
 import { isAndroid } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
-import type { RenderCustomMessage } from './chat-adapter'
 import {
   BOTTOM_ANCHOR_THRESHOLD,
   KEYBOARD_CLOSE_SCROLL_SLACK,
   SETTLE_PIN_DELAY_MS,
   TAP_SLOP,
 } from './constants'
+import type { RenderCustomMessage } from './types'
 import MyChatBubble from './my-chat-bubble'
 import { generateStyles } from './styles'
-import type { ChatFormValues, ChatMessage, MessageAction } from './types'
 import { useKeyboardScrollAnchor } from './use-keyboard-scroll-anchor'
 
 export interface MyChatListProps {
