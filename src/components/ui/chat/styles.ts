@@ -6,6 +6,8 @@ import type { ThemeType } from '@/theme/theme-context'
 
 import {
   ATTACHMENT_THUMBNAIL_SIZE,
+  CARD_MEDIA_THUMBNAIL_SIZE,
+  MEDIA_CHOICE_THUMBNAIL_SIZE,
   COMPOSER_ACTIONS_HEIGHT,
   COMPOSER_INPUT_LINE_HEIGHT,
   MIN_COMPOSER_HEIGHT,
@@ -262,6 +264,78 @@ export const generateStyles = (theme: ThemeType) => {
     },
     summaryList: {
       gap: getSpacing('x2'),
+    },
+    mediaThumbRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: getSpacing('x2'),
+    },
+    cardMediaThumb: {
+      width: CARD_MEDIA_THUMBNAIL_SIZE,
+      height: CARD_MEDIA_THUMBNAIL_SIZE,
+    },
+    mediaThumbFrame: {
+      borderRadius: theme.getRadius('medium'),
+      overflow: 'hidden',
+      backgroundColor: getColor('fill/background/secondary'),
+    },
+    mediaMoreOverlay: {
+      ...StyleSheet.absoluteFill,
+      alignItems: 'center',
+      justifyContent: 'center',
+      // theme-exempt: dark translucent photo-chrome over a thumbnail, same in both themes.
+      backgroundColor: 'rgba(17, 17, 17, 0.55)',
+    },
+    mediaMoreText: {
+      color: getColor('brand/white'),
+    },
+    mediaPlaceholder: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    mediaChoiceGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: getSpacing('x2'),
+    },
+    mediaChoiceThumb: {
+      width: MEDIA_CHOICE_THUMBNAIL_SIZE,
+      height: MEDIA_CHOICE_THUMBNAIL_SIZE,
+    },
+    mediaChoiceCellSelected: {
+      borderWidth: 2,
+      borderColor: getColor('border/info/primary'),
+    },
+    mediaChoiceCellDimmed: {
+      opacity: 0.5,
+    },
+    mediaCheckBadge: {
+      position: 'absolute',
+      top: 4,
+      right: 4,
+      width: 22,
+      height: 22,
+      borderRadius: theme.getRadius('full'),
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1.5,
+      borderColor: getColor('brand/white'),
+      // theme-exempt: translucent photo-chrome over a thumbnail, same in both themes.
+      backgroundColor: 'rgba(17, 17, 17, 0.35)',
+    },
+    mediaCheckBadgeSelected: {
+      borderColor: getColor('border/info/primary'),
+      backgroundColor: getColor('fill/info/primary'),
+    },
+    mediaChoiceFooter: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: getSpacing('x3'),
+    },
+    photoCardPending: {
+      opacity: 0.6,
     },
     confirmationButtonsRow: {
       flexDirection: 'row',

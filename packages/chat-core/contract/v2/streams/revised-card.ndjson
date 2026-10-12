@@ -1,0 +1,4 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"confirmation","status":"complete","createdAt":0,"prompt":"Save this note?","summary":[{"label":"Note","value":"milk"},{"label":"Tag","value":"home"}],"changedFields":["Tag"]}}
+{"type":"card_state","messageId":"<id>","state":"superseded"}
+{"type":"done","messageId":"<id>"}

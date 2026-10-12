@@ -9,6 +9,8 @@ import MyChatOptionsMessage from './my-chat-options-message'
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }))
+// The confirmation card's thumbnail row loads expo-image, which this Jest env cannot.
+jest.mock('@/components/elements/my-image', () => () => null)
 
 const confirmation: ConfirmationMessage = {
   id: 'c1',

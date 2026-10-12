@@ -1,0 +1,4 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"status","messageId":"<id>","text":"Đang lấy dữ liệu…"}
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"confirmation","status":"complete","createdAt":0,"prompt":"Save this note?","summary":[{"label":"Note","value":"milk"},{"label":"Photo","value":"1"}],"media":["<id>"]}}
+{"type":"done","messageId":"<id>","sessionId":"<id>"}

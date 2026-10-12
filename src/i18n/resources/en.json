@@ -578,7 +578,14 @@
       "retry": "Retry",
       "typing": "Assistant is responding",
       "expand": "Expand composer",
-      "collapse": "Collapse composer"
+      "collapse": "Collapse composer",
+      "mediaSelectedCount": "Selected {{count}}/{{max}}",
+      "mediaSubmit": "Use photos",
+      "mediaSubmitNone": "Don't use a photo",
+      "mediaSelected_one": "{{count}} photo selected",
+      "mediaSelected_other": "{{count}} photos selected",
+      "mediaSelectedNone": "No photo used",
+      "mediaUploadFailed": "Couldn't upload the photos."
     }
   }
 }

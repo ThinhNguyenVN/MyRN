@@ -297,3 +297,106 @@ describe('server session', () => {
     expect(sent).toEqual([])
   })
 })
+
+describe('media upload (contract v3)', () => {
+  const sessionId = '22222222-2222-4222-8222-222222222222'
+  const file = { uri: 'blob:photo', name: 'photo.jpg', mimeType: 'image/jpeg' }
+  let stored: Map<string, string>
+  let sent: { url: string; method: string; headers: Record<string, string>; body: unknown }[]
+  const storage: ChatSessionStorage = {
+    getItem: async (key) => stored.get(key) ?? null,
+    setItem: async (key, value) => {
+      stored.set(key, value)
+    },
+    removeItem: async (key) => {
+      stored.delete(key)
+    },
+  }
+  const scope = { appId: 'my-store', userId: 'user-1', storage }
+  let nextId = 0
+
+  beforeEach(() => {
+    stored = new Map()
+    sent = []
+    nextId = 0
+    global.fetch = jest.fn(async (url: unknown, init?: RequestInit) => {
+      if (String(url) === 'blob:photo') {
+        return { blob: async () => new Blob(['jpeg']) }
+      }
+      sent.push({
+        url: String(url),
+        method: init?.method ?? 'GET',
+        headers: init?.headers as Record<string, string>,
+        body: init?.body,
+      })
+      nextId += 1
+      return {
+        ok: true,
+        status: 201,
+        headers: new Headers({ 'X-Chat-Session': sessionId }),
+        json: async () => ({ id: `media-${nextId}`, kind: 'image', sessionId }),
+      }
+    }) as unknown as typeof fetch
+  })
+
+  it('has no uploadMedia without a session, since /media needs X-Chat-Session', () => {
+    const adapter = createHttpChatAdapter({ url: 'http://x/chat', contractVersion: 3 })
+
+    expect(adapter.uploadMedia).toBeUndefined()
+    expect(adapter.contractVersion).toBe(3)
+  })
+
+  it('posts multipart to /media with the chat headers and stores the returned session', async () => {
+    const adapter = createHttpChatAdapter({
+      url: 'http://x/chat',
+      headers: { Authorization: 'Bearer t', 'X-App-Id': 'my-store' },
+      contractVersion: 3,
+      session: scope,
+    })
+
+    await expect(adapter.uploadMedia?.(file)).resolves.toEqual({ id: 'media-1', kind: 'image' })
+
+    expect(sent[0]).toMatchObject({ url: 'http://x/media', method: 'POST' })
+    expect(sent[0]?.headers).toMatchObject({
+      Authorization: 'Bearer t',
+      'X-App-Id': 'my-store',
+      'X-Chat-Contract': '3',
+      'X-Chat-Session': 'new',
+    })
+    expect(sent[0]?.headers['Content-Type']).toBeUndefined()
+    expect(sent[0]?.body).toBeInstanceOf(FormData)
+    expect(stored.get('chat.session.my-store.user-1')).toBe(sessionId)
+  })
+
+  it('parallel uploads on a new chat wait for the first one to create the session', async () => {
+    const adapter = createHttpChatAdapter({ url: 'http://x/chat', session: scope })
+
+    await Promise.all([adapter.uploadMedia?.(file), adapter.uploadMedia?.(file)])
+
+    expect(sent.map((request) => request.headers['X-Chat-Session'])).toEqual(['new', sessionId])
+  })
+
+  it('throws on a rejected upload', async () => {
+    global.fetch = jest.fn(async () => ({ ok: false, status: 415 })) as unknown as typeof fetch
+    const adapter = createHttpChatAdapter({ url: 'http://x/chat', session: scope })
+
+    await expect(adapter.uploadMedia?.({ ...file, file: new Blob(['x']) as File })).rejects.toThrow(
+      'HTTP 415',
+    )
+  })
+
+  it('mediaSource points at GET /media/:id with the session header', async () => {
+    const adapter = createHttpChatAdapter({
+      url: 'http://x/chat',
+      headers: { Authorization: 'Bearer t' },
+      session: scope,
+    })
+    await expect(adapter.mediaSource?.('m1')).resolves.toBeNull()
+
+    stored.set('chat.session.my-store.user-1', sessionId)
+    await expect(adapter.mediaSource?.('m1')).resolves.toEqual({
+      uri: 'http://x/media/m1',
+      headers: { Authorization: 'Bearer t', 'X-Chat-Session': sessionId },
+    })
+  })
+})

@@ -1,0 +1,3 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"form","status":"complete","createdAt":0,"title":"Bạn bổ sung giúp mình các thông tin còn thiếu nhé.","fields":[{"name":"text","label":"Note","type":"text","required":true}]}}
+{"type":"done","messageId":"<id>"}

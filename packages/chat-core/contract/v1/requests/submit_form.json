@@ -1,0 +1,14 @@
+{
+  "event": {
+    "type": "submit_form",
+    "messageId": "card-3",
+    "values": { "text": "milk" }
+  },
+  "history": [
+    {
+      "id": "card-3",
+      "role": "assistant",
+      "kind": "form"
+    }
+  ]
+}

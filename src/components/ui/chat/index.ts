@@ -15,6 +15,9 @@ export { default as MyChatActionRow } from './my-chat-action-row'
 export type { MyChatActionRowProps } from './my-chat-action-row'
 export { default as MyChatUnknownMessage } from './my-chat-unknown-message'
 
+export { default as MyChatMediaThumbnail } from './my-chat-media-thumbnail'
+export type { MyChatMediaThumbnailProps } from './my-chat-media-thumbnail'
+
 export type { RenderCustomMessage } from './types'
 
 export {
@@ -22,6 +25,7 @@ export {
   createHttpChatAdapter,
   useConversation,
   generateMessageId,
+  localMediaUris,
 } from '@thinhnguyenvn/chat-core'
 export type {
   ChatAdapter,
@@ -37,6 +41,11 @@ export type {
   ChatMessageError,
   TextMessage,
   ImageMessage,
+  ChatMediaKind,
+  ChatMediaFile,
+  ChatMediaRef,
+  ChatMediaSource,
+  MediaChoiceMessage,
   ChatOption,
   OptionsMessage,
   ChatSummaryField,

@@ -4,8 +4,10 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
 import {
   type ChatAdapter,
+  type ChatMediaFile,
   type ChatMessage,
   type MessageAction,
+  localMediaUris,
   useConversation,
 } from '@thinhnguyenvn/chat-core'
 
@@ -20,6 +22,7 @@ import type { ChatSuggestion } from './my-chat-empty-state'
 import MyChatEmptyState from './my-chat-empty-state'
 import MyChatComposer from './my-chat-composer'
 import MyChatList from './my-chat-list'
+import { MyChatMediaProvider, type MyChatMediaContextValue } from './my-chat-media-context'
 import { generateStyles, getChatColumnGutter } from './styles'
 
 export interface ChatSuggestionInput {
@@ -59,7 +62,11 @@ function MyChat({
     onMessagesChange?.(chat.messages)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when messages themselves change, not on every caller re-render that hands in a new onMessagesChange identity
   }, [chat.messages])
-  const { send, sendImages } = chat
+  const { send, sendMedia } = chat
+  const media = useMemo<MyChatMediaContextValue>(
+    () => ({ localUris: localMediaUris(chat.messages), mediaSource: adapter.mediaSource }),
+    [adapter.mediaSource, chat.messages],
+  )
   const hasMessages = chat.messages.length > 0
   const [scrollToEndToken, setScrollToEndToken] = useState(0)
   const [columnWidth, setColumnWidth] = useState(0)
@@ -96,11 +103,11 @@ function MyChat({
   )
 
   const handleSendImages = useCallback(
-    (imageUris: string[], caption?: string) => {
-      sendImages(imageUris, caption)
+    (images: ChatMediaFile[], caption?: string) => {
+      sendMedia(images, caption)
       pinListToBottom()
     },
-    [pinListToBottom, sendImages],
+    [pinListToBottom, sendMedia],
   )
 
   // Composer lifts with the keyboard. The list must NOT translateY — that moves the
@@ -135,51 +142,54 @@ function MyChat({
   )
 
   return (
-    <MyView style={styles.root}>
-      <MyView style={styles.column} onLayout={handleColumnLayout}>
-        <Animated.View style={[styles.listWrapper, listKeyboardStyle]}>
-          <ConditionRenderer
-            when={hasMessages}
-            fallback={
-              <MyChatEmptyState
-                title={emptyStateTitle}
-                subtitle={emptyStateSubtitle}
-                suggestions={resolvedSuggestions}
+    <MyChatMediaProvider value={media}>
+      <MyView style={styles.root}>
+        <MyView style={styles.column} onLayout={handleColumnLayout}>
+          <Animated.View style={[styles.listWrapper, listKeyboardStyle]}>
+            <ConditionRenderer
+              when={hasMessages}
+              fallback={
+                <MyChatEmptyState
+                  title={emptyStateTitle}
+                  subtitle={emptyStateSubtitle}
+                  suggestions={resolvedSuggestions}
+                  columnGutter={columnGutter}
+                  composerHeight={composerHeight}
+                />
+              }
+            >
+              <MyChatList
+                messages={chat.messages}
+                onSelectOption={chat.selectOption}
+                onConfirm={chat.confirm}
+                onSelectMedia={chat.selectMedia}
+                onSubmitForm={chat.submitForm}
+                onRetry={chat.retry}
+                onAction={onAction}
+                renderCustomMessage={renderCustomMessage}
+                scrollToEndToken={scrollToEndToken}
                 columnGutter={columnGutter}
                 composerHeight={composerHeight}
+                isComposerFocusedRef={isComposerFocusedRef}
+                keyboardHeight={height}
               />
-            }
-          >
-            <MyChatList
-              messages={chat.messages}
-              onSelectOption={chat.selectOption}
-              onConfirm={chat.confirm}
-              onSubmitForm={chat.submitForm}
-              onRetry={chat.retry}
-              onAction={onAction}
-              renderCustomMessage={renderCustomMessage}
-              scrollToEndToken={scrollToEndToken}
-              columnGutter={columnGutter}
-              composerHeight={composerHeight}
-              isComposerFocusedRef={isComposerFocusedRef}
-              keyboardHeight={height}
-            />
-          </ConditionRenderer>
-        </Animated.View>
+            </ConditionRenderer>
+          </Animated.View>
 
-        <Animated.View
-          style={[styles.composerFloatingWrapper, composerKeyboardStyle]}
-          onLayout={handleComposerLayout}
-        >
-          <MyChatComposer
-            onSend={handleSend}
-            onSendImages={handleSendImages}
-            disabled={chat.isSending}
-            onFocusChange={handleComposerFocusChange}
-          />
-        </Animated.View>
+          <Animated.View
+            style={[styles.composerFloatingWrapper, composerKeyboardStyle]}
+            onLayout={handleComposerLayout}
+          >
+            <MyChatComposer
+              onSend={handleSend}
+              onSendImages={handleSendImages}
+              disabled={chat.isSending}
+              onFocusChange={handleComposerFocusChange}
+            />
+          </Animated.View>
+        </MyView>
       </MyView>
-    </MyView>
+    </MyChatMediaProvider>
   )
 }
 
