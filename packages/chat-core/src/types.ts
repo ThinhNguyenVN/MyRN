@@ -23,7 +23,31 @@ export interface ImageMessage extends ChatMessageBase {
   kind: 'image'
   /** 1-5 images sent together in this one message. */
   imageUris: string[]
+  /** Gateway media ids (contract v3), same order as `imageUris`; set once every upload succeeds. */
+  mediaIds?: string[]
   caption?: string
+}
+
+export type ChatMediaKind = 'image' | 'video'
+
+/** A local file to upload before `send_media` (picker / camera result). */
+export interface ChatMediaFile {
+  uri: string
+  name: string
+  mimeType: string
+  /** Web: the picked `File`, appended to the multipart body as is. */
+  file?: File
+}
+
+export interface ChatMediaRef {
+  id: string
+  kind: ChatMediaKind
+}
+
+/** Where to load a gateway media id from (`GET /media/:id` with the chat headers). */
+export interface ChatMediaSource {
+  uri: string
+  headers?: Record<string, string>
 }
 
 export interface ChatOption {
@@ -61,6 +85,21 @@ export interface ConfirmationMessage extends ChatMessageBase {
   cancelLabel?: string
   destructive?: boolean
   resolution?: ConfirmationResolution
+  lockState?: CardLockState
+  /** `'media'` means the thumbnails changed. */
+  changedFields?: string[]
+  /** Gateway media ids shown as a thumbnail row (contract v3). */
+  media?: string[]
+}
+
+/** Multi-select photo card (contract v3): pick `min`..`max` of `media`, then `select_media`. */
+export interface MediaChoiceMessage extends ChatMessageBase {
+  kind: 'media_choice'
+  prompt: string
+  media: string[]
+  min: number
+  max: number
+  selectedMediaIds?: string[]
   lockState?: CardLockState
   changedFields?: string[]
 }
@@ -108,6 +147,7 @@ export type ChatMessage =
   | ImageMessage
   | OptionsMessage
   | ConfirmationMessage
+  | MediaChoiceMessage
   | FormMessage
   | ResultMessage
   | CustomMessage
@@ -115,6 +155,8 @@ export type ChatMessage =
 export type ConversationEvent =
   | { type: 'send_text'; text: string }
   | { type: 'send_images'; imageUris: string[]; caption?: string }
+  | { type: 'send_media'; media: ChatMediaRef[]; caption?: string }
+  | { type: 'select_media'; messageId: string; mediaIds: string[] }
   | { type: 'select_option'; messageId: string; optionId: string }
   | { type: 'confirm'; messageId: string; confirmed: boolean }
   | { type: 'submit_form'; messageId: string; values: ChatFormValues }

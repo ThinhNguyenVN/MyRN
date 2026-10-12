@@ -578,7 +578,14 @@
       "retry": "Thử lại",
       "typing": "Trợ lý đang trả lời",
       "expand": "Mở rộng ô nhập",
-      "collapse": "Thu nhỏ ô nhập"
+      "collapse": "Thu nhỏ ô nhập",
+      "mediaSelectedCount": "Đã chọn {{count}}/{{max}}",
+      "mediaSubmit": "Dùng ảnh",
+      "mediaSubmitNone": "Không dùng ảnh",
+      "mediaSelected_one": "Đã chọn {{count}} ảnh",
+      "mediaSelected_other": "Đã chọn {{count}} ảnh",
+      "mediaSelectedNone": "Không dùng ảnh",
+      "mediaUploadFailed": "Chưa tải ảnh lên được."
     }
   }
 }

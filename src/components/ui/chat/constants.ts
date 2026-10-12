@@ -8,6 +8,10 @@ export const COMPOSER_INPUT_LINE_HEIGHT = 22
 /** Max images stageable in the composer for a single send. */
 export const MAX_CHAT_ATTACHMENTS = 5
 export const ATTACHMENT_THUMBNAIL_SIZE = 64
+/** Thumbnails shown on a confirmation card before the last one turns into "+N". */
+export const CONFIRMATION_MEDIA_MAX_THUMBNAILS = 4
+export const CARD_MEDIA_THUMBNAIL_SIZE = 56
+export const MEDIA_CHOICE_THUMBNAIL_SIZE = 88
 /** How many images `resizeImageIfNeeded` runs concurrently while staging a picked batch. */
 export const ATTACHMENT_RESIZE_BATCH_SIZE = 3
 

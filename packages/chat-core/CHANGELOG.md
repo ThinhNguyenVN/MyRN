@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.2.0
+
+Photos over the gateway (contract v3, gateway change `chat-contract-media`, M17). Additive: apps
+on contract 1 or 2 and `MockChatAdapter` behave as before.
+
+- `ChatAdapter` gains optional `contractVersion`, `uploadMedia(file)` and `mediaSource(id)`.
+  `createHttpChatAdapter` sets them; the media ones exist only when `session` is set, because
+  `POST /media` needs `X-Chat-Session`. Upload is multipart field `file` to `{root}/media` with
+  the `/chat` headers; the returned `sessionId` is stored like `done.sessionId`. Parallel uploads
+  on a new chat wait for the first one to create the session. `mediaSource` points at
+  `GET {root}/media/:id` with the same headers.
+- `useConversation.sendMedia(files, caption?)`: with `uploadMedia` and `contractVersion >= 3` it
+  shows the photos at once (local URIs, `pending`), uploads them in parallel, sets
+  `ImageMessage.mediaIds` and sends `send_media`. A failed upload marks the message `error` and
+  sends nothing; `retry(messageId)` uploads only the files still missing, then sends. Otherwise it
+  falls back to `send_images`.
+- `useConversation.selectMedia(messageId, mediaIds)` sends `select_media`; reducer action
+  `select_media` records `selectedMediaIds` once, and `card_state` locks `media_choice` cards.
+- Types: `MediaChoiceMessage` (`kind: 'media_choice'`, `prompt`, `media`, `min`, `max`),
+  `ConfirmationMessage.media?`, `ImageMessage.mediaIds?`, events `send_media` / `select_media`,
+  `ChatMediaFile`, `ChatMediaRef`, `ChatMediaKind`, `ChatMediaSource`.
+- `localMediaUris(messages)`: media id → local URI from the user's own photo messages.
+- `contract/` copied again from the gateway (adds `v3/`, plus the v1/v2 streams added since).
+
 ## 0.1.0
 
 First release: the MyChat core moved out of MyRN `src/components/ui/chat/` into this package,

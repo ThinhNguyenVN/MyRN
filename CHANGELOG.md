@@ -12,6 +12,8 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Changed
+- **BREAKING (`MyChatComposer` used on its own):** `onSendImages` now receives
+  `ChatMediaFile[]` (`{ uri, name, mimeType, file? }`) instead of `string[]` URIs.
 - **MyChat core is now the package `@thinhnguyenvn/chat-core`** (`packages/chat-core/`, yarn
   workspace, `0.1.0`, published on npm by hand). Moved out of `src/components/ui/chat/`: types,
   `conversationReducer`, `useConversation`, `ChatAdapter`, `createHttpChatAdapter`,
@@ -30,6 +32,18 @@ product finds out what changed since it forked.
   storageRemoveItem }`) wherever `session` is set.
 
 ### Added
+- **MyChat photos over the gateway (chat-core `0.2.0`, contract v3):** `MyChat` sends picked photos
+  with `useConversation.sendMedia` (upload to `POST /media`, then `send_media`) when the adapter
+  declares `contractVersion: 3` and has `session`; otherwise `send_images` as before. A failed
+  upload shows "couldn't upload" + Retry under the photo. New cards: `media_choice` (thumbnail
+  grid with check marks, "x/max", submit within `min`..`max`, sends `select_media`) and a thumbnail
+  row on `confirmation` when it has `media` (max 4, "+N"). Shared `MyChatMediaThumbnail`: local
+  URI first, else `GET /media/:id` with the adapter headers (expo-image `headers`, blob URL on web),
+  placeholder on 404. New i18n keys `components.chat.media*`.
+  **Product to do:** bump `@thinhnguyenvn/chat-core` to `0.2.0`, set `contractVersion: 3` on
+  `createHttpChatAdapter` (with `session`).
+- `image-picker`: library and camera picks use `preferredAssetRepresentationMode: compatible`, so
+  iOS hands back JPEG instead of HEIC (HEIC used to be skipped as unsupported).
 - `createHttpChatAdapter` optional `session: { appId, userId }`: the first send uses
   `X-Chat-Session: new`, later sends reuse the id from `done.sessionId`, stored per app and user
   (localStorage on web, the kit storage helper on native). `clearSession()` calls

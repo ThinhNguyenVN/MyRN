@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 import { GestureDetector } from 'react-native-gesture-handler'
 import Animated from 'react-native-reanimated'
+import type { ChatMediaFile } from '@thinhnguyenvn/chat-core'
 
 import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-bottom-sheet'
 import MyButton from '@/components/elements/my-button'
@@ -34,7 +35,8 @@ import { useComposerInputLayout } from './use-composer-input-layout'
 
 export interface MyChatComposerProps {
   onSend: (text: string) => void
-  onSendImages: (imageUris: string[], caption?: string) => void
+  /** Picked photos (already resized to JPEG when large); MyChat uploads them or sends their URIs. */
+  onSendImages: (images: ChatMediaFile[], caption?: string) => void
   disabled?: boolean
   /** Reports composer focus so the transcript only dismisses the keyboard it owns. */
   onFocusChange?: (focused: boolean) => void
@@ -134,9 +136,14 @@ function MyChatComposer({
     resetComposerLayout()
 
     if (pendingImages.length > 0) {
-      const imageUris = pendingImages.map((staged) => staged.image.uri)
+      const images = pendingImages.map(({ image }) => ({
+        uri: image.uri,
+        name: image.name,
+        mimeType: image.mimeType,
+        file: image.file,
+      }))
       setPendingImages([])
-      onSendImages(imageUris, trimmedText || undefined)
+      onSendImages(images, trimmedText || undefined)
       return
     }
 

@@ -14,6 +14,7 @@ export { conversationReducer, initialConversationState } from './conversation-re
 export type { ConversationAction, ConversationState } from './conversation-reducer'
 
 export { generateMessageId } from './generate-message-id'
+export { localMediaUris } from './local-media-uris'
 
 export { CARD_LOCK_STATES } from './types'
 export type {
@@ -24,6 +25,11 @@ export type {
   ChatMessageError,
   TextMessage,
   ImageMessage,
+  ChatMediaKind,
+  ChatMediaFile,
+  ChatMediaRef,
+  ChatMediaSource,
+  MediaChoiceMessage,
   ChatOption,
   OptionsMessage,
   ChatSummaryField,

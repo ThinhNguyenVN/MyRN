@@ -1,7 +1,14 @@
 import type { ChatAdapter, ChatRequest, ChatStreamHandlers } from './chat-adapter'
 import { generateMessageId } from './generate-message-id'
 import { isWeb } from './platform'
-import { CARD_LOCK_STATES, type CardLockState, type ChatMessage } from './types'
+import {
+  CARD_LOCK_STATES,
+  type CardLockState,
+  type ChatMediaFile,
+  type ChatMediaKind,
+  type ChatMediaRef,
+  type ChatMessage,
+} from './types'
 
 /** Nơi app lưu id session (SecureStore, localStorage, AsyncStorage…); package không tự chọn. */
 export interface ChatSessionStorage {
@@ -20,7 +27,7 @@ export interface ChatSessionScope {
 export interface HttpChatAdapterOptions {
   url: string
   headers?: Record<string, string>
-  /** Gửi `X-Chat-Contract`; bỏ trống = contract v1. */
+  /** Gửi `X-Chat-Contract`; bỏ trống = contract v1. Từ 3 thì ảnh đi qua `POST /media` + `send_media`. */
   contractVersion?: number
   /** Gọi mỗi lần `send()`; trả chuỗi không rỗng thì gửi `X-Locale`. */
   getLocale?: () => string | undefined
@@ -246,12 +253,102 @@ function buildHeaders(options: HttpChatAdapterOptions): Record<string, string> {
   return headers
 }
 
+/** Bỏ `Content-Type: application/json` để `FormData` tự đặt boundary multipart. */
+function mediaHeaders(options: HttpChatAdapterOptions): Record<string, string> {
+  const headers = buildHeaders(options)
+  for (const key of Object.keys(headers)) {
+    if (key.toLowerCase() === 'content-type') delete headers[key]
+  }
+  return headers
+}
+
+async function appendFile(form: FormData, file: ChatMediaFile): Promise<void> {
+  if (isWeb) {
+    const blob = file.file ?? (await (await fetch(file.uri)).blob())
+    form.append('file', blob, file.name)
+    return
+  }
+  // RN FormData nhận `{ uri, name, type }` cho file trên máy; type DOM không mô tả được dạng này.
+  form.append('file', { uri: file.uri, name: file.name, type: file.mimeType } as unknown as Blob)
+}
+
+interface MediaUploadResponse {
+  id: string
+  kind: ChatMediaKind
+  sessionId?: string
+}
+
+function createMediaTransport(
+  options: HttpChatAdapterOptions,
+  scope: ChatSessionScope,
+): Pick<ChatAdapter, 'uploadMedia' | 'mediaSource'> {
+  const key = sessionStorageKey(scope)
+  const readSessionId = async () => (await scope.storage.getItem(key))?.trim() || undefined
+  /**
+   * Upload đầu tiên khi chưa có session gửi `new` và gateway tạo session. Các upload song song
+   * khác phải chờ id đó, nếu không mỗi file sẽ nằm ở một session riêng và `send_media` báo
+   * `media.not_found`.
+   */
+  let creatingSession: Promise<unknown> | null = null
+
+  const upload = async (file: ChatMediaFile, sessionId: string): Promise<ChatMediaRef> => {
+    const form = new FormData()
+    await appendFile(form, file)
+    const response = await fetch(`${gatewayRoot(options.url)}/media`, {
+      method: 'POST',
+      headers: { ...mediaHeaders(options), [SESSION_HEADER]: sessionId },
+      body: form,
+    })
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+    const body = (await response.json()) as MediaUploadResponse
+    const returned = body.sessionId?.trim() || response.headers.get(SESSION_HEADER)?.trim()
+    if (returned) {
+      await scope.storage.setItem(key, returned).catch(() => undefined)
+    }
+    return { id: body.id, kind: body.kind }
+  }
+
+  return {
+    async uploadMedia(file) {
+      let sessionId = await readSessionId()
+      if (!sessionId && creatingSession) {
+        await creatingSession.catch(() => undefined)
+        sessionId = await readSessionId()
+      }
+      if (sessionId) {
+        return upload(file, sessionId)
+      }
+      const pending = upload(file, 'new')
+      creatingSession = pending
+      try {
+        return await pending
+      } finally {
+        if (creatingSession === pending) creatingSession = null
+      }
+    },
+    async mediaSource(id) {
+      const sessionId = await readSessionId()
+      if (!sessionId) return null
+      return {
+        uri: `${gatewayRoot(options.url)}/media/${encodeURIComponent(id)}`,
+        headers: { ...mediaHeaders(options), [SESSION_HEADER]: sessionId },
+      }
+    },
+  }
+}
+
 /**
  * Generic HTTP streaming adapter — chưa có backend thật để trỏ vào (Phase 5).
  * Không biết Gemini/OpenAI/MCP; chỉ nói NDJSON-over-HTTP với `ChatRequest`/`ChatStreamHandlers`.
+ * Gửi ảnh (`uploadMedia`) cần `session`, vì gateway tính ảnh theo session.
  */
 export function createHttpChatAdapter(options: HttpChatAdapterOptions): ChatAdapter {
+  const scope = options.session
   return {
+    contractVersion: options.contractVersion,
+    ...(scope ? createMediaTransport(options, scope) : {}),
     async send(request: ChatRequest, handlers: ChatStreamHandlers): Promise<void> {
       let lastKnownMessageId: string | null = null
       const onMessageIdSeen = (messageId: string) => {
@@ -259,7 +356,6 @@ export function createHttpChatAdapter(options: HttpChatAdapterOptions): ChatAdap
       }
 
       const headers = buildHeaders(options)
-      const scope = options.session
       let persist: Promise<void> = Promise.resolve()
       const onSessionId = scope
         ? (sessionId: string) => {

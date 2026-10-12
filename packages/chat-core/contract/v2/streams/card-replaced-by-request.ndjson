@@ -1,0 +1,7 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"card_state","messageId":"<id>","state":"cancelled"}
+{"type":"status","messageId":"<id>","text":"Đang lấy dữ liệu…"}
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"result","status":"complete","createdAt":0,"title":"saved"}}
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"chunk","messageId":"<id>","delta":"Đã nhớ."}
+{"type":"done","messageId":"<id>"}

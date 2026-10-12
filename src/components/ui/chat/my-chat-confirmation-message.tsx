@@ -11,6 +11,7 @@ import { ConditionRenderer } from '@/components/ui/condition-renderer'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import MyChatCardLockRow from './my-chat-card-lock-row'
+import MyChatMediaRow from './my-chat-media-row'
 import MyChatSummaryList from './my-chat-summary-list'
 import { generateStyles } from './styles'
 
@@ -44,6 +45,13 @@ function MyChatConfirmationMessage({ message, onConfirm }: MyChatConfirmationMes
           keyPrefix="chat-confirmation-field"
           summary={message.summary ?? []}
           changedFields={message.changedFields}
+        />
+      </ConditionRenderer>
+
+      <ConditionRenderer when={Boolean(message.media?.length)}>
+        <MyChatMediaRow
+          media={message.media ?? []}
+          isChanged={message.changedFields?.includes('media')}
         />
       </ConditionRenderer>
 

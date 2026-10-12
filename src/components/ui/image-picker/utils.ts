@@ -20,6 +20,14 @@ export const IMAGE_PICK_MAX_BYTES = 5 * 1024 * 1024
 /** Chat attachment preview/bubble target — see {@link resizeImageIfNeeded}. */
 export const IMAGE_RESIZE_MAX_EDGE = 900
 
+/**
+ * iOS: the library hands back HEIC photos as raw HEIC in the default (`automatic`) mode, which
+ * {@link assertValidImage} rejects and many backends cannot read. `compatible` makes iOS
+ * transcode them to JPEG. Ignored on Android and web.
+ */
+const COMPATIBLE_REPRESENTATION =
+  ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible
+
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'])
 
 export class ImagePickError extends Error {
@@ -143,6 +151,7 @@ async function launchPicker(
     mediaTypes: ['images'],
     allowsEditing: options.allowsEditing ?? false,
     quality: options.quality ?? 0.9,
+    preferredAssetRepresentationMode: COMPATIBLE_REPRESENTATION,
   })
 
   if (result.canceled || isNil(result.assets?.[0])) {
@@ -216,6 +225,7 @@ export async function pickImages(options: PickImagesOptions = {}): Promise<PickI
     allowsMultipleSelection: true,
     selectionLimit: options.selectionLimit,
     quality: options.quality ?? 0.9,
+    preferredAssetRepresentationMode: COMPATIBLE_REPRESENTATION,
   })
 
   if (result.canceled || !result.assets || result.assets.length === 0) {

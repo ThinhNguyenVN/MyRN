@@ -3,6 +3,7 @@ import type {
   ChatMessage,
   ConfirmationMessage,
   FormMessage,
+  MediaChoiceMessage,
   OptionsMessage,
   TextMessage,
 } from './types'
@@ -199,5 +200,30 @@ describe('conversationReducer', () => {
       conversationReducer(state, { type: 'set_card_lock', messageId: 'm1', state: 'expired' })
         .messages,
     ).toEqual(state.messages)
+  })
+
+  it('select_media records the pick once and locks with card_state', () => {
+    const card: MediaChoiceMessage = {
+      id: 'mc1',
+      role: 'assistant',
+      createdAt: 0,
+      status: 'complete',
+      kind: 'media_choice',
+      prompt: 'Pick',
+      media: ['a', 'b', 'c'],
+      min: 0,
+      max: 1,
+    }
+    let state = initialConversationState([card])
+    state = conversationReducer(state, { type: 'select_media', messageId: 'mc1', mediaIds: ['b'] })
+    state = conversationReducer(state, { type: 'select_media', messageId: 'mc1', mediaIds: ['c'] })
+    expect((state.messages[0] as MediaChoiceMessage).selectedMediaIds).toEqual(['b'])
+
+    state = conversationReducer(state, {
+      type: 'set_card_lock',
+      messageId: 'mc1',
+      state: 'superseded',
+    })
+    expect((state.messages[0] as MediaChoiceMessage).lockState).toBe('superseded')
   })
 })

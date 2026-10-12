@@ -1,0 +1,3 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"chunk","messageId":"<id>","delta":"Mình không tìm thấy ảnh bạn vừa gửi (có thể đã hết hạn), bạn gửi lại giúp mình nhé."}
+{"type":"done","messageId":"<id>","sessionId":"<id>"}

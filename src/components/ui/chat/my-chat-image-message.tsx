@@ -1,7 +1,9 @@
-import React, { memo } from 'react'
+import React, { memo, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { ImageMessage } from '@thinhnguyenvn/chat-core'
 
 import MyImage from '@/components/elements/my-image'
+import MyPressable from '@/components/elements/my-pressable'
 import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
@@ -12,11 +14,20 @@ import { generateStyles, getPhotoGridWidth } from './styles'
 
 export interface MyChatImageMessageProps {
   message: ImageMessage
+  /** Retries a failed upload (contract v3 `send_media`). */
+  onRetry?: (messageId: string) => void
 }
 
-function MyChatImageMessage({ message }: MyChatImageMessageProps) {
+function MyChatImageMessage({ message, onRetry }: MyChatImageMessageProps) {
   const styles = useThemedStyles(generateStyles)
+  const { t } = useTranslation()
   const isUser = message.role === 'user'
+  const isUploading = isUser && message.status === 'pending'
+  const isError = message.status === 'error'
+
+  const handleRetry = useCallback(() => {
+    onRetry?.(message.id)
+  }, [message.id, onRetry])
 
   const image =
     message.imageUris.length === 1 ? (
@@ -31,7 +42,7 @@ function MyChatImageMessage({ message }: MyChatImageMessageProps) {
 
   // Neutral card, not the brand-tinted "sent" bubble — see styles.ts photoCard comment.
   const photoCard = (
-    <MySurface radius="large" style={styles.photoCard}>
+    <MySurface radius="large" style={[styles.photoCard, isUploading && styles.photoCardPending]}>
       {image}
     </MySurface>
   )
@@ -45,6 +56,18 @@ function MyChatImageMessage({ message }: MyChatImageMessageProps) {
             <MyText typography="body" style={styles.userBubbleText}>
               {message.caption}
             </MyText>
+          </MyView>
+        </ConditionRenderer>
+        <ConditionRenderer when={isError}>
+          <MyView style={styles.errorRow}>
+            <MyText typography="body" style={styles.errorText}>
+              {t('components.chat.mediaUploadFailed')}
+            </MyText>
+            <MyPressable onPress={handleRetry}>
+              <MyText typography="label" style={styles.retryLink}>
+                {t('components.chat.retry')}
+              </MyText>
+            </MyPressable>
           </MyView>
         </ConditionRenderer>
       </MyView>

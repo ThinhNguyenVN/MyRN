@@ -32,6 +32,7 @@ export interface MyChatListProps {
   messages: ChatMessage[]
   onSelectOption: (messageId: string, optionId: string) => void
   onConfirm: (messageId: string, confirmed: boolean) => void
+  onSelectMedia: (messageId: string, mediaIds: string[]) => void
   onSubmitForm: (messageId: string, values: ChatFormValues) => void
   onRetry: (messageId: string) => void
   onAction: (action: MessageAction) => void
@@ -63,6 +64,7 @@ function MyChatList({
   messages,
   onSelectOption,
   onConfirm,
+  onSelectMedia,
   onSubmitForm,
   onRetry,
   onAction,
@@ -270,6 +272,7 @@ function MyChatList({
           message={item}
           onSelectOption={onSelectOption}
           onConfirm={onConfirm}
+          onSelectMedia={onSelectMedia}
           onSubmitForm={onSubmitForm}
           onRetry={onRetry}
           onAction={onAction}
@@ -277,7 +280,16 @@ function MyChatList({
         />
       </MyView>
     ),
-    [onSelectOption, onConfirm, onSubmitForm, onRetry, onAction, renderCustomMessage, itemStyle],
+    [
+      onSelectOption,
+      onConfirm,
+      onSelectMedia,
+      onSubmitForm,
+      onRetry,
+      onAction,
+      renderCustomMessage,
+      itemStyle,
+    ],
   )
 
   return (

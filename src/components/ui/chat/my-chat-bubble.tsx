@@ -8,6 +8,7 @@ import type { RenderCustomMessage } from './types'
 import MyChatConfirmationMessage from './my-chat-confirmation-message'
 import MyChatFormMessage from './my-chat-form-message'
 import MyChatImageMessage from './my-chat-image-message'
+import MyChatMediaChoiceMessage from './my-chat-media-choice-message'
 import MyChatOptionsMessage from './my-chat-options-message'
 import MyChatResultMessage from './my-chat-result-message'
 import MyChatTextMessage from './my-chat-text-message'
@@ -18,6 +19,7 @@ export interface MyChatBubbleProps {
   message: ChatMessage
   onSelectOption: (messageId: string, optionId: string) => void
   onConfirm: (messageId: string, confirmed: boolean) => void
+  onSelectMedia: (messageId: string, mediaIds: string[]) => void
   onSubmitForm: (messageId: string, values: ChatFormValues) => void
   onRetry: (messageId: string) => void
   onAction: (action: MessageAction) => void
@@ -28,6 +30,7 @@ function renderBubbleByKind({
   message,
   onSelectOption,
   onConfirm,
+  onSelectMedia,
   onSubmitForm,
   onRetry,
   onAction,
@@ -37,11 +40,13 @@ function renderBubbleByKind({
     case 'text':
       return <MyChatTextMessage message={message} onRetry={onRetry} />
     case 'image':
-      return <MyChatImageMessage message={message} />
+      return <MyChatImageMessage message={message} onRetry={onRetry} />
     case 'options':
       return <MyChatOptionsMessage message={message} onSelectOption={onSelectOption} />
     case 'confirmation':
       return <MyChatConfirmationMessage message={message} onConfirm={onConfirm} />
+    case 'media_choice':
+      return <MyChatMediaChoiceMessage message={message} onSelectMedia={onSelectMedia} />
     case 'form':
       return <MyChatFormMessage message={message} onSubmitForm={onSubmitForm} />
     case 'result':
@@ -57,6 +62,7 @@ function MyChatBubble({
   message,
   onSelectOption,
   onConfirm,
+  onSelectMedia,
   onSubmitForm,
   onRetry,
   onAction,
@@ -71,6 +77,7 @@ function MyChatBubble({
         message,
         onSelectOption,
         onConfirm,
+        onSelectMedia,
         onSubmitForm,
         onRetry,
         onAction,

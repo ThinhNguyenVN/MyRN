@@ -1,4 +1,12 @@
-import type { CardLockState, ChatMessage, ChatMessageError, ConversationEvent } from './types'
+import type {
+  CardLockState,
+  ChatMediaFile,
+  ChatMediaRef,
+  ChatMediaSource,
+  ChatMessage,
+  ChatMessageError,
+  ConversationEvent,
+} from './types'
 
 export interface ChatRequest {
   event: ConversationEvent
@@ -17,6 +25,12 @@ export interface ChatStreamHandlers {
 export interface ChatAdapter {
   send: (request: ChatRequest, handlers: ChatStreamHandlers) => Promise<void>
   cancel?: (messageId: string) => void
+  /** `X-Chat-Contract` this adapter declares; `useConversation` sends `send_media` from 3. */
+  contractVersion?: number
+  /** Uploads one file (`POST /media`) and returns its id; without it images go as `send_images`. */
+  uploadMedia?: (file: ChatMediaFile) => Promise<ChatMediaRef>
+  /** Where to load a media id that has no local URI; `null` when it cannot be loaded. */
+  mediaSource?: (id: string) => Promise<ChatMediaSource | null>
   /** Xóa session server đang lưu cho app và user của adapter này (`DELETE /session`). */
   clearSession?: () => Promise<void>
   /** Xóa mọi session server của app và user này (`DELETE /sessions`). */

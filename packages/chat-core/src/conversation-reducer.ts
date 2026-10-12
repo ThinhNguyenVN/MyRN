@@ -16,6 +16,7 @@ export type ConversationAction =
   | { type: 'append_message'; message: ChatMessage }
   | { type: 'select_option'; messageId: string; optionId: string }
   | { type: 'confirm'; messageId: string; confirmed: boolean }
+  | { type: 'select_media'; messageId: string; mediaIds: string[] }
   | { type: 'submit_form'; messageId: string; values: ChatFormValues }
   | { type: 'append_chunk'; messageId: string; delta: string }
   | { type: 'set_message'; message: ChatMessage }
@@ -61,6 +62,16 @@ export function conversationReducer(
                 resolution: action.confirmed ? 'confirmed' : 'cancelled',
                 status: 'complete',
               }
+            : message,
+        ),
+      }
+
+    case 'select_media':
+      return {
+        ...state,
+        messages: mapMessage(state.messages, action.messageId, (message) =>
+          message.kind === 'media_choice' && message.selectedMediaIds === undefined
+            ? { ...message, selectedMediaIds: action.mediaIds, status: 'complete' }
             : message,
         ),
       }
@@ -118,7 +129,9 @@ export function conversationReducer(
       return {
         ...state,
         messages: mapMessage(state.messages, action.messageId, (message) =>
-          message.kind === 'options' || message.kind === 'confirmation'
+          message.kind === 'options' ||
+          message.kind === 'confirmation' ||
+          message.kind === 'media_choice'
             ? { ...message, lockState: action.state }
             : message,
         ),

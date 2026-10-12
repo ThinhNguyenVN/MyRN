@@ -25,14 +25,26 @@ import { createHttpChatAdapter, useConversation } from '@thinhnguyenvn/chat-core
 const adapter = createHttpChatAdapter({
   url: 'http://localhost:3300/chat',
   headers: { Authorization: `Bearer ${token}` },
-  contractVersion: 2,
+  contractVersion: 3,
   getLocale: () => i18n.language,
   // Optional: keep the conversation on the gateway.
   session: { appId: 'my-store', userId: String(user.id), storage },
 })
 
-const { messages, send } = useConversation({ adapter })
+const { messages, send, sendMedia } = useConversation({ adapter })
 ```
+
+### Photos (contract v3)
+
+With `contractVersion: 3` and `session`, `sendMedia(files, caption)` uploads each file to
+`POST /media` first and then sends `send_media` with the ids. Without either (or with
+`MockChatAdapter`) it sends `send_images` like before. `files` are `{ uri, name, mimeType, file? }`;
+on web pass the picked `File` as `file`. Send JPEG/PNG/WebP/HEIC up to 5 MB.
+
+Ids the gateway shows on cards (`media_choice.media`, `confirmation.media`) are drawn from the local
+URI when this device sent them (`localMediaUris(messages)`), else from `adapter.mediaSource(id)`
+(`GET /media/:id` with the chat headers; `404` after 24h, show a placeholder). Answer a
+`media_choice` card with `selectMedia(messageId, ids)`.
 
 ### Session storage
 
@@ -62,7 +74,7 @@ Keys only contain `[A-Za-z0-9._-]` (other characters become `_`), so SecureStore
 | `ChatAdapter`, `ChatRequest`, `ChatStreamHandlers` | adapter interface |
 | `createHttpChatAdapter`, `HttpChatAdapterOptions`, `ChatSessionScope`, `ChatSessionStorage` | HTTP adapter |
 | `MockChatAdapter` | scripted demo adapter |
-| `generateMessageId` | util |
+| `generateMessageId`, `localMediaUris` | util |
 | `ChatMessage` and its kinds, `ConversationEvent`, `CardLockState`, `CARD_LOCK_STATES`… | types |
 
 ## Contract fixtures
@@ -79,5 +91,6 @@ contract version (`X-Chat-Contract`) is separate from the package version.
 | Package | Chat contract (`X-Chat-Contract`) |
 |--|--|
 | `0.1.x` | `1`, `2` (plus optional `X-Chat-Session`) |
+| `0.2.x` | `1`, `2`, `3` (media: `POST /media`, `send_media`, `media_choice`, `select_media`) |
 
 See `CHANGELOG.md`.
