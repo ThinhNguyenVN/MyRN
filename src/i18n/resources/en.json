@@ -575,6 +575,7 @@
       "attachmentUnsupportedSkipped": "{{count}} photo(s) couldn't be added (unsupported format or too large)",
       "unknownMessage": "This message type isn't supported yet.",
       "errorGeneric": "Something went wrong.",
+      "rowsShown": "Showing {{shown}}/{{total}} rows",
       "retry": "Retry",
       "typing": "Assistant is responding",
       "expand": "Expand composer",

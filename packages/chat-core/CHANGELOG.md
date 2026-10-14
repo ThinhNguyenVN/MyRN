@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+Contract copy only (gateway change `e1-fixes`): within a turn the model's words now come before
+the cards, as `chunk`s of the turn's main message, then each card as its own `message`
+(`v2/streams/card-replaced-by-request.ndjson`). Same events and shapes; no code change.
+
 ## 0.2.0
 
 Photos over the gateway (contract v3, gateway change `chat-contract-media`, M17). Additive: apps

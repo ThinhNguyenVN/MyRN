@@ -8,7 +8,7 @@ import MySurface from '@/components/elements/my-surface'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import { ConditionRenderer } from '@/components/ui/condition-renderer'
-import { useTheme, useThemedStyles } from '@/theme/theme-context'
+import { useThemedStyles } from '@/theme/theme-context'
 
 import MyChatCardLockRow from './my-chat-card-lock-row'
 import MyChatMediaRow from './my-chat-media-row'
@@ -22,7 +22,6 @@ export interface MyChatConfirmationMessageProps {
 
 function MyChatConfirmationMessage({ message, onConfirm }: MyChatConfirmationMessageProps) {
   const styles = useThemedStyles(generateStyles)
-  const { getColor } = useTheme()
   const { t } = useTranslation()
   const isLocked = message.lockState !== undefined
   const isResolved = message.resolution !== undefined && !isLocked
@@ -69,7 +68,6 @@ function MyChatConfirmationMessage({ message, onConfirm }: MyChatConfirmationMes
             type="primary"
             width="auto"
             elevation="none"
-            textColor={message.destructive ? getColor('text/alert/primary') : undefined}
             onPress={handleConfirm}
           />
         </MyView>

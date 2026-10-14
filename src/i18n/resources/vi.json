@@ -575,6 +575,7 @@
       "attachmentUnsupportedSkipped": "{{count}} ảnh không thể thêm (định dạng không hỗ trợ hoặc quá lớn)",
       "unknownMessage": "Loại tin nhắn này chưa được hỗ trợ.",
       "errorGeneric": "Đã có lỗi xảy ra.",
+      "rowsShown": "Đang hiện {{shown}}/{{total}} dòng",
       "retry": "Thử lại",
       "typing": "Trợ lý đang trả lời",
       "expand": "Mở rộng ô nhập",
