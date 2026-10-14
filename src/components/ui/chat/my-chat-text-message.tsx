@@ -9,6 +9,7 @@ import { ConditionRenderer } from '@/components/ui/condition-renderer'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
+import MyChatMarkdown from './my-chat-markdown'
 import MyChatTyping from './my-chat-typing'
 
 export interface MyChatTextMessageProps {
@@ -43,7 +44,7 @@ function MyChatTextMessage({ message, onRetry }: MyChatTextMessageProps) {
         <MyChatTyping />
       </ConditionRenderer>
       <ConditionRenderer when={!isTyping && !isError}>
-        <MyText typography="body">{message.text}</MyText>
+        <MyChatMarkdown text={message.text} />
       </ConditionRenderer>
       <ConditionRenderer when={isError}>
         <MyView style={styles.errorRow}>

@@ -64,3 +64,7 @@ export const TAP_SLOP = 8
  * so it reads as part of the same settle rather than a second, separate motion.
  */
 export const KEYBOARD_CLOSE_SCROLL_SLACK = 8
+
+/** Rows a result card shows before cutting: a wide screen, then a narrow one ("x/y" when cut). */
+export const RESULT_ROWS_WIDE = 10
+export const RESULT_ROWS_NARROW = 5

@@ -50,8 +50,13 @@ A tap on a superseded card gets a sentence and, on v2, `card_state: superseded`.
 
 - **`status`** (v2 only, like `card_state`): `{ type, messageId, text }` while the assistant works
   ("đang lấy dữ liệu…"). Show it as a transient line; the next `status`, message or `done` replaces it.
-- A read's card comes first; the model's words about it follow in a **new** text message
-  (`message` pending, then its `chunk`s), as in `v2/streams/card-replaced-by-request.ndjson`.
+- **Words before cards (change e1-fixes):** the model's words come first, as `chunk`s of the
+  turn's main message; the cards the turn read follow, each a complete `message` with its own id,
+  then `done` (`v2/streams/card-replaced-by-request.ndjson`). A turn with no words (the model only
+  called a tool, failed, or ran out of time, or a tap) shows its cards as they come, the first one
+  on the main id. Only the last step of one question shows: a read the model retried in the same
+  turn, or one that found nothing, is not drawn. Same events and shapes on every version, only the
+  order changed.
 - **Handoff:** a `result` card whose action is `{ type: 'external_link', label, url }`, for a step
   outside the chat such as paying (`v1/streams/handoff-card.ndjson`).
 
@@ -116,6 +121,6 @@ owner's session for 24h; every other case is `404`.
 
 ## Copy in MyRN
 
-`packages/chat-core/contract/` is a copy of `my-agent-platform/contract/` taken on 2026-10-12 with
-the gateway change `chat-contract-media` (M17, not committed yet in the gateway). Do not edit it
+`packages/chat-core/contract/` is a copy of `my-agent-platform/contract/` taken on 2026-10-14 with
+the gateway change `e1-fixes` (words before cards, not committed yet in the gateway). Do not edit it
 here: change the gateway fixture, then copy the folder again and update this line.
