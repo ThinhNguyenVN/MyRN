@@ -84,10 +84,12 @@ function MyChatFormMessage({ message, onSubmitForm }: MyChatFormMessageProps) {
   )
 
   const handleSubmit = useCallback(() => {
+    // Number fields send what the user typed ("50k", "50.000"): the gateway reads it in the
+    // user's locale. `Number(raw)` turned "50k" into NaN, which JSON sends as null.
     const parsed: ChatFormValues = {}
     for (const field of message.fields) {
       const raw = values[field.name] ?? ''
-      parsed[field.name] = field.type === 'number' ? Number(raw) : raw
+      parsed[field.name] = field.type === 'number' ? raw.trim() : raw
     }
     onSubmitForm(message.id, parsed)
   }, [message.fields, message.id, onSubmitForm, values])
