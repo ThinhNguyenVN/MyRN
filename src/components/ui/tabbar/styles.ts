@@ -3,6 +3,11 @@ import { Platform, StyleSheet } from 'react-native'
 import { getPrivateTabBarHeight, getTabBarBottomPad } from '@/constants/dimensions'
 import type { ThemeType } from '@/theme/theme-context'
 
+/** Diameter of the raised center action and how far it rises above the bar. */
+export const TAB_BAR_CENTER_ACTION_SIZE = 56
+const CENTER_ACTION_LIFT = 26
+const CENTER_ACTION_RING = 4
+
 export function generateTabBarStyles(theme: ThemeType) {
   const { getColor, getSpacing, getRadius, insets } = theme
   const bottomInset = insets.bottom ?? 0
@@ -48,6 +53,61 @@ export function generateTabBarStyles(theme: ThemeType) {
       paddingTop: getSpacing('x2'),
       paddingBottom: tabBarBottomPad,
       overflow: 'visible',
+    },
+    centerAction: {
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      overflow: 'visible',
+      backgroundColor: 'transparent',
+      gap: 2,
+    },
+    centerActionRing: {
+      marginTop: -CENTER_ACTION_LIFT,
+      width: TAB_BAR_CENTER_ACTION_SIZE + CENTER_ACTION_RING * 2,
+      height: TAB_BAR_CENTER_ACTION_SIZE + CENTER_ACTION_RING * 2,
+      borderRadius: getRadius('full'),
+      padding: CENTER_ACTION_RING,
+      backgroundColor: getColor('fill/background/tertiary'),
+      overflow: 'visible',
+    },
+    centerActionMark: {
+      width: 28,
+      height: 28,
+    },
+    centerActionCircle: {
+      flex: 1,
+      borderRadius: getRadius('full'),
+      alignItems: 'center',
+      justifyContent: 'center',
+      ...(Platform.OS === 'web'
+        ? { boxShadow: `0 10px 22px -8px ${getColor('fill/active/primary')}99` as const }
+        : {
+            shadowColor: getColor('fill/active/primary'),
+            shadowOpacity: 0.35,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 6 },
+            elevation: 6,
+          }),
+    },
+    centerActionBadge: {
+      position: 'absolute',
+      top: -2,
+      right: -10,
+      paddingHorizontal: getSpacing('x2'),
+      paddingVertical: 1,
+      borderRadius: getRadius('full'),
+      borderWidth: 2,
+      borderColor: getColor('fill/background/tertiary'),
+      backgroundColor: getColor('fill/warning/primary'),
+    },
+    centerActionBadgeText: {
+      fontSize: 10,
+      lineHeight: 13,
+      fontWeight: '700',
+    },
+    centerActionLabel: {
+      fontSize: 12,
+      fontWeight: '600',
     },
     tabBarLabel: {
       fontSize: 12,

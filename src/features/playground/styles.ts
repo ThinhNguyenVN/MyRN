@@ -44,6 +44,23 @@ export const generateStyles = (theme: ThemeType) => {
       flex: 1,
       backgroundColor: getColor('fill/background/secondary'),
     },
+    chatEntryToolbar: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: getSpacing('x2'),
+      paddingHorizontal: getSpacing('x4'),
+      paddingVertical: getSpacing('x2'),
+    },
+    tabBarDemoBar: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      justifyContent: 'center',
+      minHeight: 88,
+      paddingBottom: getSpacing('x3'),
+      backgroundColor: getColor('fill/background/tertiary'),
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: getColor('border/inactive/secondary'),
+    },
 
     // ─── Section titles & labels ───────────────────────────────────────────
     sectionTitle: {

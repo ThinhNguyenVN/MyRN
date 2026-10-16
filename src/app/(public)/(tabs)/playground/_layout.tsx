@@ -50,6 +50,9 @@ export default function PlaygroundLayout() {
         href: item.href,
         label: t(item.labelKey),
         icon: item.icon,
+        ...(item.href === '/playground/chat'
+          ? { badge: t('playground.chatNewBadge'), emphasis: true }
+          : {}),
       })),
     [t],
   )

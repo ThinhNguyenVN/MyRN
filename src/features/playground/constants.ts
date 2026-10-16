@@ -169,4 +169,9 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string; icon: IconName 
     href: '/playground/chat',
     icon: 'chatbubbles-outline',
   },
+  {
+    labelKey: 'playground.linksTabBar',
+    href: '/playground/tab-bar',
+    icon: 'tablet-portrait-outline',
+  },
 ]

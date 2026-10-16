@@ -64,6 +64,10 @@ If a new UI piece is useful beyond one product, it belongs in MyRN.
 8. **PR this repo;** note the product PR that originated the kit.
 9. **Forward sync:** products pull MyRN when upgrading platform / starting new work.
 
+## Recent product → MyRN
+
+- my-store AI entry kit (`useTabBar` center action, `MyChat` pending prompt / composer focus, `SideBar` emphasis/badge) → `feat/sync-ai-entry-kit` (from [my-store PR #74](https://github.com/ThinhNguyenVN/my-store/pull/74)). Product nav, Ask AI header, and `/chat?prompt=` stay in my-store.
+
 ## Direction cheat sheet
 
 | Direction | Meaning |

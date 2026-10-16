@@ -1,5 +1,6 @@
 export { default as MyChat } from './my-chat'
 export type { MyChatProps, ChatSuggestionInput } from './my-chat'
+export type { ChatPendingPrompt } from './use-pending-prompt'
 
 export { default as MyChatList } from './my-chat-list'
 export type { MyChatListProps } from './my-chat-list'

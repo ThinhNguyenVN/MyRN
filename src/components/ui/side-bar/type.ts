@@ -19,6 +19,10 @@ export interface SideBarItem {
   showChevron?: boolean
   /** Non-interactive section header row. */
   kind?: 'link' | 'section'
+  /** Soft accent fill (when not active) so one entry stands out, e.g. a new feature. */
+  emphasis?: boolean
+  /** Small pill after the label (e.g. "New"); fades out with the label when collapsed. */
+  badge?: string
 }
 
 export type SideBarVariant = 'card' | 'flush'

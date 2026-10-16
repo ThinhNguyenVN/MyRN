@@ -24,6 +24,7 @@ import MyChatComposer from './my-chat-composer'
 import MyChatList from './my-chat-list'
 import { MyChatMediaProvider, type MyChatMediaContextValue } from './my-chat-media-context'
 import { generateStyles, getChatColumnGutter } from './styles'
+import { usePendingPrompt, type ChatPendingPrompt } from './use-pending-prompt'
 
 export interface ChatSuggestionInput {
   id: string
@@ -42,6 +43,11 @@ export interface MyChatProps {
   emptyStateTitle: string
   emptyStateSubtitle?: string
   suggestions?: ChatSuggestionInput[]
+  /** Sends `text` as the user's message once per `id` (e.g. a suggestion picked on another
+   *  screen). A repeated `id` is ignored, so re-renders never send it twice. */
+  pendingPrompt?: ChatPendingPrompt
+  /** Each new value focuses the composer (e.g. the screen was opened to type right away). */
+  focusComposerToken?: number
 }
 
 function MyChat({
@@ -53,6 +59,8 @@ function MyChat({
   emptyStateTitle,
   emptyStateSubtitle,
   suggestions,
+  pendingPrompt,
+  focusComposerToken,
 }: MyChatProps) {
   const styles = useThemedStyles(generateStyles)
   const { getSpacing, isMobileSize } = useTheme()
@@ -101,6 +109,8 @@ function MyChat({
     },
     [pinListToBottom, send],
   )
+
+  usePendingPrompt(pendingPrompt, handleSend)
 
   const handleSendImages = useCallback(
     (images: ChatMediaFile[], caption?: string) => {
@@ -185,6 +195,7 @@ function MyChat({
               onSendImages={handleSendImages}
               disabled={chat.isSending}
               onFocusChange={handleComposerFocusChange}
+              focusToken={focusComposerToken}
             />
           </Animated.View>
         </MyView>

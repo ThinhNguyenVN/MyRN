@@ -1,4 +1,6 @@
 export { default as TabBarButton } from './tab-bar-button'
+export { default as TabBarCenterButton } from './tab-bar-center-button'
 export { useTabBar } from './use-tab-bar'
-export { generateTabBarStyles } from './styles'
-export type { TabBarIconName, TabBarNavItem } from './types'
+export { TAB_BAR_CENTER_ACTION_SIZE, generateTabBarStyles } from './styles'
+export type { TabBarCenterButtonProps } from './tab-bar-center-button'
+export type { TabBarCenterAction, TabBarIconName, TabBarNavItem } from './types'

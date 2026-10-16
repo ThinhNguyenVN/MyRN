@@ -12,7 +12,8 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import { generateTabBarStyles } from './styles'
 import TabBarButton from './tab-bar-button'
-import type { TabBarNavItem } from './types'
+import TabBarCenterButton from './tab-bar-center-button'
+import type { TabBarCenterAction, TabBarNavItem } from './types'
 
 type TabBarIconProps = {
   focused: boolean
@@ -29,11 +30,26 @@ type UseTabBarArgs = {
    * Public sample tabs keep the bar on all sizes.
    */
   mobileOnly?: boolean
+  /**
+   * Raised action button inserted in the middle of the tabs. It needs a route of the same `id`
+   * under the Tabs layout (a redirect is enough), but pressing it runs `onPress` instead.
+   */
+  centerAction?: TabBarCenterAction
 }
+
+type TabBarButtonRenderProps = React.ComponentProps<typeof TabBarButton>
 
 type TabRouteState = {
   index: number
   routes: { key: string; name: string; state?: { index?: number; routes?: { name: string }[] } }[]
+}
+
+type TabScreen = {
+  id: string
+  title: string
+  renderIcon: (props: TabBarIconProps) => React.ReactNode
+  /** Set only for the center action: replaces the tab button so pressing it never switches tabs. */
+  tabBarButton?: (props: TabBarButtonRenderProps) => React.ReactNode
 }
 
 /** Hide chrome when a tab hosts a nested stack focused on a child (not `index`). */
@@ -54,7 +70,7 @@ function shouldHideTabBar(state: TabRouteState, tabBarStyle: unknown): boolean {
 }
 
 /** Tabs `screenOptions` + custom tab bar. */
-export function useTabBar({ items, openDrawer, mobileOnly = false }: UseTabBarArgs) {
+export function useTabBar({ items, openDrawer, mobileOnly = false, centerAction }: UseTabBarArgs) {
   const { t } = useTranslation()
   const { getColor } = useTheme()
   const isMobileSize = useIsMobileSize()
@@ -129,21 +145,43 @@ export function useTabBar({ items, openDrawer, mobileOnly = false }: UseTabBarAr
     [activeTint, inactiveTint, isMobileSize, openDrawer, styles, t, tabBarBorderColor],
   )
 
-  const tabScreens = useMemo(
-    () =>
-      items.map((item) => ({
-        id: item.id,
-        title: t(item.labelKey),
-        renderIcon: ({ color, focused }: TabBarIconProps) => (
-          <MyIcon
-            name={focused && item.iconFocused ? item.iconFocused : item.icon}
-            size={22}
-            color={typeof color === 'string' ? color : activeTint}
-          />
-        ),
-      })),
-    [activeTint, items, t],
-  )
+  const tabScreens = useMemo(() => {
+    const screens: TabScreen[] = items.map((item) => ({
+      id: item.id,
+      title: t(item.labelKey),
+      renderIcon: ({ color, focused }: TabBarIconProps) => (
+        <MyIcon
+          name={focused && item.iconFocused ? item.iconFocused : item.icon}
+          size={22}
+          color={typeof color === 'string' ? color : activeTint}
+        />
+      ),
+    }))
+    if (!centerAction) {
+      return screens
+    }
+    const label = t(centerAction.labelKey)
+    const accessibilityLabel = t(centerAction.accessibilityLabelKey ?? centerAction.labelKey)
+    screens.splice(Math.ceil(screens.length / 2), 0, {
+      id: centerAction.id,
+      title: label,
+      renderIcon: () => null,
+      // Must be a function — memo()'d components are objects and crash BottomTabBar.
+      tabBarButton: (props: TabBarButtonRenderProps) => (
+        <TabBarCenterButton
+          label={label}
+          icon={centerAction.icon}
+          mark={centerAction.mark}
+          onPress={centerAction.onPress}
+          accessibilityLabel={accessibilityLabel}
+          badge={centerAction.badge}
+          accentColor={centerAction.accentColor}
+          style={props.style}
+        />
+      ),
+    })
+    return screens
+  }, [activeTint, centerAction, items, t])
 
   return {
     isMobileSize,
