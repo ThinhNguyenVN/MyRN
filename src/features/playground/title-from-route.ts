@@ -18,6 +18,7 @@ export function titleFromRoute(routeName: string): string {
     'menu-list-card': 'playground.linksMenuListCard',
     'profile-menu-button': 'playground.linksProfileMenuButton',
     'floating-action-button': 'playground.linksFab',
+    'tab-bar': 'playground.linksTabBar',
     'website-header': 'playground.linksWebsiteHeader',
     stepper: 'playground.linksStepper',
     pagination: 'playground.linksPagination',

@@ -41,6 +41,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | App rail (web) | `SideBar` (`card` \| `flush`, icons, header/footer) | One-off left nav View |
 | List filter menu (mobile sheet + desktop popover) | `MyBottomSheet` (mobile) + `TriggerModal` (desktop), Clear/Apply through `footer` prop | Rendering Clear/Apply inside the scrollable panel; `useScrollView={false}` + custom `contentContainerStyle` as a footer-spacing workaround |
 | Bottom tabs (pill active) | `useTabBar` / `TabBarButton` | Raw `tabBarButton` + default RN border/elevation |
+| Raised action in the middle of the bottom tabs (not a tab) | `useTabBar({ centerAction })` + a redirect route of the same `id` under the Tabs layout | Absolute button drawn over `BottomTabBar` / a fake tab screen |
 | In-page tab switcher (2+ content panes, animated slide) | `MyTabSwitcher` (`components/ui/my-tab-switcher`) | Ad-hoc `useState` + conditional render without transition |
 | Form sticky footer (save + extras + amount) | `FormFooterBar` | One-off absolute footer rows |
 | Order line (product / unit / qty / price) | `OrderFormLineEditor` | Feature-only line cards |
@@ -52,7 +53,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Testimonial / review carousel | `TestimonialsCarousel` (`components/ui/carousel`) | One-off card + `useState` index per landing feature |
 | Sliding dot indicator (any carousel) | `CarouselDots` (`components/ui/carousel`) | Inline `onPress={() => setIndex(i)}` per dot (violates `no-inline-render-handlers`) |
 | Floating contact buttons (call/email/chat stack) | `FloatingContact` (`components/ui/floating-contact`) | Ad-hoc absolute `View` + per-button `Animated` pulse |
-| Conversational / AI command-center UI (chat screen, streaming, options/confirmation/form/result messages) | `MyChat` (`components/ui/chat`) | Ad-hoc chat screen per product, forking `MyList` for an inverted/streaming list, or a one-off `ChatMessage` shape per feature |
+| Conversational / AI command-center UI (chat screen, streaming, options/confirmation/form/result messages) | `MyChat` (`components/ui/chat`) — open with a prompt or a focused composer via `pendingPrompt` / `focusComposerToken` | Ad-hoc chat screen per product, forking `MyList` for an inverted/streaming list, or a one-off `ChatMessage` shape per feature |
 
 ## Layout surfaces
 
@@ -128,7 +129,8 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 - Collapse: `collapsed?` + optional `collapseProgress` SharedValue; width `SIDEBAR_COLLAPSED_WIDTH` (72). Section rows: `kind: 'section'`
 - `SidebarCollapseToggle` — circular chevron chip for product rails (props: `collapsed`, `onPress`, `accessibilityLabel`)
 - Auto-collapse helper: `BREAKPOINT_SIDEBAR_COMPACT` (1200) in `@/constants/dimensions`
-- Used by playground layout rail; product flush rail for authenticated chrome (`PrivateSidebar` stays in the product)
+- Item `emphasis?` (soft accent fill when not active) and `badge?` (pill after the label, fades with it when collapsed)
+- Used by playground layout rail (Chat row demos badge + emphasis); product flush rail for authenticated chrome (`PrivateSidebar` stays in the product)
 
 ### Filter menu (`MyBottomSheet` mobile + `TriggerModal` desktop)
 
@@ -147,12 +149,13 @@ Two gotchas are already handled centrally inside `MyBottomSheet` — do not re-s
 
 - Path: `@/components/ui/tabbar`
 - Pill active state, theme tokens, dark-mode border/elevation overrides for RN `BottomTabBar`
-- `useTabBar({ items, openDrawer?, mobileOnly? })` → `renderTabBar`, `screenOptions`, `tabScreens`
+- `useTabBar({ items, openDrawer?, mobileOnly?, centerAction? })` → `renderTabBar`, `screenOptions`, `tabScreens`
 - Pass `items: TabBarNavItem[]` (`id`, `labelKey`, `icon`, `iconFocused?`)
+- Optional `centerAction` inserts a raised `TabBarCenterButton` in the middle. It is **not** a tab: pass `tabBarButton` from `tabScreens` onto `Tabs.Screen`, and add a placeholder route of the same `id` (a `Redirect` is enough)
 - `mobileOnly: true` when desktop uses a sidebar instead of tabs
 - `openDrawer` enables mobile header menu button
 - Nested routes can hide the bar via pathname heuristics in `use-tab-bar` (e.g. create/edit screens)
-- Sample wiring: `src/app/(public)/(tabs)/_layout.tsx`
+- Sample wiring: `src/app/(public)/(tabs)/_layout.tsx`; playground: `…/playground/tab-bar.tsx`
 
 ### `MyTabSwitcher`
 
@@ -425,7 +428,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
   - **Native keyboard:** composer `translateY` from `useReanimatedKeyboardAnimation().height`; list **must not** `translateY` (that moves FlashList’s viewport off-screen so you cannot scroll to the first message). Shrink the list on the UI thread (`marginBottom: -height`). Web: no lift. No `KeyboardAvoidingView` `behavior="padding"`. No JS `paddingTop` / `contentOffset` after the keyboard finishes. No `overflow: hidden` on the column / list wrapper that tracks the keyboard. Optional: one `scrollToEnd({ animated: false })` on `useGenericKeyboardHandler` `onEnd` if the user was already at the bottom.
   - **Wide column:** content (bubbles + composer) centered at 900; list scrollbar stays on the **window** edge. Inset items with measured column gutter — do not clip/`maxWidth` the keyboard-animated wrapper.
   - **Composer height:** native `TextInput` grows itself while `scrollEnabled` is false. Drive only a **floor** (`expandedMinHeight`, `0` = undriven) and a **ceiling** (`composerMaxHeight`). Measurements only toggle overflow (and web textarea height). Do not write animated `height` from native `contentSize`; do not remount / `isRemeasuring` to reset.
-- Props: `adapter: ChatAdapter`, `onAction: (action: MessageAction) => void`, `renderCustomMessage?: (message: CustomMessage) => ReactElement | null`, `initialMessages?`, `emptyStateTitle`, `emptyStateSubtitle?`, `suggestions?: { id, label }[]` (each suggestion sends its `label` as if the user typed it).
+- Props: `adapter: ChatAdapter`, `onAction: (action: MessageAction) => void`, `renderCustomMessage?: (message: CustomMessage) => ReactElement | null`, `initialMessages?`, `emptyStateTitle`, `emptyStateSubtitle?`, `suggestions?: { id, label }[]` (each suggestion sends its `label` as if the user typed it), `pendingPrompt?: { id, text }` (sends `text` once per `id`), `focusComposerToken?: number` (each new value focuses the composer).
 - **Provider-agnostic**: `MyChat` and its `useConversation` engine know nothing about Gemini/OpenAI/MCP — only `ChatMessage` / `ConversationEvent` / `ChatAdapter`. Do not import a specific AI provider's types here.
 - `ChatMessage` is a discriminated union by `kind`: `text | image | options | confirmation | form | result | custom`. Built-in kinds always render through the kit; `kind: 'custom'` is the only escape hatch for business UI (via `renderCustomMessage`), and falls back to an "unsupported message" card when the app doesn't recognize `customType` — do not try to override a built-in kind's rendering.
 - Interaction lifecycle is one-way: `OptionsMessage`/`ConfirmationMessage`/`FormMessage` go from pending (buttons active) to resolved (read-only "✓ ...") and stay resolved — do not add a way to "un-resolve" one, the resolved state is meant to be permanent history.

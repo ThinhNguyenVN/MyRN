@@ -40,6 +40,8 @@ export interface MyChatComposerProps {
   disabled?: boolean
   /** Reports composer focus so the transcript only dismisses the keyboard it owns. */
   onFocusChange?: (focused: boolean) => void
+  /** Each new value focuses the input (undefined = never focus programmatically). */
+  focusToken?: number
 }
 
 /** A picked image staged in the composer, resizing in the background after being shown. */
@@ -78,6 +80,7 @@ function MyChatComposer({
   onSendImages,
   disabled = false,
   onFocusChange,
+  focusToken,
 }: MyChatComposerProps) {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
@@ -289,6 +292,7 @@ function MyChatComposer({
       contentHeight={contentHeight}
       lockedHeight={composerMaxHeight}
       placeholder={t('components.chat.composerPlaceholder')}
+      focusToken={focusToken}
     />
   )
 

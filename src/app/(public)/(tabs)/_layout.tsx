@@ -33,6 +33,7 @@ export default function TabLayout() {
             options={{
               title: item.title,
               tabBarIcon: item.renderIcon,
+              tabBarButton: item.tabBarButton,
             }}
           />
         ))}

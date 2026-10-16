@@ -46,6 +46,8 @@ export type MyChatComposerInputProps = Pick<
    * Native soft keyboard: Return sends (multiline still grows from pasted / modifier newlines).
    */
   onEnterSend?: () => void
+  /** Each new value focuses the field (undefined = never focus programmatically). */
+  focusToken?: number
 }
 
 function MyChatComposerInput({
@@ -57,6 +59,7 @@ function MyChatComposerInput({
   scrollEnabled,
   onMeasuredHeight,
   onEnterSend,
+  focusToken,
   ...inputProps
 }: MyChatComposerInputProps) {
   const styles = useThemedStyles(generateStyles)
@@ -69,6 +72,13 @@ function MyChatComposerInput({
   useEffect(() => {
     onEnterSendRef.current = onEnterSend
   }, [onEnterSend])
+
+  useEffect(() => {
+    if (focusToken === undefined) {
+      return
+    }
+    inputRef.current?.focus()
+  }, [focusToken])
 
   // RN Web's TextInput overwrites `onKeyDown` with its own submit handler, so a prop
   // never runs. Attach to the DOM node instead. Keep `blurOnSubmit={false}` on web so

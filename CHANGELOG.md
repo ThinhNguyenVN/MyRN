@@ -32,6 +32,11 @@ product finds out what changed since it forked.
   storageRemoveItem }`) wherever `session` is set.
 
 ### Added
+- **Tab bar center action, MyChat pending prompt / composer focus, SideBar badge:** optional
+  `useTabBar({ centerAction })` + `TabBarCenterButton` (raised action, not a tab); `MyChat`
+  `pendingPrompt` / `focusComposerToken` (`usePendingPrompt`); `SideBarItem` `emphasis?` /
+  `badge?`. Playground: `/playground/tab-bar`, Chat toolbar + Chat rail badge. Backport from
+  my-store PR #74.
 - **MyChat photos over the gateway (chat-core `0.2.0`, contract v3):** `MyChat` sends picked photos
   with `useConversation.sendMedia` (upload to `POST /media`, then `send_media`) when the adapter
   declares `contractVersion: 3` and has `session`; otherwise `send_images` as before. A failed

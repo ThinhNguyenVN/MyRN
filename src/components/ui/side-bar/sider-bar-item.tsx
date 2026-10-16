@@ -120,9 +120,10 @@ function SideBarItemRow({ item, isActive, onSelected, collapseProgress }: SideBa
   const leadingIcon = item.icon
   const leadingIconFocused = item.iconFocused ?? item.icon
   const showChevron = shouldShowChevron(item)
+  const showEmphasis = Boolean(item.emphasis) && !isActive
 
   const content = (
-    <Animated.View style={rowAnimatedStyle}>
+    <Animated.View style={[rowAnimatedStyle, showEmphasis ? styles.itemRowEmphasis : null]}>
       <MyPressable
         onPress={onSelected}
         style={styles.itemRow}
@@ -156,6 +157,7 @@ function SideBarItemRow({ item, isActive, onSelected, collapseProgress }: SideBa
           style={[
             styles.itemRowLabelWrap,
             showChevron ? styles.itemRowLabelWrapWithChevron : null,
+            item.badge ? styles.itemRowLabelWrapWithBadge : null,
             labelWrapAnimatedStyle,
           ]}
         >
@@ -176,6 +178,17 @@ function SideBarItemRow({ item, isActive, onSelected, collapseProgress }: SideBa
           >
             {item.label}
           </Animated.Text>
+          {item.badge ? (
+            <MyView style={styles.itemRowBadge}>
+              <MyText
+                typography="label"
+                color="text/contrast/light"
+                style={styles.itemRowBadgeText}
+              >
+                {item.badge}
+              </MyText>
+            </MyView>
+          ) : null}
         </Animated.View>
         {showChevron ? (
           <Animated.View style={[styles.itemRowIcon, chevronAnimatedStyle]}>

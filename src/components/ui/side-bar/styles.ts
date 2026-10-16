@@ -121,6 +121,26 @@ export function generateStyles(theme: ThemeType) {
       justifyContent: 'center',
       overflow: 'hidden',
     },
+    itemRowEmphasis: {
+      borderRadius: getRadius('medium'),
+      backgroundColor: getColor('border/info/secondary'),
+    },
+    itemRowLabelWrapWithBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: getSpacing('x2'),
+    },
+    itemRowBadge: {
+      paddingHorizontal: getSpacing('x2'),
+      paddingVertical: 1,
+      borderRadius: getRadius('full'),
+      backgroundColor: getColor('fill/warning/primary'),
+    },
+    itemRowBadgeText: {
+      fontSize: 10,
+      lineHeight: 14,
+      fontWeight: '700',
+    },
     itemRowLabelWrapWithChevron: {
       right: 28,
     },
