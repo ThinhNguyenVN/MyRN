@@ -525,7 +525,14 @@
     "textInputNumberFormatHint": "Lưu số canonical; hiển thị có dấu phân nhóm.",
     "imageLockAspectOff": "lockAspectRatio=false (fill khung)",
     "imagePickerEmptyTitle": "Chạm để chọn ảnh",
-    "imagePickerEmptyHint": "JPEG, PNG, GIF, WebP · tối đa 5MB. Web: kéo thả cũng được."
+    "imagePickerEmptyHint": "JPEG, PNG, GIF, WebP · tối đa 5MB. Web: kéo thả cũng được.",
+    "dropdownRemoteTitle": "Remote (tìm trên server)",
+    "dropdownRemoteSubTitle": "200 dòng giả lập, 20 dòng/trang, tải thêm khi cuộn",
+    "confirmPromptButton": "Xác nhận kèm ô nhập (prompt)",
+    "confirmPromptMessage": "Huỷ đơn này? Có thể ghi lý do.",
+    "confirmPromptInputTitle": "Lý do (không bắt buộc)",
+    "confirmPromptInputPlaceholder": "Nhập lý do...",
+    "confirmPromptResult": "Lý do: {{reason}}"
   },
   "components": {
     "datePickOne": "Chọn ngày",
@@ -595,6 +602,7 @@
       "mediaSelected_other": "Đã chọn {{count}} ảnh",
       "mediaSelectedNone": "Không dùng ảnh",
       "mediaUploadFailed": "Chưa tải ảnh lên được."
-    }
+    },
+    "dropdownLoadMore": "Tải thêm"
   }
 }

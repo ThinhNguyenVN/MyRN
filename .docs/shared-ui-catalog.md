@@ -263,6 +263,17 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Collapsed icon → animated expanded `MySearchInput`; controlled `expanded` / `onExpandedChange`
 - Playground: `…/playground/expandable-search.tsx`
 
+### `MyDropdownInput` remote mode
+
+- Server-searched pickers: pass `onSearchChange` (debounced inside the kit, client filtering off), `onEndReached` + `hasMore` + `loadingMore` (infinite scroll, "Load more" row), and `selectedOptions` so a saved value keeps its label when it is not on the loaded page.
+- Wire it from any paged query in the product (e.g. a `useRemoteOptions()` hook returning these props).
+- Playground: remote demo at the end of `…/playground/dropdown.tsx`
+
+### `Confirmation.prompt` (dialog with a text input)
+
+- `Confirmation.prompt({ title, message, confirmText, input: { title, placeholder, maxLength, multiline } })` → trimmed text (`''` allowed) when confirmed, `null` when dismissed. Built on the `MyAlert` `children` slot.
+- Typical use: optional reason before a destructive action. Playground: `…/playground/toast.tsx`
+
 ### `MyFormCheckbox`
 
 - Path: `@/components/form` (or `@/components/form/adapters`)

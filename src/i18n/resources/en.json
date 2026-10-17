@@ -525,7 +525,14 @@
     "textInputNumberFormatHint": "Stores canonical digits; displays with grouping.",
     "imageLockAspectOff": "lockAspectRatio=false (fill box)",
     "imagePickerEmptyTitle": "Tap to pick an image",
-    "imagePickerEmptyHint": "JPEG, PNG, GIF, WebP · max 5MB. Web: drag & drop works too."
+    "imagePickerEmptyHint": "JPEG, PNG, GIF, WebP · max 5MB. Web: drag & drop works too.",
+    "dropdownRemoteTitle": "Remote (server search)",
+    "dropdownRemoteSubTitle": "200 fake rows, 20 per page, loads more on scroll",
+    "confirmPromptButton": "Confirm with input (prompt)",
+    "confirmPromptMessage": "Cancel this order? You can add a reason.",
+    "confirmPromptInputTitle": "Reason (optional)",
+    "confirmPromptInputPlaceholder": "Enter a reason...",
+    "confirmPromptResult": "Reason: {{reason}}"
   },
   "components": {
     "datePickOne": "Pick a date",
@@ -595,6 +602,7 @@
       "mediaSelected_other": "{{count}} photos selected",
       "mediaSelectedNone": "No photo used",
       "mediaUploadFailed": "Couldn't upload the photos."
-    }
+    },
+    "dropdownLoadMore": "Load more"
   }
 }

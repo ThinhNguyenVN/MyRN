@@ -46,4 +46,20 @@ export interface MyDropdownInputProps {
   errorMessage?: string
   required?: boolean
   style?: StyleProp<ViewStyle>
+  /**
+   * Remote mode (server search). When set, the picker always shows its search field, does not
+   * filter `options` locally and calls this with the debounced query (`''` when closed).
+   */
+  onSearchChange?: (query: string) => void
+  /** Remote mode: load the next page (called near the end of the list / "load more" row). */
+  onEndReached?: () => void
+  /** Remote mode: more pages exist. */
+  hasMore?: boolean
+  /** Remote mode: a next page is loading. */
+  loadingMore?: boolean
+  /**
+   * Options for the current value(s) that may be missing from the loaded page — used only to
+   * display the trigger label (e.g. editing a record whose product is on page 5).
+   */
+  selectedOptions?: DropdownOption[]
 }

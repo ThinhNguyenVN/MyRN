@@ -29,6 +29,7 @@ const MyAlert: React.FC<MyAlertProps> = ({
   elevation: elevationProp,
   onClose,
   buttons,
+  children,
   style,
   ...rest
 }) => {
@@ -114,6 +115,7 @@ const MyAlert: React.FC<MyAlertProps> = ({
           <ConditionRenderer when={closeInContent}>{closeButton}</ConditionRenderer>
         </MyView>
       </ConditionRenderer>
+      {children ? <MyView style={styles.body}>{children}</MyView> : null}
       <ConditionRenderer when={!!buttons?.length}>
         <MyView style={styles.footer}>{buttons?.map(renderFooterButton)}</MyView>
       </ConditionRenderer>
