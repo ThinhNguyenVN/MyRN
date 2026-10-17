@@ -61,6 +61,11 @@ const MyDropdownInput = memo(function MyDropdownInput({
   preferFullscreen = false,
   sheetHeight,
   style,
+  onSearchChange,
+  onEndReached,
+  hasMore = false,
+  loadingMore = false,
+  selectedOptions,
 }: MyDropdownInputProps) {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
@@ -95,12 +100,14 @@ const MyDropdownInput = memo(function MyDropdownInput({
     height: number
   } | null>(null)
 
+  const isRemote = Boolean(onSearchChange)
   const resolvedPlaceholder = placeholder ?? t('components.dropdownSelect')
   const hasOptions = options.length > 0
-  const isWaiting = loading || !hasOptions
+  // Remote pickers open even with an empty page: the user searches the server.
+  const isWaiting = isRemote ? false : loading || !hasOptions
   const isPickerDisabled = disabled || isWaiting
   const waitPlaceholder = loading ? t('components.dropdownLoading') : t('components.dropdownEmpty')
-  const searchable = searchableProp ?? shouldShowDropdownSearch(options.length)
+  const searchable = isRemote ? true : (searchableProp ?? shouldShowDropdownSearch(options.length))
   // Có nên dùng sheet dựa trên nội dung/props không (chưa tính platform).
   const wantsSheetByContent =
     !preferFullscreen && (preferSheet || shouldUseDropdownBottomSheet(options.length))
@@ -123,18 +130,38 @@ const MyDropdownInput = memo(function MyDropdownInput({
     [multiSelect, value],
   )
 
-  const selectedOption = !multiSelect ? options.find((option) => option.value === value) : null
+  const findOption = useCallback(
+    (optionValue: unknown) =>
+      options.find((option) => option.value === optionValue) ??
+      selectedOptions?.find((option) => option.value === optionValue),
+    [options, selectedOptions],
+  )
+  const selectedOption = !multiSelect ? findOption(value) : null
   const displayText = multiSelect
     ? selectedValues
-        .map((selected) => options.find((option) => option.value === selected)?.label)
+        .map((selected) => findOption(selected)?.label)
         .filter(Boolean)
         .join(', ') || resolvedPlaceholder
     : (selectedOption?.label ?? resolvedPlaceholder)
 
   const filteredOptions = useMemo(
-    () => filterDropdownOptions(options, filterQuery),
-    [filterQuery, options],
+    () => (isRemote ? options : filterDropdownOptions(options, filterQuery)),
+    [filterQuery, isRemote, options],
   )
+
+  // Remote search: forward the debounced query while open; reset to '' when the picker closes.
+  const lastRemoteQueryRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (!onSearchChange) return
+    const next = open ? filterQuery.trim() : ''
+    if (lastRemoteQueryRef.current === next) return
+    lastRemoteQueryRef.current = next
+    onSearchChange(next)
+  }, [filterQuery, onSearchChange, open])
+
+  const handleEndReached = useCallback(() => {
+    if (hasMore && !loadingMore) onEndReached?.()
+  }, [hasMore, loadingMore, onEndReached])
 
   const triggerRef = useRef<View>(null)
   const flashListRef = useRef<FlashListRef<DropdownOption>>(null)
@@ -399,7 +426,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
   )
 
   const modalMaxHeigh =
-    options.length > DROPDOWN_MIN_ITEMS ? DROPDOWN_MAX_HEIGHT : DROPDOWN_MIN_HEIGHT
+    isRemote || options.length > DROPDOWN_MIN_ITEMS ? DROPDOWN_MAX_HEIGHT : DROPDOWN_MIN_HEIGHT
 
   const modalMaxHeightStyle = useMemo(() => {
     return {
@@ -411,13 +438,30 @@ const MyDropdownInput = memo(function MyDropdownInput({
     <MyView style={styles.emptyWrap}>
       <MyEmptyState
         title={
-          filterQuery.length > 0
-            ? t('components.dropdownSearchEmpty')
-            : t('components.dropdownEmpty')
+          loading
+            ? t('components.dropdownLoading')
+            : filterQuery.length > 0
+              ? t('components.dropdownSearchEmpty')
+              : t('components.dropdownEmpty')
         }
       />
     </MyView>
   )
+
+  const loadMoreRow = hasMore ? (
+    <MyPressable
+      onPress={handleEndReached}
+      haptic={false}
+      accessibilityRole="button"
+      accessibilityLabel={t('components.dropdownLoadMore')}
+      style={styles.clearRow}
+      disabled={loadingMore}
+    >
+      <MyText typography="body" style={styles.clearRowText}>
+        {loadingMore ? t('components.dropdownLoading') : t('components.dropdownLoadMore')}
+      </MyText>
+    </MyPressable>
+  ) : null
 
   const sheetOptionRows = useMemo(
     () =>
@@ -449,6 +493,9 @@ const MyDropdownInput = memo(function MyDropdownInput({
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={showPickerClear ? clearSelectionRow : undefined}
           ListEmptyComponent={emptySearch}
+          ListFooterComponent={loadMoreRow}
+          onEndReached={isRemote ? handleEndReached : undefined}
+          onEndReachedThreshold={0.4}
           initialScrollIndex={selectedIndex > 0 && filterQuery === '' ? selectedIndex : undefined}
           style={styles.pickerList}
           contentContainerStyle={styles.sheetListContentMobile}
@@ -470,6 +517,9 @@ const MyDropdownInput = memo(function MyDropdownInput({
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={showPickerClear ? clearSelectionRow : undefined}
         ListEmptyComponent={emptySearch}
+        ListFooterComponent={loadMoreRow}
+        onEndReached={isRemote ? handleEndReached : undefined}
+        onEndReachedThreshold={0.4}
         initialScrollIndex={selectedIndex > 0 && filterQuery === '' ? selectedIndex : undefined}
         style={[styles.pickerList, modalMaxHeightStyle]}
         contentContainerStyle={styles.sheetListContent}
@@ -525,6 +575,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
             <ConditionRenderer when={filteredOptions.length === 0} fallback={sheetOptionRows}>
               {emptySearch}
             </ConditionRenderer>
+            {loadMoreRow}
           </MyBottomSheet>
         </ConditionRenderer>
 
