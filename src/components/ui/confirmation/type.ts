@@ -9,9 +9,20 @@ export type ConfirmationOptions = Pick<
   cancelText?: string
   buttons?: MyAlertButtonProp[]
   hideClose?: boolean
+  /** Shows a text input in the dialog (`Confirmation.prompt`). */
+  input?: ConfirmationInput
+}
+
+export type ConfirmationInput = {
+  title?: string
+  placeholder?: string
+  maxLength?: number
+  multiline?: boolean
 }
 
 export interface ConfirmationRef {
   show: (options: ConfirmationOptions) => Promise<boolean>
   hide: () => void
+  /** Text typed in the last dialog's input (trimmed). */
+  lastInput: () => string
 }

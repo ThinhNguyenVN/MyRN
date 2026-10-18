@@ -51,6 +51,9 @@ export const generateStyles = (theme: ThemeType) => {
     message: {
       color: getColor('text/active/secondary'),
     },
+    body: {
+      width: '100%',
+    },
     footer: {
       flexDirection: 'row',
       alignItems: 'center',

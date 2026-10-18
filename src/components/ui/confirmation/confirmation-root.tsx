@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Modal, View } from 'react-native'
 
 import MyAlert from '@/components/elements/my-alert'
+import MyTextInput from '@/components/elements/my-text-input'
 import type { MyAlertButtonProp } from '@/components/elements/my-alert'
 import { useThemedStyles } from '@/theme/theme-context'
 
@@ -17,6 +18,9 @@ const ConfirmationRoot = forwardRef<ConfirmationRef, object>(function Confirmati
   const [visible, setVisible] = useState(false)
   const [options, setOptions] = useState<ConfirmationOptions | null>(null)
   const resolverRef = useRef<Resolver | null>(null)
+  const [inputValue, setInputValue] = useState('')
+  const inputRef = useRef('')
+  inputRef.current = inputValue
 
   const resolveOnce = useCallback((value: boolean) => {
     const resolve = resolverRef.current
@@ -39,12 +43,15 @@ const ConfirmationRoot = forwardRef<ConfirmationRef, object>(function Confirmati
     }
     return new Promise((resolve) => {
       resolverRef.current = resolve
+      setInputValue('')
       setOptions(opts)
       setVisible(true)
     })
   }, [])
 
-  useImperativeHandle(ref, () => ({ show, hide }), [show, hide])
+  const lastInput = useCallback(() => inputRef.current.trim(), [])
+
+  useImperativeHandle(ref, () => ({ show, hide, lastInput }), [show, hide, lastInput])
 
   const handleConfirm = useCallback(() => {
     setVisible(false)
@@ -66,6 +73,7 @@ const ConfirmationRoot = forwardRef<ConfirmationRef, object>(function Confirmati
     buttons: customButtons,
     hideClose = true,
     type = 'info',
+    input,
     ...alertProps
   } = options
 
@@ -99,7 +107,20 @@ const ConfirmationRoot = forwardRef<ConfirmationRef, object>(function Confirmati
           buttons={buttons}
           onClose={hideClose ? undefined : handleCancel}
           style={styles.centered}
-        />
+        >
+          {input ? (
+            <MyTextInput
+              value={inputValue}
+              onChangeText={setInputValue}
+              title={input.title}
+              placeholder={input.placeholder}
+              maxLength={input.maxLength}
+              multiline={input.multiline}
+              height={input.multiline ? 80 : undefined}
+              autoFocus
+            />
+          ) : null}
+        </MyAlert>
       </View>
     </Modal>
   )

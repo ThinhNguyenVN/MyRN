@@ -1,4 +1,5 @@
 import type { Ionicons } from '@expo/vector-icons'
+import type { ReactNode } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 
 import type { MyImageSource } from '@/components/elements/my-image'
@@ -24,5 +25,7 @@ export interface MyAlertProps extends ContainerStyleProps {
   elevation?: ElevationToken | 'none'
   onClose?: () => void
   buttons?: MyAlertButtonProp[]
+  /** Extra content between the message and the buttons (e.g. a prompt input). */
+  children?: ReactNode
   style?: StyleProp<ViewStyle>
 }

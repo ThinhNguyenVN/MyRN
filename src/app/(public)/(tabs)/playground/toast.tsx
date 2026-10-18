@@ -134,6 +134,32 @@ export default function ToastAndConfirmationScreen() {
           })
         }}
       />
+      <MyButton
+        width="full"
+        text={t('playground.confirmPromptButton')}
+        size="small"
+        type="secondary"
+        onPress={async () => {
+          const reason = await Confirmation.prompt({
+            title: t('playground.confirmationTitle'),
+            message: t('playground.confirmPromptMessage'),
+            type: 'error',
+            confirmText: t('common.confirm'),
+            input: {
+              title: t('playground.confirmPromptInputTitle'),
+              placeholder: t('playground.confirmPromptInputPlaceholder'),
+              maxLength: 200,
+              multiline: true,
+            },
+          })
+          if (reason !== null) {
+            Toast.show({
+              text: t('playground.confirmPromptResult', { reason: reason || '—' }),
+              type: 'info',
+            })
+          }
+        }}
+      />
     </ScrollView>
   )
 }
