@@ -182,4 +182,94 @@ describe('apiClient refresh token flow', () => {
     })
     expect(refreshCount).toBe(1)
   })
+
+  it('does not refresh again for a 401 that arrives after another refresh finished', async () => {
+    const store = createTestStore()
+    store.dispatch(
+      setCredentials({
+        accessToken: 'expired-access',
+        refreshToken: 'refresh-token',
+        user: null,
+      }),
+    )
+
+    let refreshCount = 0
+    let releaseSlow: () => void = () => undefined
+    const slowGate = new Promise<void>((resolve) => {
+      releaseSlow = resolve
+    })
+
+    server.use(
+      http.post(`${origin}${Endpoints.refresh}`, () => {
+        refreshCount += 1
+        return HttpResponse.json({ accessToken: 'new-access', refreshToken: 'new-refresh' })
+      }),
+      http.get(`${origin}/secure`, ({ request }) => {
+        if (request.headers.get('authorization') === 'Bearer new-access') {
+          return HttpResponse.json({ ok: true }, { status: 200 })
+        }
+        return HttpResponse.json({ message: 'Token expired' }, { status: 401 })
+      }),
+      // Sent with the expired token; its 401 only comes back once the other refresh is done.
+      http.get(`${origin}/slow`, async ({ request }) => {
+        if (request.headers.get('authorization') === 'Bearer new-access') {
+          return HttpResponse.json({ ok: 'slow' }, { status: 200 })
+        }
+        await slowGate
+        return HttpResponse.json({ message: 'Token expired' }, { status: 401 })
+      }),
+    )
+
+    const slow = apiClient.get('/slow')
+    const fast = await apiClient.get('/secure')
+    expect(fast.status).toBe(200)
+    expect(store.getState().auth.accessToken).toBe('new-access')
+
+    releaseSlow()
+    const slowResult = await slow
+
+    expect(slowResult.data).toEqual({ ok: 'slow' })
+    expect(refreshCount).toBe(1)
+    expect(store.getState().auth.refreshToken).toBe('new-refresh')
+  })
+
+  it('still refreshes when the current token was rejected too', async () => {
+    const store = createTestStore()
+    store.dispatch(
+      setCredentials({
+        accessToken: 'expired-access',
+        refreshToken: 'refresh-token',
+        user: null,
+      }),
+    )
+
+    let refreshCount = 0
+
+    server.use(
+      http.post(`${origin}${Endpoints.refresh}`, () => {
+        refreshCount += 1
+        return HttpResponse.json({ accessToken: 'new-access', refreshToken: 'new-refresh' })
+      }),
+      http.get(`${origin}/sync-check`, ({ request }) => {
+        const auth = request.headers.get('authorization')
+        if (auth === 'Bearer new-access') return HttpResponse.json({ ok: true }, { status: 200 })
+        // Store moved to another token that has expired as well (e.g. long idle tab).
+        if (auth === 'Bearer expired-access') {
+          store.dispatch(
+            setCredentials({
+              accessToken: 'also-expired',
+              refreshToken: 'refresh-token',
+              user: null,
+            }),
+          )
+        }
+        return HttpResponse.json({ message: 'Token expired' }, { status: 401 })
+      }),
+    )
+
+    const result = await apiClient.get('/sync-check')
+
+    expect(result.data).toEqual({ ok: true })
+    expect(refreshCount).toBe(1)
+  })
 })
