@@ -26,6 +26,21 @@ function getRootState(): RootStateWithAuth {
   return getStore().getState() as RootStateWithAuth
 }
 
+function currentAccessToken(): string | null {
+  try {
+    return getRootState().auth.accessToken
+  } catch {
+    return null
+  }
+}
+
+/** Access token the failed request was sent with (`Bearer <token>`), or `null`. */
+function sentAccessToken(config: InternalAxiosRequestConfig): string | null {
+  const value = AxiosHeaders.from(config.headers).get('Authorization')
+  if (typeof value !== 'string' || !value.startsWith('Bearer ')) return null
+  return value.slice('Bearer '.length)
+}
+
 async function clearSessionLocally(): Promise<void> {
   tryGetStore()?.dispatch(logout())
   await removeStoredRefreshToken()
@@ -107,7 +122,10 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const original = error.config as InternalAxiosRequestConfig & {
+      /** Retried after a refresh — a second 401 is final. */
       _retry?: boolean
+      /** Retried with an access token another refresh already stored. */
+      _tokenSynced?: boolean
     }
 
     if (!original || !isAxiosError(error) || error.response?.status !== 401) {
@@ -116,6 +134,17 @@ apiClient.interceptors.response.use(
 
     if (shouldSkipRefresh(original.url) || original._retry) {
       return Promise.reject(normalizeAxiosError(error))
+    }
+
+    // Sent with an access token that a refresh (already finished) has since replaced: retry with
+    // the current one instead of rotating the refresh token again. Requests whose 401 arrives
+    // while that refresh is still running see the same token here and join it below.
+    const current = currentAccessToken()
+    if (!original._tokenSynced && current && current !== sentAccessToken(original)) {
+      original._tokenSynced = true
+      original.headers = AxiosHeaders.from(original.headers)
+      original.headers.Authorization = `Bearer ${current}`
+      return apiClient.request(original)
     }
 
     let refreshToken: string | null = null

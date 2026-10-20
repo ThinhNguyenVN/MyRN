@@ -118,6 +118,11 @@ product finds out what changed since it forked.
 - `side-bar`: narrower rails — flush `280 → 240`, card `260 → 220`. Collapsed width unchanged.
 
 ### Fixed
+- `apiClient` (`src/api/axios-instance.ts`): a 401 that comes back after another request's
+  refresh already finished no longer starts a second refresh. If the request was sent with an
+  access token the store has since replaced, it is retried once with the current token
+  (`_tokenSynced`); only a 401 for the current token refreshes. A second refresh used to reuse a
+  single-use refresh token and could end the session. Backport from my-store PR #75.
 - `StyleSheet.absoluteFillObject` was removed from this React Native version's types (0.86 ships
   only `StyleSheet.absoluteFill`, now the same plain spreadable object shape `{ position:
   'absolute', top: 0, left: 0, right: 0, bottom: 0 }`). Four call sites still spread the old name
