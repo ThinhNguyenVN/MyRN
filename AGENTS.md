@@ -43,7 +43,7 @@ This is an **Expo SDK 57 React Native** template app (`myrn`) for iOS, Android, 
 
 - **Tests need env:** `yarn test` without env fails `axios-instance` tests — use `npx dotenv -e .env.test -- yarn test`.
 - **Expo CLI:** no `--non-interactive`; use `CI=1` if needed.
-- **postinstall:** copies `canvaskit.wasm` into `public/` (`mkdir public` warning is harmless).
+- **postinstall:** runs `patch-package` only. Skia/CanvasKit was removed (`MySpinner` uses `react-native-svg`), so nothing is copied into `public/` anymore.
 - **DummyJSON demo login:** `emilys` / `emilyspass`.
 - **Playground bundler warnings:** some co-located non-route files under `playground/` warn “missing default export” — ignore for demos.
 - **SEO is off by default:** `seo.config.json` ships with `enabled: false` — zero effect on mobile-only/admin products until a task explicitly turns it on. See `.docs/seo-standard.md` before touching anything SEO-related; it documents a real gotcha (`AppInitGate` hides `<head>` tags from static export unless mounted above it) that already broke this once.

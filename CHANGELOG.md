@@ -12,6 +12,12 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Changed
+- `useAppInit`: removed the placeholder `notifications` task (a fake 500ms `setTimeout`). Native
+  and protected web routes wait for `isInitialized`, so every cold start paid that 500ms for no
+  work. **Product to do:** if you had added real notification setup there, keep your own task.
+  Backport from my-store (cold-start fix).
+- `AGENTS.md`: dropped the stale `postinstall` caveat about copying `canvaskit.wasm` (removed
+  together with Skia earlier).
 - **BREAKING (`MyChatComposer` used on its own):** `onSendImages` now receives
   `ChatMediaFile[]` (`{ uri, name, mimeType, file? }`) instead of `string[]` URIs.
 - **MyChat core is now the package `@thinhnguyenvn/chat-core`** (`packages/chat-core/`, yarn
