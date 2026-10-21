@@ -19,12 +19,6 @@ export function useAppInit() {
     await Font.loadAsync(Fonts)
   }, [])
 
-  const initNotifications = useCallback(async () => {
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 500)
-    })
-  }, [])
-
   const initLocale = useCallback(async () => {
     await hydrateAppLocale()
   }, [])
@@ -33,10 +27,9 @@ export function useAppInit() {
     () => [
       { name: 'auth', run: initAuth },
       { name: 'fonts', run: initFonts },
-      { name: 'notifications', run: initNotifications },
       { name: 'locale', run: initLocale },
     ],
-    [initAuth, initFonts, initLocale, initNotifications],
+    [initAuth, initFonts, initLocale],
   )
 
   useEffect(() => {
