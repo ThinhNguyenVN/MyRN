@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2
+
+- `retry(messageId)` removes the failed assistant message; the new response brings its own (fixes
+  stacked typing indicators). `retry` is ignored while a request is running, and when the last
+  running request finishes, any empty `pending` assistant text left over is dropped
+  (`set_done` gains optional `dropTyping`).
+
 ## 0.2.1
 
 Contract copy only (gateway change `e1-fixes`): within a turn the model's words now come before

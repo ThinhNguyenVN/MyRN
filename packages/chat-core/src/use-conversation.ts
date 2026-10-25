@@ -80,13 +80,27 @@ export function useConversation({
   stateRef.current = state
   const lastRequestRef = useRef<ChatRequest | null>(null)
   const pendingUploadsRef = useRef(new Map<string, PendingUpload>())
+  /** Requests still running; only the last one to finish may drop leftover typing rows. */
+  const inFlightRef = useRef(0)
 
   const runRequest = useCallback(
     (request: ChatRequest) => {
       lastRequestRef.current = request
       dispatch({ type: 'set_sending', isSending: true })
+      inFlightRef.current += 1
 
       let currentMessageId: string | null = null
+      let finished = false
+      const finish = (messageId: string | null) => {
+        if (finished) return
+        finished = true
+        inFlightRef.current -= 1
+        if (messageId) {
+          dispatch({ type: 'set_done', messageId, dropTyping: inFlightRef.current === 0 })
+        } else {
+          dispatch({ type: 'set_sending', isSending: false })
+        }
+      }
 
       const handlers: ChatStreamHandlers = {
         onMessageStart: (message) => {
@@ -107,7 +121,7 @@ export function useConversation({
           dispatch({ type: 'set_error', messageId, error })
         },
         onDone: (messageId) => {
-          dispatch({ type: 'set_done', messageId })
+          finish(messageId)
         },
       }
 
@@ -116,10 +130,8 @@ export function useConversation({
         if (messageId) {
           const message = caughtError instanceof Error ? caughtError.message : 'Unexpected error'
           dispatch({ type: 'set_error', messageId, error: { message } })
-          dispatch({ type: 'set_done', messageId })
-        } else {
-          dispatch({ type: 'set_sending', isSending: false })
         }
+        finish(messageId)
       })
     },
     [adapter],
@@ -278,6 +290,7 @@ export function useConversation({
         void uploadAndSend(retried)
         return
       }
+      if (stateRef.current.isSending) return
       dispatch({ type: 'reset_for_retry', messageId })
       if (lastRequestRef.current) {
         runRequest(lastRequestRef.current)

@@ -1,6 +1,6 @@
 {
   "name": "@thinhnguyenvn/chat-core",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "license": "MIT",
   "description": "Chat state, reducer and NDJSON-over-HTTP adapter for the MyChat UI (React / React Native).",
   "main": "dist/index.js",

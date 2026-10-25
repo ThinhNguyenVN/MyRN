@@ -1,6 +1,5 @@
 import { conversationReducer, initialConversationState } from './conversation-reducer'
 import type {
-  ChatMessage,
   ConfirmationMessage,
   FormMessage,
   MediaChoiceMessage,
@@ -154,15 +153,33 @@ describe('conversationReducer', () => {
     expect(stillError.messages[0].status).toBe('error')
   })
 
-  it('resets a message for retry, clearing error and text', () => {
+  it('removes the failed assistant message on retry, keeping the user message', () => {
     const state = initialConversationState([
+      textMessage({ id: 'u1', role: 'user', status: 'complete', text: 'hi' }),
       textMessage({ status: 'error', text: 'partial', error: { message: 'boom' } }),
     ])
     const next = conversationReducer(state, { type: 'reset_for_retry', messageId: 'm1' })
-    const reset = next.messages[0] as ChatMessage & { text?: string }
-    expect(reset.status).toBe('pending')
-    expect(reset.error).toBeUndefined()
-    expect(reset.text).toBe('')
+    expect(next.messages.map((message) => message.id)).toEqual(['u1'])
+
+    const userRetry = conversationReducer(state, { type: 'reset_for_retry', messageId: 'u1' })
+    expect(userRetry.messages).toHaveLength(2)
+  })
+
+  it('drops leftover typing rows on done only when asked', () => {
+    const state = initialConversationState([
+      textMessage({ id: 'ghost' }),
+      textMessage({ id: 'm1', status: 'streaming', text: 'hello' }),
+      textMessage({ id: 'u1', role: 'user', status: 'pending', text: '' }),
+    ])
+    const kept = conversationReducer(state, { type: 'set_done', messageId: 'm1' })
+    expect(kept.messages.map((message) => message.id)).toEqual(['ghost', 'm1', 'u1'])
+
+    const dropped = conversationReducer(state, {
+      type: 'set_done',
+      messageId: 'm1',
+      dropTyping: true,
+    })
+    expect(dropped.messages.map((message) => message.id)).toEqual(['m1', 'u1'])
   })
 
   it('locks an unresolved confirmation and keeps its status', () => {
