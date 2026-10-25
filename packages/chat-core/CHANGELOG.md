@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.3
+
+- Retry keeps the failed slot as a typing placeholder and replaces it with the new response, so
+  the list no longer shrinks and jumps. `reset_for_retry` turns the failed assistant message into
+  an empty `pending` text in place (`ConversationState.retryPlaceholderId`); the retried request's
+  first message (`append_message` or a new `set_message`) takes that slot. If the request ends
+  without any message, the placeholder is dropped (new action `drop_retry_placeholder`). `retry`
+  does nothing when there is no previous request, and an adapter whose `send` resolves without
+  `onDone` now still ends the turn.
+
 ## 0.2.2
 
 - `retry(messageId)` removes the failed assistant message; the new response brings its own (fixes

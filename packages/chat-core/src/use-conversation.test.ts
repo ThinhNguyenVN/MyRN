@@ -200,8 +200,11 @@ describe('useConversation.retry', () => {
       const failed = result.current.messages.find((message) => message.status === 'error')!
       act(() => result.current.retry(failed.id))
       expect(typingCount(result.current.messages)).toBe(1)
+      expect(result.current.messages).toHaveLength(2)
+      expect(result.current.messages[1]!.id).toBe(`reply-${replyId}`)
       act(() => calls[attempt]!.finish(false))
       expect(typingCount(result.current.messages)).toBe(0)
+      expect(result.current.messages).toHaveLength(2)
     }
 
     expect(adapter.send).toHaveBeenCalledTimes(5)
@@ -221,6 +224,62 @@ describe('useConversation.retry', () => {
     expect(typingCount(result.current.messages)).toBe(0)
     expect(result.current.messages).toHaveLength(2)
     expect(result.current.messages[1]).toMatchObject({ status: 'complete', text: 'ok' })
+  })
+
+  it('keeps the failed slot as a typing row until the retried reply arrives', () => {
+    const { adapter, calls } = controlledAdapter()
+    const { result } = renderHook(() => useConversation({ adapter }))
+
+    act(() => result.current.send('hi'))
+    act(() => calls[0]!.finish(false))
+    const failedId = result.current.messages[1]!.id
+
+    let emit: (() => void) | undefined
+    jest.mocked(adapter.send).mockImplementationOnce(
+      (_request, handlers) =>
+        new Promise<void>((resolve) => {
+          emit = () => {
+            handlers.onMessageStart({
+              id: 'late',
+              role: 'assistant',
+              createdAt: 0,
+              status: 'pending',
+              kind: 'text',
+              text: '',
+            })
+            handlers.onTextChunk('late', 'ok')
+            handlers.onDone('late')
+            resolve()
+          }
+        }),
+    )
+    act(() => result.current.retry(failedId))
+    expect(result.current.messages).toHaveLength(2)
+    expect(result.current.messages[1]).toMatchObject({ id: failedId, status: 'pending', text: '' })
+    expect(result.current.messages[1]!.error).toBeUndefined()
+
+    act(() => emit!())
+    expect(result.current.messages).toHaveLength(2)
+    expect(result.current.messages[1]).toMatchObject({ id: 'late', status: 'complete', text: 'ok' })
+    expect(typingCount(result.current.messages)).toBe(0)
+  })
+
+  it.each([
+    ['rejects', () => Promise.reject(new Error('offline'))],
+    ['finishes', () => Promise.resolve()],
+  ])('a retry that %s without any message drops the placeholder', async (_label, send) => {
+    const { adapter, calls } = controlledAdapter()
+    const { result } = renderHook(() => useConversation({ adapter }))
+
+    act(() => result.current.send('hi'))
+    act(() => calls[0]!.finish(false))
+    jest.mocked(adapter.send).mockImplementationOnce(send)
+
+    await act(async () => result.current.retry(result.current.messages[1]!.id))
+
+    expect(result.current.messages.map((message) => message.role)).toEqual(['user'])
+    expect(typingCount(result.current.messages)).toBe(0)
+    expect(result.current.isSending).toBe(false)
   })
 
   it('ignores retry while a request is running', () => {
