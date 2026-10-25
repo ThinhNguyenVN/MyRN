@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native'
 
 import type { ChatAdapter, ChatRequest } from './chat-adapter'
-import type { ChatMediaFile, ImageMessage } from './types'
+import type { ChatMediaFile, ChatMessage, ImageMessage } from './types'
 import { useConversation } from './use-conversation'
 
 const files: ChatMediaFile[] = [
@@ -128,5 +128,140 @@ describe('useConversation.selectMedia', () => {
 
     expect(requests[0]?.event).toEqual({ type: 'select_media', messageId: 'mc1', mediaIds: ['b'] })
     expect(result.current.messages[0]).toMatchObject({ selectedMediaIds: ['b'] })
+  })
+})
+
+function typingCount(messages: ChatMessage[]) {
+  return messages.filter(
+    (message) =>
+      message.role === 'assistant' &&
+      message.kind === 'text' &&
+      message.status === 'pending' &&
+      message.text === '',
+  ).length
+}
+
+let replyId = 0
+
+/** Each call starts an assistant reply that stays typing until `finish` (ok, or fail). */
+function controlledAdapter() {
+  const calls: { finish: (ok: boolean) => void }[] = []
+  const adapter: ChatAdapter = {
+    send: jest.fn(
+      (_request: ChatRequest, handlers) =>
+        new Promise<void>((resolve) => {
+          const id = `reply-${++replyId}`
+          handlers.onMessageStart({
+            id,
+            role: 'assistant',
+            createdAt: 0,
+            status: 'pending',
+            kind: 'text',
+            text: '',
+          })
+          calls.push({
+            finish: (ok) => {
+              if (ok) {
+                handlers.onTextChunk(id, 'ok')
+              } else {
+                handlers.onError(id, { message: 'boom' })
+              }
+              handlers.onDone(id)
+              resolve()
+            },
+          })
+        }),
+    ),
+  }
+  return { adapter, calls }
+}
+
+describe('useConversation.retry', () => {
+  it('an error leaves no typing row', () => {
+    const { adapter, calls } = controlledAdapter()
+    const { result } = renderHook(() => useConversation({ adapter }))
+
+    act(() => result.current.send('hi'))
+    expect(typingCount(result.current.messages)).toBe(1)
+    act(() => calls[0]!.finish(false))
+
+    expect(typingCount(result.current.messages)).toBe(0)
+    expect(result.current.messages.filter((message) => message.status === 'error')).toHaveLength(1)
+  })
+
+  it('retrying four times never stacks typing rows and ends with one error', () => {
+    const { adapter, calls } = controlledAdapter()
+    const { result } = renderHook(() => useConversation({ adapter }))
+
+    act(() => result.current.send('hi'))
+    act(() => calls[0]!.finish(false))
+
+    for (let attempt = 1; attempt <= 4; attempt += 1) {
+      const failed = result.current.messages.find((message) => message.status === 'error')!
+      act(() => result.current.retry(failed.id))
+      expect(typingCount(result.current.messages)).toBe(1)
+      act(() => calls[attempt]!.finish(false))
+      expect(typingCount(result.current.messages)).toBe(0)
+    }
+
+    expect(adapter.send).toHaveBeenCalledTimes(5)
+    expect(result.current.messages).toHaveLength(2)
+    expect(result.current.messages.filter((message) => message.status === 'error')).toHaveLength(1)
+  })
+
+  it('a retry that succeeds replaces the error with the answer', () => {
+    const { adapter, calls } = controlledAdapter()
+    const { result } = renderHook(() => useConversation({ adapter }))
+
+    act(() => result.current.send('hi'))
+    act(() => calls[0]!.finish(false))
+    act(() => result.current.retry(result.current.messages[1]!.id))
+    act(() => calls[1]!.finish(true))
+
+    expect(typingCount(result.current.messages)).toBe(0)
+    expect(result.current.messages).toHaveLength(2)
+    expect(result.current.messages[1]).toMatchObject({ status: 'complete', text: 'ok' })
+  })
+
+  it('ignores retry while a request is running', () => {
+    const { adapter, calls } = controlledAdapter()
+    const { result } = renderHook(() => useConversation({ adapter }))
+
+    act(() => result.current.send('hi'))
+    act(() => calls[0]!.finish(false))
+    const failedId = result.current.messages[1]!.id
+    act(() => result.current.retry(failedId))
+    act(() => result.current.retry(failedId))
+
+    expect(adapter.send).toHaveBeenCalledTimes(2)
+    expect(typingCount(result.current.messages)).toBe(1)
+  })
+
+  it('a finishing turn keeps the typing row of a turn still running', () => {
+    const { adapter, calls } = controlledAdapter()
+    const { result } = renderHook(() =>
+      useConversation({
+        adapter,
+        initialMessages: [
+          {
+            id: 'opt1',
+            role: 'assistant',
+            createdAt: 0,
+            status: 'complete',
+            kind: 'options',
+            prompt: 'Pick',
+            options: [{ id: 'a', label: 'A' }],
+          },
+        ],
+      }),
+    )
+
+    act(() => result.current.send('hi'))
+    act(() => result.current.selectOption('opt1', 'a'))
+    expect(typingCount(result.current.messages)).toBe(2)
+    act(() => calls[0]!.finish(true))
+    expect(typingCount(result.current.messages)).toBe(1)
+    act(() => calls[1]!.finish(true))
+    expect(typingCount(result.current.messages)).toBe(0)
   })
 })

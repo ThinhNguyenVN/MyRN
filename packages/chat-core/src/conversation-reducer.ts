@@ -21,10 +21,20 @@ export type ConversationAction =
   | { type: 'append_chunk'; messageId: string; delta: string }
   | { type: 'set_message'; message: ChatMessage }
   | { type: 'set_error'; messageId: string; error: ChatMessageError }
-  | { type: 'set_done'; messageId: string }
+  /** `dropTyping`: no other turn is running, so also drop any empty `pending` assistant text (a typing row). */
+  | { type: 'set_done'; messageId: string; dropTyping?: boolean }
   | { type: 'set_card_lock'; messageId: string; state: CardLockState }
   | { type: 'set_sending'; isSending: boolean }
   | { type: 'reset_for_retry'; messageId: string }
+
+function isTyping(message: ChatMessage): boolean {
+  return (
+    message.role === 'assistant' &&
+    message.kind === 'text' &&
+    message.status === 'pending' &&
+    message.text === ''
+  )
+}
 
 function mapMessage(
   messages: ChatMessage[],
@@ -116,14 +126,16 @@ export function conversationReducer(
         })),
       }
 
-    case 'set_done':
+    case 'set_done': {
+      const messages = mapMessage(state.messages, action.messageId, (message) =>
+        message.status === 'error' ? message : { ...message, status: 'complete' },
+      )
       return {
         ...state,
-        messages: mapMessage(state.messages, action.messageId, (message) =>
-          message.status === 'error' ? message : { ...message, status: 'complete' },
-        ),
+        messages: action.dropTyping ? messages.filter((message) => !isTyping(message)) : messages,
         isSending: false,
       }
+    }
 
     case 'set_card_lock':
       return {
@@ -140,13 +152,12 @@ export function conversationReducer(
     case 'set_sending':
       return { ...state, isSending: action.isSending }
 
+    // The failed assistant message goes away; the retried request brings its own message.
     case 'reset_for_retry':
       return {
         ...state,
-        messages: mapMessage(state.messages, action.messageId, (message) =>
-          message.kind === 'text'
-            ? { ...message, text: '', status: 'pending', error: undefined }
-            : { ...message, status: 'pending', error: undefined },
+        messages: state.messages.filter(
+          (message) => message.id !== action.messageId || message.role !== 'assistant',
         ),
       }
 

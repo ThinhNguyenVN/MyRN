@@ -11,7 +11,17 @@ product finds out what changed since it forked.
 
 ## Unreleased
 
+### Fixed
+- **MyChat retry no longer stacks typing indicators (chat-core `0.2.2`):** retrying a failed reply
+  removes it instead of leaving an empty `pending` row behind, so N retries no longer show N rows
+  of dots. **Product to do:** bump `@thinhnguyenvn/chat-core` to `0.2.2`.
+
 ### Changed
+- **MyChat E1 fixes (#62, chat-core `0.2.1`):** assistant text renders basic markdown
+  (`react-native-markdown-display`); the destructive confirm button keeps the white primary text;
+  result cards show at most 10 rows on wide screens and 5 on narrow ones, with an "x/y rows" line
+  when cut. chat-core `0.2.1` is a contract copy only (the model's words come before the turn's
+  cards). **Product to do:** bump `@thinhnguyenvn/chat-core` to `0.2.1`.
 - `useAppInit`: removed the placeholder `notifications` task (a fake 500ms `setTimeout`). Native
   and protected web routes wait for `isInitialized`, so every cold start paid that 500ms for no
   work. **Product to do:** if you had added real notification setup there, keep your own task.
