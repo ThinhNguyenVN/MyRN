@@ -84,7 +84,7 @@ export function useConversation({
   const inFlightRef = useRef(0)
 
   const runRequest = useCallback(
-    (request: ChatRequest) => {
+    (request: ChatRequest, retryPlaceholderId?: string) => {
       lastRequestRef.current = request
       dispatch({ type: 'set_sending', isSending: true })
       inFlightRef.current += 1
@@ -98,6 +98,9 @@ export function useConversation({
         if (messageId) {
           dispatch({ type: 'set_done', messageId, dropTyping: inFlightRef.current === 0 })
         } else {
+          if (retryPlaceholderId) {
+            dispatch({ type: 'drop_retry_placeholder', messageId: retryPlaceholderId })
+          }
           dispatch({ type: 'set_sending', isSending: false })
         }
       }
@@ -125,14 +128,18 @@ export function useConversation({
         },
       }
 
-      adapter.send(request, handlers).catch((caughtError: unknown) => {
-        const messageId = currentMessageId
-        if (messageId) {
-          const message = caughtError instanceof Error ? caughtError.message : 'Unexpected error'
-          dispatch({ type: 'set_error', messageId, error: { message } })
-        }
-        finish(messageId)
-      })
+      adapter
+        .send(request, handlers)
+        // An adapter that resolves without `onDone` still ends the turn.
+        .then(() => finish(currentMessageId))
+        .catch((caughtError: unknown) => {
+          const messageId = currentMessageId
+          if (messageId) {
+            const message = caughtError instanceof Error ? caughtError.message : 'Unexpected error'
+            dispatch({ type: 'set_error', messageId, error: { message } })
+          }
+          finish(messageId)
+        })
     },
     [adapter],
   )
@@ -290,11 +297,13 @@ export function useConversation({
         void uploadAndSend(retried)
         return
       }
-      if (stateRef.current.isSending) return
+      const lastRequest = lastRequestRef.current
+      if (stateRef.current.isSending || !lastRequest) return
+      const failedAssistant = stateRef.current.messages.some(
+        (message) => message.id === messageId && message.role === 'assistant',
+      )
       dispatch({ type: 'reset_for_retry', messageId })
-      if (lastRequestRef.current) {
-        runRequest(lastRequestRef.current)
-      }
+      runRequest(lastRequest, failedAssistant ? messageId : undefined)
     },
     [runRequest, uploadAndSend],
   )

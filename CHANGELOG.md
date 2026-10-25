@@ -12,6 +12,9 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Fixed
+- **MyChat retry no longer jumps the list (chat-core `0.2.3`):** retry keeps the failed slot as a
+  typing placeholder and replaces it with the new response, so the list no longer shrinks and
+  jumps. **Product to do:** bump `@thinhnguyenvn/chat-core` to `0.2.3`.
 - **MyChat retry no longer stacks typing indicators (chat-core `0.2.2`):** retrying a failed reply
   removes it instead of leaving an empty `pending` row behind, so N retries no longer show N rows
   of dots. **Product to do:** bump `@thinhnguyenvn/chat-core` to `0.2.2`.

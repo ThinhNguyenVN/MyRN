@@ -1,4 +1,8 @@
-import { conversationReducer, initialConversationState } from './conversation-reducer'
+import {
+  type ConversationAction,
+  conversationReducer,
+  initialConversationState,
+} from './conversation-reducer'
 import type {
   ConfirmationMessage,
   FormMessage,
@@ -153,16 +157,78 @@ describe('conversationReducer', () => {
     expect(stillError.messages[0].status).toBe('error')
   })
 
-  it('removes the failed assistant message on retry, keeping the user message', () => {
+  it('turns the failed assistant message into a typing row in its slot on retry', () => {
     const state = initialConversationState([
       textMessage({ id: 'u1', role: 'user', status: 'complete', text: 'hi' }),
-      textMessage({ status: 'error', text: 'partial', error: { message: 'boom' } }),
+      textMessage({ id: 'a1', status: 'error', text: 'partial', error: { message: 'boom' } }),
     ])
-    const next = conversationReducer(state, { type: 'reset_for_retry', messageId: 'm1' })
-    expect(next.messages.map((message) => message.id)).toEqual(['u1'])
+    const next = conversationReducer(state, { type: 'reset_for_retry', messageId: 'a1' })
+    expect(next.messages).toHaveLength(2)
+    expect(next.messages[1]).toMatchObject({ id: 'a1', status: 'pending', kind: 'text', text: '' })
+    expect(next.messages[1].error).toBeUndefined()
+    expect(next.retryPlaceholderId).toBe('a1')
 
     const userRetry = conversationReducer(state, { type: 'reset_for_retry', messageId: 'u1' })
-    expect(userRetry.messages).toHaveLength(2)
+    expect(userRetry).toBe(state)
+  })
+
+  it('the retried reply replaces the placeholder and the list never shrinks', () => {
+    let state = initialConversationState([
+      textMessage({ id: 'u1', role: 'user', status: 'complete', text: 'hi' }),
+      textMessage({ id: 'a1', status: 'error', text: 'partial', error: { message: 'boom' } }),
+    ])
+    const lengths: number[] = []
+    const steps: ConversationAction[] = [
+      { type: 'reset_for_retry', messageId: 'a1' },
+      { type: 'append_message', message: textMessage({ id: 'a2' }) },
+      { type: 'append_chunk', messageId: 'a2', delta: 'ok' },
+      { type: 'set_done', messageId: 'a2', dropTyping: true },
+    ]
+    for (const action of steps) {
+      state = conversationReducer(state, action)
+      lengths.push(state.messages.length)
+    }
+    expect(lengths).toEqual([2, 2, 2, 2])
+    expect(state.messages[1]).toMatchObject({ id: 'a2', status: 'complete', text: 'ok' })
+    expect(state.retryPlaceholderId).toBeUndefined()
+
+    const next = conversationReducer(state, {
+      type: 'append_message',
+      message: textMessage({ id: 'a3' }),
+    })
+    expect(next.messages.map((message) => message.id)).toEqual(['u1', 'a2', 'a3'])
+  })
+
+  it('a reply delivered whole by set_message also takes the placeholder slot', () => {
+    const state = conversationReducer(
+      initialConversationState([
+        textMessage({ id: 'u1', role: 'user', status: 'complete', text: 'hi' }),
+        textMessage({ id: 'a1', status: 'error', error: { message: 'boom' } }),
+        textMessage({ id: 'u2', role: 'user', status: 'complete', text: 'later' }),
+      ]),
+      { type: 'reset_for_retry', messageId: 'a1' },
+    )
+    const next = conversationReducer(state, {
+      type: 'set_message',
+      message: textMessage({ id: 'a2', status: 'complete', text: 'done' }),
+    })
+    expect(next.messages.map((message) => message.id)).toEqual(['u1', 'a2', 'u2'])
+  })
+
+  it('drops the retry placeholder only when it is the current one', () => {
+    const state = conversationReducer(
+      initialConversationState([
+        textMessage({ id: 'u1', role: 'user', status: 'complete', text: 'hi' }),
+        textMessage({ id: 'a1', status: 'error', error: { message: 'boom' } }),
+      ]),
+      { type: 'reset_for_retry', messageId: 'a1' },
+    )
+    expect(conversationReducer(state, { type: 'drop_retry_placeholder', messageId: 'x' })).toBe(
+      state,
+    )
+    const dropped = conversationReducer(state, { type: 'drop_retry_placeholder', messageId: 'a1' })
+    expect(dropped.messages.map((message) => message.id)).toEqual(['u1'])
+    expect(dropped.retryPlaceholderId).toBeUndefined()
   })
 
   it('drops leftover typing rows on done only when asked', () => {
