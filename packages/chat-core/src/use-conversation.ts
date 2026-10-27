@@ -8,6 +8,7 @@ import type {
   ChatMediaFile,
   ChatMediaRef,
   ChatMessage,
+  ChatQuickAction,
   ImageMessage,
 } from './types'
 
@@ -26,6 +27,11 @@ export interface UseConversationResult {
    * nếu không thì như `sendImages`.
    */
   sendMedia: (files: ChatMediaFile[], caption?: string) => void
+  /**
+   * A shortcut of the empty chat (contract v4). `run` ones show their label as the user's message
+   * and send `quick_action`; `prompt` ones are sent as the text of the label.
+   */
+  sendQuickAction: (action: ChatQuickAction) => void
   selectOption: (messageId: string, optionId: string) => void
   confirm: (messageId: string, confirmed: boolean) => void
   selectMedia: (messageId: string, mediaIds: string[]) => void
@@ -158,6 +164,25 @@ export function useConversation({
       })
     },
     [runRequest],
+  )
+
+  const sendQuickAction = useCallback(
+    (action: ChatQuickAction) => {
+      if (action.kind === 'prompt') {
+        send(action.label)
+        return
+      }
+      if (stateRef.current.isSending) {
+        return
+      }
+      const message = userTextMessage(action.label)
+      dispatch({ type: 'append_message', message })
+      runRequest({
+        event: { type: 'quick_action', id: action.id },
+        history: [...stateRef.current.messages, message],
+      })
+    },
+    [runRequest, send],
   )
 
   const sendImages = useCallback(
@@ -314,6 +339,7 @@ export function useConversation({
     send,
     sendImages,
     sendMedia,
+    sendQuickAction,
     selectOption,
     confirm,
     selectMedia,

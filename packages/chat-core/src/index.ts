@@ -1,6 +1,6 @@
 export type { ChatAdapter, ChatRequest, ChatStreamHandlers } from './chat-adapter'
 export { MockChatAdapter } from './mock-chat-adapter'
-export { createHttpChatAdapter } from './http-chat-adapter'
+export { createHttpChatAdapter, parseSessionStart } from './http-chat-adapter'
 export type {
   ChatSessionScope,
   ChatSessionStorage,
@@ -33,6 +33,9 @@ export type {
   ChatOption,
   OptionsMessage,
   ChatSummaryField,
+  ChatSummaryStyle,
+  ChatSummaryTrend,
+  ChatTone,
   ConfirmationMessage,
   ConfirmationResolution,
   ChatFormField,
@@ -43,4 +46,6 @@ export type {
   ResultMessage,
   CustomMessage,
   ConversationEvent,
+  ChatQuickAction,
+  ChatSessionStart,
 } from './types'

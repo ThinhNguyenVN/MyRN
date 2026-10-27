@@ -8,6 +8,7 @@ import {
   type ChatMediaKind,
   type ChatMediaRef,
   type ChatMessage,
+  type ChatSessionStart,
 } from './types'
 
 /** Nơi app lưu id session (SecureStore, localStorage, AsyncStorage…); package không tự chọn. */
@@ -39,6 +40,8 @@ export interface HttpChatAdapterOptions {
 }
 
 const SESSION_HEADER = 'X-Chat-Session'
+/** The first contract with the empty-chat greeting (`session_start`, `quick_action`). */
+const QUICK_ACTION_CONTRACT = 4
 
 type NdjsonEvent =
   | { type: 'chunk'; messageId: string; delta: string }
@@ -46,6 +49,7 @@ type NdjsonEvent =
   | { type: 'error'; messageId: string; error: { message: string } }
   | { type: 'done'; messageId: string; sessionId?: string }
   | { type: 'card_state'; messageId: string; state: string }
+  | ({ type: 'session_start' } & ChatSessionStart)
 
 /** Wire format: 1 dòng NDJSON = 1 event. Không phải chuẩn SSE — xem design.md Decision 4. */
 export function parseNdjsonLine(line: string): NdjsonEvent | null {
@@ -94,6 +98,32 @@ function dispatchNdjsonEvent(
     default:
       return
   }
+}
+
+/** The `session_start` line of a response body (contract v4); `null` when it has none or is not well formed. */
+export function parseSessionStart(body: string): ChatSessionStart | null {
+  for (const line of body.split('\n')) {
+    const event = parseNdjsonLine(line)
+    if (event?.type !== 'session_start') continue
+    const { greeting, quickActions } = event
+    if (
+      typeof greeting?.title !== 'string' ||
+      typeof greeting.subtitle !== 'string' ||
+      !Array.isArray(quickActions)
+    ) {
+      return null
+    }
+    return {
+      greeting: { title: greeting.title, subtitle: greeting.subtitle },
+      quickActions: quickActions.filter(
+        (action) =>
+          typeof action?.id === 'string' &&
+          typeof action.label === 'string' &&
+          (action.kind === 'run' || action.kind === 'prompt'),
+      ),
+    }
+  }
+  return null
 }
 
 /** Cắt buffer theo dòng hoàn chỉnh, trả lại phần dư (dòng chưa đủ) để nối tiếp lần đọc sau. */
@@ -401,6 +431,24 @@ export function createHttpChatAdapter(options: HttpChatAdapterOptions): ChatAdap
         await persist
       }
     },
+    ...((options.contractVersion ?? 1) >= QUICK_ACTION_CONTRACT
+      ? {
+          async startSession() {
+            try {
+              // One short line, no stream: it is read whole, and sent without a session header
+              // so the gateway makes no session for an empty chat.
+              const response = await fetch(options.url, {
+                method: 'POST',
+                headers: buildHeaders(options),
+                body: JSON.stringify({ event: { type: 'session_start' }, history: [] }),
+              })
+              return response.ok ? parseSessionStart(await response.text()) : null
+            } catch {
+              return null
+            }
+          },
+        }
+      : {}),
     clearSession: () => forgetServerSession(options, 'session'),
     clearAllSessions: () => forgetServerSession(options, 'sessions'),
   }

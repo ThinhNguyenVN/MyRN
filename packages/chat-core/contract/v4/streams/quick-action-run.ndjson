@@ -1,0 +1,5 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"status","messageId":"<id>","text":"Đang lấy dữ liệu…"}
+{"type":"chunk","messageId":"<id>","delta":"Hôm nay bán được 12,4 triệu, tăng 18% so với hôm qua."}
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"result","status":"complete","title":"Doanh thu hôm nay","summary":[{"label":"Doanh thu","value":"12.430.000đ"}],"createdAt":0}}
+{"type":"done","messageId":"<id>"}

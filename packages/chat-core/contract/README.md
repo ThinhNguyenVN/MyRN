@@ -13,6 +13,7 @@ by hand, no package is shared between the gateway and MyRN; spec `ndjson-chat-co
 | `v1/streams/` | NDJSON streams as a client on v1 (or sending no `X-Chat-Contract`) receives them |
 | `v2/streams/` | The streams that differ for a client on v2: they carry `card_state` |
 | `v3/requests/`, `v3/streams/` | Media (M17): `send_media`, `select_media`, the `media_choice` card, thumbnails on `confirmation` |
+| `v4/requests/`, `v4/streams/` | The empty chat (M13): `session_start` and its single-line answer, `quick_action` and the stream of a shortcut that runs a tool |
 
 ## Reading a stream
 
@@ -26,6 +27,12 @@ One JSON object per line. In the files, ids the gateway generates are written `<
 - **v2:** v1 plus the `card_state` event (`cancelled`, `superseded`, `expired`), the optional
   `changedFields` on `confirmation` and `options` messages, and the `X-Locale` header. Sent only
   to a client that declared `X-Chat-Contract: 2` or higher.
+
+- **v4:** the empty chat. `{ type: 'session_start' }` is answered with one `session_start` line (greeting
+  and the shortcuts of the user's role) and nothing else: no `message`, no `done`, no session, no
+  model call. A shortcut with `kind: 'run'` is tapped with `{ type: 'quick_action', id }` and answers
+  as a normal turn (a lead sentence, then the card); one with `kind: 'prompt'` is sent as
+  `send_text` with its label. Sent only to a client that declared `X-Chat-Contract: 4`.
 
 ## Changing a fixture
 
