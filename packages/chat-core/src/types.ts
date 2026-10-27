@@ -99,6 +99,10 @@ export type ConfirmationResolution = 'confirmed' | 'cancelled'
 export interface ConfirmationMessage extends ChatMessageBase {
   kind: 'confirmation'
   prompt: string
+  /** A short line under the prompt (customer, branch), as on a result card. */
+  subtitle?: string
+  /** A platform icon name (same set as `ResultMessage.icon`). */
+  icon?: string
   summary?: ChatSummaryField[]
   confirmLabel?: string
   cancelLabel?: string

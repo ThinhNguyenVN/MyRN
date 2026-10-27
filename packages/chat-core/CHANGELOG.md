@@ -12,6 +12,10 @@
   `ChatSummaryField` may carry `style` (`hero` | `kpi` | `section`), `trend`, `tone` and `badge`
   (new types `ChatSummaryStyle`, `ChatSummaryTrend`, `ChatTone`). Messages pass through as before,
   so a UI that ignores the fields still shows every row.
+- Styled confirmation cards: `ConfirmationMessage` gains the same optional `subtitle` and `icon`,
+  and its `summary` rows may carry `style`, `tone` and `badge` like a result card's. A UI should
+  show every row of a confirmation (no row limit) and draw the confirm button as dangerous when
+  `destructive` is true.
 
 ## 0.2.3
 

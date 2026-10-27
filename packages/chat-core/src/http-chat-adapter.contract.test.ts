@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'fs'
 import { join } from 'path'
 
 import type { ChatStreamHandlers } from './chat-adapter'
-import type { ChatMessage, ConversationEvent, ResultMessage } from './types'
+import type { ChatMessage, ConfirmationMessage, ConversationEvent, ResultMessage } from './types'
 import { consumeNdjsonBuffer, parseSessionStart } from './http-chat-adapter'
 
 const CONTRACT_DIR = join(__dirname, '../contract')
@@ -162,6 +162,20 @@ describe('contract v4', () => {
       tone: 'positive',
       note: 'so với kỳ trước',
     })
+  })
+
+  it('confirmation-card keeps the header and styled rows of a confirmation', () => {
+    const card = read('streams', 'confirmation-card.ndjson')
+      .split('\n')
+      .map((row) => (row.trim() ? (JSON.parse(row) as { message?: ChatMessage }) : {}))
+      .find((event) => event.message?.kind === 'confirmation')?.message as ConfirmationMessage
+
+    expect(card).toMatchObject({
+      subtitle: 'Trần Thị B · Kho chính',
+      icon: 'cart',
+      destructive: true,
+    })
+    expect(card.summary?.[0]).toMatchObject({ style: 'hero', badge: { text: 'Đã duyệt' } })
   })
 
   it('quick_action is a ConversationEvent', () => {
