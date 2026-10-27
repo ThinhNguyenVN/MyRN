@@ -5,6 +5,7 @@ import type {
   ChatMediaSource,
   ChatMessage,
   ChatMessageError,
+  ChatSessionStart,
   ConversationEvent,
 } from './types'
 
@@ -31,6 +32,11 @@ export interface ChatAdapter {
   uploadMedia?: (file: ChatMediaFile) => Promise<ChatMediaRef>
   /** Where to load a media id that has no local URI; `null` when it cannot be loaded. */
   mediaSource?: (id: string) => Promise<ChatMediaSource | null>
+  /**
+   * Contract v4: the greeting and shortcuts for an empty chat (`session_start`). `null` when the
+   * gateway has none (older contract, a failed request): the app shows its own empty state.
+   */
+  startSession?: () => Promise<ChatSessionStart | null>
   /** Xóa session server đang lưu cho app và user của adapter này (`DELETE /session`). */
   clearSession?: () => Promise<void>
   /** Xóa mọi session server của app và user này (`DELETE /sessions`). */

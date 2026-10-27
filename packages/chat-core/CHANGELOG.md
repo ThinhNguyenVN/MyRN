@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.0
+
+- Contract v4, the empty chat (M13). `adapter.startSession()` (HTTP adapter with
+  `contractVersion >= 4`) returns the greeting and the shortcuts of the user's role, or `null`
+  when the gateway has none. `useConversation().sendQuickAction(action)` sends a `run` shortcut as
+  `quick_action` (its label shows as the user's message) and a `prompt` one as text. New types
+  `ChatQuickAction`, `ChatSessionStart`, event `quick_action`, and `parseSessionStart`.
+  Nothing changes for an app that declares a lower contract version.
+- Styled result cards: `ResultMessage` gains optional `subtitle` and `icon`; each
+  `ChatSummaryField` may carry `style` (`hero` | `kpi` | `section`), `trend`, `tone` and `badge`
+  (new types `ChatSummaryStyle`, `ChatSummaryTrend`, `ChatTone`). Messages pass through as before,
+  so a UI that ignores the fields still shows every row.
+- Styled confirmation cards: `ConfirmationMessage` gains the same optional `subtitle` and `icon`,
+  and its `summary` rows may carry `style`, `tone` and `badge` like a result card's. A UI should
+  show every row of a confirmation (no row limit) and draw the confirm button as dangerous when
+  `destructive` is true.
+
 ## 0.2.3
 
 - Retry keeps the failed slot as a typing placeholder and replaces it with the new response, so

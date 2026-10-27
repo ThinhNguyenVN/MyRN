@@ -70,9 +70,28 @@ export interface OptionsMessage extends ChatMessageBase {
   changedFields?: string[]
 }
 
+/** What a value means for the business; the app sets it, the client only colours it. */
+export type ChatTone = 'positive' | 'negative' | 'warning' | 'neutral'
+
+/** `hero` the card's main figure, `kpi` a small tile, `section` the heading of the rows below. */
+export type ChatSummaryStyle = 'hero' | 'kpi' | 'section'
+
+/** A change next to a value; draw the arrow from `direction`. No `tone` means neutral colour. */
+export interface ChatSummaryTrend {
+  direction: 'up' | 'down' | 'flat'
+  text: string
+  tone?: ChatTone
+  note?: string
+}
+
 export interface ChatSummaryField {
   label: string
   value: string
+  /** Result cards only (contract v4); older gateways never send these. */
+  style?: ChatSummaryStyle
+  trend?: ChatSummaryTrend
+  tone?: ChatTone
+  badge?: { text: string; tone?: ChatTone }
 }
 
 export type ConfirmationResolution = 'confirmed' | 'cancelled'
@@ -80,6 +99,10 @@ export type ConfirmationResolution = 'confirmed' | 'cancelled'
 export interface ConfirmationMessage extends ChatMessageBase {
   kind: 'confirmation'
   prompt: string
+  /** A short line under the prompt (customer, branch), as on a result card. */
+  subtitle?: string
+  /** A platform icon name (same set as `ResultMessage.icon`). */
+  icon?: string
   summary?: ChatSummaryField[]
   confirmLabel?: string
   cancelLabel?: string
@@ -132,6 +155,10 @@ export type MessageAction =
 export interface ResultMessage extends ChatMessageBase {
   kind: 'result'
   title: string
+  /** A short line under the title (dates, branch). */
+  subtitle?: string
+  /** A platform icon name (same set as `ChatQuickAction.icon`). */
+  icon?: string
   summary?: ChatSummaryField[]
   actions?: MessageAction[]
 }
@@ -161,3 +188,20 @@ export type ConversationEvent =
   | { type: 'confirm'; messageId: string; confirmed: boolean }
   | { type: 'submit_form'; messageId: string; values: ChatFormValues }
   | { type: 'retry'; messageId: string }
+  /** Contract v4: a shortcut of kind `run` tapped on the empty chat. */
+  | { type: 'quick_action'; id: string }
+
+/** Contract v4: a shortcut on the empty chat. `run` runs a tool; `prompt` is sent as the user's text. */
+export interface ChatQuickAction {
+  id: string
+  label: string
+  /** A name the gateway knows (chart, star, check, box, plus, inbound, count, cart, search, me, list). */
+  icon: string
+  kind: 'run' | 'prompt'
+}
+
+/** Contract v4: what the empty chat opens with. */
+export interface ChatSessionStart {
+  greeting: { title: string; subtitle: string }
+  quickActions: ChatQuickAction[]
+}

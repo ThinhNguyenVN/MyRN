@@ -1,0 +1,5 @@
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"text","status":"pending","text":"","createdAt":0}}
+{"type":"status","messageId":"<id>","text":"Đang lấy dữ liệu…"}
+{"type":"chunk","messageId":"<id>","delta":"Tháng này bán được 48,25 triệu, tăng 12% so với kỳ trước."}
+{"type":"message","message":{"id":"<id>","role":"assistant","kind":"result","status":"complete","title":"Bán hàng tháng này","subtitle":"01/10 – 27/10","icon":"chart","summary":[{"label":"Doanh thu","value":"48.250.000 đ","style":"hero","trend":{"direction":"up","text":"12%","tone":"positive","note":"so với kỳ trước"}},{"label":"Lãi gộp","value":"11.430.000 đ","style":"kpi"},{"label":"Đơn đã duyệt","value":"86","style":"kpi","trend":{"direction":"up","text":"5%","tone":"positive"}},{"label":"Đơn tạo mới","value":"","style":"section"},{"label":"Đã hủy","value":"2","tone":"negative"},{"label":"Dầu ăn Neptune 1L","value":"Tồn 0","badge":{"text":"Hết hàng","tone":"warning"}}],"actions":[{"type":"navigate","label":"Xem tổng quan","href":"/dashboard?period=month"}],"createdAt":0}}
+{"type":"done","messageId":"<id>"}

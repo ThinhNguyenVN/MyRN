@@ -2,8 +2,8 @@ import { readdirSync, readFileSync } from 'fs'
 import { join } from 'path'
 
 import type { ChatStreamHandlers } from './chat-adapter'
-import type { ChatMessage, ConversationEvent } from './types'
-import { consumeNdjsonBuffer } from './http-chat-adapter'
+import type { ChatMessage, ConfirmationMessage, ConversationEvent, ResultMessage } from './types'
+import { consumeNdjsonBuffer, parseSessionStart } from './http-chat-adapter'
 
 const CONTRACT_DIR = join(__dirname, '../contract')
 
@@ -39,14 +39,17 @@ function replay(file: string): Recorded {
   return recorded
 }
 
-function streamFiles(version: 'v1' | 'v2' | 'v3'): string[] {
+function streamFiles(version: 'v1' | 'v2' | 'v3' | 'v4'): string[] {
   const dir = join(CONTRACT_DIR, version, 'streams')
-  return readdirSync(dir)
-    .filter((name) => name.endsWith('.ndjson'))
-    .map((name) => join(dir, name))
+  return (
+    readdirSync(dir)
+      // The empty chat's answer is one line and ends no turn (read by `parseSessionStart`).
+      .filter((name) => name.endsWith('.ndjson') && name !== 'session-start.ndjson')
+      .map((name) => join(dir, name))
+  )
 }
 
-describe.each(['v1', 'v2', 'v3'] as const)('contract %s streams', (version) => {
+describe.each(['v1', 'v2', 'v3', 'v4'] as const)('contract %s streams', (version) => {
   it.each(streamFiles(version))(
     '%s ends with exactly one done and opens a message before chunks',
     (file) => {
@@ -117,5 +120,69 @@ describe('contract v3 requests', () => {
 
     expect(sendMedia).toMatchObject({ type: 'send_media', media: [{ kind: 'image' }] })
     expect(selectMedia).toMatchObject({ type: 'select_media', messageId: 'media-card-1' })
+  })
+})
+
+describe('contract v4', () => {
+  const read = (...parts: string[]) => readFileSync(join(CONTRACT_DIR, 'v4', ...parts), 'utf8')
+
+  it('session-start is read whole into a greeting and shortcuts', () => {
+    const start = parseSessionStart(read('streams', 'session-start.ndjson'))
+
+    expect(start?.greeting.title).toBe('Chào buổi sáng, Thịnh')
+    expect(start?.quickActions.map((action) => action.kind)).toEqual(['run', 'prompt'])
+  })
+
+  it.each(['', 'not json', '{"type":"done","messageId":"x"}', '{"type":"session_start"}'])(
+    'gives null for a body without a well formed session_start: %j',
+    (body) => {
+      expect(parseSessionStart(body)).toBeNull()
+    },
+  )
+
+  it('result-card keeps the styled rows of a result card', () => {
+    const line = read('streams', 'result-card.ndjson')
+      .split('\n')
+      .map((row) => (row.trim() ? (JSON.parse(row) as { message?: ChatMessage }) : {}))
+      .find((event) => event.message?.kind === 'result')
+    const card = line?.message as ResultMessage
+
+    expect(card.icon).toBe('chart')
+    expect(card.summary?.map((row) => row.style)).toEqual([
+      'hero',
+      'kpi',
+      'kpi',
+      'section',
+      undefined,
+      undefined,
+    ])
+    expect(card.summary?.[0]?.trend).toEqual({
+      direction: 'up',
+      text: '12%',
+      tone: 'positive',
+      note: 'so với kỳ trước',
+    })
+  })
+
+  it('confirmation-card keeps the header and styled rows of a confirmation', () => {
+    const card = read('streams', 'confirmation-card.ndjson')
+      .split('\n')
+      .map((row) => (row.trim() ? (JSON.parse(row) as { message?: ChatMessage }) : {}))
+      .find((event) => event.message?.kind === 'confirmation')?.message as ConfirmationMessage
+
+    expect(card).toMatchObject({
+      subtitle: 'Trần Thị B · Kho chính',
+      icon: 'cart',
+      destructive: true,
+    })
+    expect(card.summary?.[0]).toMatchObject({ style: 'hero', badge: { text: 'Đã duyệt' } })
+  })
+
+  it('quick_action is a ConversationEvent', () => {
+    const event: ConversationEvent = (
+      JSON.parse(read('requests', 'quick_action.json')) as { event: ConversationEvent }
+    ).event
+
+    expect(event).toEqual({ type: 'quick_action', id: 'revenue-today' })
   })
 })

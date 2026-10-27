@@ -1,0 +1,1 @@
+{"type":"session_start","greeting":{"title":"Chào buổi sáng, Thịnh","subtitle":"Bạn muốn bắt đầu với việc nào?"},"quickActions":[{"id":"revenue-today","label":"Doanh thu hôm nay","icon":"chart","kind":"run"},{"id":"new-sale","label":"Tạo đơn bán","icon":"cart","kind":"prompt"}]}
