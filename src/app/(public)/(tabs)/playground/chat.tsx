@@ -5,7 +5,12 @@ import { useTranslation } from 'react-i18next'
 
 import MyButton from '@/components/elements/my-button'
 import { MyChat, MockChatAdapter } from '@/components/ui/chat'
-import type { ChatPendingPrompt, ChatSuggestionInput, MessageAction } from '@/components/ui/chat'
+import type {
+  ChatPendingPrompt,
+  ChatSessionStart,
+  ChatSuggestionInput,
+  MessageAction,
+} from '@/components/ui/chat'
 import { Toast } from '@/components/ui/toast'
 import { useThemedStyles } from '@/theme/theme-context'
 
@@ -16,6 +21,17 @@ const SUGGESTIONS: ChatSuggestionInput[] = [
   { id: 'check-stock', label: 'Kiểm tra tồn kho' },
   { id: 'todays-orders', label: 'Xem đơn hàng hôm nay' },
 ]
+
+/** What a gateway's `session_start` (contract v4) gives an empty chat; the mock adapter has none. */
+const SESSION_START: ChatSessionStart = {
+  greeting: { title: 'Chào buổi sáng, Thịnh', subtitle: 'Bạn muốn bắt đầu với việc nào?' },
+  quickActions: [
+    { id: 'revenue-today', label: 'Doanh thu hôm nay', icon: 'chart', kind: 'run' },
+    { id: 'low-stock', label: 'Hàng sắp hết', icon: 'box', kind: 'run' },
+    { id: 'new-order', label: 'Tạo đơn bán', icon: 'cart', kind: 'prompt' },
+    { id: 'stock-count', label: 'Kiểm kho', icon: 'count', kind: 'prompt' },
+  ],
+}
 
 export default function ChatPlaygroundScreen() {
   const styles = useThemedStyles(generateStyles)
@@ -66,6 +82,7 @@ export default function ChatPlaygroundScreen() {
         emptyStateTitle={t('playground.chatEmptyTitle')}
         emptyStateSubtitle={t('playground.chatEmptySubtitle')}
         suggestions={SUGGESTIONS}
+        sessionStart={SESSION_START}
         pendingPrompt={pendingPrompt}
         focusComposerToken={focusComposerToken}
       />

@@ -601,7 +601,13 @@
       "mediaSelected_one": "{{count}} photo selected",
       "mediaSelected_other": "{{count}} photos selected",
       "mediaSelectedNone": "No photo used",
-      "mediaUploadFailed": "Couldn't upload the photos."
+      "mediaUploadFailed": "Couldn't upload the photos.",
+      "quick": {
+        "run": "See now",
+        "prompt": "Start a task",
+        "runHint": "See now",
+        "promptHint": "Assistant asks more"
+      }
     },
     "dropdownLoadMore": "Load more"
   }
