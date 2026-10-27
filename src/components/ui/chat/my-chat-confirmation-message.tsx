@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ConfirmationMessage } from '@thinhnguyenvn/chat-core'
 
@@ -12,7 +12,8 @@ import { useThemedStyles } from '@/theme/theme-context'
 
 import MyChatCardLockRow from './my-chat-card-lock-row'
 import MyChatMediaRow from './my-chat-media-row'
-import MyChatSummaryList from './my-chat-summary-list'
+import { ResultBlocks, ResultCardHeader, ResultHero } from './my-chat-result-parts'
+import { layoutResultCard } from './result-card-layout'
 import { generateStyles } from './styles'
 
 export interface MyChatConfirmationMessageProps {
@@ -26,6 +27,11 @@ function MyChatConfirmationMessage({ message, onConfirm }: MyChatConfirmationMes
   const isLocked = message.lockState !== undefined
   const isResolved = message.resolution !== undefined && !isLocked
   const isPending = message.resolution === undefined && !isLocked
+  // Every row of a write is shown: no row limit, unlike a result card.
+  const layout = useMemo(
+    () => layoutResultCard(message.summary ?? [], Number.POSITIVE_INFINITY),
+    [message.summary],
+  )
 
   const handleConfirm = useCallback(() => {
     onConfirm(message.id, true)
@@ -36,16 +42,26 @@ function MyChatConfirmationMessage({ message, onConfirm }: MyChatConfirmationMes
   }, [message.id, onConfirm])
 
   return (
-    <MySurface radius="large" style={styles.interactiveCard}>
-      <MyText typography="body">{message.prompt}</MyText>
+    <MySurface radius="large" style={[styles.interactiveCard, styles.resultCard]}>
+      <ResultCardHeader
+        title={message.prompt}
+        subtitle={message.subtitle}
+        icon={message.icon}
+        danger={message.destructive}
+      />
 
-      <ConditionRenderer when={Boolean(message.summary?.length)}>
-        <MyChatSummaryList
-          keyPrefix="chat-confirmation-field"
-          summary={message.summary ?? []}
-          changedFields={message.changedFields}
+      {layout.hero ? (
+        <ResultHero
+          field={layout.hero}
+          isChanged={message.changedFields?.includes(layout.hero.label)}
         />
-      </ConditionRenderer>
+      ) : null}
+
+      <ResultBlocks
+        blocks={layout.blocks}
+        keyPrefix="chat-confirmation"
+        changedFields={message.changedFields}
+      />
 
       <ConditionRenderer when={Boolean(message.media?.length)}>
         <MyChatMediaRow
@@ -65,7 +81,7 @@ function MyChatConfirmationMessage({ message, onConfirm }: MyChatConfirmationMes
           />
           <MyButton
             text={message.confirmLabel ?? t('components.chat.confirm')}
-            type="primary"
+            type={message.destructive ? 'tertiary' : 'primary'}
             width="auto"
             elevation="none"
             onPress={handleConfirm}

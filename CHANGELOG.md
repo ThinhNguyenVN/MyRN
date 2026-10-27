@@ -11,6 +11,16 @@ product finds out what changed since it forked.
 
 ## Unreleased
 
+### Added
+- **MyChat empty chat and styled cards (chat-core `0.3.0`, from my-store PR #90):** `MyChat`
+  takes `sessionStart` (contract v4 greeting + quick action cards; `run` cards send
+  `quick_action`). Result and confirmation cards share `my-chat-result-parts.tsx`: header with
+  icon/subtitle, hero figure with trend/badge chips, KPI tiles, section headings, toned rows and
+  badges; confirmations show every row and a red confirm button when `destructive`. New i18n keys
+  `components.chat.quick.*`. Playground chat shows a sample greeting. **Product to do:** bump
+  `@thinhnguyenvn/chat-core` to `0.3.0`, copy `src/components/ui/chat/` and the
+  `components.chat.quick` keys.
+
 ### Fixed
 - **MyChat retry no longer jumps the list (chat-core `0.2.3`):** retry keeps the failed slot as a
   typing placeholder and replaces it with the new response, so the list no longer shrinks and

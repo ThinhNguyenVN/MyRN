@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { MessageAction, ResultMessage } from '@thinhnguyenvn/chat-core'
 
@@ -8,9 +8,9 @@ import { ConditionRenderer } from '@/components/ui/condition-renderer'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import { RESULT_ROWS_NARROW, RESULT_ROWS_WIDE } from './constants'
-
 import MyChatActionRow from './my-chat-action-row'
-import MyChatSummaryList from './my-chat-summary-list'
+import { ResultBlocks, ResultCardHeader, ResultHero } from './my-chat-result-parts'
+import { layoutResultCard } from './result-card-layout'
 import { generateStyles } from './styles'
 
 export interface MyChatResultMessageProps {
@@ -22,26 +22,28 @@ function MyChatResultMessage({ message, onAction }: MyChatResultMessageProps) {
   const styles = useThemedStyles(generateStyles)
   const { isMobileSize } = useTheme()
   const { t } = useTranslation()
-  const summary = message.summary ?? []
   const limit = isMobileSize ? RESULT_ROWS_NARROW : RESULT_ROWS_WIDE
-  const shown = summary.slice(0, limit)
+  const layout = useMemo(
+    () => layoutResultCard(message.summary ?? [], limit),
+    [message.summary, limit],
+  )
 
   return (
-    <MySurface radius="large" style={styles.interactiveCard}>
-      <MyText typography="label">{message.title}</MyText>
+    <MySurface radius="large" style={[styles.interactiveCard, styles.resultCard]}>
+      <ResultCardHeader title={message.title} subtitle={message.subtitle} icon={message.icon} />
 
-      <ConditionRenderer when={shown.length > 0}>
-        <MyChatSummaryList keyPrefix="chat-result-field" summary={shown} />
-      </ConditionRenderer>
+      {layout.hero ? <ResultHero field={layout.hero} /> : null}
 
-      <ConditionRenderer when={shown.length < summary.length}>
+      <ResultBlocks blocks={layout.blocks} keyPrefix="chat-result" />
+
+      <ConditionRenderer when={layout.shownRows < layout.totalRows}>
         <MyText typography="caption" color="text/active/secondary">
-          {t('components.chat.rowsShown', { shown: shown.length, total: summary.length })}
+          {t('components.chat.rowsShown', { shown: layout.shownRows, total: layout.totalRows })}
         </MyText>
       </ConditionRenderer>
 
       <ConditionRenderer when={Boolean(message.actions?.length)}>
-        <MyChatActionRow actions={message.actions ?? []} onAction={onAction} />
+        <MyChatActionRow actions={message.actions ?? []} onAction={onAction} variant="link" />
       </ConditionRenderer>
     </MySurface>
   )

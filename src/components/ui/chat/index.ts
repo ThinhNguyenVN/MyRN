@@ -9,7 +9,11 @@ export { default as MyChatComposer } from './my-chat-composer'
 export type { MyChatComposerProps } from './my-chat-composer'
 
 export { default as MyChatEmptyState } from './my-chat-empty-state'
-export type { MyChatEmptyStateProps, ChatSuggestion } from './my-chat-empty-state'
+export type {
+  MyChatEmptyStateProps,
+  ChatSuggestion,
+  ChatQuickActionItem,
+} from './my-chat-empty-state'
 
 export { default as MyChatTyping } from './my-chat-typing'
 export { default as MyChatActionRow } from './my-chat-action-row'
@@ -60,4 +64,6 @@ export type {
   ResultMessage,
   CustomMessage,
   ConversationEvent,
+  ChatQuickAction,
+  ChatSessionStart,
 } from '@thinhnguyenvn/chat-core'

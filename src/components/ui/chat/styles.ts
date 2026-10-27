@@ -220,6 +220,77 @@ export const generateStyles = (theme: ThemeType) => {
     emptyTitle: {
       textAlign: 'center',
     },
+    greeting: {
+      alignItems: 'center',
+      gap: getSpacing('x2'),
+    },
+    greetingBadge: {
+      width: 48,
+      height: 48,
+      borderRadius: theme.getRadius('large'),
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: getSpacing('x1'),
+      backgroundColor: getColor('fill/active/primary'),
+    },
+    greetingTitle: {
+      textAlign: 'center',
+    },
+    quickGroups: {
+      width: '100%',
+      maxWidth: 520,
+      gap: getSpacing('x5'),
+    },
+    quickGroup: {
+      gap: getSpacing('x2'),
+    },
+    quickGroupTitle: {
+      textTransform: 'uppercase',
+      letterSpacing: 0.8,
+      paddingHorizontal: getSpacing('x1'),
+    },
+    quickGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: getSpacing('x3'),
+    },
+    quickCard: {
+      // Two to a row: half the width minus half the gap.
+      flexBasis: '47%',
+      flexGrow: 1,
+      minHeight: 92,
+      padding: getSpacing('x3'),
+      gap: getSpacing('x2'),
+      borderRadius: theme.getRadius('large'),
+      borderWidth: 1,
+    },
+    quickCardRun: {
+      backgroundColor: getColor('border/info/tertiary'),
+      borderColor: getColor('border/info/secondary'),
+    },
+    quickCardPrompt: {
+      backgroundColor: getColor('fill/background/primary'),
+      borderColor: getColor('border/inactive/secondary'),
+      borderStyle: 'dashed',
+    },
+    quickIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: theme.getRadius('large'),
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    quickIconRun: {
+      backgroundColor: getColor('fill/active/primary'),
+    },
+    quickIconPrompt: {
+      backgroundColor: getColor('fill/background/secondary'),
+      borderWidth: 1,
+      borderColor: getColor('border/inactive/secondary'),
+    },
+    quickLabel: {
+      flexGrow: 1,
+    },
     suggestionChips: {
       flexDirection: 'row',
       flexWrap: 'wrap',
@@ -254,6 +325,8 @@ export const generateStyles = (theme: ThemeType) => {
     summaryLabelGroup: {
       flexDirection: 'row',
       alignItems: 'center',
+      flexWrap: 'wrap',
+      flexShrink: 1,
       gap: getSpacing('x2'),
     },
     changedDot: {
@@ -261,6 +334,16 @@ export const generateStyles = (theme: ThemeType) => {
       height: 6,
       borderRadius: 3,
       backgroundColor: getColor('fill/info/primary'),
+    },
+    summaryLabel: {
+      flexShrink: 1,
+    },
+    summaryValueGroup: {
+      alignItems: 'flex-end',
+      flexShrink: 1,
+    },
+    summaryValue: {
+      textAlign: 'right',
     },
     summaryList: {
       gap: getSpacing('x2'),
@@ -352,6 +435,83 @@ export const generateStyles = (theme: ThemeType) => {
     },
     resultActionsColumn: {
       gap: getSpacing('x3'),
+    },
+
+    // Result card (styled rows: hero, tiles, sections, link actions)
+    resultCard: {
+      gap: getSpacing('x5'),
+    },
+    resultHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: getSpacing('x3'),
+    },
+    resultIcon: {
+      width: 36,
+      height: 36,
+      borderRadius: theme.getRadius('large'),
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: getColor('border/info/tertiary'),
+    },
+    resultIconDanger: {
+      backgroundColor: getColor('border/alert/tertiary'),
+    },
+    resultHeaderText: {
+      flex: 1,
+      minWidth: 0,
+    },
+    resultHero: {
+      gap: getSpacing('x1'),
+    },
+    resultTrendRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: getSpacing('x2'),
+      marginTop: getSpacing('x1'),
+    },
+    resultTiles: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: getSpacing('x2'),
+    },
+    resultTile: {
+      flexGrow: 1,
+      flexBasis: '40%',
+      minWidth: 0,
+      gap: getSpacing('x1'),
+      paddingVertical: getSpacing('x3'),
+      paddingHorizontal: getSpacing('x4'),
+      borderRadius: theme.getRadius('medium'),
+      backgroundColor: getColor('fill/background/secondary'),
+    },
+    resultSection: {
+      gap: getSpacing('x3'),
+      paddingTop: getSpacing('x4'),
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: getColor('border/inactive/secondary'),
+    },
+    resultSectionTitle: {
+      textTransform: 'uppercase',
+      letterSpacing: 0.6,
+    },
+    resultLinks: {
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: getColor('border/inactive/secondary'),
+    },
+    resultLinkRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: getSpacing('x3'),
+      paddingTop: getSpacing('x4'),
+    },
+    resultLinkLabel: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: getSpacing('x2'),
+      flexShrink: 1,
     },
 
     unknownCard: {

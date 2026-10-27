@@ -6,6 +6,8 @@ import {
   type ChatAdapter,
   type ChatMediaFile,
   type ChatMessage,
+  type ChatQuickAction,
+  type ChatSessionStart,
   type MessageAction,
   localMediaUris,
   useConversation,
@@ -18,7 +20,7 @@ import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import type { RenderCustomMessage } from './types'
 import { COMPOSER_HEIGHT_COMMIT_THRESHOLD } from './constants'
-import type { ChatSuggestion } from './my-chat-empty-state'
+import type { ChatQuickActionItem, ChatSuggestion } from './my-chat-empty-state'
 import MyChatEmptyState from './my-chat-empty-state'
 import MyChatComposer from './my-chat-composer'
 import MyChatList from './my-chat-list'
@@ -43,6 +45,8 @@ export interface MyChatProps {
   emptyStateTitle: string
   emptyStateSubtitle?: string
   suggestions?: ChatSuggestionInput[]
+  /** The gateway's greeting and shortcuts (contract v4); when it has shortcuts they replace `suggestions`. */
+  sessionStart?: ChatSessionStart | null
   /** Sends `text` as the user's message once per `id` (e.g. a suggestion picked on another
    *  screen). A repeated `id` is ignored, so re-renders never send it twice. */
   pendingPrompt?: ChatPendingPrompt
@@ -59,6 +63,7 @@ function MyChat({
   emptyStateTitle,
   emptyStateSubtitle,
   suggestions,
+  sessionStart,
   pendingPrompt,
   focusComposerToken,
 }: MyChatProps) {
@@ -151,6 +156,19 @@ function MyChat({
     [suggestions, send],
   )
 
+  const { sendQuickAction } = chat
+  const quickActions = useMemo<ChatQuickActionItem[]>(
+    () =>
+      (sessionStart?.quickActions ?? []).map((action: ChatQuickAction) => ({
+        ...action,
+        onPress: () => {
+          sendQuickAction(action)
+          pinListToBottom()
+        },
+      })),
+    [sessionStart, sendQuickAction, pinListToBottom],
+  )
+
   return (
     <MyChatMediaProvider value={media}>
       <MyView style={styles.root}>
@@ -163,6 +181,8 @@ function MyChat({
                   title={emptyStateTitle}
                   subtitle={emptyStateSubtitle}
                   suggestions={resolvedSuggestions}
+                  greeting={sessionStart?.greeting}
+                  quickActions={quickActions}
                   columnGutter={columnGutter}
                   composerHeight={composerHeight}
                 />

@@ -601,7 +601,13 @@
       "mediaSelected_one": "Đã chọn {{count}} ảnh",
       "mediaSelected_other": "Đã chọn {{count}} ảnh",
       "mediaSelectedNone": "Không dùng ảnh",
-      "mediaUploadFailed": "Chưa tải ảnh lên được."
+      "mediaUploadFailed": "Chưa tải ảnh lên được.",
+      "quick": {
+        "run": "Xem ngay",
+        "prompt": "Bắt đầu việc",
+        "runHint": "Xem ngay",
+        "promptHint": "Trợ lý hỏi thêm"
+      }
     },
     "dropdownLoadMore": "Tải thêm"
   }
