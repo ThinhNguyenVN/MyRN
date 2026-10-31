@@ -12,6 +12,26 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Added
+- **Firebase foundation, on when config files exist (`my-rn-step-01-firebase-foundation`):** Analytics,
+  Crashlytics, Remote Config and Cloud Messaging via `@react-native-firebase/*` `26.4.1`, behind
+  `@/services/firebase` (no-op on web and in Expo Go). Kit wiring: `firebase` task in
+  `useAppInit`, `FirebaseBridge` in the root layout (auto `screen_view`, user id from auth, push
+  tap → `data.url`), typed events (`AnalyticsEventMap`, extend by declaration merging), typed
+  Remote Config defaults + `useRemoteConfig`, consent toggle, `requestPushPermission` /
+  `setPushTokenHandler`. Native: Firebase turns on per env when `firebase/<env>/` has both
+  config files (`scripts/firebase-native.js`): `app.config.ts` then adds the plugins +
+  `expo-build-properties` (iOS static frameworks), and `react-native.config.js` stops excluding
+  RNFirebase from autolinking — without files the app builds with no Firebase. `firebase.json`,
+  `index.ts` entry (package `main`) for the background handler. Adds `expo-dev-client` and
+  `expo-notifications`; native work now needs a dev client. Guide: `.docs/firebase-standard.md`.
+  **Product to do:** add the 5 RNFirebase packages + `expo-dev-client`, `expo-notifications`,
+  `expo-build-properties`; copy `src/services/firebase/`, `src/configs/firebase.config.ts`,
+  `src/configs/remote-config.defaults.ts` (replace sample keys), `firebase.json`, `index.ts`,
+  `firebase/README.md`, `scripts/firebase-native.js`, `react-native.config.js` (merge if you have
+  one); set `"main": "index.ts"`; merge `app.config.ts` (`resolveFirebase`, `FIREBASE_PLUGINS`,
+  ios/android/plugins fields), the `useAppInit` task and `FirebaseBridge`; add your
+  `firebase/<env>/` files; call `requestPushPermission` + `setPushTokenHandler` where your
+  product wants push. Then `npx expo prebuild --clean`.
 - **MyChat empty chat and styled cards (chat-core `0.3.0`, from my-store PR #90):** `MyChat`
   takes `sessionStart` (contract v4 greeting + quick action cards; `run` cards send
   `quick_action`). Result and confirmation cards share `my-chat-result-parts.tsx`: header with

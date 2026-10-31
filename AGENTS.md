@@ -23,6 +23,7 @@ This is an **Expo SDK 57 React Native** template app (`myrn`) for iOS, Android, 
    - API / RTK / auth → `.docs/data-state-standard.md`
    - Missing UX detail → `.docs/default-behavior-rules.md`
    - SEO (title/meta/OG/JSON-LD/robots/sitemap) → `.docs/seo-standard.md`
+   - Firebase (analytics, crashlytics, remote config, push) → `.docs/firebase-standard.md`
    - Ambiguity → precedence in `.docs/README.md`
    - Prompt templates → `.docs/prompt-template-scope-lock.md`, `prompt-template-feature.md`, `prompt-template-full-app.md`
 4. Platform OpenSpec capabilities under `openspec/specs/` are **baseline already shipped** — read `openspec/specs/README.md` before treating them as work to redo.
@@ -47,4 +48,5 @@ This is an **Expo SDK 57 React Native** template app (`myrn`) for iOS, Android, 
 - **DummyJSON demo login:** `emilys` / `emilyspass`.
 - **Playground bundler warnings:** some co-located non-route files under `playground/` warn “missing default export” — ignore for demos.
 - **SEO is off by default:** `seo.config.json` ships with `enabled: false` — zero effect on mobile-only/admin products until a task explicitly turns it on. See `.docs/seo-standard.md` before touching anything SEO-related; it documents a real gotcha (`AppInitGate` hides `<head>` tags from static export unless mounted above it) that already broke this once.
+- **Firebase turns on per env when config files exist:** with `firebase/<env>/google-services.json` + `GoogleService-Info.plist`, `app.config.ts` adds the plugins and `react-native.config.js` links RNFirebase; without them native builds have no Firebase and `@/services/firebase` is a no-op (also on web and Expo Go). Real Firebase needs a dev client (`npx expo run:ios|android`). Import only from `@/services/firebase`. Package `main` is `index.ts` (registers the FCM background handler before `expo-router/entry`). See `.docs/firebase-standard.md`.
 - **MyChat list/composer:** do not re-apply list `translateY` with the keyboard, `overflow: hidden` on the lifting wrapper, or native `height` from `contentSize`. Living model: `openspec/specs/mychat-chat-ui/spec.md` + catalog `MyChat`. Archive Decision 8f is stale (8g).
