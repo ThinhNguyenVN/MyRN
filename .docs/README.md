@@ -62,6 +62,7 @@ Rules:
 - `default-behavior-rules.md`: fallback product and UX behavior when the design or prompt does not specify enough detail.
 - `canonical-references.md`: which existing files are the source of truth when there is ambiguity.
 - `seo-standard.md`: web SEO (title/meta/OG/JSON-LD/robots/sitemap) — config-driven via `seo.config.json`, opt-in, off by default. Read before any task mentioning SEO, meta tags, Open Graph, or search indexing.
+- `firebase-standard.md`: Firebase (Analytics, Crashlytics, Remote Config, push) — turns on per env when `firebase/<env>/` config files exist, native only (no-op otherwise, on web and in Expo Go); per-env config files, typed events and flags, push permission/token/deep link. Read before any task touching analytics, crash reporting, feature flags, or notifications.
 - `prompt-template-full-app.md`: reusable prompt template for generating a whole app or a large domain.
 - `prompt-template-feature.md`: reusable prompt template for implementing one feature or a small set of screens.
 - `prompt-template-scope-lock.md`: reusable prompt template for a planning or scope-confirmation pass before coding.
@@ -110,6 +111,13 @@ Read:
 1. `data-state-standard.md`
 2. `default-behavior-rules.md`
 3. `canonical-references.md`
+
+### Analytics, crash reporting, feature flags or push
+
+Read:
+
+1. `firebase-standard.md`
+2. `data-state-standard.md` (when sending the push token to an API)
 
 ### Enable or update SEO for a product
 

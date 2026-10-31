@@ -22,6 +22,8 @@ Without these, do scope-lock / ask — do not invent a product:
 - RTK Query / Redux / form / i18n patterns — `data-state-standard.md`
 - Web SEO (title/meta/OG/JSON-LD/robots/sitemap), config-driven and **off by default**
   — `seo-standard.md`
+- Firebase (Analytics, Crashlytics, Remote Config, push), wired and **off until you add
+  `firebase/<env>/` config files** — `firebase-standard.md`
 - Playground = component catalog only
 - Conventions in `.docs/` + change process via OpenSpec
 
@@ -125,4 +127,5 @@ OpenSpec change artifacts in this repo are written in **Vietnamese** (`openspec/
 | UX fallbacks | `default-behavior-rules.md` |
 | Canonical code | `canonical-references.md` |
 | SEO (public web products only) | `seo-standard.md` |
+| Firebase / push / flags | `firebase-standard.md` |
 | Prompts | `prompt-template-scope-lock.md`, `prompt-template-feature.md`, `prompt-template-full-app.md` |

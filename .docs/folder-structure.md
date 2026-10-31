@@ -22,6 +22,7 @@ src/
 ├ features/
 ├ hooks/
 ├ i18n/
+├ services/
 ├ store/
 ├ theme/
 ├ types/
@@ -147,6 +148,12 @@ Notes:
 - shared HTTP client
 - base query adapter
 - error normalization
+
+### `src/services`
+
+- app-wide SDK integrations with no UI, exposed as a small typed API
+  (`services/firebase`: analytics, crashlytics, remote config, push — see `firebase-standard.md`)
+- features import the service's `index.ts`, never the vendor SDK directly
 
 ### `src/store`
 
