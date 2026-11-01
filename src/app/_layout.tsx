@@ -21,6 +21,13 @@ import { Provider } from 'react-redux'
 import { AppInitProvider, useAppInit } from '@/hooks/app-init-hooks'
 import { isWeb } from '@/constants/dimensions'
 import { useHydratedColorScheme } from '@/hooks/color-scheme-hooks'
+import { selectAuthUser } from '@/features/auth/auth-slice'
+import {
+  useFirebaseScreenTracking,
+  useFirebaseUser,
+  usePushNotificationNavigation,
+} from '@/services/firebase'
+import { useAppSelector } from '@/store/hooks'
 import { store } from '@/store/store'
 
 SplashScreen.preventAutoHideAsync()
@@ -66,6 +73,7 @@ export default function RootLayout() {
                     <Stack.Screen name="(public)" options={{ headerShown: false }} />
                     <Stack.Screen name="(private)" options={{ headerShown: false }} />
                   </Stack>
+                  <FirebaseBridge />
                   <View style={styles.portalHostOverlay} pointerEvents="box-none">
                     <PortalHost name="root" />
                   </View>
@@ -95,6 +103,19 @@ function AppInitBridge({ children }: { children: React.ReactNode }) {
       <AppInitGate isInitialized={isInitialized}>{children}</AppInitGate>
     </AppInitProvider>
   )
+}
+
+/**
+ * App-wide Firebase wiring: screen_view per route, user id from auth, push tap → route.
+ * Rendered after `<Stack>` (inside the init gate) so the router is mounted before a cold-start
+ * notification navigates. No-op on web / Expo Go.
+ */
+function FirebaseBridge() {
+  const user = useAppSelector(selectAuthUser)
+  useFirebaseScreenTracking()
+  useFirebaseUser(user ? String(user.id) : null)
+  usePushNotificationNavigation()
+  return null
 }
 
 /**

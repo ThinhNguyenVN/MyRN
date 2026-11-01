@@ -152,7 +152,10 @@ async function main() {
       '  4. Remove the `playground` demo routes: src/app/(public)/(tabs)/playground/,\n' +
       '     and its tab entry.\n' +
       '  5. Check .docs/shared-ui-catalog.md before building new screens — reuse kit\n' +
-      '     components first.\n',
+      '     components first.\n' +
+      '  6. Firebase is wired but off: when you need it, create one Firebase project per\n' +
+      '     env and put google-services.json + GoogleService-Info.plist in firebase/<env>/\n' +
+      '     — see .docs/firebase-standard.md.\n',
   )
 }
 

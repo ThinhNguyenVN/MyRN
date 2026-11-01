@@ -4,6 +4,7 @@ import * as Font from 'expo-font'
 import { useInitAuth } from '@/features/auth/use-init-auth'
 import { Fonts } from '@/configs/themes'
 import { hydrateAppLocale } from '@/i18n'
+import { initFirebase } from '@/services/firebase'
 
 type AppInitTask = {
   name: string
@@ -28,6 +29,7 @@ export function useAppInit() {
       { name: 'auth', run: initAuth },
       { name: 'fonts', run: initFonts },
       { name: 'locale', run: initLocale },
+      { name: 'firebase', run: initFirebase },
     ],
     [initAuth, initFonts, initLocale],
   )

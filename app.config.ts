@@ -84,7 +84,76 @@ function resolveScheme(slug: string) {
   return normalized || 'my-rn-template'
 }
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- shared with react-native.config.js
+const { resolveFirebaseNative } = require('./scripts/firebase-native') as {
+  resolveFirebaseNative: (appEnv: AppEnv) => {
+    dir: string
+    files: { android: string; ios: string; web: string }
+    enabled: boolean
+    partial: boolean
+    webEnabled: boolean
+  }
+}
+
+/**
+ * Firebase turns on per env when `firebase/<env>/` has both `google-services.json` and
+ * `GoogleService-Info.plist` (see `.docs/firebase-standard.md`). Without them the native build
+ * has no Firebase plugins or pods (`react-native.config.js`) and `@/services/firebase` stays a
+ * no-op, so the template and new products build before a Firebase project exists.
+ */
+function resolveFirebase() {
+  const firebase = resolveFirebaseNative(resolveAppEnv())
+  if (firebase.partial) {
+    console.warn(
+      `[firebase] ${firebase.dir} needs both google-services.json and GoogleService-Info.plist — Firebase stays off.`,
+    )
+  }
+  return firebase
+}
+
+/** Web `firebaseConfig` (+ optional `vapidKey`) for `extra.firebaseWeb`; read by `web-sdk.ts`. */
+function readFirebaseWebConfig(file: string): Record<string, string> | null {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(path.resolve(__dirname, file), 'utf8'))
+    if (parsed && typeof parsed === 'object' && parsed.apiKey && parsed.appId && parsed.projectId) {
+      return parsed
+    }
+  } catch (error) {
+    console.warn(`[firebase] ${file} is not valid JSON — Firebase web stays off.`, error)
+    return null
+  }
+  console.warn(`[firebase] ${file} needs apiKey, appId and projectId — Firebase web stays off.`)
+  return null
+}
+
+/** Native config Firebase needs; only applied when the env has config files. */
+const FIREBASE_PLUGINS: ExpoConfig['plugins'] = [
+  // disableSPM: Firebase via CocoaPods; SPM + static frameworks fails `pod install`.
+  ['@react-native-firebase/app', { ios: { disableSPM: true } }],
+  '@react-native-firebase/analytics',
+  '@react-native-firebase/crashlytics',
+  '@react-native-firebase/messaging',
+  'expo-notifications',
+  [
+    'expo-build-properties',
+    {
+      ios: {
+        useFrameworks: 'static',
+        forceStaticLinking: [
+          'RNFBApp',
+          'RNFBAnalytics',
+          'RNFBCrashlytics',
+          'RNFBMessaging',
+          'RNFBRemoteConfig',
+        ],
+      },
+    },
+  ],
+]
+
 const resolvedTemplateConfig = loadTemplateConfig()
+const firebase = resolveFirebase()
+const firebaseWeb = firebase.webEnabled ? readFirebaseWebConfig(firebase.files.web) : null
 
 const config: ExpoConfig = {
   ...baseConfig,
@@ -94,10 +163,24 @@ const config: ExpoConfig = {
   ios: {
     ...baseConfig.ios,
     bundleIdentifier: resolvedTemplateConfig.bundleId,
+    ...(firebase.enabled && {
+      googleServicesFile: firebase.files.ios,
+      infoPlist: {
+        ...baseConfig.ios?.infoPlist,
+        // Data pushes delivered while the app is in background.
+        UIBackgroundModes: ['remote-notification'],
+      },
+    }),
   },
   android: {
     ...baseConfig.android,
     package: resolvedTemplateConfig.packageName,
+    ...(firebase.enabled && { googleServicesFile: firebase.files.android }),
+  },
+  plugins: [...(baseConfig.plugins ?? []), ...(firebase.enabled ? FIREBASE_PLUGINS : [])],
+  extra: {
+    ...baseConfig.extra,
+    ...(firebaseWeb && { firebaseWeb }),
   },
 }
 
