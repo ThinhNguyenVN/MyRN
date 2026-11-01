@@ -31,6 +31,7 @@ Only open a capability here when you are **changing that capability** (e.g. edit
 | `mychat-chat-adapter` | `ChatAdapter` + mock/HTTP NDJSON streaming — not Gemini/MCP |
 | `mychat-chat-core` | Core MyChat lives in published npm package `@thinhnguyenvn/chat-core`; UI re-exports it from `@/components/ui/chat` |
 | `mychat-playground-workflow` | Playground `chat` scripted demo of the kit |
+| `firebase-foundation` | `@/services/firebase` (native + web), on per env when `firebase/<env>/` config exists, no-op otherwise — see `.docs/firebase-standard.md` |
 | `product-ui-kit-test-coverage` | Kit QA expectations (tests/smoke) — process, not a product screen |
 | `picker-facade-test-coverage` | Picker helper test/smoke expectations — process, not a product screen |
 
