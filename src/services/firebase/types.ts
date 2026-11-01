@@ -15,3 +15,5 @@ export type FirebaseModules = {
 }
 
 export type FirebaseRemoteMessage = MessagingModule.RemoteMessage
+
+export type NotificationsResponse = NotificationsModule.NotificationResponse

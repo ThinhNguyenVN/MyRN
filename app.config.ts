@@ -88,9 +88,10 @@ function resolveScheme(slug: string) {
 const { resolveFirebaseNative } = require('./scripts/firebase-native') as {
   resolveFirebaseNative: (appEnv: AppEnv) => {
     dir: string
-    files: { android: string; ios: string }
+    files: { android: string; ios: string; web: string }
     enabled: boolean
     partial: boolean
+    webEnabled: boolean
   }
 }
 
@@ -108,6 +109,21 @@ function resolveFirebase() {
     )
   }
   return firebase
+}
+
+/** Web `firebaseConfig` (+ optional `vapidKey`) for `extra.firebaseWeb`; read by `web-sdk.ts`. */
+function readFirebaseWebConfig(file: string): Record<string, string> | null {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(path.resolve(__dirname, file), 'utf8'))
+    if (parsed && typeof parsed === 'object' && parsed.apiKey && parsed.appId && parsed.projectId) {
+      return parsed
+    }
+  } catch (error) {
+    console.warn(`[firebase] ${file} is not valid JSON — Firebase web stays off.`, error)
+    return null
+  }
+  console.warn(`[firebase] ${file} needs apiKey, appId and projectId — Firebase web stays off.`)
+  return null
 }
 
 /** Native config Firebase needs; only applied when the env has config files. */
@@ -137,6 +153,7 @@ const FIREBASE_PLUGINS: ExpoConfig['plugins'] = [
 
 const resolvedTemplateConfig = loadTemplateConfig()
 const firebase = resolveFirebase()
+const firebaseWeb = firebase.webEnabled ? readFirebaseWebConfig(firebase.files.web) : null
 
 const config: ExpoConfig = {
   ...baseConfig,
@@ -161,6 +178,10 @@ const config: ExpoConfig = {
     ...(firebase.enabled && { googleServicesFile: firebase.files.android }),
   },
   plugins: [...(baseConfig.plugins ?? []), ...(firebase.enabled ? FIREBASE_PLUGINS : [])],
+  extra: {
+    ...baseConfig.extra,
+    ...(firebaseWeb && { firebaseWeb }),
+  },
 }
 
 export default config

@@ -1,14 +1,16 @@
 # Firebase standard
 
 Firebase (Analytics, Crashlytics, Remote Config, Cloud Messaging) is wired in this template via
-`@react-native-firebase/*` and **turns on per env when its config files exist**. Product code
+`@react-native-firebase/*` on native and the Firebase JS SDK (`firebase`) on web, and **turns on
+per env when its config files exist**. Product code
 imports only from `@/services/firebase` and never changes when Firebase is turned on.
 
 | Runtime | Behaviour |
 |---------|-----------|
 | Native build, `firebase/<env>/` has both files | Real Firebase |
 | Native build, files missing (template, new product) | No-op — no Firebase plugins, RNFirebase not linked |
-| Web | No-op (`native-modules.web.ts`; RNFirebase is not in the web bundle) |
+| Web, `firebase/<env>/firebase-web.json` exists | Real Firebase (JS SDK): Analytics, Remote Config, push, errors as `exception` events |
+| Web, no web config | No-op |
 | Expo Go, or a build made before Firebase was added | No-op (`isFirebaseAvailable()` is `false`) |
 
 Every call is safe in a no-op runtime: it never throws and never blocks the UI. Native features
@@ -22,6 +24,9 @@ EAS `development` build. Expo Go still opens the app, without Firebase.
    `packageName`. Enable Analytics when creating the project.
 3. Download the files into `firebase/<env>/`:
    `google-services.json` and `GoogleService-Info.plist`. Commit them (client config, not secrets).
+   Web: add a Web app, save its `firebaseConfig` object as `firebase/<env>/firebase-web.json`
+   (JSON). `measurementId` only exists when the project is linked to Google Analytics (Project
+   settings → Integrations); without it Analytics and error events stay off on web.
 4. iOS push: upload an APNs auth key (`.p8`) in Firebase → Project settings → Cloud Messaging.
    EAS adds the Push Notifications capability when credentials are set up.
 5. `npx expo prebuild --clean` (or an EAS build) and run on a device.
@@ -45,8 +50,34 @@ Other native config:
 - `firebase.json`: RNFirebase native flags (Android notification channel, iOS foreground
   presentation). Add `analytics_auto_collection_enabled` / `crashlytics_auto_collection_enabled:
   false` here when collection must be off before JS starts (see Consent).
-- `index.ts` (package `main`): registers the background message handler, then loads
+- `index.ts` (package `main`): registers the background message handler, then `require`s
   `expo-router/entry`.
+
+## Web
+
+Same API, same imports. Every `*.web.ts` file in `src/services/firebase/` replaces its native
+twin on web; they load the SDK through `web-sdk.ts` with dynamic `import()` (lazy chunks, never in
+the native bundle, skipped during static rendering).
+
+- **Config:** `firebase/<env>/firebase-web.json` → `app.config.ts` → `extra.firebaseWeb`. The
+  manifest is inlined at bundle time, so after adding or editing the file restart with
+  `npx expo start --clear` (and rebuild for a static export).
+- **Analytics:** GA4 with the web app's `measurementId`. `screen_view` comes from the same
+  `FirebaseBridge`. GA4 enhanced measurement may also log `page_view` on URL changes — turn it off
+  in the GA4 web stream settings if you only want `screen_view`.
+- **Errors:** no Crashlytics on web. `recordError` and uncaught errors / unhandled rejections are
+  sent as GA4 `exception` events (`description` ≤ 100 chars, `fatal`), at most 20 per session.
+  `crashLog` and `setCrashUserId` do nothing on web.
+- **Remote Config:** same defaults, hook and background fetch (needs IndexedDB).
+- **Push:** needs HTTPS (localhost is fine) and `public/firebase-messaging-sw.js` at the site root.
+  - Call `requestPushPermission()` from a click handler (browsers drop prompts without a user
+    gesture). Unsupported browsers return `'unavailable'`; iOS Safari supports push only for a web
+    app added to the home screen.
+  - `vapidKey` in `firebase-web.json` is optional (Firebase's default key is used without it).
+  - Background / closed tab: the service worker shows the notification. Foreground: the kit shows
+    it through the same worker. Click: focuses the app tab and routes to `data.url` via
+    `usePushNotificationNavigation`; with no tab open it opens `data.url` directly.
+  - Keep `FIREBASE_SDK_VERSION` in the worker equal to the `firebase` version in `package.json`.
 
 ## Wiring the kit already does
 
@@ -166,5 +197,6 @@ iOS App Tracking Transparency is not part of the kit (Analytics works without ID
 - Do keep `firebase/<env>/` files in sync with `template.config.json` ids.
 - Don't block init or a screen on Remote Config fetch or token fetch.
 - Don't add a second screen tracker; the bridge already logs `screen_view`.
-- Don't run push/crash testing in Expo Go — use a dev client.
+- Don't run push/crash testing in Expo Go — use a dev client (web push works in a desktop browser).
+- Don't import `web-sdk.ts` from a non-`.web.ts` file: it would pull the Firebase JS SDK into the native bundle.
 - Don't move the Firebase plugins into `app.json`: they must stay conditional in `app.config.ts`.

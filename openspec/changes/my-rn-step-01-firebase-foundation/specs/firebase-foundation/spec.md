@@ -7,11 +7,11 @@ App SHALL dùng Analytics, Crashlytics, Remote Config và Cloud Messaging qua `@
 - **WHEN** một feature cần log event
 - **THEN** nó MUST gọi `logEvent` từ `@/services/firebase` với tên event đã khai báo trong `AnalyticsEventMap`, sai tên hoặc sai params MUST báo lỗi type
 
-### Requirement: No-op an toàn khi không có Firebase native
-Trên web, trong Expo Go và trong build chưa có native code Firebase, mọi API của service SHALL là no-op: MUST NOT throw, MUST NOT chặn UI. `isFirebaseAvailable()` MUST trả `false`. Bundle web MUST NOT chứa `@react-native-firebase`.
+### Requirement: No-op an toàn khi không có Firebase
+Trong Expo Go, trong build chưa có native code Firebase và trên web khi env chưa có `firebase/<env>/firebase-web.json`, mọi API của service SHALL là no-op: MUST NOT throw, MUST NOT chặn UI. `isFirebaseAvailable()` MUST trả `false`. Bundle web MUST NOT chứa `@react-native-firebase`; bundle native MUST NOT chứa Firebase JS SDK.
 
-#### Scenario: Mở app trên web
-- **WHEN** app chạy trên web và code gọi `logEvent`, `recordError`, `useRemoteConfig`, `requestPushPermission`
+#### Scenario: Mở app trong Expo Go hoặc web chưa có config
+- **WHEN** app chạy trong Expo Go, hoặc trên web khi env chưa có config web, và code gọi `logEvent`, `recordError`, `useRemoteConfig`, `requestPushPermission`
 - **THEN** app MUST chạy bình thường, `useRemoteConfig` MUST trả default, `requestPushPermission` MUST trả `'unavailable'`
 
 #### Scenario: Lời gọi native bị lỗi
@@ -29,8 +29,23 @@ Firebase native SHALL bật cho một env khi và chỉ khi `firebase/<env>/` c�
 - **WHEN** EAS build profile `staging`
 - **THEN** app MUST dùng `firebase/staging/google-services.json` và `firebase/staging/GoogleService-Info.plist`
 
+### Requirement: Firebase trên web
+Khi `firebase/<env>/firebase-web.json` có, web SHALL dùng Firebase JS SDK qua cùng API của `@/services/firebase`: Analytics (GA4, cần `measurementId`), Remote Config, push web và báo lỗi bằng event GA4 `exception`. SDK MUST được load lazy, MUST NOT chạy lúc static render.
+
+#### Scenario: Remote Config trên web
+- **WHEN** web mở với config web của env
+- **THEN** `useRemoteConfig` MUST trả giá trị đã fetch từ project, không chặn render
+
+#### Scenario: Push web
+- **WHEN** user cho quyền thông báo qua `requestPushPermission()` trên trình duyệt hỗ trợ push
+- **THEN** kit MUST đăng ký `firebase-messaging-sw.js`, lấy FCM token và đưa vào `setPushTokenHandler`; trình duyệt không hỗ trợ MUST trả `'unavailable'`
+
+#### Scenario: Lỗi trên web
+- **WHEN** gọi `recordError(error)` hoặc có lỗi không bắt
+- **THEN** kit MUST gửi event `exception` (lỗi không bắt là `fatal: true`, tối đa 20 lần mỗi phiên)
+
 ### Requirement: Init Firebase không chặn startup
-Task `firebase` trong `useAppInit` SHALL chỉ đọc state local (consent, Remote Config đã activate, quyền push đã có). Fetch Remote Config và lấy FCM token MUST chạy nền; fetch MUST có timeout.
+Task `firebase` trong `useAppInit` SHALL chỉ đọc state local (consent, Remote Config đã activate, quyền push đã có). Fetch Remote Config và lấy FCM token MUST chạy nền; fetch MUST có timeout (setting `fetchTimeoutMillis`). Fetch xong muộn MUST vẫn cập nhật giá trị.
 
 #### Scenario: Mạng chậm lúc mở app
 - **WHEN** fetch Remote Config bị treo

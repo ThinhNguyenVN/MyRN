@@ -7,7 +7,7 @@ let cached: FirebaseModules | null | undefined
 
 /**
  * Native Firebase modules, or `null` when they cannot run: Expo Go has no RNFirebase native
- * code, and a dev build made before Firebase was added has none either. Every service treats
+ * code, and a native build without the Firebase config files does not link it. Every service treats
  * `null` as "no-op", so product code never branches on the runtime. Web has its own file.
  */
 export function loadFirebase(): FirebaseModules | null {
@@ -19,6 +19,11 @@ export function loadFirebase(): FirebaseModules | null {
   }
 
   try {
+    // `require` succeeds even when the RNFirebase pods / gradle module are not linked (dev build
+    // made before the config files existed); the native module is only checked on first use.
+    // `getApp()` touches it now, so a missing native side throws here and Firebase stays off.
+    const app: typeof import('@react-native-firebase/app') = require('@react-native-firebase/app')
+    app.getApp()
     cached = {
       analytics: require('@react-native-firebase/analytics'),
       crashlytics: require('@react-native-firebase/crashlytics'),

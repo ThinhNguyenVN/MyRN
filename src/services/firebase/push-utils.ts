@@ -26,6 +26,13 @@ export function toPushPermissionStatus(response: PermissionResponseLike): PushPe
   return 'undetermined'
 }
 
+/** Browser `Notification.permission` → kit status. */
+export function toWebPushPermissionStatus(permission: string): PushPermissionStatus {
+  if (permission === 'granted') return 'granted'
+  if (permission === 'denied') return 'denied'
+  return 'undetermined'
+}
+
 export function canReceivePush(status: PushPermissionStatus): boolean {
   return status === 'granted' || status === 'provisional'
 }
@@ -42,4 +49,26 @@ export function resolveNotificationRoute(data: unknown): string | null {
   const trimmed = url.trim()
   if (!trimmed.startsWith('/') || trimmed.startsWith('//')) return null
   return trimmed
+}
+
+/**
+ * One tap can be reported by more than one source (RNFirebase and expo-notifications, launch
+ * and listener). The guard lets each tap through once: same notification id, or the same
+ * payload within `windowMs`.
+ */
+export function createNotificationOpenGuard(windowMs = 2000, now: () => number = Date.now) {
+  const seenIds = new Set<string>()
+  let lastKey: string | null = null
+  let lastAt = 0
+
+  return (id: string | null | undefined, data: Record<string, unknown>): boolean => {
+    if (id && seenIds.has(id)) return false
+    const key = JSON.stringify(data)
+    const at = now()
+    if (key === lastKey && at - lastAt < windowMs) return false
+    if (id) seenIds.add(id)
+    lastKey = key
+    lastAt = at
+    return true
+  }
 }

@@ -1,4 +1,10 @@
-import { canReceivePush, resolveNotificationRoute, toPushPermissionStatus } from './push-utils'
+import {
+  canReceivePush,
+  createNotificationOpenGuard,
+  resolveNotificationRoute,
+  toPushPermissionStatus,
+  toWebPushPermissionStatus,
+} from './push-utils'
 
 describe('toPushPermissionStatus', () => {
   it('maps granted / denied / undetermined', () => {
@@ -37,5 +43,35 @@ describe('resolveNotificationRoute', () => {
     expect(resolveNotificationRoute({ url: 'https://evil.example/x' })).toBeNull()
     expect(resolveNotificationRoute({ url: '//evil.example/x' })).toBeNull()
     expect(resolveNotificationRoute({ url: 'myapp://todo' })).toBeNull()
+  })
+})
+
+describe('createNotificationOpenGuard', () => {
+  it('lets each notification id through once', () => {
+    let time = 0
+    const shouldOpen = createNotificationOpenGuard(2000, () => time)
+    expect(shouldOpen('a', { url: '/x' })).toBe(true)
+    time = 10_000
+    expect(shouldOpen('a', { url: '/x' })).toBe(false)
+    expect(shouldOpen('b', { url: '/x' })).toBe(true)
+  })
+
+  it('drops the same payload reported by a second source right after', () => {
+    let time = 0
+    const shouldOpen = createNotificationOpenGuard(2000, () => time)
+    expect(shouldOpen('fcm-1', { url: '/orders/1' })).toBe(true)
+    time = 500
+    expect(shouldOpen('expo-1', { url: '/orders/1' })).toBe(false)
+    expect(shouldOpen('expo-2', { url: '/orders/2' })).toBe(true)
+    time = 5000
+    expect(shouldOpen(null, { url: '/orders/2' })).toBe(true)
+  })
+})
+
+describe('toWebPushPermissionStatus', () => {
+  it('maps Notification.permission', () => {
+    expect(toWebPushPermissionStatus('granted')).toBe('granted')
+    expect(toWebPushPermissionStatus('denied')).toBe('denied')
+    expect(toWebPushPermissionStatus('default')).toBe('undetermined')
   })
 })

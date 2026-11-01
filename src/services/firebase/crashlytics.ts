@@ -1,14 +1,7 @@
+import { toError } from './errors'
 import { withFirebase, withFirebaseAsync } from './safe-call'
 
-export function toError(error: unknown): Error {
-  if (error instanceof Error) return error
-  if (typeof error === 'string') return new Error(error)
-  try {
-    return new Error(JSON.stringify(error))
-  } catch {
-    return new Error(String(error))
-  }
-}
+export { toError } from './errors'
 
 /**
  * Records a non-fatal error. Fatal JS errors and native crashes are captured automatically.
@@ -34,3 +27,6 @@ export async function setCrashUserId(userId: string | null): Promise<void> {
     crashlytics.setUserId(crashlytics.getCrashlytics(), userId ?? ''),
   )
 }
+
+/** Native: fatal JS errors and native crashes are captured by Crashlytics itself. */
+export function captureGlobalErrors(): void {}

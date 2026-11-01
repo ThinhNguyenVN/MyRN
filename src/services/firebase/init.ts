@@ -1,4 +1,5 @@
 import { applyStoredCollectionConsent } from './consent'
+import { captureGlobalErrors } from './crashlytics'
 import { initMessaging } from './messaging'
 import { initRemoteConfig } from './remote-config'
 
@@ -8,6 +9,7 @@ import { initRemoteConfig } from './remote-config'
  */
 export async function initFirebase(): Promise<void> {
   await applyStoredCollectionConsent()
+  captureGlobalErrors()
   void initMessaging()
   await initRemoteConfig()
 }

@@ -1,9 +1,12 @@
 /* global __dirname */
 /**
- * Single source for "is Firebase on for this env": `firebase/<env>/` must hold both
- * `google-services.json` and `GoogleService-Info.plist`. Used by `app.config.ts` (plugins) and
- * `react-native.config.js` (autolinking), so a template or product without a Firebase project
- * builds natively with no Firebase code at all. See `.docs/firebase-standard.md`.
+ * Single source for "is Firebase on for this env":
+ * - native: `firebase/<env>/` must hold both `google-services.json` and `GoogleService-Info.plist`.
+ *   Used by `app.config.ts` (plugins) and `react-native.config.js` (autolinking), so a template or
+ *   product without a Firebase project builds natively with no Firebase code at all.
+ * - web: `firebase/<env>/firebase-web.json` (the web app's `firebaseConfig`, plus optional
+ *   `vapidKey`). `app.config.ts` copies it to `extra.firebaseWeb`.
+ * See `.docs/firebase-standard.md`.
  */
 const fs = require('fs')
 const path = require('path')
@@ -31,11 +34,19 @@ function resolveFirebaseNative(appEnv = resolveAppEnv()) {
   const files = {
     android: `${dir}/google-services.json`,
     ios: `${dir}/GoogleService-Info.plist`,
+    web: `${dir}/firebase-web.json`,
   }
   const exists = (relativePath) => fs.existsSync(path.resolve(ROOT, relativePath))
   const hasAndroid = exists(files.android)
   const hasIos = exists(files.ios)
-  return { appEnv, dir, files, enabled: hasAndroid && hasIos, partial: hasAndroid !== hasIos }
+  return {
+    appEnv,
+    dir,
+    files,
+    enabled: hasAndroid && hasIos,
+    partial: hasAndroid !== hasIos,
+    webEnabled: exists(files.web),
+  }
 }
 
 module.exports = { RNFB_PACKAGES, resolveFirebaseNative }

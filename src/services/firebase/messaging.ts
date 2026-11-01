@@ -3,61 +3,35 @@ import { Platform } from 'react-native'
 import { firebaseConfig } from '@/configs/firebase.config'
 
 import { logEvent } from './analytics'
+import { emitPushToken } from './push-token'
 import {
   canReceivePush,
+  createNotificationOpenGuard,
   resolveNotificationRoute,
   toPushPermissionStatus,
   type PushPermissionStatus,
 } from './push-utils'
 import { withFirebase, withFirebaseAsync } from './safe-call'
-import type { FirebaseModules, FirebaseRemoteMessage } from './types'
+import type { FirebaseModules, FirebaseRemoteMessage, NotificationsResponse } from './types'
 
-export type PushTokenHandler = (token: string) => void | Promise<void>
+export { getPushToken, setPushTokenHandler, type PushTokenHandler } from './push-token'
+
 export type NotificationOpenHandler = (route: string | null, data: Record<string, unknown>) => void
 
 const isAndroid = Platform.OS === 'android'
 const { androidChannelId, androidChannelName } = firebaseConfig.notifications
 
-let currentToken: string | null = null
-const tokenHandlers = new Set<PushTokenHandler>()
 let foregroundListenersAttached = false
 let initialOpenHandled = false
+const shouldOpen = createNotificationOpenGuard()
 
 function warn(label: string, error: unknown) {
   if (__DEV__) console.warn(`[firebase] ${label}`, error)
 }
 
-function emitToken(token: string) {
-  if (!token || token === currentToken) return
-  currentToken = token
-  tokenHandlers.forEach((handler) => {
-    Promise.resolve(handler(token)).catch((error) => warn('push token handler failed', error))
-  })
-}
-
-/**
- * Registers where the FCM token goes (usually: send it to your backend for the signed-in
- * user). Called right away with the current token if there is one, then on every refresh.
- */
-export function setPushTokenHandler(handler: PushTokenHandler): () => void {
-  tokenHandlers.add(handler)
-  if (currentToken) {
-    Promise.resolve(handler(currentToken)).catch((error) =>
-      warn('push token handler failed', error),
-    )
-  }
-  return () => {
-    tokenHandlers.delete(handler)
-  }
-}
-
-export function getPushToken(): string | null {
-  return currentToken
-}
-
 async function fetchToken({ messaging }: FirebaseModules) {
   // iOS registers for remote messages automatically (RNFirebase default) before a token exists.
-  emitToken(await messaging.getToken(messaging.getMessaging()))
+  emitPushToken(await messaging.getToken(messaging.getMessaging()))
 }
 
 /** Android 8+: FCM and local notifications need a channel; Android 13 needs it before the prompt. */
@@ -96,7 +70,7 @@ function attachForegroundListeners(modules: FirebaseModules) {
   const { messaging, notifications } = modules
   const instance = messaging.getMessaging()
 
-  messaging.onTokenRefresh(instance, emitToken)
+  messaging.onTokenRefresh(instance, emitPushToken)
   messaging.onMessage(instance, (message) => presentForegroundMessage(modules, message))
 
   if (isAndroid) {
@@ -157,41 +131,44 @@ export function subscribeNotificationOpens(handler: NotificationOpenHandler): ()
     () => {},
     ({ messaging, notifications }) => {
       const instance = messaging.getMessaging()
-      const open = (data: Record<string, unknown> | undefined) => {
+      const open = (id: string | null | undefined, data: Record<string, unknown> | undefined) => {
+        // expo-notifications keeps the last tap until cleared and returns it on every later
+        // cold start; clear it once handled so an old push is never replayed.
+        if (isAndroid) {
+          try {
+            notifications.clearLastNotificationResponse()
+          } catch (error) {
+            warn('clearLastNotificationResponse failed', error)
+          }
+        }
         const payload = data ?? {}
+        if (!shouldOpen(id, payload)) return
         const route = resolveNotificationRoute(payload)
         logEvent('notification_open', { url: route ?? undefined })
         handler(route, payload)
       }
+      const openResponse = (response: NotificationsResponse) =>
+        open(response.notification.request.identifier, response.notification.request.content.data)
 
       if (!initialOpenHandled) {
         initialOpenHandled = true
-        // Both sources can report the same launch tap; the first one wins.
-        let launchOpened = false
-        const openLaunch = (data: Record<string, unknown> | undefined) => {
-          if (launchOpened) return
-          launchOpened = true
-          open(data)
-        }
         messaging
           .getInitialNotification(instance)
-          .then((message) => message && openLaunch(message.data))
+          .then((message) => message && open(message.messageId, message.data))
           .catch((error) => warn('getInitialNotification failed', error))
         if (isAndroid) {
           notifications
             .getLastNotificationResponseAsync()
-            .then((response) => response && openLaunch(response.notification.request.content.data))
+            .then((response) => response && openResponse(response))
             .catch((error) => warn('getLastNotificationResponse failed', error))
         }
       }
 
       const unsubscribeRemote = messaging.onNotificationOpenedApp(instance, (message) =>
-        open(message.data),
+        open(message.messageId, message.data),
       )
       const localSubscription = isAndroid
-        ? notifications.addNotificationResponseReceivedListener((response) =>
-            open(response.notification.request.content.data),
-          )
+        ? notifications.addNotificationResponseReceivedListener(openResponse)
         : null
 
       return () => {
