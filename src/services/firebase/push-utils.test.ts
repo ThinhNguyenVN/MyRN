@@ -50,21 +50,24 @@ describe('createNotificationOpenGuard', () => {
   it('lets each notification id through once', () => {
     let time = 0
     const shouldOpen = createNotificationOpenGuard(2000, () => time)
-    expect(shouldOpen('a', { url: '/x' })).toBe(true)
+    expect(shouldOpen('a', '/x')).toBe(true)
     time = 10_000
-    expect(shouldOpen('a', { url: '/x' })).toBe(false)
-    expect(shouldOpen('b', { url: '/x' })).toBe(true)
+    expect(shouldOpen('a', '/x')).toBe(false)
+    expect(shouldOpen('b', '/x')).toBe(true)
   })
 
-  it('drops the same payload reported by a second source right after', () => {
+  it('drops the same route reported by a second source right after', () => {
     let time = 0
     const shouldOpen = createNotificationOpenGuard(2000, () => time)
-    expect(shouldOpen('fcm-1', { url: '/orders/1' })).toBe(true)
+    // Same tap: FCM data and expo content.data differ, the resolved route does not.
+    expect(shouldOpen('fcm-1', resolveNotificationRoute({ url: '/orders/1', from: 'fcm' }))).toBe(
+      true,
+    )
     time = 500
-    expect(shouldOpen('expo-1', { url: '/orders/1' })).toBe(false)
-    expect(shouldOpen('expo-2', { url: '/orders/2' })).toBe(true)
+    expect(shouldOpen('expo-1', resolveNotificationRoute({ url: '/orders/1' }))).toBe(false)
+    expect(shouldOpen('expo-2', '/orders/2')).toBe(true)
     time = 5000
-    expect(shouldOpen(null, { url: '/orders/2' })).toBe(true)
+    expect(shouldOpen(null, '/orders/2')).toBe(true)
   })
 })
 

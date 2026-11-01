@@ -142,8 +142,8 @@ export function subscribeNotificationOpens(handler: NotificationOpenHandler): ()
           }
         }
         const payload = data ?? {}
-        if (!shouldOpen(id, payload)) return
         const route = resolveNotificationRoute(payload)
+        if (!shouldOpen(id, route)) return
         logEvent('notification_open', { url: route ?? undefined })
         handler(route, payload)
       }

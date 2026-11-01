@@ -45,6 +45,7 @@
 - [x] 5.4c Web với config (`my-store-test`, app `my-rn-web`): Remote Config fetch `success`, service worker + FCM token lấy được; `expo export -p web` OK, JS SDK nằm ở chunk lazy
 - [x] 5.4d Analytics web (GA4 `G-30LRCD12TJ`, đã liên kết GA cho `my-store-test`): `page_view`, `screen_view`, event có type, `exception`, user id đều gửi `g/collect` 204
 - [x] 5.4e Push thật tới web (Chrome, Firebase console "Send test message"): nhận và hiện thông báo. Sửa race 2 `getToken` song song làm SDK đổi token
+- [x] 5.4g Mở app từ thông báo khi không có tab (static export + static host): `/#notification_url=<route động>` điều hướng đúng (mở thẳng route đó thì 404); URL ngoài app ở lại `/`
 - [ ] 5.4f Click thông báo web → `data.url` (cần bấm tay trên thông báo của OS)
 - [ ] 5.5 Tạo Firebase project + file config, `npx expo prebuild --clean`, build dev client iOS và Android — chờ Thịnh
 - [ ] 5.6 Trên máy thật: event trong DebugView, `screen_view`, non-fatal + crash, Remote Config đổi giá trị, push foreground/background/quit + tap `data.url` — chờ Thịnh

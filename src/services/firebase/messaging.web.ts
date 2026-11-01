@@ -2,7 +2,8 @@
  * Web push (FCM JS SDK). Needs HTTPS (or localhost) and `public/firebase-messaging-sw.js`.
  * - Background/closed tab: the service worker shows the notification.
  * - Foreground: the page re-posts it through the service worker so it looks the same.
- * - Click: the service worker focuses the app and posts `data` back here, or opens `data.url`.
+ * - Click: the service worker focuses the app and posts `data` back here, or opens `/` with the
+ *   route in `#notification_url=` (only `/` is sure to exist in a static export).
  * iOS Safari supports push only for a web app added to the home screen; elsewhere it is
  * `'unavailable'`.
  */
@@ -24,6 +25,8 @@ export type NotificationOpenHandler = (route: string | null, data: Record<string
 
 /** Message type the service worker posts when a notification is clicked. */
 const OPEN_MESSAGE_TYPE = 'firebase-notification-open'
+/** Query param the worker adds to `/` when a click opens the app (same name in the worker). */
+const LAUNCH_URL_PARAM = 'notification_url'
 /** Same scope as the Firebase default, so the worker never controls the app's pages. */
 const SW_SCOPE = '/firebase-cloud-messaging-push-scope'
 
@@ -156,22 +159,47 @@ export async function initMessaging(): Promise<void> {
   }
 }
 
+let launchChecked = false
+
 /**
- * Calls `handler` when the user clicks a notification while the app is open in a tab. A click
- * with no open tab opens `data.url` directly (the route loads, no handler call).
+ * A click with no app tab open makes the worker open `/#notification_url=<path>`: only `/` is
+ * sure to exist in a static export (`/todo/42` has no HTML file). Reads the param once, removes
+ * it from the address bar, and returns the payload to open (`null` = not a notification launch).
+ */
+function takeLaunchPayload(): Record<string, unknown> | null {
+  if (launchChecked || typeof window === 'undefined') return null
+  launchChecked = true
+  // In the hash, not the query: expo-router would treat a query as a route param of `/`.
+  const params = new URLSearchParams(window.location.hash.slice(1))
+  if (!params.has(LAUNCH_URL_PARAM)) return null
+  const payload = { url: params.get(LAUNCH_URL_PARAM) ?? '' }
+  const { pathname, search } = window.location
+  window.history.replaceState(window.history.state, '', pathname + search)
+  return payload
+}
+
+/**
+ * Calls `handler` when the user clicks a notification: while the app is open in a tab (the
+ * worker posts the click here), or once on startup when the click opened the app.
  */
 export function subscribeNotificationOpens(handler: NotificationOpenHandler): () => void {
   if (!getWebFirebaseConfig() || typeof navigator === 'undefined' || !navigator.serviceWorker) {
     return () => {}
   }
+  const open = (id: string | undefined, payload: Record<string, unknown>) => {
+    const route = resolveNotificationRoute(payload)
+    if (!shouldOpen(id, route)) return
+    logEvent('notification_open', { url: route ?? undefined })
+    handler(route, payload)
+  }
+  const launchPayload = takeLaunchPayload()
+  // Next tick: the subscriber mounts inside the router; navigate after it has mounted.
+  if (launchPayload) setTimeout(() => open(undefined, launchPayload), 0)
+
   const onMessage = (event: MessageEvent) => {
     const message = event.data as { type?: string; id?: string; data?: Record<string, unknown> }
     if (message?.type !== OPEN_MESSAGE_TYPE) return
-    const payload = message.data ?? {}
-    if (!shouldOpen(message.id, payload)) return
-    const route = resolveNotificationRoute(payload)
-    logEvent('notification_open', { url: route ?? undefined })
-    handler(route, payload)
+    open(message.id, message.data ?? {})
   }
   navigator.serviceWorker.addEventListener('message', onMessage)
   return () => navigator.serviceWorker.removeEventListener('message', onMessage)

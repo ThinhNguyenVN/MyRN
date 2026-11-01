@@ -54,16 +54,17 @@ export function resolveNotificationRoute(data: unknown): string | null {
 /**
  * One tap can be reported by more than one source (RNFirebase and expo-notifications, launch
  * and listener). The guard lets each tap through once: same notification id, or the same
- * payload within `windowMs`.
+ * resolved route within `windowMs`. The route, not the payload, is compared: RNFirebase
+ * `message.data` and expo `content.data` for the same push usually differ.
  */
 export function createNotificationOpenGuard(windowMs = 2000, now: () => number = Date.now) {
   const seenIds = new Set<string>()
   let lastKey: string | null = null
   let lastAt = 0
 
-  return (id: string | null | undefined, data: Record<string, unknown>): boolean => {
+  return (id: string | null | undefined, route: string | null): boolean => {
     if (id && seenIds.has(id)) return false
-    const key = JSON.stringify(data)
+    const key = route ?? ''
     const at = now()
     if (key === lastKey && at - lastAt < windowMs) return false
     if (id) seenIds.add(id)

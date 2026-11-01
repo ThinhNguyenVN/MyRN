@@ -76,7 +76,9 @@ the native bundle, skipped during static rendering).
   - `vapidKey` in `firebase-web.json` is optional (Firebase's default key is used without it).
   - Background / closed tab: the service worker shows the notification. Foreground: the kit shows
     it through the same worker. Click: focuses the app tab and routes to `data.url` via
-    `usePushNotificationNavigation`; with no tab open it opens `data.url` directly.
+    `usePushNotificationNavigation`. With no tab open it opens `/#notification_url=<path>` (only
+    `/` is sure to exist in a static export) and the app routes there on startup; a non-app
+    `data.url` just opens `/`.
   - Keep `FIREBASE_SDK_VERSION` in the worker equal to the `firebase` version in `package.json`.
 
 ## Wiring the kit already does

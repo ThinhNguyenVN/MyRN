@@ -6,12 +6,17 @@
  */
 const FIREBASE_SDK_VERSION = '12.17.1'
 const OPEN_MESSAGE_TYPE = 'firebase-notification-open'
+/** Read by `messaging.web.ts` on startup. */
+const LAUNCH_URL_PARAM = 'notification_url'
 
-/** Same rule as `resolveNotificationRoute`: only in-app paths. */
-function toAppPath(url) {
-  if (typeof url !== 'string') return '/'
-  const trimmed = url.trim()
-  return trimmed.startsWith('/') && !trimmed.startsWith('//') ? trimmed : '/'
+/**
+ * Opens the app shell `/` (the only page sure to exist in a static export; `/todo/42` has no HTML
+ * file) and lets the app route to `data.url`. Not an in-app path → just `/`.
+ */
+function launchUrl(url) {
+  const trimmed = typeof url === 'string' ? url.trim() : ''
+  if (!trimmed.startsWith('/') || trimmed.startsWith('//')) return '/'
+  return `/#${LAUNCH_URL_PARAM}=${encodeURIComponent(trimmed)}`
 }
 
 // Registered before the Firebase SDK's own handler so `data.url` decides where a click goes.
@@ -30,7 +35,7 @@ self.addEventListener('notificationclick', (event) => {
         client.postMessage({ type: OPEN_MESSAGE_TYPE, id, data })
         return
       }
-      await clients.openWindow(toAppPath(data.url))
+      await clients.openWindow(launchUrl(data.url))
     })(),
   )
 })
