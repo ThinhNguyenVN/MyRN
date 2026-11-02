@@ -20,6 +20,7 @@ export function titleFromRoute(routeName: string): string {
     'floating-action-button': 'playground.linksFab',
     'tab-bar': 'playground.linksTabBar',
     'website-header': 'playground.linksWebsiteHeader',
+    'otp-code-input': 'playground.linksOtpCodeInput',
     stepper: 'playground.linksStepper',
     pagination: 'playground.linksPagination',
     collapsible: 'playground.linksCollapsible',

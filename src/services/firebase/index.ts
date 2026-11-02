@@ -15,9 +15,15 @@ export {
   registerBackgroundMessageHandler,
   requestPushPermission,
   setPushTokenHandler,
+  subscribeForegroundMessages,
   subscribeNotificationOpens,
 } from './messaging'
-export type { NotificationOpenHandler, PushTokenHandler } from './messaging'
+export type {
+  ForegroundMessageHandler,
+  NotificationOpenHandler,
+  PushTokenHandler,
+} from './messaging'
+export { canReceivePush } from './push-utils'
 export type { PushPermissionStatus } from './push-utils'
 export { getRemoteConfigValue, useRemoteConfig } from './remote-config'
 export type { RemoteConfigKey, RemoteConfigValues } from './remote-config'

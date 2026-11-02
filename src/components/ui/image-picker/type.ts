@@ -60,7 +60,6 @@ export type ImagePickerFieldProps = {
   isUploading?: boolean
   errorMessage?: string | null
   emptyTitle: string
-  emptyHint?: string
   clearAccessibilityLabel: string
   /** Web only: opens the browser file picker (click). Native shows the camera/library sheet instead. */
   onPick: () => void
@@ -78,6 +77,17 @@ export type ImagePickerFieldProps = {
   onPickError?: (error: unknown) => void
   /** Forwarded to {@link pickedImageFromFile} (web drop) and {@link pickImage}/{@link pickImageFromCamera} (native). */
   pickOptions?: PickImageOptions
-  /** `square` (default): full-width rectangle, e.g. product photo. `circle`: fixed-size avatar. */
+  /** `square` (default): fixed square thumbnail (see `size`). `circle`: fixed-size avatar. */
   shape?: 'square' | 'circle'
+  /** Edge length in px of the `square` thumbnail. Default 120. Ignored for `circle`. */
+  size?: number
+}
+
+/** {@link ImagePickerFieldProps} plus the text column shown beside the thumbnail. */
+export type ImageThumbnailRowProps = ImagePickerFieldProps & {
+  title?: string
+  /** Format / size guidance. */
+  hint?: string
+  /** Extra line, e.g. "optional". */
+  note?: string
 }

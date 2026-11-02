@@ -6,13 +6,14 @@ import { Toast } from '@/components/ui/toast'
 import { useServerListConfirmedAction } from './use-server-list-confirmed-action'
 
 jest.mock('@/components/ui/confirmation', () => ({
-  Confirmation: { confirm: jest.fn() },
+  Confirmation: { confirm: jest.fn(), prompt: jest.fn() },
 }))
 jest.mock('@/components/ui/toast', () => ({
   Toast: { show: jest.fn() },
 }))
 
 const confirmMock = Confirmation.confirm as jest.Mock
+const promptMock = Confirmation.prompt as jest.Mock
 const toastShowMock = Toast.show as jest.Mock
 
 const baseParams = {
@@ -95,5 +96,46 @@ describe('useServerListConfirmedAction', () => {
     })
 
     expect(toastShowMock).toHaveBeenCalledWith({ text: 'Delete failed', type: 'error' })
+  })
+
+  it('reasonInput: asks with a prompt and passes the typed reason to the action', async () => {
+    promptMock.mockResolvedValue('Customer changed their mind')
+    const action = jest.fn().mockResolvedValue(undefined)
+    const { result } = renderHook(() => useServerListConfirmedAction())
+
+    await act(async () => {
+      await result.current({ ...baseParams, action, reasonInput: { placeholder: 'Reason' } })
+    })
+
+    expect(confirmMock).not.toHaveBeenCalled()
+    expect(action).toHaveBeenCalledWith('Customer changed their mind')
+  })
+
+  it('reasonInput: prompt dismissed → action is not called', async () => {
+    promptMock.mockResolvedValue(null)
+    const action = jest.fn()
+    const { result } = renderHook(() => useServerListConfirmedAction())
+
+    await act(async () => {
+      await result.current({ ...baseParams, action, reasonInput: {} })
+    })
+
+    expect(action).not.toHaveBeenCalled()
+    expect(toastShowMock).not.toHaveBeenCalled()
+  })
+
+  it('handleError returns true → no error toast', async () => {
+    confirmMock.mockResolvedValue(true)
+    const error = new Error('custom')
+    const action = jest.fn().mockRejectedValue(error)
+    const handleError = jest.fn().mockResolvedValue(true)
+    const { result } = renderHook(() => useServerListConfirmedAction())
+
+    await act(async () => {
+      await result.current({ ...baseParams, action, handleError })
+    })
+
+    expect(handleError).toHaveBeenCalledWith(error)
+    expect(toastShowMock).not.toHaveBeenCalled()
   })
 })

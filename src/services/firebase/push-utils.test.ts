@@ -1,6 +1,8 @@
 import {
   canReceivePush,
   createNotificationOpenGuard,
+  notificationOpenKey,
+  parseLaunchData,
   resolveNotificationRoute,
   toPushPermissionStatus,
   toWebPushPermissionStatus,
@@ -60,14 +62,78 @@ describe('createNotificationOpenGuard', () => {
     let time = 0
     const shouldOpen = createNotificationOpenGuard(2000, () => time)
     // Same tap: FCM data and expo content.data differ, the resolved route does not.
-    expect(shouldOpen('fcm-1', resolveNotificationRoute({ url: '/orders/1', from: 'fcm' }))).toBe(
-      true,
-    )
+    const route = (data: Record<string, unknown>) =>
+      notificationOpenKey(resolveNotificationRoute(data), data, [])
+    expect(shouldOpen('fcm-1', route({ url: '/orders/1', from: 'fcm' }))).toBe(true)
     time = 500
-    expect(shouldOpen('expo-1', resolveNotificationRoute({ url: '/orders/1' }))).toBe(false)
+    expect(shouldOpen('expo-1', route({ url: '/orders/1' }))).toBe(false)
     expect(shouldOpen('expo-2', '/orders/2')).toBe(true)
     time = 5000
     expect(shouldOpen(null, '/orders/2')).toBe(true)
+  })
+})
+
+describe('notificationOpenKey', () => {
+  const FIELDS = ['resource', 'postId', 'commentId'] as const
+
+  it('uses the route when there is one', () => {
+    expect(notificationOpenKey('/orders/1', { postId: '2' }, FIELDS)).toBe('/orders/1')
+  })
+
+  it('builds the key from the listed string fields only', () => {
+    expect(
+      notificationOpenKey(
+        null,
+        { resource: 'post', postId: '225', type: 'comment_added', n: 1 },
+        FIELDS,
+      ),
+    ).toBe('resource=post&postId=225')
+  })
+})
+
+describe('createNotificationOpenGuard without data.url', () => {
+  const FIELDS = ['resource', 'postId'] as const
+  const key = (data: Record<string, unknown>) => notificationOpenKey(null, data, FIELDS)
+
+  it('dedupes one tap reported twice by two sources', () => {
+    let time = 0
+    const shouldOpen = createNotificationOpenGuard(2000, () => time)
+    expect(shouldOpen('fcm-1', key({ resource: 'post', postId: '1', from: 'fcm' }))).toBe(true)
+    time = 300
+    expect(shouldOpen('expo-1', key({ resource: 'post', postId: '1' }))).toBe(false)
+  })
+
+  it('lets taps on different targets through within the window', () => {
+    let time = 0
+    const shouldOpen = createNotificationOpenGuard(2000, () => time)
+    expect(shouldOpen('fcm-1', key({ resource: 'post', postId: '1' }))).toBe(true)
+    time = 300
+    expect(shouldOpen('fcm-2', key({ resource: 'post', postId: '2' }))).toBe(true)
+  })
+
+  it('lets a web launch (no id) through once', () => {
+    let time = 0
+    const shouldOpen = createNotificationOpenGuard(2000, () => time)
+    expect(shouldOpen(undefined, '')).toBe(true)
+    time = 5000
+    expect(shouldOpen(undefined, '')).toBe(true)
+  })
+})
+
+describe('parseLaunchData', () => {
+  it('keeps string fields of a JSON object', () => {
+    expect(parseLaunchData('{"resource":"post","postId":"225","n":1}')).toEqual({
+      resource: 'post',
+      postId: '225',
+    })
+  })
+
+  it('returns null for empty, bad JSON and non-objects', () => {
+    expect(parseLaunchData(null)).toBeNull()
+    expect(parseLaunchData('')).toBeNull()
+    expect(parseLaunchData('{bad')).toBeNull()
+    expect(parseLaunchData('[1]')).toBeNull()
+    expect(parseLaunchData('"x"')).toBeNull()
   })
 })
 

@@ -77,8 +77,9 @@ the native bundle, skipped during static rendering).
   - Background / closed tab: the service worker shows the notification. Foreground: the kit shows
     it through the same worker. Click: focuses the app tab and routes to `data.url` via
     `usePushNotificationNavigation`. With no tab open it opens `/#notification_url=<path>` (only
-    `/` is sure to exist in a static export) and the app routes there on startup; a non-app
-    `data.url` just opens `/`.
+    `/` is sure to exist in a static export) and the app routes there on startup. A push without
+    `data.url` opens `/#notification_data=<json>` (the string fields of `data`) so the app can
+    resolve the target itself; nothing usable just opens `/`.
   - Keep `FIREBASE_SDK_VERSION` in the worker equal to the `firebase` version in `package.json`.
 
 ## Wiring the kit already does
@@ -175,7 +176,15 @@ const status = await requestPushPermission() // 'granted' | 'provisional' | 'den
   (`expo-notifications`, channel `firebaseConfig.notifications.androidChannelId`).
 - Open: a push with `data.url = "/orders/42"` navigates there (from quit, background or
   foreground). Only in-app paths starting with `/` are accepted. Use `subscribeNotificationOpens`
-  for custom handling.
+  for custom handling (e.g. pushes that carry ids instead of `data.url`).
+- One tap can be reported twice (RNFirebase + expo-notifications, launch + listener); the kit opens
+  it once. The key is the resolved route, or — for pushes without `data.url` — the `data` fields
+  listed in `firebaseConfig.notifications.openKeyFields` (e.g. `['resource', 'postId']`; default
+  `[]`). List the fields that identify the target, so taps on two different targets both open.
+- Foreground arrivals: `subscribeForegroundMessages((data) => …)` runs for every push received
+  while the app is open (e.g. refresh an unread badge); display stays with the kit.
+- `canReceivePush(status)` tells whether a permission status can get pushes (granted /
+  provisional).
 - Data-only messages in background: pass a handler to `registerBackgroundMessageHandler` in
   `index.ts`. Keep it short (no UI, no navigation).
 - Test: Firebase console → Messaging → "Send test message" with the token from

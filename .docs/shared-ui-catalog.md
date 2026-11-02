@@ -21,6 +21,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | List row: thumb + title + subtitle + trailing | `MediaListRow` (`components/ui/media-list-row`) | One-off product/order row layouts |
 | Desktop page header (title + back + actions) | `WebsiteHeader` (`components/ui/website-header`) | One-off private header chrome |
 | Multi-step wizard indicator | `Stepper` (`components/ui/stepper`) | Custom step circles / progress rows |
+| One-time code (OTP / SMS code) entry | `OtpCodeInput` (`components/ui/otp-code-input`) + `useCountdown` for the resend timer | One `TextInput` per digit (breaks paste and SMS autofill) |
 | List pagination controls | `Pagination` (`components/ui/pagination`) | Ad-hoc prev/next + page buttons |
 | Web table (panel + horizontal scroll + pagination + responsive column-hiding) | `MyTable` (`components/ui/my-table`) | Re-implementing `MySurface` panel + `ScrollView horizontal` + `onLayout` width probe + `Pagination` per feature |
 | Initial list/page loading | `MySkeleton` | Ad-hoc gray boxes / spinner-only blank screen when skeleton fits |
@@ -34,7 +35,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Initial list loading (page-level) | `LoadingPlaceholder` (`components/ui/loading-placeholder`) | Ad-hoc `MySkeleton` wrappers per screen |
 | Image carousel + fullscreen preview | `ImageSlider` + `ImagePreview` | Custom pager/zoom unless kit cannot support the case |
 | Pick image from library or camera (web/iOS/Android) | `pickImage` / `pickImageFromCamera` / `buildImageFormData` (`components/ui/image-picker`) | Ad-hoc `<input type="file">` / Files document picker for photos |
-| Image dropzone + preview + clear | `ImagePickerField` (`components/ui/image-picker`) | Feature-only upload boxes that reimplement dashed dropzone UI |
+| Image dropzone + preview + clear (square thumbnail, or `ImageThumbnailRow` with a text column) | `ImagePickerField` / `ImageThumbnailRow` (`components/ui/image-picker`) | Feature-only upload boxes that reimplement dashed dropzone UI |
 | Edge nav drawer (hamburger menu) | `DrawerMenu` | Ad-hoc `Modal` + absolute panel |
 | Native full-screen picker / filter | `NativeFullscreenModal` | Feature-local `Modal` with one-off iOS/Android padding |
 | Status / tag color | `MyTag` | One-off badge StyleSheets / `MyChip` for status |
@@ -300,6 +301,15 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Multi-step indicator; `steps`, `activeStep`, optional `maxReached` / `allowJump` / `onStepPress`
 - Playground: `…/playground/stepper.tsx`
 
+### `OtpCodeInput`
+
+- Path: `@/components/ui/otp-code-input`
+- One hidden `TextInput` under `length` (default 6) display cells: typing, paste (`"123 456"` too) and SMS autofill (iOS `oneTimeCode`, Android `sms-otp`, web `one-time-code`) land in the same field
+- Controlled: `value` / `onChangeText` (digits only); `onComplete(code)` fires once `length` digits are in; `error`, `disabled`, `autoFocus` (default true, re-focuses when re-enabled)
+- `ref` handle: `focus()`, `shake()` (skipped when the OS asks for reduced motion) — e.g. after a wrong code
+- Resend timer: `useCountdown(targetAt)` + `formatCountdown` (`@/hooks/use-countdown`) — absolute time, stays right after the app was in the background
+- Playground: `…/playground/otp-code-input.tsx`
+
 ### `Pagination`
 
 - Path: `@/components/ui/pagination`
@@ -347,7 +357,8 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - `pickImage` (library) / `pickImageFromCamera` (native camera) + `buildImageFormData` for the pick + multipart; `ImagePickerField` for dropzone UI (web drag-drop)
 - Native (iOS/Android): tapping the field opens a `MyBottomSheet` to choose Take Photo vs Choose from Library, then routes through the same `onImagePicked`/`onPickError`/`pickOptions` props already used for web drag-drop — no extra wiring needed by feature callers. Web is unchanged (`onPick` opens the browser file picker directly, no camera option)
 - `readOnly` — preview only (no pick, drop, or clear)
-- `shape?: 'square' | 'circle'` — `square` (default) is a full-width rectangle (e.g. product photo); `circle` is a fixed-size (`AVATAR_PICKER_SIZE`, 140) centered avatar dropzone with an icon-only empty state (no title/hint — not enough room)
+- `ImageThumbnailRow` — `ImagePickerFieldProps` + `title` / `hint` (format, size) / `note` (e.g. "optional") in a text column beside the thumbnail; the row shows `errorMessage`. Same layout on mobile and desktop, so every upload section looks alike
+- `shape?: 'square' | 'circle'` — `square` (default) is a fixed square thumbnail, `size` px per edge (default `DEFAULT_PICKER_SIZE`, 120); `circle` is a fixed-size (`AVATAR_PICKER_SIZE`, 140) centered avatar dropzone with an icon-only empty state (no title/hint — not enough room)
 - Playground: `…/playground/image-picker.tsx`
 
 ### `MediaListRow`
@@ -393,7 +404,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 
 - Path: `@/components/ui/profile-menu-button`
 - Avatar (falls back to a placeholder person icon when `avatarUri` is not set) trigger + `TriggerModal` panel of full-width `MyButton` actions — same shape as `TableRowMoreMenu` but sized/styled for a header avatar trigger
-- Props: `items: ProfileMenuItem[]` (`key`, `text`, `icon`, `onPress`), `avatarUri?`, `accessibilityLabel`
+- Props: `items: ProfileMenuItem[]` (`key`, `text`, `icon`, `onPress`), `avatarUri?`, `displayName?` (when set, the panel opens with avatar + name above the items), `accessibilityLabel`
 - Used by `WebsiteHeader`'s `profileMenuItems` prop; can also be used standalone
 - Playground: `…/playground/profile-menu-button.tsx`
 
@@ -459,6 +470,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - `useOrderListExport` (`src/hooks/use-order-list-export.ts`) — filtered PDF/Excel export with cap confirm
 - `useDebouncedValue` (`src/hooks/commons-hooks.ts`)
 - `useClientListPaging` (`src/hooks/use-client-list-paging.ts`) — web pages / mobile load-more over an in-memory list (default page size 10)
+- `useCountdown` / `formatCountdown` (`src/hooks/use-countdown.ts`) — whole seconds left until an epoch-ms target, ticking once a second (resend-code timers, holds)
 - Date/id filter helpers (`src/utils/list-filter.ts`) — month ranges, toggle ids, `toApiDateTimeRange`, `singleDropdownValue`
 
 ## Import cheat sheet

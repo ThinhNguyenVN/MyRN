@@ -41,6 +41,9 @@ export interface DateRange {
 export interface MyDateRangePickerProps {
   value?: DateRange | null
   onValueChange?: (range: DateRange) => void
+  /** Called when the user taps "Confirm" (the picker closes too). Lets a consumer apply the range
+   * on confirm instead of on every tap (keep a draft in `onValueChange`, apply here). */
+  onConfirm?: () => void
   placeholder?: string
   disabled?: boolean
   minDate?: Date

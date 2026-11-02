@@ -10,6 +10,8 @@ export type ProfileMenuItem = {
 
 export type ProfileMenuButtonProps = {
   avatarUri?: string | null
+  /** When set, the menu opens with the avatar + this name above the items. */
+  displayName?: string | null
   items: ProfileMenuItem[]
   accessibilityLabel: string
 }

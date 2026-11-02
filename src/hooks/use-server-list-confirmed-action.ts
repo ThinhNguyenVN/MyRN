@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 
 import { Confirmation } from '@/components/ui/confirmation'
+import type { ConfirmationInput } from '@/components/ui/confirmation/type'
 import { Toast } from '@/components/ui/toast'
 import { getApiFailureMessage } from '@/utils/api-error'
 
@@ -10,8 +11,13 @@ export type ConfirmedActionParams = {
   confirmText: string
   successText: string
   errorText: string
-  action: () => Promise<unknown>
+  /** Receives the typed reason when `reasonInput` is set (`''` when left empty). */
+  action: (reason?: string) => Promise<unknown>
   type?: 'info' | 'error'
+  /** Ask for an optional text (e.g. a cancel reason) in the confirmation dialog. */
+  reasonInput?: ConfirmationInput
+  /** Custom error UI (e.g. a dedicated dialog); return `true` when handled (no toast). */
+  handleError?: (error: unknown) => Promise<boolean> | boolean
 }
 
 /**
@@ -35,16 +41,32 @@ export function useServerListConfirmedAction(onSuccess?: () => void) {
       errorText,
       action,
       type,
+      handleError,
+      reasonInput,
     }: ConfirmedActionParams) => {
-      const confirmed = await Confirmation.confirm({ title, message, confirmText, type })
-      if (!confirmed) {
-        return
+      let reason: string | undefined
+      if (reasonInput) {
+        const typed = await Confirmation.prompt({
+          title,
+          message,
+          confirmText,
+          type,
+          input: reasonInput,
+        })
+        if (typed === null) return
+        reason = typed
+      } else {
+        const confirmed = await Confirmation.confirm({ title, message, confirmText, type })
+        if (!confirmed) {
+          return
+        }
       }
       try {
-        await action()
+        await action(reason)
         onSuccess?.()
         Toast.show({ text: successText, type: 'success' })
       } catch (error) {
+        if (handleError && (await handleError(error))) return
         Toast.show({ text: getApiFailureMessage(error, errorText), type: 'error' })
       }
     },

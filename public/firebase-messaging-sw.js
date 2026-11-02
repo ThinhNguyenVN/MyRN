@@ -8,15 +8,24 @@ const FIREBASE_SDK_VERSION = '12.17.1'
 const OPEN_MESSAGE_TYPE = 'firebase-notification-open'
 /** Read by `messaging.web.ts` on startup. */
 const LAUNCH_URL_PARAM = 'notification_url'
+const LAUNCH_DATA_PARAM = 'notification_data'
 
 /**
  * Opens the app shell `/` (the only page sure to exist in a static export; `/todo/42` has no HTML
- * file) and lets the app route to `data.url`. Not an in-app path → just `/`.
+ * file) and lets the app route to `data.url`. No `data.url` → forwards the string fields of
+ * `data` as JSON so the app can resolve the route itself. Nothing usable → just `/`.
  */
-function launchUrl(url) {
-  const trimmed = typeof url === 'string' ? url.trim() : ''
-  if (!trimmed.startsWith('/') || trimmed.startsWith('//')) return '/'
-  return `/#${LAUNCH_URL_PARAM}=${encodeURIComponent(trimmed)}`
+function launchUrl(data) {
+  const url = typeof data.url === 'string' ? data.url.trim() : ''
+  if (url.startsWith('/') && !url.startsWith('//')) {
+    return `/#${LAUNCH_URL_PARAM}=${encodeURIComponent(url)}`
+  }
+  const fields = {}
+  Object.keys(data).forEach((key) => {
+    if (key !== 'url' && typeof data[key] === 'string') fields[key] = data[key]
+  })
+  if (Object.keys(fields).length === 0) return '/'
+  return `/#${LAUNCH_DATA_PARAM}=${encodeURIComponent(JSON.stringify(fields))}`
 }
 
 // Registered before the Firebase SDK's own handler so `data.url` decides where a click goes.
@@ -35,7 +44,7 @@ self.addEventListener('notificationclick', (event) => {
         client.postMessage({ type: OPEN_MESSAGE_TYPE, id, data })
         return
       }
-      await clients.openWindow(launchUrl(data.url))
+      await clients.openWindow(launchUrl(data))
     })(),
   )
 })

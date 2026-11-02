@@ -14,6 +14,8 @@ export type WebsiteHeaderProps = {
   onProfilePress?: () => void
   /** Avatar shown on the profile trigger when `profileMenuItems` is passed (falls back to a placeholder icon). */
   avatarUri?: string | null
+  /** Name shown with the avatar at the top of the profile menu (`profileMenuItems` only). */
+  displayName?: string | null
   /**
    * When passed (non-empty), the profile action renders as a `ProfileMenuButton`
    * popover with these items instead of the plain `onProfilePress` icon button.

@@ -12,6 +12,29 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Added
+- **`OtpCodeInput` + `useCountdown` (from my-store PR #99, phone OTP login):** `components/ui/otp-code-input` —
+  one hidden `TextInput` under `length` (default 6) cells, so typing, paste and SMS autofill
+  (iOS/Android/web) all work; `onComplete`, `error`, `disabled`, `autoFocus`, `ref` handle
+  `focus()` / `shake()` (honours reduced motion). `src/hooks/use-countdown.ts`: `useCountdown(targetAt)`
+  + `formatCountdown` for resend timers. Playground `otp-code-input`. **Product to do:** copy
+  `src/components/ui/otp-code-input/` and `src/hooks/use-countdown.ts`.
+- **Push kit: foreground messages, opens without `data.url` (from my-store Step 15):**
+  `subscribeForegroundMessages(handler)` (every push received while the app is open, e.g. a badge
+  refresh), `canReceivePush` exported. Pushes without `data.url` now open on web too: the service
+  worker opens `/#notification_data=<json>` and `parseLaunchData` hands the `data` to
+  `subscribeNotificationOpens`. The open guard dedupes one tap by
+  `notificationOpenKey(route, data, firebaseConfig.notifications.openKeyFields)` (new config,
+  default `[]`). **Product to do:** copy `src/services/firebase/` (new `foreground-messages.ts`),
+  `public/firebase-messaging-sw.js`, add `openKeyFields` to `firebase.config.ts` (list the `data`
+  fields that identify a target).
+- **`ImageThumbnailRow` (from my-store):** square thumbnail + `title` / `hint` / `note` / error
+  column. **Product to do:** copy `src/components/ui/image-picker/`.
+- **`useServerListConfirmedAction` `reasonInput` / `handleError`:** ask for an optional text with
+  `Confirmation.prompt` (passed to `action(reason)`), or show custom error UI (return `true` to
+  skip the toast). **Product to do:** copy the hook.
+- **Small kit props (from my-store):** `useServerListSearchState(initialSearch)` (e.g. a keyword
+  from a deep link); `MyDateRangePicker` `onConfirm` (apply on confirm instead of on every tap);
+  `ProfileMenuButton` / `WebsiteHeader` `displayName` (avatar + name at the top of the menu).
 - **Firebase foundation, native + web, on when config files exist (`my-rn-step-01-firebase-foundation`):** Analytics,
   Crashlytics, Remote Config and Cloud Messaging via `@react-native-firebase/*` `26.4.1` on native
   and the Firebase JS SDK (`firebase` `12.17.1`, lazy-loaded, `*.web.ts`) on web, behind
@@ -55,6 +78,15 @@ product finds out what changed since it forked.
   of dots. **Product to do:** bump `@thinhnguyenvn/chat-core` to `0.2.2`.
 
 ### Changed
+- **`ImagePickerField` `square` is a fixed square thumbnail (breaking):** `size` prop (default 120)
+  instead of a full-width 200px box; `emptyHint` removed — put format/size guidance in
+  `ImageThumbnailRow` `hint`. Smaller dashed border, radius `medium`.
+- **`SideBar` active row:** the longest matching `href` wins, so `/settings/company` no longer lights
+  up `/settings` too.
+- **`FormFieldError`** grows up to 40px (two-line errors no longer clip); **`MyTag`** no longer
+  shrinks in a row (`flexShrink: 0`).
+- **Push open guard signature:** `createNotificationOpenGuard()` now takes `(id, key)` — build the
+  key with `notificationOpenKey`.
 - **MyChat E1 fixes (#62, chat-core `0.2.1`):** assistant text renders basic markdown
   (`react-native-markdown-display`); the destructive confirm button keeps the white primary text;
   result cards show at most 10 rows on wide screens and 5 on narrow ones, with an "x/y rows" line
