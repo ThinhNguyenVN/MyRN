@@ -12,6 +12,19 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Added
+- **Unsaved changes guard (from my-store PR #101, MY-52):** `<UnsavedChangesGuard extraDirty? />`
+  (`components/form`, inside `MyForm`) and `useUnsavedChangesGuard(isDirty)` ask "Stay / Discard"
+  before leaving a dirty form: stack removal (header/in-app Back, Android back, iOS swipe) via
+  `usePreventRemove`; registry `unsavedChanges` (`src/hooks/unsaved-changes-registry.ts`) with
+  `confirmLeave()` for lateral `router.push` and `allowLeave()` before navigating after save/delete;
+  web browser back/forward + `beforeunload` (`unsaved-changes-browser.web.ts`). Header Back
+  fallback (`NavigationBarHeader`, `WebsiteHeaderNav`) now asks before `router.navigate`.
+  i18n `common.unsavedChanges.*`; todo form uses it; `.docs/screen-standard.md` § Unsaved changes
+  guard. **Product to do:** copy `src/hooks/unsaved-changes-*.ts`, `use-unsaved-changes-guard.ts`,
+  `src/components/form/unsaved-changes-guard.tsx` (+ export), the two header files, add
+  `installBrowserLeaveGuard()` to `index.ts` **before** `require('expo-router/entry')` (window
+  `popstate` listeners run in registration order), the i18n keys, then put the guard in every
+  form and `await unsavedChanges.confirmLeave()` in your sidebar/drawer/shortcut `router.push`.
 - **`OtpCodeInput` + `useCountdown` (from my-store PR #99, phone OTP login):** `components/ui/otp-code-input` —
   one hidden `TextInput` under `length` (default 6) cells, so typing, paste and SMS autofill
   (iOS/Android/web) all work; `onComplete`, `error`, `disabled`, `autoFocus`, `ref` handle

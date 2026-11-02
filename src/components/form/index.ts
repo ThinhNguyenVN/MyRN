@@ -3,6 +3,8 @@ export { default as MyForm } from './my-form'
 export { default as FormFieldLabel } from './form-field-label'
 export { default as FormFieldError } from './form-field-error'
 export { default as MyFormField } from './my-form-field'
+export { default as UnsavedChangesGuard } from './unsaved-changes-guard'
+export type { UnsavedChangesGuardProps } from './unsaved-changes-guard'
 export type {
   FormFieldLabelProps,
   FormFieldErrorProps,

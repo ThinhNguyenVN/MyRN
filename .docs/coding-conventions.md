@@ -171,6 +171,7 @@ Chi tiết: `.docs/data-state-standard.md` + `.cursor/rules/thunk-feature-flow.m
 ## 10. DRY & scope
 
 - Logic/UI giống 2+ chỗ → gộp, không copy-paste.
+- Form nhập liệu: bắt buộc guard thay đổi chưa lưu dùng chung (`<UnsavedChangesGuard />` / `useUnsavedChangesGuard`, `unsavedChanges.allowLeave()` trước khi điều hướng sau lưu/xoá) — chi tiết `screen-standard.md` § Unsaved changes guard. Điểm điều hướng ngang mới (menu, shortcut, `router.push` sang mục khác) MUST `await unsavedChanges.confirmLeave()` trước.
 - Không sửa ngoài phạm vi task; không markdown/docs thừa trừ khi được yêu cầu.
 - Branch: `feat/` | `fix/` | `issue/` | `release/` — không `cursor/`.
 
@@ -185,5 +186,6 @@ Chi tiết: `.docs/data-state-standard.md` + `.cursor/rules/thunk-feature-flow.m
 - [ ] `isWeb` / `isNil` / `useIsMobileSize` đúng chỗ (không `Platform.OS` cho breakpoint / web flag UI)
 - [ ] Sheet + input: `useBottomSheetTextInput` nếu cần
 - [ ] Form có text input (không phải header search): `MyKeyboardAvoiding.ScrollView` cho body scroll
+- [ ] Form nhập liệu có `<UnsavedChangesGuard />` (hoặc hook) và gọi `unsavedChanges.allowLeave()` trước điều hướng sau lưu/xoá
 - [ ] `app/` mỏng; screen production dưới `features/…/screens`
 - [ ] Không wrapper View thừa; DRY; `yarn lint` sạch lỗi

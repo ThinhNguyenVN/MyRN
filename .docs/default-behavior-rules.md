@@ -102,7 +102,7 @@ Default cases:
 
 - delete
 - sign out if unsaved work would be lost
-- discard dirty form changes
+- discard dirty form changes (shared guard — `screen-standard.md` § Unsaved changes guard)
 - irreversible state changes
 
 Do not add confirmation for harmless or easily reversible actions unless the product explicitly asks for it.

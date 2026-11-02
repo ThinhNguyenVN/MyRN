@@ -32,6 +32,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | App language (Vi\|En) | `AppLocaleSwitch` (`@/i18n/app-locale-switch`) | Feature-local locale switcher / re-init i18n by hand |
 | Boolean / checkbox / radio in `MyForm` | `MyFormCheckbox` | `MyCheckbox` + `Controller` ad-hoc in new screens |
 | Form body scroll (native keyboard) | `MyKeyboardAvoiding.ScrollView` | Raw `ScrollView` / `KeyboardAvoidingView` around form fields |
+| Ask before leaving a form with unsaved changes | `<UnsavedChangesGuard />` (`@/components/form`, inside `MyForm`) / `useUnsavedChangesGuard`; `unsavedChanges.allowLeave()` after save, `confirmLeave()` before lateral `router.push` | Feature-local `beforeRemove` listeners (miss web back/forward, sidebar, tab close) |
 | Initial list loading (page-level) | `LoadingPlaceholder` (`components/ui/loading-placeholder`) | Ad-hoc `MySkeleton` wrappers per screen |
 | Image carousel + fullscreen preview | `ImageSlider` + `ImagePreview` | Custom pager/zoom unless kit cannot support the case |
 | Pick image from library or camera (web/iOS/Android) | `pickImage` / `pickImageFromCamera` / `buildImageFormData` (`components/ui/image-picker`) | Ad-hoc `<input type="file">` / Files document picker for photos |

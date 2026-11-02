@@ -165,5 +165,6 @@ From `eslint.config.js`:
 - [ ] Prefixed list keys
 - [ ] My* + theme tokens; `isWeb`/`isNil`/`useIsMobileSize` as applicable
 - [ ] Form body with text inputs: `MyKeyboardAvoiding.ScrollView` (not header search; sheet → `useBottomSheetTextInput`)
+- [ ] Data-entry form: `<UnsavedChangesGuard />` (or `useUnsavedChangesGuard`) + `unsavedChanges.allowLeave()` before navigating after save/delete; lateral `router.push` awaits `unsavedChanges.confirmLeave()` (`.docs/screen-standard.md` § Unsaved changes guard)
 - [ ] Thin `app/` routes; screens under `features/…/screens`
 - [ ] Lint clean (errors fixed)

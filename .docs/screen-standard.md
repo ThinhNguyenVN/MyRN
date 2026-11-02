@@ -105,8 +105,20 @@ Form screens should follow this flow:
 4. view uses `MyForm*` adapters
 5. submit handler is owned by container or a dedicated screen hook
 6. native form body scroll uses `MyKeyboardAvoiding.ScrollView` (not RN `ScrollView`) whenever `MyTextInput` / `MyFormTextInput` can be covered by the keyboard
+7. every data-entry form MUST guard unsaved changes (see below)
 
 Do **not** wrap header / list-toolbar search. `MyTextInput` inside `MyBottomSheet` uses `useBottomSheetTextInput`. Sticky footers stay outside the avoiding scroll. Web may keep a plain `ScrollView` (the kit already falls back). Canonical wrap: `login-screen.container.tsx`, `todo-form.view.tsx`.
+
+### Unsaved changes guard (required)
+
+Every data-entry form (auth and playground excepted) MUST ask "Stay / Discard" before the user leaves with unsaved changes. Use the shared guard, never a per-feature one:
+
+- Put `<UnsavedChangesGuard />` (`@/components/form`) inside `MyForm`. Pass `extraDirty` for unsaved state outside react-hook-form (a picked image waiting for Save). Render it only when the form is editable.
+- Dirty state that is not react-hook-form (e.g. permission toggles): call `useUnsavedChangesGuard(isDirty)` (`@/hooks/use-unsaved-changes-guard`).
+- After a successful save/delete that navigates away, call `unsavedChanges.allowLeave()` (`@/hooks/unsaved-changes-registry`) right before `router.replace/back` — the form is still dirty at that point. Forms that stay on screen after save must reset (new `key` or `reset(values)`) so `isDirty` goes back to `false`.
+- Lateral navigation that keeps the form mounted (`router.push` from a sidebar, drawer, bell, shortcut) MUST `await unsavedChanges.confirmLeave()` first.
+
+The guard covers stack removal (header/in-app Back, Android back, iOS swipe) through `usePreventRemove`; the header Back fallback `router.navigate` (direct entry / refresh) asks through `confirmLeave()`; on web it also covers browser back/forward (listener installed from `index.ts` before `expo-router/entry`) and tab close/reload. Canonical use: `todo-form.container.tsx`.
 
 Expected shape:
 
@@ -216,6 +228,7 @@ Avoid these in new production screens:
 - Is navigation/data orchestration kept out of the `view`?
 - Does the form use `MyForm` and `MyForm*` adapters (including `MyFormCheckbox` when needed)?
 - Does the form body use `MyKeyboardAvoiding.ScrollView` for native text inputs (excluding header search)?
+- Does the form render `<UnsavedChangesGuard />` (or the hook) and call `unsavedChanges.allowLeave()` before navigating after save/delete?
 - Does the list use `MyList` instead of raw list primitives?
 - Does the list use `MySkeleton` / `MyEmptyState` / `MyErrorState` for async states?
 - Does a list/dashboard screen refetch on focus (`useFocusEffect`), not just on mount/pull-to-refresh?

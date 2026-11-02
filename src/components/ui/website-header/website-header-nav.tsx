@@ -1,6 +1,8 @@
 import React, { memo, useCallback } from 'react'
 import { router } from 'expo-router'
 
+import { unsavedChanges } from '@/hooks/unsaved-changes-registry'
+
 import WebsiteHeader from './website-header'
 import type { WebsiteHeaderNavExtraProps, WebsiteHeaderNavProps } from './type'
 
@@ -37,8 +39,12 @@ const WebsiteHeaderNav: React.FC<WebsiteHeaderNavProps & WebsiteHeaderNavExtraPr
       router.back()
       return
     }
+    // Direct entry / refresh: this navigate keeps the current screen mounted (no `beforeRemove`),
+    // so ask about unsaved changes first.
     if (fallbackBackHref) {
-      router.navigate(fallbackBackHref)
+      void unsavedChanges.confirmLeave().then((confirmed) => {
+        if (confirmed) router.navigate(fallbackBackHref)
+      })
     }
   }, [fallbackBackHref, navigation, stackCanGoBack])
 
