@@ -9,7 +9,13 @@
     "loading": "Loading",
     "disabled": "Disabled",
     "back": "Back",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "unsavedChanges": {
+      "title": "Discard unsaved changes?",
+      "message": "Your unsaved changes will be lost if you leave this page.",
+      "confirm": "Discard",
+      "cancel": "Stay"
+    }
   },
   "pagination": {
     "summary": "Showing {{from}} to {{to}} of {{total}}",

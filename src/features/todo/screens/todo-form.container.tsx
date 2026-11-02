@@ -1,13 +1,14 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
 
-import { MyForm } from '@/components/form'
+import { MyForm, UnsavedChangesGuard } from '@/components/form'
 import { selectAuthUser } from '@/features/auth/auth-slice'
 import {
   useCreateTodoMutation,
   useGetTodoByIdQuery,
   useUpdateTodoMutation,
 } from '@/features/todo/todo-api'
+import { unsavedChanges } from '@/hooks/unsaved-changes-registry'
 import { useAppSelector } from '@/store/hooks'
 
 import { todoFormDefaultValues, todoFormSchema, type TodoFormInput } from './todo-form.types'
@@ -53,6 +54,7 @@ export default function TodoFormScreenContainer() {
             userId: authUser?.id ?? 1,
           }).unwrap()
         }
+        unsavedChanges.allowLeave()
         router.back()
       } finally {
         setIsSubmitting(false)
@@ -69,6 +71,7 @@ export default function TodoFormScreenContainer() {
       mode="onSubmit"
       reValidateMode="onChange"
     >
+      <UnsavedChangesGuard />
       <TodoFormView
         mode={isEditMode ? 'edit' : 'add'}
         isSubmitting={isSubmitting}

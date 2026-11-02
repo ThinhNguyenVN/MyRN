@@ -66,6 +66,7 @@ If a new UI piece is useful beyond one product, it belongs in MyRN.
 
 ## Recent product → MyRN
 
+- my-store Step 18 unsaved changes guard (`UnsavedChangesGuard`, `useUnsavedChangesGuard`, `unsavedChanges` registry, web `installBrowserLeaveGuard` in `index.ts`, header Back fallback asks) → `feat/sync-step-18-unsaved-changes` (from [my-store PR #101](https://github.com/ThinhNguyenVN/my-store/pull/101)). Product forms, `PrivateSidebar`/`PrivateDrawer`/bell/Ask AI wiring and logout stay in my-store.
 - my-store AI entry kit (`useTabBar` center action, `MyChat` pending prompt / composer focus, `SideBar` emphasis/badge) → `feat/sync-ai-entry-kit` (from [my-store PR #74](https://github.com/ThinhNguyenVN/my-store/pull/74)). Product nav, Ask AI header, and `/chat?prompt=` stay in my-store.
 
 ## Direction cheat sheet

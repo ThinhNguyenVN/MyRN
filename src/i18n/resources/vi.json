@@ -9,7 +9,13 @@
     "loading": "Đang tải",
     "disabled": "Vô hiệu hóa",
     "back": "Quay lại",
-    "comingSoon": "Tính năng sắp có"
+    "comingSoon": "Tính năng sắp có",
+    "unsavedChanges": {
+      "title": "Bỏ thay đổi chưa lưu?",
+      "message": "Các thay đổi chưa lưu sẽ bị mất nếu bạn rời trang này.",
+      "confirm": "Bỏ thay đổi",
+      "cancel": "Ở lại"
+    }
   },
   "pagination": {
     "summary": "Hiển thị {{from}} đến {{to}} trong tổng số {{total}}",
