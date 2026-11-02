@@ -625,5 +625,12 @@
       }
     },
     "dropdownLoadMore": "Load more"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for may have been removed, moved, or never existed. Check the link or head back to the main page.",
+    "goHome": "Go to home",
+    "goLogin": "Sign in",
+    "goBack": "Go back"
   }
 }

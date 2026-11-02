@@ -66,6 +66,7 @@ If a new UI piece is useful beyond one product, it belongs in MyRN.
 
 ## Recent product → MyRN
 
+- Step 19: 404 screen (`src/app/+not-found.tsx` + `features/not-found`, no logo) and `FilterChoiceField` → MyRN `feat/sync-step-19-kit`. Left in my-store on purpose: `use-permission` (product RBAC), `use-idempotency-key` (BE header contract + `expo-crypto`), `use-list-deep-link` + registry (AI gateway contract), `paged-list`, domain `order-form-line` (imports `features/lookups`), `PrivateSidebar`/`PrivateDrawer`.
 - my-store Step 18 unsaved changes guard (`UnsavedChangesGuard`, `useUnsavedChangesGuard`, `unsavedChanges` registry, web `installBrowserLeaveGuard` in `index.ts`, header Back fallback asks) → `feat/sync-step-18-unsaved-changes` (from [my-store PR #101](https://github.com/ThinhNguyenVN/my-store/pull/101)). Product forms, `PrivateSidebar`/`PrivateDrawer`/bell/Ask AI wiring and logout stay in my-store.
 - my-store AI entry kit (`useTabBar` center action, `MyChat` pending prompt / composer focus, `SideBar` emphasis/badge) → `feat/sync-ai-entry-kit` (from [my-store PR #74](https://github.com/ThinhNguyenVN/my-store/pull/74)). Product nav, Ask AI header, and `/chat?prompt=` stay in my-store.
 

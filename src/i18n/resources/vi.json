@@ -625,5 +625,12 @@
       }
     },
     "dropdownLoadMore": "Tải thêm"
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "description": "Trang bạn tìm có thể đã bị xoá, đổi địa chỉ hoặc chưa từng tồn tại. Kiểm tra lại đường dẫn hoặc quay về trang chính.",
+    "goHome": "Về trang chủ",
+    "goLogin": "Đăng nhập",
+    "goBack": "Quay lại"
   }
 }
