@@ -19,6 +19,7 @@ function WebsiteHeader({
   onNotificationsPress,
   onProfilePress,
   avatarUri,
+  displayName,
   profileMenuItems,
   right,
 }: WebsiteHeaderProps) {
@@ -64,6 +65,7 @@ function WebsiteHeader({
         {profileMenuItems && profileMenuItems.length > 0 ? (
           <ProfileMenuButton
             avatarUri={avatarUri}
+            displayName={displayName}
             items={profileMenuItems}
             accessibilityLabel={t('dashboard.header.profile')}
           />

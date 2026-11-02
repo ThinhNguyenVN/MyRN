@@ -5,6 +5,7 @@ import MyText from '@/components/elements/my-text'
 import {
   ImagePickError,
   ImagePickerField,
+  ImageThumbnailRow,
   pickImage,
   type PickedImage,
 } from '@/components/ui/image-picker'
@@ -56,11 +57,13 @@ export default function ImagePickerScreen() {
       <MyText typography="body" color="text/active/secondary" style={styles.introText}>
         {t('playground.imagePickerIntro')}
       </MyText>
-      <ImagePickerField
+      <ImageThumbnailRow
+        title={t('playground.imagePickerRowTitle')}
+        hint={t('playground.imagePickerEmptyHint')}
+        note={t('playground.imagePickerRowNote')}
         imageUri={imageUri}
         isUploading={isUploading}
         emptyTitle={t('playground.imagePickerEmptyTitle')}
-        emptyHint={t('playground.imagePickerEmptyHint')}
         clearAccessibilityLabel={t('playground.imagePickerClear')}
         onPick={handlePick}
         onClear={handleClear}

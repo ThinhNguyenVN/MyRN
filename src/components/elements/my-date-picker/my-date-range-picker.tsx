@@ -111,6 +111,7 @@ const RangeFooter = memo(function RangeFooter({
 const MyDateRangePicker = memo(function MyDateRangePicker({
   value,
   onValueChange,
+  onConfirm,
   placeholder,
   disabled = false,
   minDate,
@@ -206,13 +207,16 @@ const MyDateRangePicker = memo(function MyDateRangePicker({
     (closePicker: () => void) => (
       <RangeFooter
         onClear={handleClear}
-        onConfirm={closePicker}
+        onConfirm={() => {
+          onConfirm?.()
+          closePicker()
+        }}
         clearLabel={clearLabel}
         confirmLabel={confirmLabel}
         rowStyle={styles.footerButtonRow}
       />
     ),
-    [handleClear, clearLabel, confirmLabel, styles.footerButtonRow],
+    [handleClear, onConfirm, clearLabel, confirmLabel, styles.footerButtonRow],
   )
 
   return (

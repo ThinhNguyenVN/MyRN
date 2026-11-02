@@ -3,10 +3,12 @@ import { Platform } from 'react-native'
 import { firebaseConfig } from '@/configs/firebase.config'
 
 import { logEvent } from './analytics'
+import { emitForegroundMessage } from './foreground-messages'
 import { emitPushToken } from './push-token'
 import {
   canReceivePush,
   createNotificationOpenGuard,
+  notificationOpenKey,
   resolveNotificationRoute,
   toPushPermissionStatus,
   type PushPermissionStatus,
@@ -14,12 +16,13 @@ import {
 import { withFirebase, withFirebaseAsync } from './safe-call'
 import type { FirebaseModules, FirebaseRemoteMessage, NotificationsResponse } from './types'
 
+export { subscribeForegroundMessages, type ForegroundMessageHandler } from './foreground-messages'
 export { getPushToken, setPushTokenHandler, type PushTokenHandler } from './push-token'
 
 export type NotificationOpenHandler = (route: string | null, data: Record<string, unknown>) => void
 
 const isAndroid = Platform.OS === 'android'
-const { androidChannelId, androidChannelName } = firebaseConfig.notifications
+const { androidChannelId, androidChannelName, openKeyFields } = firebaseConfig.notifications
 
 let foregroundListenersAttached = false
 let initialOpenHandled = false
@@ -71,7 +74,10 @@ function attachForegroundListeners(modules: FirebaseModules) {
   const instance = messaging.getMessaging()
 
   messaging.onTokenRefresh(instance, emitPushToken)
-  messaging.onMessage(instance, (message) => presentForegroundMessage(modules, message))
+  messaging.onMessage(instance, (message) => {
+    presentForegroundMessage(modules, message)
+    emitForegroundMessage(message.data)
+  })
 
   if (isAndroid) {
     notifications.setNotificationHandler({
@@ -143,7 +149,7 @@ export function subscribeNotificationOpens(handler: NotificationOpenHandler): ()
         }
         const payload = data ?? {}
         const route = resolveNotificationRoute(payload)
-        if (!shouldOpen(id, route)) return
+        if (!shouldOpen(id, notificationOpenKey(route, payload, openKeyFields))) return
         logEvent('notification_open', { url: route ?? undefined })
         handler(route, payload)
       }

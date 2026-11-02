@@ -19,5 +19,11 @@ export const firebaseConfig = {
     /** Must match `messaging_android_notification_channel_id` in `firebase.json`. */
     androidChannelId: 'default',
     androidChannelName: 'General',
+    /**
+     * Pushes without `data.url`: `data` fields that identify the target (e.g.
+     * `['resource', 'postId']`). Two reports of one tap within 2s are merged when these match;
+     * taps on different targets are not. Empty: every push without a url shares one key.
+     */
+    openKeyFields: [] as readonly string[],
   },
 } as const

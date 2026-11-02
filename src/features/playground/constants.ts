@@ -81,6 +81,11 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string; icon: IconName 
     icon: 'film-outline',
   },
   {
+    labelKey: 'playground.linksOtpCodeInput',
+    href: '/playground/otp-code-input',
+    icon: 'keypad-outline',
+  },
+  {
     labelKey: 'playground.linksStepper',
     href: '/playground/stepper',
     icon: 'footsteps-outline',

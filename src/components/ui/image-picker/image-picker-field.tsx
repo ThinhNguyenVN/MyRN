@@ -23,7 +23,7 @@ import { isWeb } from '@/constants/dimensions'
 import { useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import { useImageDropZone } from './hooks'
-import { generateStyles } from './styles'
+import { DEFAULT_PICKER_SIZE, generateStyles } from './styles'
 import type { ImagePickerFieldProps, PickedImage } from './type'
 import { pickImage, pickImageFromCamera } from './utils'
 
@@ -31,7 +31,6 @@ const DRAG_ANIM_MS = 180
 
 const WEB_HOST_STYLE = {
   position: 'relative' as const,
-  width: '100%',
 }
 
 function ImagePickerFieldInner({
@@ -39,7 +38,6 @@ function ImagePickerFieldInner({
   isUploading = false,
   errorMessage,
   emptyTitle,
-  emptyHint,
   clearAccessibilityLabel,
   onPick,
   onClear,
@@ -48,11 +46,13 @@ function ImagePickerFieldInner({
   pickOptions,
   readOnly = false,
   shape = 'square',
+  size = DEFAULT_PICKER_SIZE,
 }: ImagePickerFieldProps) {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
   const { getColor } = useTheme()
   const isAvatar = shape === 'circle'
+  const frameSize = isAvatar ? undefined : { width: size, height: size }
   const hasPreview = Boolean(imageUri)
   const showClear = hasPreview && !isUploading && !readOnly
 
@@ -131,7 +131,7 @@ function ImagePickerFieldInner({
   }, [onPick])
 
   const dropzoneBody = (
-    <View style={isAvatar ? styles.dropzoneHostAvatar : styles.dropzoneHost}>
+    <View style={isAvatar ? styles.dropzoneHostAvatar : [styles.dropzoneHost, frameSize]}>
       <Animated.View
         style={[isAvatar ? styles.dropzoneAvatar : styles.dropzone, dropzoneAnimatedStyle]}
       >
@@ -163,13 +163,10 @@ function ImagePickerFieldInner({
           </ConditionRenderer>
           <ConditionRenderer when={!hasPreview && !isUploading && !isAvatar}>
             <>
-              <MyIcon name="cloud-upload-outline" size={40} color="icon/inactive/primary" />
-              <MyText typography="body">{emptyTitle}</MyText>
-              <ConditionRenderer when={Boolean(emptyHint)}>
-                <MyText typography="caption" style={styles.hint}>
-                  {emptyHint}
-                </MyText>
-              </ConditionRenderer>
+              <MyIcon name="cloud-upload-outline" size={28} color="icon/inactive/primary" />
+              <MyText typography="caption" style={styles.emptyTitle} numberOfLines={2}>
+                {emptyTitle}
+              </MyText>
             </>
           </ConditionRenderer>
         </MyPressable>
@@ -205,9 +202,13 @@ function ImagePickerFieldInner({
   )
 
   return (
-    <MyView style={isAvatar ? styles.rootAvatar : styles.root}>
+    <MyView style={isAvatar ? styles.rootAvatar : [styles.root, { width: size }]}>
       {isWeb
-        ? createElement('div', { ref: hostRef, style: WEB_HOST_STYLE }, dropzoneBody)
+        ? createElement(
+            'div',
+            { ref: hostRef, style: { ...WEB_HOST_STYLE, width: isAvatar ? '100%' : size } },
+            dropzoneBody,
+          )
         : dropzoneBody}
 
       <ConditionRenderer when={Boolean(errorMessage)}>

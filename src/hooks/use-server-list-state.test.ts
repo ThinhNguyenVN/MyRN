@@ -10,6 +10,13 @@ import { useServerListRefresh, useServerListSearchState } from './use-server-lis
 jest.mock('expo-router', () => ({ useFocusEffect: jest.fn() }))
 
 describe('useServerListSearchState', () => {
+  it('seeds search from initialSearch', () => {
+    const { result } = renderHook(() => useServerListSearchState('shoes'))
+
+    expect(result.current.search).toBe('shoes')
+    expect(result.current.page).toBe(1)
+  })
+
   it('handleSearchChange updates search and resets page to 1', () => {
     const { result } = renderHook(() => useServerListSearchState())
 

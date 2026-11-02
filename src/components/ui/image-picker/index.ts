@@ -11,6 +11,7 @@ export {
   buildImageFormData,
 } from './utils'
 export { ImagePickerField } from './image-picker-field'
+export { ImageThumbnailRow } from './image-thumbnail-row'
 export type {
   PickedImage,
   ImagePickErrorCode,
@@ -19,4 +20,5 @@ export type {
   PickImagesResult,
   BuildImageFormDataOptions,
   ImagePickerFieldProps,
+  ImageThumbnailRowProps,
 } from './type'

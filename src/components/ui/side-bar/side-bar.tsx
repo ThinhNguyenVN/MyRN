@@ -78,9 +78,17 @@ function SideBarInner({
     const escaped = href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     return new RegExp(`^${escaped}(/|$)`).test(pathname)
   }
-  const activeIndex = data.findIndex(
-    (item) => item.kind !== 'section' && item.href && pathMatchesHref(item.href),
-  )
+  // Longest matching href wins so `/settings/company` does not light up `/settings`.
+  let activeIndex = -1
+  let activeHrefLength = -1
+  data.forEach((item, index) => {
+    if (item.kind !== 'section' && item.href && pathMatchesHref(item.href)) {
+      if (item.href.length > activeHrefLength) {
+        activeIndex = index
+        activeHrefLength = item.href.length
+      }
+    }
+  })
 
   const highlightYExpanded = useSharedValue(computeSidebarHighlightY(data, activeIndex, false))
   const highlightYCollapsed = useSharedValue(computeSidebarHighlightY(data, activeIndex, true))

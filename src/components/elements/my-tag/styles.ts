@@ -8,6 +8,7 @@ export function generateStyles(theme: ThemeType) {
   return StyleSheet.create({
     base: {
       alignSelf: 'flex-start',
+      flexShrink: 0,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',

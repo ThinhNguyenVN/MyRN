@@ -5,10 +5,11 @@ import { useCallback, useEffect, useState } from 'react'
  * The "search + page" half of a server-side list screen — call this BEFORE building the query args
  * (the feature needs `page` to call RTK Query). Symmetric with `useServerListRefresh` (called AFTER,
  * needs `refetch`/`isFetching` from RTK Query) — the two hooks are split apart because of that
- * ordering constraint (see `use-server-list-paging.ts`).
+ * ordering constraint (see `use-server-list-paging.ts`). `initialSearch` seeds the keyword (e.g.
+ * from a deep link); it is read once on mount.
  */
-export function useServerListSearchState() {
-  const [search, setSearch] = useState('')
+export function useServerListSearchState(initialSearch = '') {
+  const [search, setSearch] = useState(initialSearch)
   const [page, setPage] = useState(1)
 
   const handlePagingReset = useCallback(() => setPage(1), [])

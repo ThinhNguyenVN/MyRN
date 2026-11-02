@@ -3,15 +3,21 @@
  * - Background/closed tab: the service worker shows the notification.
  * - Foreground: the page re-posts it through the service worker so it looks the same.
  * - Click: the service worker focuses the app and posts `data` back here, or opens `/` with the
- *   route in `#notification_url=` (only `/` is sure to exist in a static export).
+ *   route in `#notification_url=` (only `/` is sure to exist in a static export) — or, for a push
+ *   without `data.url`, the whole `data` as JSON in `#notification_data=`.
  * iOS Safari supports push only for a web app added to the home screen; elsewhere it is
  * `'unavailable'`.
  */
+import { firebaseConfig } from '@/configs/firebase.config'
+
 import { logEvent } from './analytics'
+import { emitForegroundMessage } from './foreground-messages'
 import { emitPushToken } from './push-token'
 import {
   canReceivePush,
   createNotificationOpenGuard,
+  notificationOpenKey,
+  parseLaunchData,
   resolveNotificationRoute,
   toWebPushPermissionStatus,
   type PushPermissionStatus,
@@ -19,17 +25,21 @@ import {
 import type { FirebaseRemoteMessage } from './types'
 import { getWebFirebaseConfig, getWebMessaging, warnWeb } from './web-sdk'
 
+export { subscribeForegroundMessages, type ForegroundMessageHandler } from './foreground-messages'
 export { getPushToken, setPushTokenHandler, type PushTokenHandler } from './push-token'
 
 export type NotificationOpenHandler = (route: string | null, data: Record<string, unknown>) => void
 
 /** Message type the service worker posts when a notification is clicked. */
 const OPEN_MESSAGE_TYPE = 'firebase-notification-open'
-/** Query param the worker adds to `/` when a click opens the app (same name in the worker). */
+/** Hash params the worker adds to `/` when a click opens the app (same names in the worker). */
 const LAUNCH_URL_PARAM = 'notification_url'
+/** Push without `data.url`: the worker forwards the whole `data` as JSON for the app to resolve. */
+const LAUNCH_DATA_PARAM = 'notification_data'
 /** Same scope as the Firebase default, so the worker never controls the app's pages. */
 const SW_SCOPE = '/firebase-cloud-messaging-push-scope'
 
+const OPEN_KEY_FIELDS = firebaseConfig.notifications.openKeyFields
 const shouldOpen = createNotificationOpenGuard()
 let foregroundListenerAttached = false
 let registrationPromise: Promise<ServiceWorkerRegistration | null> | null = null
@@ -102,6 +112,7 @@ async function attachForegroundListener(): Promise<void> {
   foregroundListenerAttached = true
   const { onMessage } = await import('firebase/messaging')
   onMessage(messaging, (payload) => {
+    emitForegroundMessage(payload.data)
     const notification = payload.notification
     if (!notification) return
     void getRegistration()
@@ -171,11 +182,12 @@ function takeLaunchPayload(): Record<string, unknown> | null {
   launchChecked = true
   // In the hash, not the query: expo-router would treat a query as a route param of `/`.
   const params = new URLSearchParams(window.location.hash.slice(1))
-  if (!params.has(LAUNCH_URL_PARAM)) return null
-  const payload = { url: params.get(LAUNCH_URL_PARAM) ?? '' }
+  const hasUrl = params.has(LAUNCH_URL_PARAM)
+  if (!hasUrl && !params.has(LAUNCH_DATA_PARAM)) return null
   const { pathname, search } = window.location
   window.history.replaceState(window.history.state, '', pathname + search)
-  return payload
+  if (hasUrl) return { url: params.get(LAUNCH_URL_PARAM) ?? '' }
+  return parseLaunchData(params.get(LAUNCH_DATA_PARAM))
 }
 
 /**
@@ -188,7 +200,7 @@ export function subscribeNotificationOpens(handler: NotificationOpenHandler): ()
   }
   const open = (id: string | undefined, payload: Record<string, unknown>) => {
     const route = resolveNotificationRoute(payload)
-    if (!shouldOpen(id, route)) return
+    if (!shouldOpen(id, notificationOpenKey(route, payload, OPEN_KEY_FIELDS))) return
     logEvent('notification_open', { url: route ?? undefined })
     handler(route, payload)
   }

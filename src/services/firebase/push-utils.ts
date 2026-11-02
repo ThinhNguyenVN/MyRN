@@ -52,19 +52,55 @@ export function resolveNotificationRoute(data: unknown): string | null {
 }
 
 /**
+ * Web launch payload: the service worker puts a push's `data` (no `url`) in
+ * `#notification_data=<json>`. Only string values of a plain object are kept; anything else
+ * (bad JSON, arrays) → `null`.
+ */
+export function parseLaunchData(raw: string | null): Record<string, string> | null {
+  if (!raw) return null
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    return null
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null
+  const data: Record<string, string> = {}
+  Object.entries(parsed as Record<string, unknown>).forEach(([key, value]) => {
+    if (typeof value === 'string') data[key] = value
+  })
+  return data
+}
+
+/**
+ * Key the open guard compares: the resolved route, or — for a push without `data.url` — the
+ * `fields` of `data` that identify its target (e.g. `resource` + `postId`). Only those fields
+ * are used: RNFirebase `message.data` and expo `content.data` for the same push usually differ.
+ */
+export function notificationOpenKey(
+  route: string | null,
+  data: Record<string, unknown>,
+  fields: readonly string[],
+): string {
+  if (route) return route
+  return fields
+    .filter((field) => typeof data[field] === 'string')
+    .map((field) => `${field}=${data[field] as string}`)
+    .join('&')
+}
+
+/**
  * One tap can be reported by more than one source (RNFirebase and expo-notifications, launch
- * and listener). The guard lets each tap through once: same notification id, or the same
- * resolved route within `windowMs`. The route, not the payload, is compared: RNFirebase
- * `message.data` and expo `content.data` for the same push usually differ.
+ * and listener). The guard lets each tap through once: same notification id, or the same key
+ * (`notificationOpenKey`) within `windowMs`.
  */
 export function createNotificationOpenGuard(windowMs = 2000, now: () => number = Date.now) {
   const seenIds = new Set<string>()
   let lastKey: string | null = null
   let lastAt = 0
 
-  return (id: string | null | undefined, route: string | null): boolean => {
+  return (id: string | null | undefined, key: string): boolean => {
     if (id && seenIds.has(id)) return false
-    const key = route ?? ''
     const at = now()
     if (key === lastKey && at - lastAt < windowMs) return false
     if (id) seenIds.add(id)

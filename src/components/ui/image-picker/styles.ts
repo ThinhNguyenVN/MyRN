@@ -3,14 +3,15 @@ import { StyleSheet } from 'react-native'
 import type { ThemeType } from '@/theme/theme-context'
 
 export const AVATAR_PICKER_SIZE = 140
+export const DEFAULT_PICKER_SIZE = 120
 
 export function generateStyles(theme: ThemeType) {
   const { getColor, getSpacing, getRadius } = theme
 
   return StyleSheet.create({
+    /** Width comes from the `size` prop. */
     root: {
-      gap: getSpacing('x3'),
-      width: '100%',
+      gap: getSpacing('x2'),
     },
     rootAvatar: {
       gap: getSpacing('x3'),
@@ -18,9 +19,8 @@ export function generateStyles(theme: ThemeType) {
       alignSelf: 'center',
     },
     /** Positioning context for overlay + clear button. */
+    /** Width/height come from the `size` prop. */
     dropzoneHost: {
-      width: '100%',
-      height: 200,
       position: 'relative',
     },
     dropzoneHostAvatar: {
@@ -29,10 +29,10 @@ export function generateStyles(theme: ThemeType) {
       position: 'relative',
     },
     dropzone: {
-      borderWidth: 2,
+      borderWidth: 1.5,
       borderStyle: 'dashed',
       borderColor: getColor('border/inactive/secondary'),
-      borderRadius: getRadius('large'),
+      borderRadius: getRadius('medium'),
       backgroundColor: getColor('fill/background/secondary'),
       height: '100%',
       width: '100%',
@@ -52,10 +52,10 @@ export function generateStyles(theme: ThemeType) {
       flex: 1,
       width: '100%',
       height: '100%',
-      padding: getSpacing('x8'),
+      padding: getSpacing('x2'),
       alignItems: 'center',
       justifyContent: 'center',
-      gap: getSpacing('x2'),
+      gap: getSpacing('x1'),
     },
     dropzonePressableAvatar: {
       flex: 1,
@@ -117,18 +117,31 @@ export function generateStyles(theme: ThemeType) {
     },
     clearButton: {
       position: 'absolute',
-      top: getSpacing('x3'),
-      right: getSpacing('x3'),
+      top: getSpacing('x1'),
+      right: getSpacing('x1'),
       zIndex: 4,
       elevation: 4,
     },
-    hint: {
+    thumbnailRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: getSpacing('x4'),
+      width: '100%',
+    },
+    thumbnailRowText: {
+      flex: 1,
+      minWidth: 0,
+      gap: getSpacing('x1'),
+    },
+    rowHint: {
+      color: getColor('text/active/tertiary'),
+    },
+    emptyTitle: {
       color: getColor('text/active/tertiary'),
       textAlign: 'center',
     },
     error: {
       color: getColor('text/alert/primary'),
-      textAlign: 'center',
     },
     sourceSheetBody: {
       gap: getSpacing('x3'),

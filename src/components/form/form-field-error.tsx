@@ -10,7 +10,7 @@ import { generateStyles } from './styles'
 
 const DURATION_MS = 200
 const MAX_HEIGHT_COLLAPSED = 0
-const MAX_HEIGHT_VISIBLE = 20
+const MAX_HEIGHT_VISIBLE = 40
 
 function FormFieldError({ error, style: styleProp }: FormFieldErrorProps) {
   const styles = useThemedStyles(generateStyles)
