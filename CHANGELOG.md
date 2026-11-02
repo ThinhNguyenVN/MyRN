@@ -12,6 +12,16 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Added
+- **404 screen (from my-store, MY-47):** `src/app/+not-found.tsx` re-exports `features/not-found`
+  (container + view). It must live under `src/app` so an unmatched web URL renders inside the root
+  layout; expo-router's built-in fallback renders outside it and breaks hydration (React #418).
+  Shows the unmatched path, "Go back" (only with history) and a primary action to
+  `Routes.defaultRoute` / `Routes.login`. i18n `notFound.*`. **Product to do:** copy
+  `src/app/+not-found.tsx`, `src/features/not-found/`, the `notFound` keys; add your logo to the view.
+- **`FilterChoiceField` (from my-store):** `components/ui/filter-choice-field` — checkbox list for
+  1–2 options, dropdown from 3 (single or multi); `onToggle(id)` must use a functional state update.
+  **Product to do:** copy `src/components/ui/filter-choice-field/`.
+
 - **Unsaved changes guard (from my-store PR #101, MY-52):** `<UnsavedChangesGuard extraDirty? />`
   (`components/form`, inside `MyForm`) and `useUnsavedChangesGuard(isDirty)` ask "Stay / Discard"
   before leaving a dirty form: stack removal (header/in-app Back, Android back, iOS swipe) via

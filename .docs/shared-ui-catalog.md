@@ -37,6 +37,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Image carousel + fullscreen preview | `ImageSlider` + `ImagePreview` | Custom pager/zoom unless kit cannot support the case |
 | Pick image from library or camera (web/iOS/Android) | `pickImage` / `pickImageFromCamera` / `buildImageFormData` (`components/ui/image-picker`) | Ad-hoc `<input type="file">` / Files document picker for photos |
 | Image dropzone + preview + clear (square thumbnail, or `ImageThumbnailRow` with a text column) | `ImagePickerField` / `ImageThumbnailRow` (`components/ui/image-picker`) | Feature-only upload boxes that reimplement dashed dropzone UI |
+| Filter field: checkbox list for 1–2 options, dropdown from 3 (single or multi) | `FilterChoiceField` (`components/ui/filter-choice-field`) | Hand-rolled checkbox groups per filter sheet |
 | Edge nav drawer (hamburger menu) | `DrawerMenu` | Ad-hoc `Modal` + absolute panel |
 | Native full-screen picker / filter | `NativeFullscreenModal` | Feature-local `Modal` with one-off iOS/Android padding |
 | Status / tag color | `MyTag` | One-off badge StyleSheets / `MyChip` for status |
