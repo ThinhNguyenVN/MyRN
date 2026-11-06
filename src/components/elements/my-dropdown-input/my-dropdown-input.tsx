@@ -116,6 +116,14 @@ const MyDropdownInput = memo(function MyDropdownInput({
   const shouldUseSheet = (isNative && nativeWantsSheet) || (isWeb && isMobileSize)
   const allowClear = allowClearProp ?? !required
 
+  // Single select: an option with value '' (e.g. "default") is a real choice, ticked when value is ''.
+  const hasEmptyOption = useMemo(
+    () =>
+      options.some((option) => option.value === '') ||
+      Boolean(selectedOptions?.some((option) => option.value === '')),
+    [options, selectedOptions],
+  )
+
   const selectedValues = useMemo<string[]>(
     () =>
       multiSelect
@@ -126,8 +134,10 @@ const MyDropdownInput = memo(function MyDropdownInput({
             : []
         : !isNil(value) && value !== ''
           ? [value as string]
-          : [],
-    [multiSelect, value],
+          : value === '' && hasEmptyOption
+            ? ['']
+            : [],
+    [multiSelect, value, hasEmptyOption],
   )
 
   const findOption = useCallback(
@@ -178,11 +188,11 @@ const MyDropdownInput = memo(function MyDropdownInput({
       const lastValue = selectedValues[selectedValues.length - 1]
       return filteredOptions.findIndex((option) => option.value === lastValue)
     }
-    if (isNil(value) || value === '') {
+    if (selectedValues.length === 0) {
       return -1
     }
-    return filteredOptions.findIndex((option) => option.value === value)
-  }, [filteredOptions, multiSelect, selectedValues, value])
+    return filteredOptions.findIndex((option) => option.value === selectedValues[0])
+  }, [filteredOptions, multiSelect, selectedValues])
 
   useEffect(() => {
     chevronRotation.value = withTiming(open ? -90 : 0)
@@ -375,7 +385,8 @@ const MyDropdownInput = memo(function MyDropdownInput({
     </Animated.View>
   )
   const triggerClearIcon = <MyIcon name="close-circle" size={20} color="icon/active/secondary" />
-  const hasSelection = selectedValues.length > 0
+  // '' never counts as clearable: clearing to '' is a no-op.
+  const hasSelection = selectedValues.some((selected) => selected !== '')
   const showTriggerClear = allowClear && hasSelection && !isPickerDisabled
   const showPickerClear = allowClear && hasSelection && filterQuery === ''
 
