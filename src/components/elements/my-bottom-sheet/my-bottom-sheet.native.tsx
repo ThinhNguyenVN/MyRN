@@ -209,6 +209,8 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     const useBottomSheet = isMobileSize && !isWeb && !androidExpoGoWideScreen
     /** Controlled mode: cha truyền visible — state nội bộ chỉ dùng khi không controlled (web desktop modal). */
     const [internalVisible, setInternalVisible] = useState(false)
+    /** Theo dõi mở/đóng của nhánh Modal uncontrolled — guard để onClosed gọi đúng 1 lần, không đệ quy. */
+    const modalOpenRef = useRef(false)
 
     const panDownEnabled = enablePanDownToClose && pressBackdropToClose
 
@@ -218,9 +220,19 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         return
       }
       if (visibleProp === undefined) {
+        modalOpenRef.current = true
         setInternalVisible(true)
       }
     }, [useBottomSheet, visibleProp])
+
+    /** Nhánh Modal uncontrolled: tắt + báo onClosed/onDismiss như native `onDismiss` (chỉ khi đang mở). */
+    const closeInternalModal = useCallback(() => {
+      if (!modalOpenRef.current) return
+      modalOpenRef.current = false
+      setInternalVisible(false)
+      onClosed?.()
+      onDismiss?.()
+    }, [onClosed, onDismiss])
 
     const close = useCallback(() => {
       if (useBottomSheet) {
@@ -228,9 +240,9 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         return
       }
       if (visibleProp === undefined) {
-        setInternalVisible(false)
+        closeInternalModal()
       }
-    }, [useBottomSheet, visibleProp])
+    }, [useBottomSheet, visibleProp, closeInternalModal])
 
     /**
      * Đóng do TƯƠNG TÁC người dùng (X / backdrop / hệ thống) — báo cha qua onClose/onClosed.
@@ -245,10 +257,8 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         onCloseProp?.()
         return
       }
-      setInternalVisible(false)
-      onClosed?.()
-      onDismiss?.()
-    }, [useBottomSheet, visibleProp, onCloseProp, onClosed, onDismiss])
+      closeInternalModal()
+    }, [useBottomSheet, visibleProp, onCloseProp, closeInternalModal])
 
     useImperativeHandle(ref, () => ({ open, close }), [open, close])
 

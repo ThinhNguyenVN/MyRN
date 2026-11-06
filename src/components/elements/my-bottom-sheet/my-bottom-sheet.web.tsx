@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import {
@@ -189,20 +190,32 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     const styles = useThemedStyles(generateStyles)
     /** Controlled mode: cha truyền visible — state nội bộ chỉ dùng khi không controlled. */
     const [internalVisible, setInternalVisible] = useState(false)
+    /** Theo dõi mở/đóng của nhánh Modal uncontrolled — guard để onClosed gọi đúng 1 lần, không đệ quy. */
+    const modalOpenRef = useRef(false)
 
     const panDownEnabled = enablePanDownToClose && pressBackdropToClose
 
     const open = useCallback(() => {
       if (visibleProp === undefined) {
+        modalOpenRef.current = true
         setInternalVisible(true)
       }
     }, [visibleProp])
 
+    /** Nhánh Modal uncontrolled: tắt + báo onClosed/onDismiss như native `onDismiss` (chỉ khi đang mở). */
+    const closeInternalModal = useCallback(() => {
+      if (!modalOpenRef.current) return
+      modalOpenRef.current = false
+      setInternalVisible(false)
+      onClosed?.()
+      onDismiss?.()
+    }, [onClosed, onDismiss])
+
     const close = useCallback(() => {
       if (visibleProp === undefined) {
-        setInternalVisible(false)
+        closeInternalModal()
       }
-    }, [visibleProp])
+    }, [visibleProp, closeInternalModal])
 
     /**
      * Đóng do TƯƠNG TÁC người dùng (X / backdrop / hệ thống) — báo cha qua onClose/onClosed.
@@ -213,10 +226,8 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
         onCloseProp?.()
         return
       }
-      setInternalVisible(false)
-      onClosed?.()
-      onDismiss?.()
-    }, [visibleProp, onCloseProp, onClosed, onDismiss])
+      closeInternalModal()
+    }, [visibleProp, onCloseProp, closeInternalModal])
 
     useImperativeHandle(ref, () => ({ open, close }), [open, close])
 
