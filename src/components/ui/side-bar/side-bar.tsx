@@ -27,7 +27,7 @@ import {
   SIDEBAR_HIGHLIGHT_WIDTH_EXPANDED,
   generateStyles,
 } from './styles'
-import type { SideBarItem, SideBarProps } from './type'
+import type { SideBarItem, SideBarProps, SideBarSelection } from './type'
 import SideBarRow from './sider-bar-item'
 import { computeSidebarHighlightY } from './utils'
 
@@ -69,6 +69,9 @@ function SideBarInner({
   const styles = useThemedStyles(generateStyles)
   const navigateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const highlightTargetRef = useRef<number | null>(null)
+  const moveHighlightToIndexRef = useRef<(index: number) => void>(() => undefined)
+  const selectionSeqRef = useRef(0)
+  const activeIndexRef = useRef(-1)
 
   const internalCollapseProgress = useSharedValue(collapsed ? 1 : 0)
   const collapseProgress: SharedValue<number> = collapseProgressProp ?? internalCollapseProgress
@@ -89,6 +92,7 @@ function SideBarInner({
       }
     }
   })
+  activeIndexRef.current = activeIndex
 
   const highlightYExpanded = useSharedValue(computeSidebarHighlightY(data, activeIndex, false))
   const highlightYCollapsed = useSharedValue(computeSidebarHighlightY(data, activeIndex, true))
@@ -171,6 +175,7 @@ function SideBarInner({
     },
     [animateHighlightTo, collapsed, data, highlightYCollapsed, highlightYExpanded],
   )
+  moveHighlightToIndexRef.current = moveHighlightToIndex
 
   useEffect(() => {
     if (activeIndex < 0) {
@@ -181,28 +186,76 @@ function SideBarInner({
 
   useEffect(() => {
     return () => {
+      selectionSeqRef.current += 1
       if (navigateTimeoutRef.current) {
         clearTimeout(navigateTimeoutRef.current)
       }
     }
   }, [])
 
+  const clearNavigateTimeout = useCallback(() => {
+    if (navigateTimeoutRef.current) {
+      clearTimeout(navigateTimeoutRef.current)
+      navigateTimeoutRef.current = null
+    }
+  }, [])
+
+  /** Pill moves only after the caller accepts the row, so "Stay" leaves the current item active. */
+  const applySelection = useCallback(
+    (index: number, outcome: SideBarSelection, selectionSeq: number) => {
+      if (selectionSeq !== selectionSeqRef.current) {
+        return
+      }
+      if (outcome === false) {
+        if (activeIndexRef.current >= 0) {
+          moveHighlightToIndexRef.current(activeIndexRef.current)
+        }
+        return
+      }
+      moveHighlightToIndexRef.current(index)
+      if (typeof outcome !== 'function') {
+        return
+      }
+      clearNavigateTimeout()
+      navigateTimeoutRef.current = setTimeout(() => {
+        navigateTimeoutRef.current = null
+        if (selectionSeq !== selectionSeqRef.current) {
+          return
+        }
+        outcome()
+      }, HIGHLIGHT_NAV_DELAY_MS)
+    },
+    [clearNavigateTimeout],
+  )
+
   const handleSelected = useCallback(
     (item: SideBarItem, index: number) => () => {
       if (item.kind === 'section') {
         return
       }
-      if (navigateTimeoutRef.current) {
-        clearTimeout(navigateTimeoutRef.current)
-        navigateTimeoutRef.current = null
+      clearNavigateTimeout()
+      const selectionSeq = ++selectionSeqRef.current
+
+      if (!onSelectedProp) {
+        moveHighlightToIndexRef.current(index)
+        return
       }
 
-      moveHighlightToIndex(index)
-      navigateTimeoutRef.current = setTimeout(() => {
-        onSelectedProp?.(item, index)
-      }, HIGHLIGHT_NAV_DELAY_MS)
+      let result: SideBarSelection | Promise<SideBarSelection>
+      try {
+        result = onSelectedProp(item, index)
+      } catch {
+        return
+      }
+
+      void Promise.resolve(result).then(
+        (outcome) => {
+          applySelection(index, outcome, selectionSeq)
+        },
+        () => undefined,
+      )
     },
-    [moveHighlightToIndex, onSelectedProp],
+    [applySelection, clearNavigateTimeout, onSelectedProp],
   )
 
   const showHighlight = activeIndex >= 0
@@ -221,6 +274,7 @@ function SideBarInner({
               : null,
           ]}
           pointerEvents="none"
+          testID="sidebar-active-highlight"
         />
       ) : null}
       {data.map((item, index) => (

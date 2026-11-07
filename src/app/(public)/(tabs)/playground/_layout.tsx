@@ -107,8 +107,10 @@ export default function PlaygroundLayout() {
 
   const handleSelected = useCallback(
     (item: SideBarItem) => {
-      if (item.href === pathname) return
-      router.replace(item.href as any)
+      if (item.href === pathname) return false
+      return () => {
+        router.replace(item.href as any)
+      }
     },
     [pathname],
   )
