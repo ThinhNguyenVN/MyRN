@@ -27,11 +27,19 @@ export interface SideBarItem {
 
 export type SideBarVariant = 'card' | 'flush'
 
+/**
+ * Row press result:
+ * - `false` — stay on the current route (the highlight does not move).
+ * - a function — run it after the highlight starts moving, so navigation waits out the pill.
+ * - `void` — the caller already handled the press; the highlight follows the row.
+ */
+export type SideBarSelection = void | false | (() => void)
+
 export interface SideBarProps {
   data: SideBarItem[]
   elevation?: ElevationToken | 'none'
   style?: StyleProp<ViewStyle>
-  onSelected?: (item: SideBarItem, index: number) => void
+  onSelected?: (item: SideBarItem, index: number) => SideBarSelection | Promise<SideBarSelection>
   /** Brand / title above the nav list. */
   header?: ReactNode
   /** Secondary actions below the nav list (e.g. Help / Logout). */

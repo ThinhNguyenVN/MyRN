@@ -93,6 +93,7 @@ product finds out what changed since it forked.
   `components.chat.quick` keys.
 
 ### Fixed
+- **SideBar highlight stays on the current route when a press is cancelled (from my-store):** the pill no longer jumps to the pressed row before `onSelected` resolves. Return `false` to keep the current item active (for example the user stayed on a dirty form). Return a function to run after the pill starts moving, so `router.push` waits out the highlight. Playground rail uses that function. **Product to do:** copy `src/components/ui/side-bar/side-bar.tsx`, `type.ts`, and `side-bar.test.tsx`. If a sidebar asks before navigating, return `false` when the user stays and return the `router.push` from `onSelected` instead of navigating inside the handler immediately.
 - **MyChat retry no longer jumps the list (chat-core `0.2.3`):** retry keeps the failed slot as a
   typing placeholder and replaces it with the new response, so the list no longer shrinks and
   jumps. **Product to do:** bump `@thinhnguyenvn/chat-core` to `0.2.3`.

@@ -133,6 +133,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 - `SidebarCollapseToggle` — circular chevron chip for product rails (props: `collapsed`, `onPress`, `accessibilityLabel`)
 - Auto-collapse helper: `BREAKPOINT_SIDEBAR_COMPACT` (1200) in `@/constants/dimensions`
 - Item `emphasis?` (soft accent fill when not active) and `badge?` (pill after the label, fades with it when collapsed)
+- `onSelected` may return `false` to keep the current highlight, or a function that runs after the pill starts moving (navigation)
 - Used by playground layout rail (Chat row demos badge + emphasis); product flush rail for authenticated chrome (`PrivateSidebar` stays in the product)
 
 ### Filter menu (`MyBottomSheet` mobile + `TriggerModal` desktop)
