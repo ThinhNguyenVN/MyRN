@@ -9,7 +9,6 @@ import MyBottomSheet, { type MyBottomSheetRef } from '@/components/elements/my-b
 import MyEmptyState from '@/components/elements/my-empty-state'
 import MyIcon from '@/components/elements/my-icon'
 import MyPressable from '@/components/elements/my-pressable'
-import MySearchInput from '@/components/elements/my-search-input'
 import MyText from '@/components/elements/my-text'
 import MyTextInput from '@/components/elements/my-text-input'
 import type { MyTextInputRef } from '@/components/elements/my-text-input/type'
@@ -23,6 +22,7 @@ import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 import { useThemedStyles } from '@/theme/theme-context'
 
 import { DropdownOptionRow } from './dropdown-option-row'
+import { DropdownSearchField } from './dropdown-search-field'
 import {
   DROPDOWN_ITEM_SIZE,
   DROPDOWN_LIST_DRAW_DISTANCE,
@@ -84,6 +84,12 @@ const MyDropdownInput = memo(function MyDropdownInput({
   const [open, setOpen] = useState(false)
   const [lockedIsSheet, setLockedIsSheet] = useState<boolean | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  /** Bumped to clear the search field, which keeps its own text (see `DropdownSearchField`). */
+  const [searchFieldKey, setSearchFieldKey] = useState(0)
+  const resetSearch = useCallback(() => {
+    setSearchQuery('')
+    setSearchFieldKey((key) => key + 1)
+  }, [])
   const closeAfterSelectRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const triggerLayoutRef = useRef<{
     x: number
@@ -266,7 +272,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
     if (isPickerDisabled) {
       return
     }
-    setSearchQuery('')
+    resetSearch()
     if (isNative) {
       setLockedIsSheet(wantsSheetByContent)
       setOpen(true)
@@ -281,7 +287,14 @@ const MyDropdownInput = memo(function MyDropdownInput({
       captureTriggerLayout(x, y, width, height)
       setOpen(true)
     })
-  }, [captureTriggerLayout, isNative, isPickerDisabled, wantsSheetByContent, measureTrigger])
+  }, [
+    captureTriggerLayout,
+    isNative,
+    isPickerDisabled,
+    wantsSheetByContent,
+    measureTrigger,
+    resetSearch,
+  ])
 
   const closePicker = useCallback(() => {
     if (closeAfterSelectRef.current) {
@@ -292,11 +305,11 @@ const MyDropdownInput = memo(function MyDropdownInput({
     mobileSearchRef.current?.blur()
     triggerInputRef.current?.blur()
     Keyboard.dismiss()
-    setSearchQuery('')
+    resetSearch()
     sheetRef.current?.close()
     setLockedIsSheet(null)
     setOpen(false)
-  }, [])
+  }, [resetSearch])
 
   const handleNativeDismiss = useCallback(() => {
     if (skipDismissRef.current) {
@@ -540,9 +553,10 @@ const MyDropdownInput = memo(function MyDropdownInput({
 
   const mobileSearchField = (
     <MyView style={isWeb ? [styles.searchWrap, styles.searchWrapWeb] : styles.searchWrap}>
-      <MySearchInput
+      <DropdownSearchField
+        key={searchFieldKey}
         ref={mobileSearchRef}
-        value={searchQuery}
+        initialValue=""
         onChangeText={setSearchQuery}
         placeholder={t('components.dropdownSearch')}
         useBottomSheetTextInput={nativeWantsSheet}
