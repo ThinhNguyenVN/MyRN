@@ -79,6 +79,8 @@ export default function DropdownScreen() {
   const [fullscreenValue, setFullscreenValue] = useState<string | null>(null)
   const [remoteValue, setRemoteValue] = useState<string | null>(null)
   const remote = useFakeRemoteOptions()
+  const [createValue, setCreateValue] = useState<string | null>(null)
+  const [createdOptions, setCreatedOptions] = useState<{ label: string; value: string }[]>([])
   const options = dropdownOptions.map((option) => ({
     label: t(option.labelKey),
     value: option.value,
@@ -102,6 +104,16 @@ export default function DropdownScreen() {
   }, [])
   const handleRemoteChange = useCallback((v: string | string[]) => {
     setRemoteValue(Array.isArray(v) ? (v[0] ?? null) : v)
+  }, [])
+  const handleCreateChange = useCallback((v: string | string[]) => {
+    setCreateValue(Array.isArray(v) ? (v[0] ?? null) : v)
+  }, [])
+  // The product creates the row (a POST in real use) and resolves the option, or null on failure.
+  const handleCreateOption = useCallback(async (name: string) => {
+    await new Promise((resolve) => setTimeout(resolve, 400))
+    const created = { label: name, value: `created-${Date.now()}` }
+    setCreatedOptions((prev) => [...prev, created])
+    return created
   }, [])
   const handleDisabledChange = useCallback(() => {}, [])
 
@@ -157,6 +169,16 @@ export default function DropdownScreen() {
         placeholder={t('components.dropdownSelect')}
         title={t('playground.dropdownRemoteTitle')}
         subTitle={t('playground.dropdownRemoteSubTitle')}
+      />
+      <MyDropdownInput
+        options={createdOptions}
+        value={createValue}
+        onValueChange={handleCreateChange}
+        onCreateOption={handleCreateOption}
+        placeholder={t('components.dropdownSelect')}
+        title={t('playground.dropdownCreateTitle')}
+        subTitle={t('playground.dropdownCreateSubTitle')}
+        preferSheet
       />
       <MyDropdownInput
         options={options}

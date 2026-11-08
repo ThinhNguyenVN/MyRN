@@ -273,6 +273,12 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Wire it from any paged query in the product (e.g. a `useRemoteOptions()` hook returning these props).
 - Playground: remote demo at the end of `…/playground/dropdown.tsx`
 
+### `MyDropdownInput` quick-create
+
+- Pass `onCreateOption(name) => Promise<DropdownOption | null>`: when the search text matches no option, the list shows a "Create “name”" row (and an "empty, type a name" hint when there are no options). The returned option is selected and remembered for the trigger label; `null` = creation failed (the product shows its own error; nothing is selected).
+- The row waits until the typed text was searched: remote mode passes `searchedQuery` (what the hook last requested) and `fetching` so a stale list never lets the user create a duplicate. A second tap while creating is ignored.
+- Gate it by permission in the product (pass `undefined` when the user cannot create). Playground: quick-create demo in `…/playground/dropdown.tsx`
+
 ### `Confirmation.prompt` (dialog with a text input)
 
 - `Confirmation.prompt({ title, message, confirmText, input: { title, placeholder, maxLength, multiline } })` → trimmed text (`''` allowed) when confirmed, `null` when dismissed. Built on the `MyAlert` `children` slot.
