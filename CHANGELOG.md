@@ -101,6 +101,11 @@ product finds out what changed since it forked.
   `components.chat.quick` keys.
 
 ### Fixed
+- **`MyTextInput` `multiline` at the one-line height (from my-store, MY-9):** text sat at the top
+  of the box (web `<textarea>` does not centre like `<input>`). One-row multiline inputs now get
+  8 + 24 + 8 padding/line height (`inputMultilineSingleRow`), so the text lines up with single-line
+  inputs; taller multiline inputs are unchanged. **Product to do:** copy
+  `src/components/elements/my-text-input/my-text-input.tsx` and `styles.ts`.
 - **`MyDropdownInput` search field no longer drops characters or duplicates IME input (from my-store):** on web the picker body renders inside a `@gorhom/portal` host that receives props one commit late, so a search field controlled by the picker's state had its stale value restored between keystrokes. Fast typing lost characters ("Bosch" became "Bsh") and Vietnamese VNI/Telex composition duplicated letters ("mục" became "muuc"). The text now lives in `DropdownSearchField`, which owns its state and reports changes up; the picker clears it by remounting with a new `key`. **Product to do:** copy `src/components/elements/my-dropdown-input/dropdown-search-field.tsx` (+ test) and the matching changes in `my-dropdown-input.tsx` (`searchFieldKey` / `resetSearch`).
 - **SideBar highlight stays on the current route when a press is cancelled (from my-store):** the pill no longer jumps to the pressed row before `onSelected` resolves. Return `false` to keep the current item active (for example the user stayed on a dirty form). Return a function to run after the pill starts moving, so `router.push` waits out the highlight. Playground rail uses that function. **Product to do:** copy `src/components/ui/side-bar/side-bar.tsx`, `type.ts`, and `side-bar.test.tsx`. If a sidebar asks before navigating, return `false` when the user stays and return the `router.push` from `onSelected` instead of navigating inside the handler immediately.
 - **MyChat retry no longer jumps the list (chat-core `0.2.3`):** retry keeps the failed slot as a
