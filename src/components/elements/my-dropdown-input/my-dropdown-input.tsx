@@ -66,6 +66,9 @@ const MyDropdownInput = memo(function MyDropdownInput({
   hasMore = false,
   loadingMore = false,
   selectedOptions,
+  fetching = false,
+  searchedQuery,
+  onCreateOption,
 }: MyDropdownInputProps) {
   const styles = useThemedStyles(generateStyles)
   const { t } = useTranslation()
@@ -90,6 +93,9 @@ const MyDropdownInput = memo(function MyDropdownInput({
     setSearchQuery('')
     setSearchFieldKey((key) => key + 1)
   }, [])
+  const [creating, setCreating] = useState(false)
+  /** Options created from this picker; kept so the trigger label resolves before the list refetches. */
+  const [createdOptions, setCreatedOptions] = useState<DropdownOption[]>([])
   const closeAfterSelectRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const triggerLayoutRef = useRef<{
     x: number
@@ -149,8 +155,9 @@ const MyDropdownInput = memo(function MyDropdownInput({
   const findOption = useCallback(
     (optionValue: unknown) =>
       options.find((option) => option.value === optionValue) ??
-      selectedOptions?.find((option) => option.value === optionValue),
-    [options, selectedOptions],
+      selectedOptions?.find((option) => option.value === optionValue) ??
+      createdOptions.find((option) => option.value === optionValue),
+    [createdOptions, options, selectedOptions],
   )
   const selectedOption = !multiSelect ? findOption(value) : null
   const displayText = multiSelect
@@ -372,6 +379,48 @@ const MyDropdownInput = memo(function MyDropdownInput({
     [closePicker, multiSelect, onValueChange, selectedValues],
   )
 
+  // Latest toggle for the async create below: `selectedValues` may change while the POST runs.
+  const toggleOrSelectRef = useRef(toggleOrSelect)
+  toggleOrSelectRef.current = toggleOrSelect
+
+  const createName = searchQuery.trim()
+  // Offer "create" only once the typed text has been searched: the list belongs to exactly this
+  // query (`searchedQuery` is what the remote hook last dispatched) and no fetch is in flight,
+  // so an existing entry that a stale list does not show yet is not duplicated.
+  const searchSettled = (searchedQuery ?? filterQuery.trim()) === createName && !fetching
+  const showCreateRow =
+    Boolean(onCreateOption) &&
+    createName !== '' &&
+    searchSettled &&
+    ![...options, ...(selectedOptions ?? []), ...createdOptions].some(
+      (option) => option.label.trim().toLowerCase() === createName.toLowerCase(),
+    )
+
+  const creatingRef = useRef(false)
+
+  const handleCreate = useCallback(async () => {
+    // A ref, not the `creating` state: two quick taps land before the re-render disables the row.
+    if (!onCreateOption || creatingRef.current || createName === '') {
+      return
+    }
+    creatingRef.current = true
+    setCreating(true)
+    try {
+      const created = await onCreateOption(createName)
+      if (created) {
+        setCreatedOptions((prev) => [
+          ...prev.filter((option) => option.value !== created.value),
+          created,
+        ])
+        resetSearch()
+        toggleOrSelectRef.current(created.value)
+      }
+    } finally {
+      creatingRef.current = false
+      setCreating(false)
+    }
+  }, [createName, onCreateOption, resetSearch])
+
   const renderOption = useCallback(
     ({ item }: { item: DropdownOption }) => (
       <DropdownOptionRow
@@ -458,6 +507,31 @@ const MyDropdownInput = memo(function MyDropdownInput({
     }
   }, [modalMaxHeigh])
 
+  const createRow = showCreateRow ? (
+    <MyPressable
+      onPress={handleCreate}
+      haptic={false}
+      accessibilityRole="button"
+      accessibilityLabel={t('components.dropdownCreate', { name: createName })}
+      style={styles.clearRow}
+      disabled={creating}
+    >
+      <MyText typography="body" style={styles.createRowText}>
+        {creating
+          ? t('components.dropdownCreating')
+          : t('components.dropdownCreate', { name: createName })}
+      </MyText>
+    </MyPressable>
+  ) : null
+
+  const listHeader =
+    createRow || showPickerClear ? (
+      <>
+        {createRow}
+        {showPickerClear ? clearSelectionRow : null}
+      </>
+    ) : undefined
+
   const emptySearch = (
     <MyView style={styles.emptyWrap}>
       <MyEmptyState
@@ -466,7 +540,9 @@ const MyDropdownInput = memo(function MyDropdownInput({
             ? t('components.dropdownLoading')
             : filterQuery.length > 0
               ? t('components.dropdownSearchEmpty')
-              : t('components.dropdownEmpty')
+              : onCreateOption
+                ? t('components.dropdownCreateHint')
+                : t('components.dropdownEmpty')
         }
       />
     </MyView>
@@ -515,7 +591,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="none"
           showsVerticalScrollIndicator={false}
-          ListHeaderComponent={showPickerClear ? clearSelectionRow : undefined}
+          ListHeaderComponent={listHeader}
           ListEmptyComponent={emptySearch}
           ListFooterComponent={loadMoreRow}
           onEndReached={isRemote ? handleEndReached : undefined}
@@ -539,7 +615,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="none"
         showsVerticalScrollIndicator={false}
-        ListHeaderComponent={showPickerClear ? clearSelectionRow : undefined}
+        ListHeaderComponent={listHeader}
         ListEmptyComponent={emptySearch}
         ListFooterComponent={loadMoreRow}
         onEndReached={isRemote ? handleEndReached : undefined}
@@ -596,6 +672,7 @@ const MyDropdownInput = memo(function MyDropdownInput({
             contentContainerStyle={styles.sheetPickerContent}
           >
             <ConditionRenderer when={searchable}>{mobileSearchField}</ConditionRenderer>
+            {createRow}
             <ConditionRenderer when={showPickerClear}>{clearSelectionRow}</ConditionRenderer>
             <ConditionRenderer when={filteredOptions.length === 0} fallback={sheetOptionRows}>
               {emptySearch}

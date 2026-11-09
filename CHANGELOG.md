@@ -12,6 +12,14 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Added
+- **`MyDropdownInput` quick-create (from my-store PR #114, MY-75):** new props `onCreateOption`
+  (`(name) => Promise<DropdownOption | null>`), `fetching` and `searchedQuery`. A search text that
+  matches no option shows a "Create “name”" row (after the list was searched for exactly that text,
+  case-insensitive duplicate check, double-tap guarded); the created option is selected and kept for
+  the trigger label. i18n `components.dropdownCreate/dropdownCreating/dropdownCreateHint`;
+  playground quick-create demo; `.docs/shared-ui-catalog.md`. **Product to do:** copy
+  `my-dropdown-input/{type.ts,styles.ts,my-dropdown-input.tsx}` and the three i18n keys; pass
+  `fetching`/`searchedQuery` from your remote-options hook (my-store `useRemoteOptions`).
 - **404 screen (from my-store, MY-47):** `src/app/+not-found.tsx` re-exports `features/not-found`
   (container + view). It must live under `src/app` so an unmatched web URL renders inside the root
   layout; expo-router's built-in fallback renders outside it and breaks hydration (React #418).

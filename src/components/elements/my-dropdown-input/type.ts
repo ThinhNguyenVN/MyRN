@@ -62,4 +62,13 @@ export interface MyDropdownInputProps {
    * display the trigger label (e.g. editing a record whose product is on page 5).
    */
   selectedOptions?: DropdownOption[]
+  /** Remote mode: a list fetch (any page) is in flight; the create row waits for it. */
+  fetching?: boolean
+  /** Remote mode: the query the list was last requested for (trimmed; `''` = none). */
+  searchedQuery?: string
+  /**
+   * Quick-create: when set and the search text matches no option, the picker offers a "create"
+   * row. Resolve with the created option (it is then selected) or `null` when creation failed.
+   */
+  onCreateOption?: (name: string) => Promise<DropdownOption | null>
 }

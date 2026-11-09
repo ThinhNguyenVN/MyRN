@@ -126,6 +126,9 @@ export function generateStyles(theme: ThemeType) {
       clearRowText: {
         color: getColor('text/active/tertiary'),
       },
+      createRowText: {
+        color: getColor('text/info/primary'),
+      },
       optionLabelMobile: {
         flexShrink: 1,
       },
