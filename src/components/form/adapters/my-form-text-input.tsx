@@ -47,7 +47,10 @@ function MyFormTextInputInner<TFieldValues extends FieldValues>({
         error={showErrorVisual}
         value={value as string}
         onChangeText={(text) => onChange(text)}
-        onBlur={onBlur}
+        onBlur={(e) => {
+          onBlur()
+          rest.onBlur?.(e)
+        }}
         onFocus={(e) => {
           if (error) clearError?.()
           rest.onFocus?.(e)

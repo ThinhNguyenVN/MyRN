@@ -101,6 +101,11 @@ product finds out what changed since it forked.
   `components.chat.quick` keys.
 
 ### Fixed
+- **`MyFormTextInput` drops the caller's `onBlur` (from my-store PR #116, step 29):** the adapter
+  passed the form field's `onBlur` to `MyTextInput` after `{...rest}`, so an `onBlur` given by the
+  screen was silently ignored. It now calls the field's `onBlur` (touched state) and then the
+  caller's — needed e.g. to auto-save a field when it loses focus. No change for callers without
+  `onBlur`. **Product to do:** copy `src/components/form/adapters/my-form-text-input.tsx`.
 - **`MyTextInput` `multiline` at the one-line height (from my-store, MY-9):** text sat at the top
   of the box (web `<textarea>` does not centre like `<input>`). One-row multiline inputs now get
   8 + 24 + 8 padding/line height (`inputMultilineSingleRow`), so the text lines up with single-line
