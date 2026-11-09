@@ -67,6 +67,15 @@ export function generateStyles(theme: ThemeType) {
       paddingTop: getSpacing('x2'),
       paddingBottom: getSpacing('x2'),
     },
+    /**
+     * `multiline` at the one-line height: a web `<textarea>` (and native multiline) keeps text at
+     * the top instead of centring it like `<input>`. 8 + 24 + 8 = INPUT_HEIGHT (40).
+     */
+    inputMultilineSingleRow: {
+      paddingTop: getSpacing('x2'),
+      paddingBottom: getSpacing('x2'),
+      lineHeight: getSpacing('x6'),
+    },
 
     iconWrap: {
       justifyContent: 'center' as const,

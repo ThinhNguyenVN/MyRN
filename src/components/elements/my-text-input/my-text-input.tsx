@@ -208,6 +208,7 @@ const MyTextInput = memo(
     }, [width])
 
     const resolvedHeight = height ?? DEFAULT_HEIGHT_BY_SIZE[size]
+    const isSingleRowMultiline = Boolean(rest.multiline) && resolvedHeight <= INPUT_HEIGHT
     const inputRowStateStyle = useMemo(
       () => ({
         borderColor: stateColors.border,
@@ -296,6 +297,7 @@ const MyTextInput = memo(
               styles.inputBase,
               inputDynamicStyle as TextStyle,
               resolvedHeight > INPUT_HEIGHT && styles.inputMultilinePadding,
+              isSingleRowMultiline && styles.inputMultilineSingleRow,
               webInputStyle,
               inputStyle,
             ]}
