@@ -101,6 +101,11 @@ product finds out what changed since it forked.
   `components.chat.quick` keys.
 
 ### Fixed
+- **`TriggerModal` popover keeps the caller's theme (from my-store PR #120, MY-97):** the portal
+  renders at the root host, outside the caller's providers, so on a screen forced light or dark
+  (`MyThemeProvider value=…`) the dropdown options took the app theme (pale text, dark radios on a
+  white panel). The portal content is now wrapped in `MyThemeProvider value={themeName}` of the
+  caller. **Product to do:** copy `src/components/ui/trigger-modal/trigger-modal.tsx`.
 - **`MyFormTextInput` drops the caller's `onBlur` (from my-store PR #116, step 29):** the adapter
   passed the form field's `onBlur` to `MyTextInput` after `{...rest}`, so an `onBlur` given by the
   screen was silently ignored. It now calls the field's `onBlur` (touched state) and then the

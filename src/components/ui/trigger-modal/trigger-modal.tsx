@@ -9,7 +9,7 @@ import Animated, {
 import { Portal } from '@gorhom/portal'
 
 import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
-import { useTheme, useThemedStyles } from '@/theme/theme-context'
+import { MyThemeProvider, useTheme, useThemedStyles } from '@/theme/theme-context'
 
 import { generateStyles } from './styles'
 import type { TriggerModalProps } from './type'
@@ -33,7 +33,7 @@ const TriggerModal = memo(function TriggerModal({
   footerContainerStyle,
 }: TriggerModalProps) {
   const styles = useThemedStyles(generateStyles)
-  const { getSpacing } = useTheme()
+  const { getSpacing, themeName } = useTheme()
   const gap = getSpacing('x1')
   const opacity = useSharedValue(0)
   const [isExiting, setIsExiting] = useState(false)
@@ -112,38 +112,45 @@ const TriggerModal = memo(function TriggerModal({
 
   return (
     <Portal hostName="root">
-      <Animated.View
-        style={[StyleSheet.absoluteFill, animatedBackdropStyle]}
-        pointerEvents={allowPointerEvents ? 'auto' : 'none'}
-      >
-        <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} />
-        <MyView
-          elevation={'soft/down/small'}
-          radius="medium"
-          fillParent
-          style={[
-            styles.panel,
-            panelLayout && {
-              left: panelLayout.left,
-              width: panelLayout.width,
-              top: panelLayout.top,
-              bottom: panelLayout.bottom,
-              maxHeight: Math.max(200, panelLayout.maxHeight),
-            },
-            panelStyle,
-          ]}
+      {/*
+        A portal renders at the root host, outside the caller's providers: the panel would take the
+        app theme while a screen forced light (auth / store setup) or dark keeps its own. Hand the
+        caller's theme back in so the options read like the field that opened them.
+      */}
+      <MyThemeProvider value={themeName}>
+        <Animated.View
+          style={[StyleSheet.absoluteFill, animatedBackdropStyle]}
+          pointerEvents={allowPointerEvents ? 'auto' : 'none'}
         >
+          <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} />
           <MyView
-            style={[styles.contentWrap, contentContainerStyle]}
-            onLayout={handleContentLayout}
+            elevation={'soft/down/small'}
+            radius="medium"
+            fillParent
+            style={[
+              styles.panel,
+              panelLayout && {
+                left: panelLayout.left,
+                width: panelLayout.width,
+                top: panelLayout.top,
+                bottom: panelLayout.bottom,
+                maxHeight: Math.max(200, panelLayout.maxHeight),
+              },
+              panelStyle,
+            ]}
           >
-            {children}
+            <MyView
+              style={[styles.contentWrap, contentContainerStyle]}
+              onLayout={handleContentLayout}
+            >
+              {children}
+            </MyView>
+            {!!footer ? (
+              <View style={[styles.footerWrap, footerContainerStyle]}>{footer}</View>
+            ) : null}
           </MyView>
-          {!!footer ? (
-            <View style={[styles.footerWrap, footerContainerStyle]}>{footer}</View>
-          ) : null}
-        </MyView>
-      </Animated.View>
+        </Animated.View>
+      </MyThemeProvider>
     </Portal>
   )
 })
