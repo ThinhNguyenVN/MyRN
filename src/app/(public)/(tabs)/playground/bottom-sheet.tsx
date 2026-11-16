@@ -19,6 +19,8 @@ const LIST_ITEMS = [
   'playground.dropdownOptionC',
   'playground.dropdownOptionD',
 ]
+/** Enough rows to overflow the dialog and show its own scroll. */
+const DIALOG_ITEMS = Array.from({ length: 30 }, (_, index) => index + 1)
 
 export default function BottomSheetScreen() {
   const styles = useThemedStyles(generateStyles)
@@ -37,6 +39,8 @@ export default function BottomSheetScreen() {
   const longRef = useRef<MyBottomSheetRef>(null)
   const customHeaderRef = useRef<MyBottomSheetRef>(null)
   const noCloseRef = useRef<MyBottomSheetRef>(null)
+  const dialogRef = useRef<MyBottomSheetRef>(null)
+  const [dialogChecked, setDialogChecked] = useState<number[]>([])
 
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
@@ -82,6 +86,13 @@ export default function BottomSheetScreen() {
           size="small"
           type="dark"
           onPress={() => noCloseRef.current?.open()}
+        />
+        <MyButton
+          width="full"
+          text={t('playground.bottomSheetDemo7')}
+          size="small"
+          type="secondary"
+          onPress={() => dialogRef.current?.open()}
         />
       </MyView>
 
@@ -310,6 +321,36 @@ export default function BottomSheetScreen() {
             {t('playground.bottomSheetNoCloseDesc')}
           </MyText>
         </MyView>
+      </MyBottomSheet>
+
+      {/* 7. Centred dialog on wide screens (sheet on mobile) */}
+      <MyBottomSheet
+        ref={dialogRef}
+        title={t('playground.bottomSheetDialog')}
+        desktopPresentation="dialog"
+        pressBackdropToClose
+        footer={
+          <MyButton
+            width="full"
+            text={t('common.done')}
+            type="primary"
+            onPress={() => dialogRef.current?.close()}
+          />
+        }
+      >
+        {DIALOG_ITEMS.map((item) => (
+          <MyView key={`dialog-item-${item}`} paddingVertical={8} paddingHorizontal={0}>
+            <MyCheckbox
+              label={t('playground.bottomSheetDialogItem', { n: item })}
+              checked={dialogChecked.includes(item)}
+              onValueChange={(checked) =>
+                setDialogChecked((current) =>
+                  checked ? [...current, item] : current.filter((value) => value !== item),
+                )
+              }
+            />
+          </MyView>
+        ))}
       </MyBottomSheet>
     </ScrollView>
   )

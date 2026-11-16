@@ -12,6 +12,13 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Added
+- **`MyBottomSheet` `desktopPresentation="dialog"` (from my-store PR #123, MY-97):** on wide screens
+  (not `isMobileSize`) the panel shows in the middle of the screen (max width 560, max height as the
+  sheet, all corners rounded, no drag handle or pan-to-close, footer with a top border) instead of at
+  the bottom; mobile stays a sheet. Default `sheet` keeps every existing caller unchanged. Web and
+  native (RN `Modal` branch) files; unused `modalOverlay`/`modalPanel` styles replaced by
+  `dialogOverlay`/`dialogPanel`/`dialogFooter`. Playground demo 7; `.docs/shared-ui-catalog.md`.
+  **Product to do:** copy `my-bottom-sheet` (`type.ts`, `styles.ts`, platform files).
 - **`MyDropdownInput` quick-create (from my-store PR #114, MY-75):** new props `onCreateOption`
   (`(name) => Promise<DropdownOption | null>`), `fetching` and `searchedQuery`. A search text that
   matches no option shows a "Create “name”" row (after the list was searched for exactly that text,

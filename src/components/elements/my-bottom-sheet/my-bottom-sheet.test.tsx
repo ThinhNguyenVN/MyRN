@@ -143,3 +143,50 @@ describe.each(variants)('MyBottomSheet %s (RN Modal branch, uncontrolled)', (_na
     expect(onClosed).not.toHaveBeenCalled()
   })
 })
+
+describe.each(variants)(
+  'MyBottomSheet %s desktopPresentation="dialog" (wide screen)',
+  (_name, load) => {
+    const MyBottomSheet = load()
+
+    function open() {
+      const ref = createRef<MyBottomSheetRef>()
+      const onClosed = jest.fn()
+      const utils = render(
+        <MyBottomSheet
+          ref={ref}
+          title="Sheet"
+          showClose
+          onClosed={onClosed}
+          desktopPresentation="dialog"
+        >
+          {null}
+        </MyBottomSheet>,
+        { wrapper: Wrapper },
+      )
+      act(() => ref.current?.open())
+      return { onClosed, ...utils }
+    }
+
+    const styleOf = (node: { props: { style?: unknown } }) =>
+      Object.assign({}, ...[node.props.style].flat(Infinity).filter(Boolean))
+
+    it('centres the panel and hides the drag handle', () => {
+      const { UNSAFE_root } = open()
+      const overlays = UNSAFE_root.findAll(
+        (node) => styleOf(node).justifyContent === 'center' && styleOf(node).padding === 24,
+      )
+      expect(overlays.length).toBeGreaterThan(0)
+      const handles = UNSAFE_root.findAll(
+        (node) => styleOf(node).width === 36 && styleOf(node).height === 4,
+      )
+      expect(handles).toHaveLength(0)
+    })
+
+    it('closes and reports like the sheet', () => {
+      const { onClosed, getByRole } = open()
+      fireEvent.press(getByRole('button'))
+      expect(onClosed).toHaveBeenCalledTimes(1)
+    })
+  },
+)

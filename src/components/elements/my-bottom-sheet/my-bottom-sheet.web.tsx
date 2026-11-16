@@ -34,6 +34,7 @@ import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
 import MyPressable from '@/components/elements/my-pressable'
 import { useThemedStyles } from '@/theme/theme-context'
+import { useIsMobileSize } from '@/hooks/dimenstions-hooks'
 
 import type { MyBottomSheetProps, MyBottomSheetRef } from './type'
 import { generateStyles } from './styles'
@@ -57,6 +58,8 @@ const SHEET_OFFSCREEN_Y = 640
 
 type RnModalSheetProps = {
   visible: boolean
+  /** Desktop dialog: panel in the middle of the screen, no drag handle. */
+  dialog: boolean
   panDownEnabled: boolean
   pressBackdropToClose: boolean
   panelStyle: StyleProp<ViewStyle>
@@ -69,6 +72,7 @@ type RnModalSheetProps = {
 
 function RnModalSheetInner({
   visible,
+  dialog,
   panDownEnabled,
   pressBackdropToClose,
   panelStyle,
@@ -143,7 +147,7 @@ function RnModalSheetInner({
   return (
     <Modal visible={visible} transparent onRequestClose={onRequestClose} animationType="none">
       <GestureHandlerRootView style={styles.gestureRoot}>
-        <View style={styles.webSheetOverlay}>
+        <View style={dialog ? styles.dialogOverlay : styles.webSheetOverlay}>
           <Pressable style={styles.backdropHit} onPress={handleBackdropPress}>
             <Animated.View style={[styles.backdropFill, backdropAnimatedStyle]} />
           </Pressable>
@@ -151,7 +155,7 @@ function RnModalSheetInner({
             <Pressable onPress={ignorePanelPress}>
               <GestureDetector gesture={panGesture}>
                 <Animated.View style={styles.dragHandleHit}>
-                  {panDownEnabled ? <View style={styles.handle} /> : null}
+                  {!dialog && panDownEnabled ? <View style={styles.handle} /> : null}
                   <View style={styles.dragRegion}>{header}</View>
                 </Animated.View>
               </GestureDetector>
@@ -184,6 +188,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
       snapPoints,
       visible: visibleProp,
       onClose: onCloseProp,
+      desktopPresentation = 'sheet',
     },
     ref,
   ) => {
@@ -193,7 +198,10 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     /** Theo dõi mở/đóng của nhánh Modal uncontrolled — guard để onClosed gọi đúng 1 lần, không đệ quy. */
     const modalOpenRef = useRef(false)
 
-    const panDownEnabled = enablePanDownToClose && pressBackdropToClose
+    const isMobileSize = useIsMobileSize()
+    /** Wide screens with `desktopPresentation="dialog"`: centred panel instead of a bottom sheet. */
+    const asDialog = desktopPresentation === 'dialog' && !isMobileSize
+    const panDownEnabled = enablePanDownToClose && pressBackdropToClose && !asDialog
 
     const open = useCallback(() => {
       if (visibleProp === undefined) {
@@ -270,7 +278,7 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     const maxHeight: DimensionValue = `${maxHeightPct}%`
     const hasFixedHeight = Boolean(snapPoints?.length)
     const panelStyle: StyleProp<ViewStyle> = [
-      styles.webSheetPanel,
+      asDialog ? styles.dialogPanel : styles.webSheetPanel,
       hasFixedHeight ? { height: Math.round((windowHeight * maxHeightPct) / 100) } : { maxHeight },
     ]
     const isOpen = visibleProp ?? internalVisible
@@ -292,12 +300,17 @@ const MyBottomSheet = forwardRef<MyBottomSheetRef, MyBottomSheetProps>(
     return (
       <RnModalSheet
         visible={isOpen}
+        dialog={asDialog}
         panDownEnabled={panDownEnabled}
         pressBackdropToClose={pressBackdropToClose}
         panelStyle={panelStyle}
         header={header ?? headerContent}
         body={body}
-        footer={footer ? <MyView style={styles.modalFooter}>{footer}</MyView> : null}
+        footer={
+          footer ? (
+            <MyView style={asDialog ? styles.dialogFooter : styles.modalFooter}>{footer}</MyView>
+          ) : null
+        }
         styles={styles}
         onRequestClose={requestClose}
       />
