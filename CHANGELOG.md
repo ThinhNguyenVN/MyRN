@@ -11,6 +11,11 @@ product finds out what changed since it forked.
 
 ## Unreleased
 
+### Fixed
+- **`MyBottomSheet` (RN `Modal` branch, sheet and dialog):** a body taller than the panel's max height
+  did not scroll and pushed the footer out; the panel's inner `Pressable` now shrinks (`panelInner`).
+  From my-store PR #123.
+
 ### Added
 - **`MyBottomSheet` `desktopPresentation="dialog"` (from my-store PR #123, MY-97):** on wide screens
   (not `isMobileSize`) the panel shows in the middle of the screen (max width 560, max height as the

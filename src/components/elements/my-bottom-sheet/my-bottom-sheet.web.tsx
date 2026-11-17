@@ -152,7 +152,7 @@ function RnModalSheetInner({
             <Animated.View style={[styles.backdropFill, backdropAnimatedStyle]} />
           </Pressable>
           <Animated.View style={[panelStyle, panelAnimatedStyle]}>
-            <Pressable onPress={ignorePanelPress}>
+            <Pressable style={styles.panelInner} onPress={ignorePanelPress}>
               <GestureDetector gesture={panGesture}>
                 <Animated.View style={styles.dragHandleHit}>
                   {!dialog && panDownEnabled ? <View style={styles.handle} /> : null}

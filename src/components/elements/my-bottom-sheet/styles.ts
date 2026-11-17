@@ -29,6 +29,12 @@ export const generateStyles = (theme: ThemeType) => {
       backgroundColor: getColor('fill/background/tertiary'),
       overflow: 'hidden',
     },
+    /** Lets the body shrink inside the panel's max height, so a long body scrolls and the footer stays. */
+    panelInner: {
+      flexGrow: 1,
+      flexShrink: 1,
+      minHeight: 0,
+    },
     dialogFooter: {
       padding: getSpacing('x4'),
       borderTopWidth: StyleSheet.hairlineWidth,
