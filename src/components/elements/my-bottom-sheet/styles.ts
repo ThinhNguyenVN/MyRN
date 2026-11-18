@@ -1,9 +1,10 @@
 import { Radius } from '@/theme/radius'
-import { MAX_INPUT_WIDTH } from '@/constants/dimensions'
 import type { ThemeType } from '@/theme/theme-context'
 import { StyleSheet } from 'react-native'
 
 const HEADER_HEIGHT = 40
+/** `desktopPresentation="dialog"`: wide enough for a list row with a name and a detail line. */
+const DIALOG_MAX_WIDTH = 560
 /** Material3 `ModalBottomSheet` default `sheetMaxWidth` (640.dp). */
 export const ANDROID_MATERIAL_SHEET_MAX_WIDTH = 640
 
@@ -14,21 +15,30 @@ export const generateStyles = (theme: ThemeType) => {
       borderTopLeftRadius: Radius.medium,
       borderTopRightRadius: Radius.medium,
     },
-    /** Web desktop: dialog căn giữa. */
-    // theme-exempt: modal backdrop scrim stays the same dark tint in both themes.
-    modalOverlay: {
+    /** `desktopPresentation="dialog"`: panel in the middle, the backdrop is the sheet's. */
+    dialogOverlay: {
       flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.5)',
       justifyContent: 'center',
       alignItems: 'center',
-      padding: getSpacing('x4'),
+      padding: getSpacing('x6'),
     },
-    modalPanel: {
+    dialogPanel: {
       width: '100%',
-      maxWidth: MAX_INPUT_WIDTH,
-      borderRadius: Radius.medium,
+      maxWidth: DIALOG_MAX_WIDTH,
+      borderRadius: Radius.large,
       backgroundColor: getColor('fill/background/tertiary'),
       overflow: 'hidden',
+    },
+    /** Lets the body shrink inside the panel's max height, so a long body scrolls and the footer stays. */
+    panelInner: {
+      flexGrow: 1,
+      flexShrink: 1,
+      minHeight: 0,
+    },
+    dialogFooter: {
+      padding: getSpacing('x4'),
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: getColor('border/inactive/tertiary'),
     },
     /** Web mobile-responsive: bottom sheet Android-like — neo đáy, full-width, cap chiều cao. */
     // theme-exempt: modal backdrop scrim stays the same dark tint in both themes.

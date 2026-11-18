@@ -24,6 +24,11 @@ export interface MyBottomSheetProps {
   /** Gọi khi sheet đóng do tương tác (backdrop/X/hệ thống) trong controlled mode. */
   onClose?: () => void
   index?: number
+  /**
+   * Wide screens (not `isMobileSize`): `sheet` (default) keeps the panel at the bottom,
+   * `dialog` shows it in the middle of the screen (long lists, pickers). Mobile is always a sheet.
+   */
+  desktopPresentation?: 'sheet' | 'dialog'
 }
 
 export interface MyBottomSheetRef {

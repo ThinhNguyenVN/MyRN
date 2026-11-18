@@ -42,6 +42,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Native full-screen picker / filter | `NativeFullscreenModal` | Feature-local `Modal` with one-off iOS/Android padding |
 | Status / tag color | `MyTag` | One-off badge StyleSheets / `MyChip` for status |
 | App rail (web) | `SideBar` (`card` \| `flush`, icons, header/footer) | One-off left nav View |
+| Long list / picker in a panel (sheet on mobile, centred dialog on desktop) | `MyBottomSheet` with `desktopPresentation="dialog"` | `TriggerModal` popover for a long list (runs out of room); a feature-local centred `Modal` |
 | List filter menu (mobile sheet + desktop popover) | `MyBottomSheet` (mobile) + `TriggerModal` (desktop), Clear/Apply through `footer` prop | Rendering Clear/Apply inside the scrollable panel; `useScrollView={false}` + custom `contentContainerStyle` as a footer-spacing workaround |
 | Bottom tabs (pill active) | `useTabBar` / `TabBarButton` | Raw `tabBarButton` + default RN border/elevation |
 | Raised action in the middle of the bottom tabs (not a tab) | `useTabBar({ centerAction })` + a redirect route of the same `id` under the Tabs layout | Absolute button drawn over `BottomTabBar` / a fake tab screen |
