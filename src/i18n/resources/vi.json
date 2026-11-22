@@ -552,7 +552,11 @@
     "confirmPromptMessage": "Huỷ đơn này? Có thể ghi lý do.",
     "confirmPromptInputTitle": "Lý do (không bắt buộc)",
     "confirmPromptInputPlaceholder": "Nhập lý do...",
-    "confirmPromptResult": "Lý do: {{reason}}"
+    "confirmPromptResult": "Lý do: {{reason}}",
+    "myTableRowPressed": "Đã bấm dòng {{id}}",
+    "profileMenuButtonInitialsIntro": "Không có ảnh: chữ viết tắt trên avatar, tên + dòng phụ ở đầu menu.",
+    "profileMenuButtonDemoName": "Thinh Nguyen",
+    "profileMenuButtonDemoEmail": "admin@example.com"
   },
   "components": {
     "datePickOne": "Chọn ngày",

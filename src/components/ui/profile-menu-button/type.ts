@@ -9,9 +9,14 @@ export type ProfileMenuItem = {
 }
 
 export type ProfileMenuButtonProps = {
+  /** Photo on the trigger and in the menu header; wins over `initials`. */
   avatarUri?: string | null
-  /** When set, the menu opens with the avatar + this name above the items. */
+  /** Letter(s) on the avatar when there is no photo (else a generic person icon). */
+  initials?: string
+  /** When set (or `subtitle`), the menu opens with the avatar + name above the items. */
   displayName?: string | null
+  /** Secondary line under the name in the menu header (e.g. email). */
+  subtitle?: string | null
   items: ProfileMenuItem[]
   accessibilityLabel: string
 }

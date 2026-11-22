@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Dimensions, Pressable, StyleSheet, View } from 'react-native'
+import { Dimensions, Platform, Pressable, StyleSheet, View } from 'react-native'
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -97,6 +97,16 @@ const TriggerModal = memo(function TriggerModal({
       opacity.value = withTiming(1, { duration: FADE_DURATION })
     }
   }, [visible, contentReady, opacity])
+
+  /** Web: Escape closes the panel like a native dropdown. */
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !visible || typeof document === 'undefined') return undefined
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [visible, onClose])
 
   const animatedBackdropStyle = useAnimatedStyle(() => ({ opacity: opacity.value }))
 

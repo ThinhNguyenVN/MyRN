@@ -6,6 +6,8 @@ export interface MySwitchProps {
   onValueChange?: (value: boolean) => void
   disabled?: boolean
   label?: ReactNode
+  /** Accessible name; falls back to nothing (role=switch + checked state are always set). */
+  accessibilityLabel?: string
   isLeftLabel?: boolean
   /** Label above the track — use in tight footers on mobile. */
   stacked?: boolean

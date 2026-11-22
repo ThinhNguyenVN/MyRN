@@ -23,7 +23,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Multi-step wizard indicator | `Stepper` (`components/ui/stepper`) | Custom step circles / progress rows |
 | One-time code (OTP / SMS code) entry | `OtpCodeInput` (`components/ui/otp-code-input`) + `useCountdown` for the resend timer | One `TextInput` per digit (breaks paste and SMS autofill) |
 | List pagination controls | `Pagination` (`components/ui/pagination`) | Ad-hoc prev/next + page buttons |
-| Web table (panel + horizontal scroll + pagination + responsive column-hiding) | `MyTable` (`components/ui/my-table`) | Re-implementing `MySurface` panel + `ScrollView horizontal` + `onLayout` width probe + `Pagination` per feature |
+| Web table (panel + horizontal scroll + pagination + responsive column-hiding; `onRowPress` + `getRowAccessibilityLabel` for clickable rows, `fitWidth` to truncate instead of scrolling) | `MyTable` (`components/ui/my-table`) | Re-implementing `MySurface` panel + `ScrollView horizontal` + `onLayout` width probe + `Pagination` per feature |
 | Initial list/page loading | `MySkeleton` | Ad-hoc gray boxes / spinner-only blank screen when skeleton fits |
 | Empty list / empty filter | `MyEmptyState` | Blank `View` or title-only without shared empty |
 | Fetch failure + retry | `MyErrorState` | Inline error text without retry affordance |
