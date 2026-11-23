@@ -114,6 +114,7 @@ const MyButton: React.FC<MyButtonProps> = ({
   return (
     <MyPressable
       disabled={isButtonInteractionLocked(disabled, loading)}
+      accessibilityRole="button"
       {...pressableProps}
       style={touchableStyle}
     >

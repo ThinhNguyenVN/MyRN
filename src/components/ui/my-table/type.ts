@@ -32,6 +32,12 @@ export type MyTableProps<Item, Columns> = {
   resolveColumns: (width: number, previous: Columns | undefined) => Columns
   fallbackWidth: number
   columns: MyTableColumn<Item, Columns>[]
+  /** Makes every row pressable (e.g. open a detail). Cells stay plain elements so header and cell widths match. */
+  onRowPress?: (item: Item) => void
+  /** Accessible name of a pressable row (role=link). */
+  getRowAccessibilityLabel?: (item: Item) => string
+  /** Never wider than the panel: long nowrap cells truncate instead of widening the table (default: scroll horizontally). */
+  fitWidth?: boolean
   page: number
   pageSize: number
   total: number

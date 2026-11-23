@@ -14,6 +14,7 @@ const MySwitch: React.FC<MySwitchProps> = ({
   onValueChange,
   disabled = false,
   label,
+  accessibilityLabel,
   isLeftLabel = true,
   stacked = false,
   labelStyle,
@@ -44,6 +45,10 @@ const MySwitch: React.FC<MySwitchProps> = ({
     <MyPressable
       onPress={handlePress}
       disabled={disabled}
+      accessibilityRole="switch"
+      accessibilityLabel={accessibilityLabel}
+      aria-checked={value}
+      accessibilityState={{ checked: value, disabled }}
       style={[stacked ? styles.stacked : styles.row, style]}
       animatedType="opacity"
     >

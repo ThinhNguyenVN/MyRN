@@ -41,6 +41,14 @@ export default function ProfileMenuButtonScreen() {
     <View style={styles.screenContent}>
       <MyText typography="body">{t('playground.profileMenuButtonIntro')}</MyText>
       <ProfileMenuButton items={items} accessibilityLabel={t('dashboard.header.profile')} />
+      <MyText typography="body">{t('playground.profileMenuButtonInitialsIntro')}</MyText>
+      <ProfileMenuButton
+        initials="TN"
+        displayName={t('playground.profileMenuButtonDemoName')}
+        subtitle={t('playground.profileMenuButtonDemoEmail')}
+        items={items}
+        accessibilityLabel={t('dashboard.header.profile')}
+      />
     </View>
   )
 }

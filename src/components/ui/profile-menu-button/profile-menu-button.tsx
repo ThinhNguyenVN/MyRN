@@ -1,12 +1,12 @@
-import { memo, useCallback, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useRef, useState } from 'react'
 import { View } from 'react-native'
 
 import MyButton from '@/components/elements/my-button'
 import MyIcon from '@/components/elements/my-icon'
 import MyImage from '@/components/elements/my-image'
+import MyPressable from '@/components/elements/my-pressable'
 import MyText from '@/components/elements/my-text'
 import MyView from '@/components/elements/my-view'
-import { ConditionRenderer } from '@/components/ui/condition-renderer'
 import { TriggerModal, type TriggerLayout } from '@/components/ui/trigger-modal'
 import { useThemedStyles } from '@/theme/theme-context'
 
@@ -16,6 +16,7 @@ import type { ProfileMenuButtonProps, ProfileMenuItem } from './type'
 const ITEM_HEIGHT_ESTIMATE = 52
 const HEADER_HEIGHT_ESTIMATE = 64
 const PANEL_PADDING_ESTIMATE = 40
+const PANEL_MIN_WIDTH = 280
 
 interface MenuItemProps {
   readonly item: ProfileMenuItem
@@ -33,6 +34,8 @@ function MenuItemInner({ item, onPick }: MenuItemProps) {
       size="small"
       width="full"
       elevation="none"
+      // the icon glyph would otherwise leak into the accessible name
+      accessibilityLabel={item.text}
       onPress={handlePress}
     />
   )
@@ -40,43 +43,35 @@ function MenuItemInner({ item, onPick }: MenuItemProps) {
 
 const MenuItem = memo(MenuItemInner)
 
-interface MenuHeaderProps {
+interface AvatarProps {
   readonly avatarUri?: string | null
-  readonly displayName?: string | null
+  readonly initials?: string
+  readonly style: object
 }
 
-function MenuHeaderInner({ avatarUri, displayName }: MenuHeaderProps) {
-  const styles = useThemedStyles(generateStyles)
-
+/** Photo when `avatarUri` is set, else initials, else a generic person icon. */
+function Avatar({ avatarUri, initials, style }: AvatarProps) {
+  if (avatarUri) {
+    return <MyImage url={avatarUri} style={style} lockAspectRatio={false} contentFit="cover" />
+  }
   return (
-    <MyView style={styles.header}>
-      <ConditionRenderer
-        when={Boolean(avatarUri)}
-        fallback={
-          <MyView style={styles.headerAvatar}>
-            <MyIcon name="person-circle-outline" size={28} color="icon/inactive/primary" />
-          </MyView>
-        }
-      >
-        <MyImage
-          url={avatarUri ?? ''}
-          style={styles.headerAvatar}
-          lockAspectRatio={false}
-          contentFit="cover"
-        />
-      </ConditionRenderer>
-      <MyText typography="body" style={styles.headerName} numberOfLines={1}>
-        {displayName ?? ''}
-      </MyText>
+    <MyView style={style}>
+      {initials ? (
+        <MyText typography="body" color="text/active/primary">
+          {initials}
+        </MyText>
+      ) : (
+        <MyIcon name="person-circle-outline" size={28} color="icon/inactive/primary" />
+      )}
     </MyView>
   )
 }
 
-const MenuHeader = memo(MenuHeaderInner)
-
 function ProfileMenuButtonInner({
   avatarUri,
+  initials,
   displayName,
+  subtitle,
   items,
   accessibilityLabel,
 }: ProfileMenuButtonProps) {
@@ -84,7 +79,7 @@ function ProfileMenuButtonInner({
   const triggerRef = useRef<View>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [triggerLayout, setTriggerLayout] = useState<TriggerLayout | null>(null)
-  const hasHeader = Boolean(displayName)
+  const hasHeader = Boolean(displayName || subtitle)
   const estimatedPanelHeight =
     (hasHeader ? HEADER_HEIGHT_ESTIMATE : 0) +
     items.length * ITEM_HEIGHT_ESTIMATE +
@@ -112,46 +107,41 @@ function ProfileMenuButtonInner({
     item.onPress()
   }, [])
 
-  const trigger = useMemo(() => {
-    if (avatarUri) {
-      return (
-        <MyImage
-          url={avatarUri}
-          style={styles.avatar}
-          onPress={handlePress}
-          lockAspectRatio={false}
-          contentFit="cover"
-        />
-      )
-    }
-    return (
-      <MyButton.Icon
-        icon="person-circle-outline"
-        type="light"
-        size="small"
-        elevation="none"
-        onPress={handlePress}
-        accessibilityLabel={accessibilityLabel}
-      />
-    )
-  }, [accessibilityLabel, avatarUri, handlePress, styles.avatar])
-
   return (
     <>
       <View ref={triggerRef} collapsable={false}>
-        {trigger}
+        <MyPressable
+          onPress={handlePress}
+          haptic={false}
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel}
+        >
+          <Avatar avatarUri={avatarUri} initials={initials} style={styles.avatar} />
+        </MyPressable>
       </View>
       <TriggerModal
         visible={isOpen}
         onClose={handleClose}
         triggerLayout={triggerLayout}
-        panelMinWidth={240}
+        panelMinWidth={PANEL_MIN_WIDTH}
         estimatedPanelHeight={estimatedPanelHeight}
         contentContainerStyle={styles.itemList}
       >
-        <ConditionRenderer when={hasHeader}>
-          <MenuHeader avatarUri={avatarUri} displayName={displayName} />
-        </ConditionRenderer>
+        {hasHeader ? (
+          <MyView style={styles.header}>
+            <Avatar avatarUri={avatarUri} initials={initials} style={styles.headerAvatar} />
+            <MyView style={styles.headerText}>
+              <MyText typography="body" numberOfLines={1}>
+                {displayName ?? ''}
+              </MyText>
+              {subtitle ? (
+                <MyText typography="caption" color="text/active/secondary" numberOfLines={1}>
+                  {subtitle}
+                </MyText>
+              ) : null}
+            </MyView>
+          </MyView>
+        ) : null}
 
         {items.map((item) => (
           <MenuItem key={`profile-menu-${item.key}`} item={item} onPick={handlePick} />

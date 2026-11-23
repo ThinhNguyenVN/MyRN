@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { Alert } from 'react-native'
 import { useTranslation } from 'react-i18next'
 
 import MyText from '@/components/elements/my-text'
@@ -23,6 +24,11 @@ export default function MyTableScreen() {
   const { t } = useTranslation()
   const windowWidth = useWindowWidth()
   const [page, setPage] = useState(1)
+  const handleRowPress = useCallback(
+    (item: PlaygroundTableItem) => Alert.alert(t('playground.myTableRowPressed', { id: item.id })),
+    [t],
+  )
+  const rowLabel = useCallback((item: PlaygroundTableItem) => item.id, [])
 
   const pageItems = PLAYGROUND_TABLE_ITEMS.slice(
     (page - 1) * PLAYGROUND_TABLE_PAGE_SIZE,
@@ -81,6 +87,9 @@ export default function MyTableScreen() {
           resolveColumns={playgroundTableColumnVisibility}
           fallbackWidth={windowWidth}
           columns={columns}
+          fitWidth
+          onRowPress={handleRowPress}
+          getRowAccessibilityLabel={rowLabel}
           page={page}
           pageSize={PLAYGROUND_TABLE_PAGE_SIZE}
           total={PLAYGROUND_TABLE_ITEMS.length}

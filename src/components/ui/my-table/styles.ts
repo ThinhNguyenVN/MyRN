@@ -24,6 +24,9 @@ export function generateStyles(theme: ThemeType) {
       flexGrow: 1,
       minWidth: '100%',
     },
+    tableFit: {
+      maxWidth: '100%',
+    },
     tableMin: {
       flexGrow: 1,
       width: '100%',

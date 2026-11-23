@@ -552,7 +552,11 @@
     "confirmPromptMessage": "Cancel this order? You can add a reason.",
     "confirmPromptInputTitle": "Reason (optional)",
     "confirmPromptInputPlaceholder": "Enter a reason...",
-    "confirmPromptResult": "Reason: {{reason}}"
+    "confirmPromptResult": "Reason: {{reason}}",
+    "myTableRowPressed": "Row {{id}} pressed",
+    "profileMenuButtonInitialsIntro": "Without a photo: initials on the avatar, name + subtitle in the menu header.",
+    "profileMenuButtonDemoName": "Thinh Nguyen",
+    "profileMenuButtonDemoEmail": "admin@example.com"
   },
   "components": {
     "datePickOne": "Pick a date",
