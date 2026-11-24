@@ -212,10 +212,11 @@ export default function PricingScreen() {
           },
           {
             key: 'content',
-            label: t('playground.pricingContent'),
+            label: t('playground.pricingContentKeep'),
             value: 'MYSTORE DEMO',
             copyable: true,
-            emphasis: true,
+            highlight: true,
+            hint: t('playground.pricingContentHint'),
           },
         ]}
         onCopy={() => undefined}

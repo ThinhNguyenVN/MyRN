@@ -105,6 +105,28 @@ describe('StatusSummaryCard', () => {
 })
 
 describe('TransferDetails', () => {
+  it('frames the highlighted row with its hint after the other rows', () => {
+    const view = renderWithTheme(
+      <TransferDetails
+        qrUrl="https://example.com/qr.png"
+        rows={[
+          {
+            key: 'content',
+            label: 'Giữ nguyên nội dung',
+            value: 'MYSTORE 42',
+            highlight: true,
+            hint: 'Để biết đơn nào',
+          },
+          { key: 'bank', label: 'Ngân hàng', value: 'Vietcombank' },
+        ]}
+        copyLabel="Copy"
+      />,
+    )
+    const texts = view.getAllByText(/Vietcombank|MYSTORE 42/).map((node) => node.props.children)
+    expect(texts).toEqual(['Vietcombank', 'MYSTORE 42'])
+    expect(view.getByText('Để biết đơn nào')).toBeTruthy()
+  })
+
   it('copies the copy value of copyable rows only', () => {
     const onCopy = jest.fn()
     const view = renderWithTheme(

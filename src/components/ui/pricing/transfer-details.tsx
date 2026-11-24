@@ -27,8 +27,15 @@ export type TransferDetailRow = {
   copyValue?: string
   /** Copy button on this row (needs `onCopy`). */
   copyable?: boolean
-  /** Bigger value (amount, transfer content). */
+  /** Bigger value (amount). */
   emphasis?: boolean
+  /**
+   * The value the payer must not change (e.g. the transfer content that identifies the order):
+   * shown in its own framed box after the other rows, with `label` as a prompt and `hint` under
+   * the value.
+   */
+  highlight?: boolean
+  hint?: string
 }
 
 export type TransferDetailsProps = {
@@ -95,14 +102,26 @@ function TransferDetailsInner({
           ) : null}
         </MyView>
         <MyView style={styles.details}>
-          {rows.map((row) => (
-            <DetailRow
-              key={`transfer-row-${row.key}`}
-              row={row}
-              onCopy={row.copyable ? onCopy : null}
-              copyLabel={copyLabel}
-            />
-          ))}
+          {rows
+            .filter((row) => !row.highlight)
+            .map((row) => (
+              <DetailRow
+                key={`transfer-row-${row.key}`}
+                row={row}
+                onCopy={row.copyable ? onCopy : null}
+                copyLabel={copyLabel}
+              />
+            ))}
+          {rows
+            .filter((row) => row.highlight)
+            .map((row) => (
+              <DetailRow
+                key={`transfer-row-${row.key}`}
+                row={row}
+                onCopy={row.copyable ? onCopy : null}
+                copyLabel={copyLabel}
+              />
+            ))}
           {note ? (
             <MyView style={styles.note}>
               <MyIcon name="information-circle" size={18} color={getColor('icon/info/primary')} />
@@ -131,14 +150,19 @@ function DetailRowInner({ row, onCopy, copyLabel }: DetailRowProps) {
   }, [onCopy, row.copyValue, row.value])
 
   return (
-    <MyView style={styles.row}>
+    <MyView style={row.highlight ? styles.highlightBox : styles.row}>
       <MyView style={styles.rowText}>
-        <MyText typography="caption" color="text/active/secondary">
+        <MyText typography={row.highlight ? 'label' : 'caption'} color="text/active/secondary">
           {row.label}
         </MyText>
-        <MyText typography={row.emphasis ? 'h6' : 'subtitle'} selectable>
+        <MyText typography={row.highlight ? 'h5' : row.emphasis ? 'h6' : 'subtitle'} selectable>
           {row.value}
         </MyText>
+        {row.hint ? (
+          <MyText typography="caption" color="text/active/secondary">
+            {row.hint}
+          </MyText>
+        ) : null}
       </MyView>
       {onCopy ? (
         <MyPressable
@@ -236,6 +260,17 @@ function generateStyles(theme: ThemeType) {
     rowText: {
       flex: 1,
       gap: 2,
+    },
+    highlightBox: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: getSpacing('x3'),
+      marginTop: getSpacing('x3'),
+      padding: getSpacing('x3'),
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: getColor('border/warning/secondary'),
+      backgroundColor: getColor('fill/background/secondary'),
     },
     copy: {
       flexDirection: 'row',

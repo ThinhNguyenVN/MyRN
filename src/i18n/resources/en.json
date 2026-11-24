@@ -146,6 +146,8 @@
     "pricingAccount": "Account number",
     "pricingAmount": "Amount",
     "pricingContent": "Transfer content",
+    "pricingContentKeep": "Keep this transfer content",
+    "pricingContentHint": "It tells us which order you paid.",
     "pricingCopy": "Copy",
     "pricingQrHint": "Amount and content are filled in by the QR.",
     "pricingNote": "Transfer exactly this amount and content.",

@@ -144,6 +144,8 @@
     "pricingAccount": "Số tài khoản",
     "pricingAmount": "Số tiền",
     "pricingContent": "Nội dung chuyển khoản",
+    "pricingContentKeep": "Giữ nguyên nội dung chuyển khoản",
+    "pricingContentHint": "Nội dung này cho biết bạn trả cho đơn nào.",
     "pricingCopy": "Copy",
     "pricingQrHint": "Số tiền và nội dung đã có sẵn trong QR.",
     "pricingNote": "Chuyển đúng số tiền và nội dung này.",

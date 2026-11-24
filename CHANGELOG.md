@@ -26,7 +26,8 @@ product finds out what changed since it forked.
 - **Pricing kit `components/ui/pricing` (from my-store step 38/39, MY-43):** `PricingPlanCard`
   (featured gradient + hover lift/halo/sweep, saving chip, ribbon, current pill, CTA),
   `PlanComparisonTable`, `FeatureHighlights`, `UsageMeter`, `StatusSummaryCard`, `TransferDetails`
-  (QR + copyable rows + steps). Props-driven; featured colours through `palette`
+  (QR + copyable rows + steps; a `highlight` row frames the transfer content to keep, from my-store
+  PR #136). Props-driven; featured colours through `palette`
   (`DEFAULT_FEATURED_PALETTE`). Playground `pricing.tsx`; catalog section "Pricing kit".
   **Product to do:** copy the folder; map your plan data to props.
 - **`MySegment` option `badge`** (e.g. `-17%`) after the label, read out with it.

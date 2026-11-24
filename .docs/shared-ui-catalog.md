@@ -461,7 +461,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - `FeatureHighlights`: 2–4 short promises (icon, title, sentence); row on desktop, stacked on mobile. Keep them true (no invented numbers).
 - `UsageMeter`: label, `used`, `limit` (`null` = no bar), `valueText`, `exhaustedText`; warning colour from `warningRatio` (0.8), alert at the limit.
 - `StatusSummaryCard`: `tone` (`ok` / `warning` / `alert`) tints the edge, icon disc, status pill and big figure; `children` slot (e.g. a `UsageMeter`).
-- `TransferDetails`: optional numbered `steps`, QR image, detail `rows` (copy button per `copyable` row through `onCopy`), `note`.
+- `TransferDetails`: optional numbered `steps`, QR image, detail `rows` (copy button per `copyable` row through `onCopy`), `note`. A `highlight` row (with `hint`) is the value the payer must not change (the transfer content that names the order): framed box after the other rows.
 - Playground: `…/playground/pricing.tsx`
 
 ### `MyChat`
