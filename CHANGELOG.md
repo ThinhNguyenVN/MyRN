@@ -12,11 +12,31 @@ product finds out what changed since it forked.
 ## Unreleased
 
 ### Fixed
+- **`MyIcon`:** the glyph's `lineHeight` equals `size`. On web the icon font's default line height made
+  the box taller than the glyph, so icons sat ~1px off-centre in circles and badges. From my-store
+  PR #132. **Product to do:** copy `my-icon/my-icon.tsx`.
+- **`MySegment`:** the pill split the track evenly, so options of different widths (a longer label)
+  were not covered; it now slides to each option's measured position and width (equal split only
+  before the first measure). Options are wrapped in a measured `slot` view.
 - **`MyBottomSheet` (RN `Modal` branch, sheet and dialog):** a body taller than the panel's max height
   did not scroll and pushed the footer out; the panel's inner `Pressable` now shrinks (`panelInner`).
   From my-store PR #123.
 
 ### Added
+- **Pricing kit `components/ui/pricing` (from my-store step 38/39, MY-43):** `PricingPlanCard`
+  (featured gradient + hover lift/halo/sweep, saving chip, ribbon, current pill, CTA),
+  `PlanComparisonTable`, `FeatureHighlights`, `UsageMeter`, `StatusSummaryCard`, `TransferDetails`
+  (QR + copyable rows + steps; a `highlight` row frames the transfer content to keep, from my-store
+  PR #136). Props-driven; featured colours through `palette`
+  (`DEFAULT_FEATURED_PALETTE`). Playground `pricing.tsx`; catalog section "Pricing kit".
+  **Product to do:** copy the folder; map your plan data to props.
+- **`MySegment` option `badge`** (e.g. `-17%`) after the label, read out with it.
+- **`MyChat` `composerReplacement`** (from my-store PR #133/#134): shown in the composer's frame
+  instead of the composer; the empty state drops its shortcuts; `MyChatList` `pinOnComposerResize`
+  keeps the last message above it for a reader at the bottom. Also `sessionStartPending` (empty area
+  blank until the greeting request settles). **Product to do:** copy `my-chat.tsx`, `my-chat-list.tsx`.
+- **Theme tokens `border/alert/tertiary` and `border/info/tertiary`** (`alertFaint`, `infoFaint`):
+  very faint status tints for soft pills, icon discs and highlighted columns.
 - **`MyBottomSheet` `desktopPresentation="dialog"` (from my-store PR #123, MY-97):** on wide screens
   (not `isMobileSize`) the panel shows in the middle of the screen (max width 560, max height as the
   sheet, all corners rounded, no drag handle or pan-to-close, footer with a top border) instead of at

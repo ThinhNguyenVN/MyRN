@@ -39,10 +39,14 @@ export function generateStyles(theme: ThemeType) {
       borderRadius: Radius.full,
       backgroundColor: getColor('fill/active/primary'),
     },
-    option: {
+    slot: {
       flexGrow: 0,
       flexShrink: 1,
       zIndex: 1,
+    },
+    option: {
+      flexDirection: 'row',
+      gap: getSpacing('x1'),
       minWidth: 44,
       height: 36,
       paddingHorizontal: getSpacing('x3'),
@@ -55,6 +59,19 @@ export function generateStyles(theme: ThemeType) {
       flexShrink: 1,
       flexBasis: 0,
       minWidth: 0,
+    },
+    optionInnerFill: {
+      width: '100%',
+    },
+    badge: {
+      paddingHorizontal: 6,
+      paddingVertical: 1,
+      borderRadius: Radius.full,
+      backgroundColor: getColor('border/success/secondary'),
+    },
+    badgeLabel: {
+      color: getColor('text/success/primary'),
+      fontFamily: FontFamily.medium,
     },
     optionCompact: {
       minWidth: 36,

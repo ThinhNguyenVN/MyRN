@@ -23,12 +23,16 @@ export const ColorPaletteLight = {
   // Semantic
   danger: '#b91c1c',
   dangerMuted: '#fecaca',
+  /** Very faint alert tint for a soft status surface (pill, icon disc, table cell). */
+  alertFaint: '#fef2f2',
   warning: '#b45309',
   warningMuted: '#fde68a',
   success: '#047857',
   successMuted: '#a7f3d0',
   info: '#0e7490',
   infoMuted: '#a5f3fc',
+  /** Very faint info tint for a soft brand-ish surface (chip, icon disc, highlighted column). */
+  infoFaint: '#ecfeff',
   // Background
   background: '#FFFFFF',
   backgroundSecondary: '#f5f5f4',
@@ -57,12 +61,16 @@ export const ColorPaletteDark = {
   // Semantic — bớt neon, dễ nhìn
   danger: '#fca5a5',
   dangerMuted: '#7f1d1d',
+  /** Very faint alert tint on the dark background. */
+  alertFaint: '#2a1515',
   warning: '#fcd34d',
   warningMuted: '#78350f',
   success: '#86efac',
   successMuted: '#14532d',
   info: '#67e8f9',
   infoMuted: '#0e7490',
+  /** Very faint info tint on the dark background. */
+  infoFaint: '#0c2a30',
   // Background
   background: '#09090b',
   backgroundSecondary: '#27272a',
@@ -210,6 +218,7 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       alert: {
         primary: palette.danger,
         secondary: palette.dangerMuted,
+        tertiary: palette.alertFaint,
       },
       warning: {
         primary: palette.warning,
@@ -218,6 +227,7 @@ function buildTokens(palette: Readonly<Record<keyof ColorPalette, string>>) {
       info: {
         primary: palette.info,
         secondary: palette.infoMuted,
+        tertiary: palette.infoFaint,
       },
       success: {
         primary: palette.success,

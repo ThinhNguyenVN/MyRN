@@ -47,11 +47,21 @@ export interface MyChatProps {
   suggestions?: ChatSuggestionInput[]
   /** The gateway's greeting and shortcuts (contract v4); when it has shortcuts they replace `suggestions`. */
   sessionStart?: ChatSessionStart | null
+  /**
+   * While true, and there is no greeting yet, the empty area stays blank. Stops the local
+   * suggestion chips from painting for a frame before `sessionStart` arrives.
+   */
+  sessionStartPending?: boolean
   /** Sends `text` as the user's message once per `id` (e.g. a suggestion picked on another
    *  screen). A repeated `id` is ignored, so re-renders never send it twice. */
   pendingPrompt?: ChatPendingPrompt
   /** Each new value focuses the composer (e.g. the screen was opened to type right away). */
   focusComposerToken?: number
+  /**
+   * Shown instead of the composer, e.g. a notice that the user cannot send right now. The
+   * history stays readable and the empty state drops its shortcuts (they would only send).
+   */
+  composerReplacement?: React.ReactNode
 }
 
 function MyChat({
@@ -64,8 +74,10 @@ function MyChat({
   emptyStateSubtitle,
   suggestions,
   sessionStart,
+  sessionStartPending,
   pendingPrompt,
   focusComposerToken,
+  composerReplacement,
 }: MyChatProps) {
   const styles = useThemedStyles(generateStyles)
   const { getSpacing, isMobileSize } = useTheme()
@@ -106,6 +118,8 @@ function MyChat({
   const pinListToBottom = useCallback(() => {
     setScrollToEndToken((current) => current + 1)
   }, [])
+
+  const hasComposerReplacement = composerReplacement !== undefined && composerReplacement !== null
 
   const handleSend = useCallback(
     (text: string) => {
@@ -168,6 +182,8 @@ function MyChat({
       })),
     [sessionStart, sendQuickAction, pinListToBottom],
   )
+  // Blank until the greeting request settles, so the local chips never paint first.
+  const showEmptyState = !sessionStartPending || quickActions.length > 0
 
   return (
     <MyChatMediaProvider value={media}>
@@ -177,15 +193,20 @@ function MyChat({
             <ConditionRenderer
               when={hasMessages}
               fallback={
-                <MyChatEmptyState
-                  title={emptyStateTitle}
-                  subtitle={emptyStateSubtitle}
-                  suggestions={resolvedSuggestions}
-                  greeting={sessionStart?.greeting}
-                  quickActions={quickActions}
-                  columnGutter={columnGutter}
-                  composerHeight={composerHeight}
-                />
+                <ConditionRenderer
+                  when={showEmptyState}
+                  fallback={<MyView style={styles.emptyState} />}
+                >
+                  <MyChatEmptyState
+                    title={emptyStateTitle}
+                    subtitle={emptyStateSubtitle}
+                    suggestions={hasComposerReplacement ? [] : resolvedSuggestions}
+                    greeting={sessionStart?.greeting}
+                    quickActions={hasComposerReplacement ? [] : quickActions}
+                    columnGutter={columnGutter}
+                    composerHeight={composerHeight}
+                  />
+                </ConditionRenderer>
               }
             >
               <MyChatList
@@ -200,6 +221,7 @@ function MyChat({
                 scrollToEndToken={scrollToEndToken}
                 columnGutter={columnGutter}
                 composerHeight={composerHeight}
+                pinOnComposerResize={hasComposerReplacement}
                 isComposerFocusedRef={isComposerFocusedRef}
                 keyboardHeight={height}
               />
@@ -210,13 +232,20 @@ function MyChat({
             style={[styles.composerFloatingWrapper, composerKeyboardStyle]}
             onLayout={handleComposerLayout}
           >
-            <MyChatComposer
-              onSend={handleSend}
-              onSendImages={handleSendImages}
-              disabled={chat.isSending}
-              onFocusChange={handleComposerFocusChange}
-              focusToken={focusComposerToken}
-            />
+            {hasComposerReplacement ? (
+              // Same frame as the composer: full column width, background and top corners.
+              <MyView style={styles.composerRoot} radius="large">
+                {composerReplacement}
+              </MyView>
+            ) : (
+              <MyChatComposer
+                onSend={handleSend}
+                onSendImages={handleSendImages}
+                disabled={chat.isSending}
+                onFocusChange={handleComposerFocusChange}
+                focusToken={focusComposerToken}
+              />
+            )}
           </Animated.View>
         </MyView>
       </MyView>

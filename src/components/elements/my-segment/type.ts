@@ -3,6 +3,8 @@ export type MySegmentSize = 'compact' | 'default'
 export type MySegmentOption<T extends string = string> = {
   value: T
   label: string
+  /** Short tag after the label, e.g. a saving (`-17%`). */
+  badge?: string
   accessibilityLabel?: string
 }
 
@@ -27,4 +29,8 @@ export type MySegmentItemProps<T extends string = string> = {
   fill: boolean
   disabled: boolean
   onSelect: (value: T) => void
+  onMeasure: (value: T, layout: SegmentSlot) => void
 }
+
+/** Where an option sits in the track, so the pill can slide to its real size. */
+export type SegmentSlot = { x: number; width: number }
