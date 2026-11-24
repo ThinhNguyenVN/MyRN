@@ -49,6 +49,11 @@ export interface MyChatListProps {
    * globally, and this component unmounts whenever `hasMessages` flips.
    */
   keyboardHeight: SharedValue<number>
+  /**
+   * Something replaces the composer (`MyChat` `composerReplacement`): when its height changes,
+   * keep the last message above it, but only for a reader already at the bottom.
+   */
+  pinOnComposerResize?: boolean
 }
 
 function keyExtractor(item: ChatMessage): string {
@@ -72,6 +77,7 @@ function MyChatList({
   scrollToEndToken = 0,
   columnGutter,
   composerHeight,
+  pinOnComposerResize = false,
   isComposerFocusedRef,
   keyboardHeight,
 }: MyChatListProps) {
@@ -147,6 +153,15 @@ function MyChatList({
     }
     return pinToEndAfterLayout()
   }, [messages.length, pinToEndAfterLayout])
+
+  // A taller replacement (e.g. the usage-limit notice) takes the composer's place: a reader at
+  // the bottom keeps the last answer in view; one reading higher up keeps their place.
+  useLayoutEffect(() => {
+    if (!pinOnComposerResize || composerHeight <= 0 || !isAtBottomRef.current) {
+      return
+    }
+    return pinToEndAfterLayout()
+  }, [composerHeight, pinOnComposerResize, pinToEndAfterLayout])
 
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     didScrollDuringTouchRef.current = true

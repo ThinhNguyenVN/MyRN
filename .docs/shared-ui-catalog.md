@@ -58,6 +58,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 | Sliding dot indicator (any carousel) | `CarouselDots` (`components/ui/carousel`) | Inline `onPress={() => setIndex(i)}` per dot (violates `no-inline-render-handlers`) |
 | Floating contact buttons (call/email/chat stack) | `FloatingContact` (`components/ui/floating-contact`) | Ad-hoc absolute `View` + per-button `Animated` pulse |
 | Conversational / AI command-center UI (chat screen, streaming, options/confirmation/form/result messages) | `MyChat` (`components/ui/chat`) — open with a prompt or a focused composer via `pendingPrompt` / `focusComposerToken` | Ad-hoc chat screen per product, forking `MyList` for an inverted/streaming list, or a one-off `ChatMessage` shape per feature |
+| Price list / plan purchase (plan cards, period switch, comparison, usage, bank transfer) | `PricingPlanCard`, `PlanComparisonTable`, `FeatureHighlights`, `UsageMeter`, `StatusSummaryCard`, `TransferDetails` (`components/ui/pricing`) + `MySegment` with `badge` for the period | Feature-local plan cards, hand-made progress bars, a separate `*-switcher` for month / year |
 
 ## Layout surfaces
 
@@ -102,6 +103,7 @@ Reusable kit invented in a product must be backported here — see `platform-kit
 
 - Path: `@/components/elements/my-segment`
 - Sliding pill for **2 or more** labeled values (`options`, `value`, `onChange`, `size?: 'compact' \| 'default'`). Use for locale, period, billing, etc. Do not invent a feature-local `*-switcher`.
+- An option can carry a short `badge` after its label (e.g. a saving `-17%`, soft success colours). The pill slides to the **measured** position and width of the selected option, so options of different widths line up.
 - Playground: `…/playground/segment.tsx`
 
 ### `AppLocaleSwitch`
@@ -451,6 +453,17 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 
 ## Conversational UI (chat kit)
 
+### Pricing kit (`components/ui/pricing`)
+
+- Path: `@/components/ui/pricing`. Everything is props-driven: the caller formats prices, numbers and dates and passes text; no plan type, API or i18n inside.
+- `PricingPlanCard`: name, tagline, icon, price + period, struck price, saving chip, note, features, `ribbon`, `currentLabel`, `ctaLabel` + `onPress` (no CTA = not pressable), `featured`, `selected`. Hover (web): lift + halo; featured adds a light sweep; press shrinks; nothing under reduced motion. Featured card colours come from `palette` (`FeaturedPalette`, default navy + amber `DEFAULT_FEATURED_PALETTE`, theme-exempt on purpose: ink on the card's own gradient).
+- `PlanComparisonTable`: `columns` (`highlighted` column: header in the featured colour, tinted cells, bold values) × `rows` (`values`: text, or `true` / `false` = check / dash).
+- `FeatureHighlights`: 2–4 short promises (icon, title, sentence); row on desktop, stacked on mobile. Keep them true (no invented numbers).
+- `UsageMeter`: label, `used`, `limit` (`null` = no bar), `valueText`, `exhaustedText`; warning colour from `warningRatio` (0.8), alert at the limit.
+- `StatusSummaryCard`: `tone` (`ok` / `warning` / `alert`) tints the edge, icon disc, status pill and big figure; `children` slot (e.g. a `UsageMeter`).
+- `TransferDetails`: optional numbered `steps`, QR image, detail `rows` (copy button per `copyable` row through `onCopy`), `note`.
+- Playground: `…/playground/pricing.tsx`
+
 ### `MyChat`
 
 - Path: `@/components/ui/chat`
@@ -471,6 +484,7 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - Contract fixtures: `packages/chat-core/contract/` (copy of the gateway's `contract/`); products keep no copy.
 - Composer auto-grows via `MyChatComposerInput` (chat-kit `TextInput`, not `MyTextInput`) up to a viewport max, then scrolls internally. `isMobile`: expand/collapse (button + pull-down from input top) + send must return to the default one-line height. Not `isMobile` (web, or wide native): max column `MAX_CHAT_WIDTH` (900), attach/input/send on one row, no expand; empty placeholder is vertically centered with the action buttons. The `+` button reuses `pickImage`/`pickImageFromCamera` from `components/ui/image-picker` (native: bottom sheet Take Photo/Choose from Library; web: opens the file picker directly) — do not reimplement image picking here. Sending photos: `MyChat` calls `useConversation.sendMedia`, which uploads to the gateway and sends `send_media` when the adapter has `contractVersion: 3` + `session` (else `send_images` with local URIs). Gateway media ids on cards (`media_choice`, `confirmation.media`) render through `MyChatMediaThumbnail` (local URI first, else `adapter.mediaSource`, placeholder on 404) — reuse it, do not load `/media/:id` by hand.
 - `MyChatList` is FlashList v2 with `startRenderingFromBottom` (not `inverted`, not `MyList`). Space messages with `ItemSeparatorComponent` — `gap` on `contentContainerStyle` is ignored because cells are absolutely positioned.
+- `composerReplacement?: ReactNode` shows in the composer's own frame (column width, background, top corners) instead of the composer, e.g. a "you used every message this month" notice. History stays readable; the empty state drops its suggestions and quick actions; while it shows, a height change keeps the last message above it only for a reader already at the bottom. `sessionStartPending?: boolean` keeps the empty area blank until the greeting request settles.
 - Playground: `…/playground/chat.tsx` — full scripted "Tạo sản phẩm" workflow (streaming → options → form → confirmation → result + actions) plus a smoke path for `external_link`/`navigate` actions.
 
 ### Shared form hooks

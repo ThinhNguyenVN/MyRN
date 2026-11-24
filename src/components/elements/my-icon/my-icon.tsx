@@ -22,7 +22,15 @@ const MyIcon: React.FC<MyIconProps> = ({
 
   return (
     <MyView {...rest} style={style}>
-      <Ionicons name={name} size={size} color={resolvedColor} includeFontPadding={false} />
+      {/* lineHeight = size: on web the icon font's default line height makes the box taller
+          than the glyph, so icons sat ~1px off-centre inside circles and badges. */}
+      <Ionicons
+        name={name}
+        size={size}
+        color={resolvedColor}
+        includeFontPadding={false}
+        style={{ lineHeight: size }}
+      />
     </MyView>
   )
 }
