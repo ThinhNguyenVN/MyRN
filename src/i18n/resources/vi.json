@@ -610,7 +610,21 @@
     "myTableRowPressed": "Đã bấm dòng {{id}}",
     "profileMenuButtonInitialsIntro": "Không có ảnh: chữ viết tắt trên avatar, tên + dòng phụ ở đầu menu.",
     "profileMenuButtonDemoName": "Thinh Nguyen",
-    "profileMenuButtonDemoEmail": "admin@example.com"
+    "profileMenuButtonDemoEmail": "admin@example.com",
+    "linksDialogs": "Dialog ghi (ActionDialog)",
+    "dialogsPeriod": {
+      "month": "Theo tháng",
+      "quarter": "Theo quý",
+      "year": "Theo năm"
+    },
+    "dialogsPlan": "Gói",
+    "dialogsAmount": "Số tiền",
+    "dialogsEmpty": "Không có giá trị (ẩn)",
+    "dialogsOpen": "Mở dialog",
+    "dialogsTitle": "Ghi thanh toán",
+    "dialogsSubmit": "Lưu",
+    "dialogsNote": "Ghi chú",
+    "dialogsNoteRequired": "Cần ghi chú."
   },
   "components": {
     "datePickOne": "Chọn ngày",

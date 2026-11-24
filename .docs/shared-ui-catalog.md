@@ -497,6 +497,24 @@ Canonical reference: `todo-list.view.tsx` / `todo-list.container.tsx`.
 - `useCountdown` / `formatCountdown` (`src/hooks/use-countdown.ts`) — whole seconds left until an epoch-ms target, ticking once a second (resend-code timers, holds)
 - Date/id filter helpers (`src/utils/list-filter.ts`) — month ranges, toggle ids, `toApiDateTimeRange`, `singleDropdownValue`
 
+## Write dialogs (form in a dialog)
+
+### `ActionDialog`
+`@/components/ui/action-dialog` — shell of a write dialog: title, body, inline error, cancel + submit
+(locked while sending), optional secondary action (Back / Reject). Desktop: centred dialog
+(`MyBottomSheet` `desktopPresentation="dialog"`); mobile: bottom sheet. Playground: `dialogs.tsx`.
+
+### `ChoiceChips`
+`@/components/ui/choice-chips` — single-choice pills (`radio` role). Use **inside dialogs** instead of
+`MyDropdownInput`: its desktop popover is portaled under the dialog's Modal and gets hidden.
+
+### `InfoRow`
+`@/components/ui/info-row` — one "label: value" line of a detail section (stacked on mobile); renders
+nothing without a value or children.
+
+Decimal strings from the BE (money, quantities) display with `formatDecimalString` and validate with
+`normalizeDecimal` (`@/utils/format-decimal`) — never coerce them to `number`.
+
 ## Import cheat sheet
 
 ```ts
