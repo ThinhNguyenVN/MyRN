@@ -19,6 +19,7 @@ export const PLAYGROUND_LINKS: { labelKey: string; href: string; icon: IconName 
   { labelKey: 'playground.linksSwitch', href: '/playground/switch', icon: 'toggle-outline' },
   { labelKey: 'playground.linksSegment', href: '/playground/segment', icon: 'options-outline' },
   { labelKey: 'playground.linksPricing', href: '/playground/pricing', icon: 'diamond-outline' },
+  { labelKey: 'playground.linksDialogs', href: '/playground/dialogs', icon: 'albums-outline' },
   {
     labelKey: 'playground.linksDropdown',
     href: '/playground/dropdown',

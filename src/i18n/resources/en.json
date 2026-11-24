@@ -612,7 +612,21 @@
     "myTableRowPressed": "Row {{id}} pressed",
     "profileMenuButtonInitialsIntro": "Without a photo: initials on the avatar, name + subtitle in the menu header.",
     "profileMenuButtonDemoName": "Thinh Nguyen",
-    "profileMenuButtonDemoEmail": "admin@example.com"
+    "profileMenuButtonDemoEmail": "admin@example.com",
+    "linksDialogs": "Write dialog (ActionDialog)",
+    "dialogsPeriod": {
+      "month": "Monthly",
+      "quarter": "Quarterly",
+      "year": "Yearly"
+    },
+    "dialogsPlan": "Plan",
+    "dialogsAmount": "Amount",
+    "dialogsEmpty": "No value (hidden)",
+    "dialogsOpen": "Open dialog",
+    "dialogsTitle": "Record payment",
+    "dialogsSubmit": "Save",
+    "dialogsNote": "Note",
+    "dialogsNoteRequired": "A note is required."
   },
   "components": {
     "datePickOne": "Pick a date",

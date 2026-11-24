@@ -11,6 +11,15 @@ product finds out what changed since it forked.
 
 ## Unreleased
 
+### Added
+- **Write-dialog kit (from my-store-admin PR #1):** `components/ui/action-dialog` (`ActionDialog`:
+  title, body, inline error, cancel + submit locked while sending, optional secondary action; dialog
+  on desktop, sheet on mobile), `components/ui/choice-chips` (`ChoiceChips`, single-choice pills —
+  use inside dialogs instead of `MyDropdownInput`, whose popover opens under the dialog) and
+  `components/ui/info-row` (`InfoRow`). Plus `utils/format-decimal` (`formatDecimalString`,
+  `normalizeDecimal`) for BE decimal strings. Playground `dialogs.tsx`; catalog section "Write dialogs".
+  **Product to do:** copy the three folders and `utils/format-decimal.ts`.
+
 ### Fixed
 - **`MyIcon`:** the glyph's `lineHeight` equals `size`. On web the icon font's default line height made
   the box taller than the glyph, so icons sat ~1px off-centre in circles and badges. From my-store
